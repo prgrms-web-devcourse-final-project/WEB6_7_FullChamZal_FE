@@ -16,7 +16,7 @@ export default function CardList() {
         <Card
           title="장소 기반 편지"
           contents="도착해야만 열리는 메시지. 첫 데이트 장소, 여행 코스, 나만의 비밀 장소에 감정을 기록하세요."
-          bg="#FF2600"
+          bg="#FF9481"
           icon={<Map />}
         />
         <Card

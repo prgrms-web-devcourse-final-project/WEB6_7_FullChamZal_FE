@@ -3,7 +3,7 @@ import Button from "../../common/Button";
 export default function SixthSection() {
   return (
     <>
-      <section className="relative w-full py-30 overflow-hidden">
+      <section className="relative w-full overflow-hidden">
         <div className="max-w-80 mx-auto space-y-25">
           <div className="w-full text-center space-y-5">
             <h3 className="text-4xl font-bold leading-12">

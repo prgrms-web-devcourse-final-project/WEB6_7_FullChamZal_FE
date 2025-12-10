@@ -76,20 +76,23 @@ export default function FourthSection() {
       <section className="relative flex flex-row gap-18">
         {/* left */}
         <div className="flex-2 max-w-180 sticky top-40 font-semibold space-y-10 self-start">
-          <div className="space-y-3">
-            <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
-            <p className="text-[#FF2600] text-3xl">
-              {STEP_LABELS[activeIndex] ?? "Write"}
-            </p>
-          </div>
-          <div className="w-full h-110 rounded-xl bg-gray-400 shadow-xl">
-            <Image
-              src={stepsData[activeIndex].img ? stepsData[activeIndex].img : ""}
-              alt={stepsData[activeIndex].title}
-              width={800}
-              height={800}
-              className="w-full h-full rounded-xl object-cover"
-            />
+          {/* 여기 래퍼 div 추가 */}
+          <div key={activeIndex} className="space-y-10 fade-up">
+            <div className="space-y-3">
+              <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
+              <p className="text-[#FF2600] text-3xl">
+                {STEP_LABELS[activeIndex] ?? "Write"}
+              </p>
+            </div>
+            <div className="w-full h-110 rounded-xl bg-gray-400 shadow-xl">
+              <Image
+                src={stepsData[activeIndex].img || ""}
+                alt={stepsData[activeIndex].title}
+                width={800}
+                height={800}
+                className="w-full h-full rounded-xl object-cover"
+              />
+            </div>
           </div>
         </div>
 

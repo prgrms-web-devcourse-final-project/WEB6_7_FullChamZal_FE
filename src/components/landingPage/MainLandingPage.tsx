@@ -9,7 +9,7 @@ export default function MainLandingPage() {
   return (
     <>
       <MainSection />
-      <main className="mx-auto max-w-[1320px] px-15 space-y-60">
+      <main className="mx-auto max-w-[1320px] px-15 space-y-100">
         <SecondSection />
         <ThirdSection />
         <FourthSection />
