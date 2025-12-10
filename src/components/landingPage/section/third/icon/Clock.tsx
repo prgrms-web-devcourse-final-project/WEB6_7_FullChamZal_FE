@@ -1,22 +1,11 @@
 export default function Clock() {
   return (
     <>
-      <svg
-        width="354"
-        height="354"
-        viewBox="0 0 354 354"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M181.138 136.96L175.239 189.966L198.793 219.418M97.2253 47.1279L53.0467 82.4585M318.077 111.952L282.747 67.7734M92.36 257.212L57.4295 284.181M241.616 273.419L269.454 307.776M281.251 201.763C274.736 260.312 221.991 302.494 163.442 295.978C104.893 289.463 62.7114 236.717 69.227 178.169C75.7425 119.62 128.488 77.4382 187.037 83.9537C245.586 90.4693 287.767 143.214 281.251 201.763Z"
-          stroke="white"
-          stroke-opacity="0.8"
-          stroke-width="14"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+      <div className="w-[340px] h-[340px] rounded-full bg-linear-to-b from-white/40 to-white/0 p-9">
+        <div className="w-full h-full rounded-full bg-linear-to-b from-white/40 to-white/0 p-9">
+          <div className="w-full h-full rounded-full bg-linear-to-b from-white/40 to-white/0 p-9"></div>
+        </div>
+      </div>
     </>
   );
 }

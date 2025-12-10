@@ -1,8 +1,8 @@
 export default function Text({ data }: { data: FiveDataType }) {
   return (
     <>
-      <div className="max-w-[480px] text-right space-y-2 z-0">
-        <p className="flex items-center justify-end gap-2 font-semibold">
+      <div className="max-w-[480px] space-y-2 z-0">
+        <p className="flex items-center gap-2 font-semibold">
           <span className="text-[#172C51] text-4xl">Dear.</span>
           <span className="text-[#FF2600] text-3xl underline">
             {data.title}

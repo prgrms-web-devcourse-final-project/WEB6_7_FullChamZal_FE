@@ -1,4 +1,5 @@
 type StepData = {
+  img?: string;
   icon: JSX.Element;
   step: string;
   title: string;
@@ -6,6 +7,7 @@ type StepData = {
 };
 
 type FiveDataType = {
+  img: string;
   title: string;
   step: string;
   contents: string;

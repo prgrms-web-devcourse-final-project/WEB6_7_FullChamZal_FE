@@ -1,34 +1,11 @@
 export default function Letter() {
   return (
     <>
-      <svg
-        width="383"
-        height="346"
-        viewBox="0 0 383 346"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <g clip-path="url(#clip0_360_1640)">
-          <path
-            d="M135.759 87.9708C103.458 80.1483 71.3592 99.731 63.5368 132.032L40.0694 228.934C38.4097 235.787 39.5404 243.019 43.2129 249.039C46.8853 255.059 52.7987 259.373 59.652 261.033L266.377 311.096C273.23 312.756 280.462 311.625 286.482 307.953C292.502 304.281 296.816 298.367 298.476 291.514L323.507 188.151C330.391 159.727 312.767 130.838 284.342 123.954L135.759 87.9708ZM135.759 87.9708C168.059 95.7933 187.642 127.892 179.82 160.193L156.352 257.095C154.692 263.948 150.378 269.862 144.359 273.534C138.339 277.207 131.107 278.337 124.254 276.678M233.065 166.248L271.826 175.635L265.568 201.476M113.654 151.008L126.574 154.137"
-            stroke="white"
-            stroke-opacity="0.8"
-            stroke-width="14"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </g>
-        <defs>
-          <clipPath id="clip0_360_1640">
-            <rect
-              width="317.8"
-              height="285.241"
-              fill="white"
-              transform="matrix(0.975731 0.218971 -0.252847 0.967506 72.123 0)"
-            />
-          </clipPath>
-        </defs>
-      </svg>
+      <div className="relative w-[340px] h-[340px]">
+        <div className="absolute -left-1/4 top-0 w-[340px] h-[340px] rounded-full bg-linear-to-b from-white/40 to-white/0"></div>
+        <div className="absolute left-0 top-0 w-[340px] h-[340px] rounded-full bg-linear-to-b from-white/40 to-white/0"></div>
+        <div className="absolute left-1/4 top-0 w-[340px] h-[340px] rounded-full bg-linear-to-b from-white/40 to-white/0"></div>
+      </div>
     </>
   );
 }
