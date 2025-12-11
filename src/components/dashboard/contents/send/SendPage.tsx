@@ -1,20 +1,13 @@
 import { Send } from "lucide-react";
 import DivBox from "../../DivBox";
-<<<<<<< HEAD
 import SendEnvelopeCard from "./SendEnvelopeCard";
-=======
->>>>>>> 3eea960be18699561dff241a825be886b6c4a96d
 
 export default function SendPage() {
   return (
     <>
       <section className="flex-1 w-full">
         <div className="p-8">
-<<<<<<< HEAD
           <DivBox className="cursor-auto hover:bg-white space-y-12">
-=======
-          <DivBox>
->>>>>>> 3eea960be18699561dff241a825be886b6c4a96d
             <div className="flex items-center gap-4">
               <Send className="text-primary" />
               <div>
@@ -26,7 +19,6 @@ export default function SendPage() {
                 </p>
               </div>
             </div>
-<<<<<<< HEAD
 
             <div className="flex justify-between">
               {/* 편지 */}
@@ -36,8 +28,6 @@ export default function SendPage() {
               <SendEnvelopeCard />
               <SendEnvelopeCard />
             </div>
-=======
->>>>>>> 3eea960be18699561dff241a825be886b6c4a96d
           </DivBox>
         </div>
       </section>
