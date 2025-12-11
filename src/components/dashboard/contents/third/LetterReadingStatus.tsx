@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import DivBox from "../DivBox";
+import DivBox from "../../DivBox";
 
 export default function LetterReadingStatus() {
   const donutData = [

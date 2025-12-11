@@ -1,6 +1,6 @@
 "use client";
 import { TrendingUp } from "lucide-react";
-import DivBox from "../DivBox";
+import DivBox from "../../DivBox";
 import {
   Area,
   CartesianGrid,

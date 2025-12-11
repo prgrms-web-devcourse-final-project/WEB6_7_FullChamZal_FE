@@ -1,7 +1,7 @@
-import PendingLetters from "./PendingLetters";
-import TodayLetters from "./TodayLetters";
-import ActivityStats from "./ActivityStats";
-import QuickWrite from "./QuickWrite";
+import PendingLetters from "./second/PendingLetters";
+import TodayLetters from "./first/TodayLetters";
+import ActivityStats from "./third/ActivityStats";
+import QuickWrite from "./four/QuickWrite";
 
 export default function DashboardContents() {
   return (

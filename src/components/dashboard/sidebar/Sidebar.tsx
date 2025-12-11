@@ -7,7 +7,7 @@ import Profile from "./Profile";
 export default function Sidebar() {
   return (
     <>
-      <aside className="w-72 h-full border-r border-outline flex flex-col justify-between p-6">
+      <aside className="w-72 h-full border-r border-outline hidden lg:flex flex-col justify-between p-6">
         <div className="space-y-9">
           {/* 로고 */}
           <div className="flex items-center gap-2">

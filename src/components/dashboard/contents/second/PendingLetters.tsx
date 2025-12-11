@@ -1,5 +1,5 @@
 import { Clock, Sparkle } from "lucide-react";
-import DivBox from "../DivBox";
+import DivBox from "../../DivBox";
 
 export default function PendingLetters() {
   return (
@@ -17,10 +17,9 @@ export default function PendingLetters() {
               </p>
             </div>
           </div>
-          <div className="py-2 px-4"></div>
         </div>
         {/* Card => 총 4개 까지, lg:4개 */}
-        <div className="grid grid-cols-3 lg:grid-cols-4 gap-4 ml-6">
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4 lg:ml-6">
           <DivBox>
             <div className="space-y-3">
               <div className="flex justify-between">

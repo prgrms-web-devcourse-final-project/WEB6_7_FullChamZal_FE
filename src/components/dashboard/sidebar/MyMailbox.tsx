@@ -1,4 +1,4 @@
-import { Heart, Inbox, Mail, Send } from "lucide-react";
+import { Heart, Inbox, MailPlus, Send } from "lucide-react";
 import DivBox from "../DivBox";
 
 export default function MyMailbox() {
@@ -9,7 +9,7 @@ export default function MyMailbox() {
         <div className="space-y-4">
           <DivBox className="py-2 rounded-[10px]">
             <div className="flex items-center justify-center gap-2">
-              <Mail size={20} />
+              <MailPlus size={20} />
               <span>편지 쓰기</span>
             </div>
           </DivBox>
