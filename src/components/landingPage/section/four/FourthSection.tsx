@@ -80,7 +80,7 @@ export default function FourthSection() {
           <div key={activeIndex} className="space-y-10 fade-up">
             <div className="space-y-3">
               <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
-              <p className="text-[#FF2600] text-3xl">
+              <p className="text-primary text-3xl">
                 {STEP_LABELS[activeIndex] ?? "Write"}
               </p>
             </div>

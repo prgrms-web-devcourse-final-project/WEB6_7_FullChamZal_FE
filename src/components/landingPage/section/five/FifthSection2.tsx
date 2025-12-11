@@ -45,7 +45,7 @@ export default function FifthSection2() {
     <section className="w-full h-120 space-y-10">
       <div className="space-y-3 font-semibold">
         <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
-        <p className="text-[#FF2600] text-3xl">Who?</p>
+        <p className="text-primary text-3xl">Who?</p>
       </div>
       <div className="flex gap-5 h-full">
         {items.map((item) => {
@@ -73,7 +73,7 @@ export default function FifthSection2() {
                   transition={{ duration: 0.2 }}
                 >
                   <div className="bg-white/80 pt-8 p-10">
-                    <h3 className="font-semibold text-3xl text-[#FF2600] mb-2">
+                    <h3 className="font-semibold text-3xl text-primary mb-2">
                       <span className="text-4xl text-[#172C51]">Dear.</span>{" "}
                       {item.title}
                     </h3>
