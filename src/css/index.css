@@ -75,6 +75,10 @@
     font-display: swap;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #070D19;
@@ -213,7 +217,7 @@ body {
     --color-button-hover: #F9F9F9;
 
     --color-outline: #E7E5E4;
-    
+
     --color-text: #070D19;
     --color-text-2: #3F4756;
     --color-text-3: #6F7786;

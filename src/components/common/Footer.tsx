@@ -3,38 +3,38 @@ import Logo from "./Logo";
 
 const links = [
   {
-    title: "Features",
+    title: "Main",
+    href: "#main",
+  },
+  {
+    title: "??",
     href: "#",
   },
   {
-    title: "Solution",
-    href: "#",
+    title: "What",
+    href: "#what",
   },
   {
-    title: "Customers",
-    href: "#",
+    title: "How",
+    href: "#how",
   },
   {
-    title: "Pricing",
-    href: "#",
+    title: "Who",
+    href: "#who",
   },
   {
-    title: "Help",
-    href: "#",
-  },
-  {
-    title: "About",
-    href: "#",
+    title: "Start",
+    href: "#start",
   },
 ];
 
 export default function Footer() {
   return (
-    <footer className="py-16 md:py-32">
+    <footer className="py-16">
       <div className="mx-auto max-w-5xl px-6">
         <Link href="/" aria-label="go home" className="mx-auto block size-fit">
           <div className="w-12 h-12">
-            {/* <Logo className={"w-full h-full"} /> */}
+            <Logo className={"w-full h-full"} />
           </div>
         </Link>
 

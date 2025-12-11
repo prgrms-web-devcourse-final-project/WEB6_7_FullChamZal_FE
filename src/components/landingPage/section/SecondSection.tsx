@@ -1,7 +1,7 @@
 export default function SecondSection() {
   return (
     <>
-      <section>SecondSection</section>
+      <section className="py-60">SecondSection</section>
     </>
   );
 }

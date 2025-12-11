@@ -1,5 +1,5 @@
+import DivBox from "@/components/dashboard/DivBox";
 import { ArrowRight } from "lucide-react";
-import DivBox from "../../DivBox";
 
 export default function TodayLetters() {
   return (
