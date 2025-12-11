@@ -78,10 +78,10 @@ export default function MainSection() {
               </p>
             </div>
             <div className="font-medium flex gap-4 mt-20">
-              <Button className="text-white gap-2 bg-[#FF2600] rounded-xl">
+              <Button className="text-white gap-2 bg-primary rounded-xl">
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
-              <Button className="rounded-xl border-2 bg-white border-[#FF2600]/30">
+              <Button className="rounded-xl border-2 bg-white border-primary/30">
                 자세히 보기
               </Button>
             </div>
@@ -90,8 +90,8 @@ export default function MainSection() {
         <div className="absolute left-1/2 -translate-x-1/2 bottom-8">
           <div className="flex flex-col gap-2 w-10 items-center justify-center">
             <span>Scroll</span>
-            <div className="relative w-6 h-10 rounded-full border-2 border-[#FF2600]/50">
-              <span className="w-1 h-1.5 absolute left-1/2 -translate-x-1/2 top-2 bg-[#FF2600] rounded-full bounce-y"></span>
+            <div className="relative w-6 h-10 rounded-full border-2 border-primary/50">
+              <span className="w-1 h-1.5 absolute left-1/2 -translate-x-1/2 top-2 bg-primary rounded-full bounce-y"></span>
             </div>
           </div>
         </div>
