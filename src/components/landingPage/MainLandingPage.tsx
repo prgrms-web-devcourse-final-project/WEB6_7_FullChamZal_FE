@@ -1,5 +1,4 @@
 import FifthSection from "./section/five/FifthSection";
-import FifthSection2 from "./section/five/FifthSection2";
 import FourthSection from "./section/four/FourthSection";
 import MainSection from "./section/main/MainSection";
 import SecondSection from "./section/SecondSection";
@@ -10,12 +9,11 @@ export default function MainLandingPage() {
   return (
     <>
       <MainSection />
-      <main className="mx-auto max-w-[1320px] px-15 space-y-100">
+      <main className="mx-auto max-w-[1320px] px-15">
         <SecondSection />
         <ThirdSection />
         <FourthSection />
-        {/* <FifthSection /> */}
-        <FifthSection2 />
+        <FifthSection />
         <SixthSection />
       </main>
     </>

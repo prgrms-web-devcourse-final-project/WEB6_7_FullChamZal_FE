@@ -1,0 +1,1 @@
+type AuthMode = "login" | "register";

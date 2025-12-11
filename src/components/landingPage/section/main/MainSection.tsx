@@ -59,7 +59,10 @@ export default function MainSection() {
 
   return (
     <>
-      <section className="relative w-full min-h-screen overflow-hidden mb-60">
+      <section
+        id="main"
+        className="relative w-full min-h-screen overflow-hidden mb-60"
+      >
         <Background />
         <div className="relative w-full h-screen z-10 flex items-center justify-center font-paperozi">
           <div className="max-w-430 min-h-100 flex flex-col items-center justify-center">
