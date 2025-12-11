@@ -56,7 +56,7 @@ export default function FifthSection() {
               key={item.id}
               layout
               onHoverStart={() => setActiveId(item.id)}
-              className={`rounded-2xl h-full flex flex-col justify-end overflow-hidden cursor-pointer transition-all bg-cover bg-center bg-no-repeat ${
+              className={`rounded-2xl h-full flex flex-col justify-end overflow-hidden transition-all bg-cover bg-center bg-no-repeat ${
                 isActive ? "flex-2 shadow-xl" : "flex-1"
               }`}
               style={{ backgroundImage: `url(${item.img})` }}

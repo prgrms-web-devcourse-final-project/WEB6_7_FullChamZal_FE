@@ -19,14 +19,14 @@ export default function SixthSection() {
               <br />
               특별한 순간을 만들어줄 것입니다
             </p>
-            <div className="space-x-3">
+            <div className="space-x-4">
               <Link href={"/capsules/new"}>
-                <Button className="bg-primary text-white">
+                <Button className="border border-primary/50 bg-primary py-4 px-5 font-normal">
                   편지 쓰러 가기
                 </Button>
               </Link>
               <Link href={"/auth/login"}>
-                <Button className="rounded-xl border-2 bg-white border-primary/30">
+                <Button className="border border-outline text-text py-4 px-5 bg-white hover:bg-button-hover font-normal">
                   로그인
                 </Button>
               </Link>

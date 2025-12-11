@@ -34,7 +34,7 @@ export default function AuthShell({
         {/* 여기부터 각 페이지 전용 폼 들어감 */}
         {children}
       </div>
-      <AuthFooter />
+      <AuthFooter title={title} />
     </section>
   );
 }

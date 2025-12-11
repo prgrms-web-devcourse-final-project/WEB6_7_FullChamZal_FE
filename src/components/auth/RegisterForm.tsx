@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "../common/Button";
 import Input from "../common/Input";
 import { useEffect, useState } from "react";
 
@@ -140,26 +141,19 @@ export default function RegisterForm() {
             onBlur={() => setTelTouched(true)}
             error={telError}
           >
-            <button
+            <Button
               type="button"
               onClick={handleSendAuthCode}
               disabled={isSendDisabled}
-              className={`
-                  inline-flex flex-col items-center justify-center w-20 h-13 rounded-xl text-white
-                  ${
-                    isSendDisabled
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-primary-3 hover:bg-primary-2 cursor-pointer"
-                  }
-                `}
+              className={"flex flex-col w-19"}
             >
               {sendButtonLabel}{" "}
               {countdown !== 0 ? (
-                <span className="text-sm">({countdown}s)</span>
+                <span className="text-xs font-normal">({countdown}s)</span>
               ) : (
                 ""
               )}
-            </button>
+            </Button>
           </Input>
 
           {/* 인증번호 입력창: 버튼 누른 뒤에만 보이게 */}
@@ -171,31 +165,21 @@ export default function RegisterForm() {
               value={authCode}
               onChange={(e) => setAuthCode(e.target.value)}
             >
-              <button
+              <Button
                 type="button"
                 onClick={handleVerifyAuthCode}
                 disabled={isVerifyDisabled}
-                className={`
-                    inline-flex items-center justify-center w-20 h-13 rounded-xl text-white
-                    ${
-                      isVerifyDisabled
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-primary-3 hover:bg-primary-2 cursor-pointer"
-                    }
-                  `}
+                className={"w-19"}
               >
                 확인
-              </button>
+              </Button>
             </Input>
           )}
         </div>
 
-        <button
-          type="submit"
-          className="w-full py-3 rounded-xl text-white font-semibold bg-primary-3 hover:bg-primary-2"
-        >
+        <Button type="submit" className="w-full py-3">
           회원가입
-        </button>
+        </Button>
       </form>
     </>
   );

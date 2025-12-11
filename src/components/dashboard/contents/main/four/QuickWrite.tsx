@@ -1,5 +1,5 @@
 import { Clock, PencilLine } from "lucide-react";
-import DivBox from "../../DivBox";
+import DivBox from "../../../DivBox";
 
 export default function QuickWrite() {
   return (

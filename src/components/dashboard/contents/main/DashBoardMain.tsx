@@ -1,12 +1,12 @@
-import PendingLetters from "./second/PendingLetters";
 import TodayLetters from "./first/TodayLetters";
-import ActivityStats from "./third/ActivityStats";
 import QuickWrite from "./four/QuickWrite";
+import PendingLetters from "./second/PendingLetters";
+import ActivityStats from "./third/ActivityStats";
 
-export default function DashboardContents() {
+export default function DashBoardMain() {
   return (
     <>
-      <div className="flex-1 h-full overflow-y-auto p-8">
+      <section className="flex-1 h-full overflow-y-auto p-8">
         <div className="space-y-9">
           {/* 오늘 열람 가능한 편지 */}
           <TodayLetters />
@@ -17,7 +17,7 @@ export default function DashboardContents() {
           {/* 빠른 편지 쓰기 */}
           <QuickWrite />
         </div>
-      </div>
+      </section>
     </>
   );
 }

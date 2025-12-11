@@ -81,10 +81,10 @@ export default function MainSection() {
               </p>
             </div>
             <div className="font-medium flex gap-4 mt-20">
-              <Button className="text-white gap-2 bg-primary rounded-xl">
+              <Button className="bg-primary py-4 px-5 font-normal">
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
-              <Button className="rounded-xl border-2 bg-white border-primary/30">
+              <Button className="border border-outline text-text px-5 bg-white hover:bg-button-hover font-normal">
                 자세히 보기
               </Button>
             </div>

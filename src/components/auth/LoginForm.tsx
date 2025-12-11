@@ -2,6 +2,8 @@
 
 import Input from "@/components/common/Input";
 import { useState } from "react";
+import Button from "../common/Button";
+import { redirect } from "next/navigation";
 
 export default function LoginForm() {
   const [id, setId] = useState("");
@@ -10,6 +12,8 @@ export default function LoginForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 로그인 API
+
+    redirect("/dashboard");
   };
 
   return (
@@ -31,14 +35,26 @@ export default function LoginForm() {
           value={pw}
           onChange={(e) => setPw(e.target.value)}
         />
+
+        <div className="text-text-4 text-xs space-x-2 text-right">
+          <button
+            type="button"
+            className="cursor-pointer underline hover:text-text-3"
+          >
+            아이디 찾기
+          </button>
+          <button
+            type="button"
+            className="cursor-pointer underline hover:text-text-3"
+          >
+            비밀번호 찾기
+          </button>
+        </div>
       </div>
 
-      <button
-        type="submit"
-        className="w-full py-3 rounded-xl text-white font-semibold bg-primary-3 hover:bg-primary-2"
-      >
+      <Button type="submit" className="w-full py-3">
         로그인
-      </button>
+      </Button>
     </form>
   );
 }
