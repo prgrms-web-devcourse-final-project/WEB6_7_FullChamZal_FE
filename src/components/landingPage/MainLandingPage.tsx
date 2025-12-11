@@ -1,4 +1,5 @@
 import FifthSection from "./section/five/FifthSection";
+import FifthSection2 from "./section/five/FifthSection2";
 import FourthSection from "./section/four/FourthSection";
 import MainSection from "./section/main/MainSection";
 import SecondSection from "./section/SecondSection";
@@ -13,7 +14,8 @@ export default function MainLandingPage() {
         <SecondSection />
         <ThirdSection />
         <FourthSection />
-        <FifthSection />
+        {/* <FifthSection /> */}
+        <FifthSection2 />
         <SixthSection />
       </main>
     </>

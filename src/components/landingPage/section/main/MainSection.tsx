@@ -4,7 +4,7 @@
 import { ArrowRight } from "lucide-react";
 import Background from "./Background";
 import { useEffect, useState } from "react";
-import Button from "@/src/components/common/Button";
+import Button from "@/components/common/Button";
 
 export default function MainSection() {
   const words: string[] = ["You", "Time", "There", "Now", "___"];
@@ -21,7 +21,7 @@ export default function MainSection() {
 
     const typingSpeed = 110; // 타이핑 속도
     const deletingSpeed = 70; // 지우는 속도
-    const holdDelay = 900; // 단어 다 쳤을 때 유지 시간
+    const holdDelay = 900; // 유지 시간
     const betweenWordsDelay = 400; // 다음 단어 넘어가기 전 쉬는 시간
 
     let timeout: ReturnType<typeof setTimeout>;
@@ -31,9 +31,8 @@ export default function MainSection() {
       if (charIndex < currentWord.length) {
         timeout = setTimeout(() => setCharIndex((c) => c + 1), typingSpeed);
       } else {
-        // 단어 하나 다 쳤을 때
+        // 단어 하나 다 쳤을 때 마지막 단어면 여기서 끝
         if (wordIndex === words.length - 1) {
-          // 마지막 단어면 여기서 끝
           setIsFinished(true);
         } else {
           // 잠깐 유지 후 지우기 시작
@@ -45,7 +44,6 @@ export default function MainSection() {
       if (charIndex > 0) {
         timeout = setTimeout(() => setCharIndex((c) => c - 1), deletingSpeed);
       } else {
-        // 다 지우고 다음 단어로
         timeout = setTimeout(() => {
           setIsDeleting(false);
           setWordIndex((i) => i + 1);

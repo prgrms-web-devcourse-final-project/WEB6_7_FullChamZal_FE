@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes } from "react";
 import { twMerge } from "tailwind-merge";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  className?: string; // 추가로 받을 스타일
+  className?: string;
 };
 
 export default function Button({ className, children, ...props }: ButtonProps) {

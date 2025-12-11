@@ -1,4 +1,4 @@
-import "@/src/css/index.css";
+import "@/css/index.css";
 
 export const metadata = {
   title: "Next.js",

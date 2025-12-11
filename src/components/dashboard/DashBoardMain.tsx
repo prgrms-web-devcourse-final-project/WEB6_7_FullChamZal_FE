@@ -1,7 +1,11 @@
+import DashboardContents from "./contents/DashboardContents";
+import Sidebar from "./sidebar/Sidebar";
+
 export default function DashBoardMain() {
   return (
     <>
-      <h1>DashBoardMain</h1>
+      <Sidebar />
+      <DashboardContents />
     </>
   );
 }
