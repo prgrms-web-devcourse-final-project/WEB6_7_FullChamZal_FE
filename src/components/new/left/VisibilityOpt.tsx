@@ -47,7 +47,11 @@ function OptionCard({
         if (e.key === "Enter" || e.key === " ") onClick();
       }}
       className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer border-2
-        ${selected ? "border-primary bg-primary/5" : "border-outline"}`}
+        ${
+          selected
+            ? "border-primary bg-primary/5"
+            : "border-outline hover:border-primary/50"
+        }`}
     >
       <div
         className={`w-8 h-8 rounded-lg flex items-center justify-center
