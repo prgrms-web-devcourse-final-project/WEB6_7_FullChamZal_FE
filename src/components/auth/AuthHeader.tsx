@@ -11,9 +11,9 @@ export default function AuthHeader({
     <>
       {/* 로고 */}
       <header className="space-y-6">
-        <div className="flex items-center gap-2">
+        <div className="text-primary flex items-center gap-2">
           <Logo className="w-9" />
-          <span className="text-primary text-2xl font-paperozi font-extrabold">
+          <span className="text-2xl font-paperozi font-extrabold">
             Dear. ___
           </span>
         </div>

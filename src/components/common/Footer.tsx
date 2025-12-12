@@ -33,7 +33,7 @@ export default function Footer() {
     <footer className="py-16">
       <div className="mx-auto max-w-5xl px-6">
         <Link href="/" aria-label="go home" className="mx-auto block size-fit">
-          <div className="w-12 h-12">
+          <div className="w-12 h-12 text-primary">
             <Logo className={"w-full h-full"} />
           </div>
         </Link>

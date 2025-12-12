@@ -10,9 +10,9 @@ export default function Sidebar() {
       <aside className="w-72 h-full border-r border-outline hidden lg:flex flex-col justify-between p-6">
         <div className="space-y-9">
           {/* 로고 */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-primary">
             <Logo className="w-9" />
-            <span className="text-primary text-2xl font-paperozi font-extrabold">
+            <span className="text-2xl font-paperozi font-extrabold">
               Dear. ___
             </span>
           </div>
