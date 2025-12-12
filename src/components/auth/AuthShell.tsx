@@ -6,11 +6,11 @@ import { ReactNode } from "react";
 import AuthHeader from "./AuthHeader";
 import AuthFooter from "./AuthFooter";
 
-interface AuthShellProps {
+type AuthShellProps = {
   title: string;
   description: string;
   children: ReactNode;
-}
+};
 
 export default function AuthShell({
   title,

@@ -1,0 +1,1 @@
+type Visibility = "PRIVATE" | "PUBLIC";
