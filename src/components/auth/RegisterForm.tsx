@@ -4,7 +4,13 @@ import Button from "../common/Button";
 import Input from "../common/Input";
 import { useEffect, useState } from "react";
 
-export default function RegisterForm() {
+export default function RegisterForm({
+  agreements,
+  onBack,
+}: {
+  agreements: { terms: boolean; privacy: boolean; marketing: boolean };
+  onBack: () => void;
+}) {
   const [showAuthInput, setShowAuthInput] = useState(false);
 
   const [id, setId] = useState("");
@@ -23,7 +29,7 @@ export default function RegisterForm() {
 
   // 인증 버튼 관련 상태
   const [hasSentOnce, setHasSentOnce] = useState(false); // 재전송 상태
-  const [countdown, setCountdown] = useState(0); // 60초 카운트다운
+  const [countdown, setCountdown] = useState(0); // 180초 카운트다운
 
   // 정규식: 010XXXXXXXX
   const phoneRegex = /^010\d{8}$/;
@@ -54,7 +60,7 @@ export default function RegisterForm() {
     alert("인증이 완료되었습니다.");
   };
 
-  // 60초 카운트다운 타이머
+  // 180초 카운트다운 타이머
   useEffect(() => {
     if (countdown <= 0) return;
 
