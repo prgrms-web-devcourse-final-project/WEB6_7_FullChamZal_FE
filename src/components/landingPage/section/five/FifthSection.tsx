@@ -1,57 +1,103 @@
 "use client";
 
 import { useState } from "react";
-import Text from "./Text";
-import ImgCard from "./ImgCard";
+import { motion } from "framer-motion";
 
-const Data: FiveDataType[] = [
+const items = [
   {
-    img: "https://cdn.pixabay.com/photo/2017/10/26/19/45/red-2892235_1280.png",
+    id: "love",
+    img: "/img/couple.jpg",
     title: "Love & Moments",
     step: "1. 커플",
-    contents:
-      "여행 코스나 기념일에 맞춰 열리는 감성 편지.\n함께 걸어온 순간 곳곳에 작은 서프라이즈를 남겨보세요.\n두 사람의 이야기가 자연스럽게 이어지는 특별한 경험이 됩니다.",
+    desc: "여행 코스나 기념일에 딱 맞춰 열리는 감성 캡슐.\n같이 걸어온 길 위에 작은 서프라이즈를 남겨보세요.\n두 사람만의 순간이 하나의 이야기로 이어집니다.",
+    label: "Love & Moments",
   },
   {
-    img: "https://cdn.pixabay.com/photo/2020/12/26/16/47/christmas-5861895_640.jpg",
+    id: "people",
+    img: "/img/family.jpg",
     title: "People & Memories",
     step: "2. 친구·가족",
-    contents:
-      "생일 1년 전에 미리 써두는 편지처럼 마음을 담아 기록해보세요.\n함께했던 장소에서 열리는 메시지는 추억을 한 번 더 불러옵니다.\n따뜻한 마음이 시간 속에서 다시 피어나는 순간을 만날 수 있습니다.",
+    desc: "생일 1년 전에 미리 써두는 편지.\n함께 걸었던 장소에서 열리는 메시지.\n따뜻한 마음이 시간 속에서 다시 살아납니다.",
+    label: "People & Memories",
   },
   {
-    img: "https://cdn.pixabay.com/photo/2018/11/11/19/46/christmas-3809544_640.jpg",
+    id: "goals",
+    img: "/img/me.jpg",
     title: "Goals & Growth",
     step: "3. 미래의 나에게",
-    contents:
-      "지금의 다짐과 생각을 미래의 나에게 전해보세요.\n3개월 뒤, 1년 뒤에 도착하는 편지가 성장의 기준점이 됩니다.\n회고의 시간이 새로운 방향을 열어주는 특별한 경험이 됩니다.",
+    desc: "지금의 다짐을 미래의 나에게 보내보세요.\n3개월 뒤, 1년 뒤 도착하는 편지가 회고와 성장을 이어줍니다.",
+    label: "Goals & Growth",
   },
   {
-    img: "https://cdn.pixabay.com/photo/2018/12/14/23/16/christmas-3876026_640.jpg",
+    id: "places",
+    img: "/img/places.jpg",
     title: "Places & Stories",
     step: "4. 여행자·크리에이터",
-    contents:
-      "“이곳을 찾은 누구에게나” 열리는 공개 편지를 남겨보세요.\n지도 위에 기록된 한 줄의 문장이 누군가의 여행을 완성합니다.\n공간 자체가 이야기를 품는 새로운 경험으로 바뀝니다.",
-  },
-  {
-    img: "https://cdn.pixabay.com/photo/2016/11/14/16/20/snowflake-1823942_640.jpg",
-    title: "Daily & Comfort",
-    step: "5. 일상의 나를 위한 편지",
-    contents:
-      "바쁜 하루 속에서도 작은 응원을 남겨보세요.\n지친 나에게, 혹은 누군가에게 건네는 짧은 문장이 큰 위로가 됩니다.\n필요한 순간에 도착하는 한마디가 일상을 부드럽게 감싸줍니다.",
+    desc: "여행지, 전시, 공연 같은 장소에 이야기를 남겨보세요.\n시간이 지나 다시 찾았을 때, 그 순간의 기록이 기다리고 있습니다.",
+    label: "Places & Stories",
   },
 ];
 
 export default function FifthSection() {
-  const [active, setActive] = useState(0);
+  const [activeId, setActiveId] = useState<string>("love");
 
   return (
-    <section className="relative w-full lg:h-180">
-      {/* 텍스트 영역 */}
-      <Text data={Data[active]} />
+    <section id="who" className="w-full space-y-10 py-60">
+      <div className="space-y-3 font-semibold">
+        <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
+        <p className="text-primary text-3xl">Who?</p>
+      </div>
+      <div className="flex gap-5 h-120">
+        {items.map((item) => {
+          const isActive = item.id === activeId;
 
-      {/* 배경 카드들 */}
-      <ImgCard data={Data} active={active} setActive={setActive} />
+          return (
+            <motion.div
+              key={item.id}
+              layout
+              onHoverStart={() => setActiveId(item.id)}
+              className={`rounded-2xl h-full flex flex-col justify-end overflow-hidden transition-all bg-cover bg-center bg-no-repeat ${
+                isActive ? "flex-2 shadow-xl" : "flex-1"
+              }`}
+              style={{ backgroundImage: `url(${item.img})` }}
+            >
+              {/* 카드 안쪽 레이어 컨테이너 */}
+              <div className="relative w-full h-full">
+                {/* 활성 내용 */}
+                <motion.div
+                  className="h-full flex flex-col justify-end "
+                  animate={{
+                    opacity: isActive ? 1 : 0,
+                    y: isActive ? 0 : 10,
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="bg-white/80 pt-8 p-10">
+                    <h3 className="font-semibold text-3xl text-primary mb-2">
+                      <span className="text-4xl text-[#172C51]">Dear.</span>{" "}
+                      {item.title}
+                    </h3>
+                    <p className="font-semibold mb-3">{item.step}</p>
+                    <p className="whitespace-pre-line">{item.desc}</p>
+                  </div>
+                </motion.div>
+
+                {/* 비활성 상태 */}
+                <motion.div
+                  className="absolute inset-0 flex items-end"
+                  animate={{
+                    opacity: isActive ? 0 : 1,
+                    y: isActive ? -10 : 0,
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="relative w-full h-full bg-black/15 flex items-center justify-center"></div>
+                </motion.div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
     </section>
   );
 }

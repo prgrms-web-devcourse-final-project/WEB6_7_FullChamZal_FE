@@ -59,7 +59,10 @@ export default function MainSection() {
 
   return (
     <>
-      <section className="relative w-full min-h-screen overflow-hidden mb-60">
+      <section
+        id="main"
+        className="relative w-full min-h-screen overflow-hidden mb-60"
+      >
         <Background />
         <div className="relative w-full h-screen z-10 flex items-center justify-center font-paperozi">
           <div className="max-w-430 min-h-100 flex flex-col items-center justify-center">
@@ -78,10 +81,10 @@ export default function MainSection() {
               </p>
             </div>
             <div className="font-medium flex gap-4 mt-20">
-              <Button className="text-white gap-2 bg-[#FF2600] rounded-xl">
+              <Button className="bg-primary py-4 px-5 font-normal">
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
-              <Button className="rounded-xl border-2 bg-white border-[#FF2600]/30">
+              <Button className="border border-outline text-text px-5 bg-white hover:bg-button-hover font-normal">
                 자세히 보기
               </Button>
             </div>
@@ -90,8 +93,8 @@ export default function MainSection() {
         <div className="absolute left-1/2 -translate-x-1/2 bottom-8">
           <div className="flex flex-col gap-2 w-10 items-center justify-center">
             <span>Scroll</span>
-            <div className="relative w-6 h-10 rounded-full border-2 border-[#FF2600]/50">
-              <span className="w-1 h-1.5 absolute left-1/2 -translate-x-1/2 top-2 bg-[#FF2600] rounded-full bounce-y"></span>
+            <div className="relative w-6 h-10 rounded-full border-2 border-primary/50">
+              <span className="w-1 h-1.5 absolute left-1/2 -translate-x-1/2 top-2 bg-primary rounded-full bounce-y"></span>
             </div>
           </div>
         </div>

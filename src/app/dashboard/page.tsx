@@ -1,11 +1,9 @@
-import DashBoardMain from "@/components/dashboard/DashBoardMain";
+import DashBoardMain from "@/components/dashboard/contents/main/DashBoardMain";
 
 export default function DashboardPage() {
   return (
     <>
-      <main className="w-full h-screen flex justify-between items-start overflow-hidden">
-        <DashBoardMain />
-      </main>
+      <DashBoardMain />
     </>
   );
 }

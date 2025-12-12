@@ -73,7 +73,7 @@ export default function FourthSection() {
 
   return (
     <>
-      <section className="relative flex flex-row gap-18">
+      <section id="how" className="relative flex flex-row gap-18 py-60">
         {/* left */}
         <div className="flex-2 max-w-180 sticky top-40 font-semibold space-y-10 self-start">
           {/* 여기 래퍼 div 추가 */}
