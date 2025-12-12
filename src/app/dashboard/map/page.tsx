@@ -1,7 +1,11 @@
+import MapContents from "@/components/dashboard/map/MapContents";
+
 export default function MapPage() {
   return (
     <>
-      <h1>MapPage</h1>
+      <div className="w-full h-screen p-8">
+        <MapContents />
+      </div>
     </>
   );
 }

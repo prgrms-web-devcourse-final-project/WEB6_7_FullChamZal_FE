@@ -81,7 +81,7 @@ export default function MyMailbox() {
                     isBookmark ? "text-white" : "text-text-3"
                   }`}
                 >
-                  즐겨찾기
+                  소중한 편지
                 </span>
                 <span className="text-2xl">12</span>
               </div>

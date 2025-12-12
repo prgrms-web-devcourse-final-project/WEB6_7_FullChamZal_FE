@@ -3,7 +3,9 @@ import DashBoardMain from "@/components/dashboard/contents/main/DashBoardMain";
 export default function DashboardPage() {
   return (
     <>
-      <DashBoardMain />
+      <div className="p-8">
+        <DashBoardMain />
+      </div>
     </>
   );
 }
