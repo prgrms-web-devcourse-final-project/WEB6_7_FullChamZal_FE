@@ -1,5 +1,5 @@
 import Left from "./left/Left";
-import Right from "./Right";
+import Right from "./right/Right";
 import WriteHeader from "./WriteHeader";
 
 export default function WritePage() {
@@ -12,7 +12,7 @@ export default function WritePage() {
           <div className="w-full lg:w-1/2 overflow-y-auto">
             <Left />
           </div>
-          <div className="w-1/2 hidden lg:block">
+          <div className="w-1/2 hidden lg:block border-l border-outline">
             <Right />
           </div>
         </div>
