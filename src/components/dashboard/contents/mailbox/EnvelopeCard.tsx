@@ -1,5 +1,6 @@
 "use client";
 
+import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock } from "lucide-react";
 
 export default function EnvelopeCard() {
@@ -9,21 +10,59 @@ export default function EnvelopeCard() {
       <div className=" relative w-[280px] h-[180px] transition-transform duration-500 transform-3d group-hover:transform-[rotateY(180deg)]">
         {/* ------------------------- 앞면 (기본 보임) ------------------------- */}
         <div className="absolute inset-0 backface-hidden">
-          <div className="relative w-full h-full bg-linear-to-b from-[#FFEAEA] to-[#FDCACA] p-5">
-            <div className="flex justify-between h-full">
-              <div>
+          <div className="relative w-full h-full bg-linear-to-b from-[#FFEAEA] to-[#FDCACA] p-3">
+            <div className="flex justify-between h-full text-sm">
+              {/* 보낸 사람 */}
+              <div className="w-2/5">
                 <p>Dear.홍길동</p>
+                <div className="space-y-2">
+                  <div className="w-full h-px bg-white"></div>
+                  <div className="flex gap-0.5">
+                    <div className="w-3 h-3 bg-white"></div>
+                    <div className="w-3 h-3 bg-white"></div>
+                    <div className="w-3 h-3 bg-white"></div>
+                    <div className="w-3 h-3 bg-white"></div>
+                    <div className="w-3 h-3 bg-white"></div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-end">
-                <p>From. 성춘향</p>
+
+              {/* 오른쪽 */}
+              <div className="w-2/5 h-full flex flex-col">
+                <div className="flex flex-col items-end mt-auto">
+                  <p>From. 성춘향</p>
+                  <div className="w-full space-y-2">
+                    <div className="w-full h-px bg-white"></div>
+                    <div className="flex justify-end gap-0.5">
+                      <div className="w-3 h-3 bg-white"></div>
+                      <div className="w-3 h-3 bg-white"></div>
+                      <div className="w-3 h-3 bg-white"></div>
+                      <div className="w-3 h-3 bg-white"></div>
+                      <div className="w-3 h-3 bg-white"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* 가운데 제목 */}
+            <div className="absolute top-1/2 left-1/2 -translate-1/2 w-30">
+              <p className="text-center text-sm line-clamp-3">
+                뭐 한 여기쯤에 제목을 이렇게저렇게뭐 이렇게 안녕 이걸 꼭 읽어줘
+              </p>
+            </div>
+
+            {/* 조건에 따라 시간인지 장소인지 핀으로 표시 */}
             <div className="absolute top-0 right-0">
               <div className="text-primary p-4 space-y-2">
                 <Clock size={16} />
                 <MapPin size={16} />
               </div>
+            </div>
+
+            {/* 로고 */}
+            <div className="absolute bottom-3 left-3 text-white">
+              <Logo className="w-5" />
             </div>
           </div>
         </div>
