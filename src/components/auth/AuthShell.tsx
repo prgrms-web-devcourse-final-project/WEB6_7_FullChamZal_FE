@@ -18,7 +18,7 @@ export default function AuthShell({
   children,
 }: AuthShellProps) {
   return (
-    <section className="min-w-lg min-h-180 py-20">
+    <section className="w-full max-w-xl min-h-180 py-20 px-8">
       {/* 상단 뒤로가기 */}
       <Link
         href="/"
@@ -28,7 +28,7 @@ export default function AuthShell({
         <span className="text-sm">홈으로</span>
       </Link>
 
-      <div className="w-full p-10 rounded-t-3xl bg-sub border border-outline space-y-8 shadow-xl">
+      <div className="w-full p-6 md:p-10 rounded-t-3xl bg-sub border border-outline space-y-4 md:space-y-8 shadow-xl">
         <AuthHeader title={title} description={description} />
 
         {/* 여기부터 각 페이지 전용 폼 들어감 */}

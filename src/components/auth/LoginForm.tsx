@@ -17,8 +17,8 @@ export default function LoginForm() {
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="space-y-5">
+    <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+      <div className="space-y-3 md:space-y-5">
         <Input
           id="id"
           label="아이디"

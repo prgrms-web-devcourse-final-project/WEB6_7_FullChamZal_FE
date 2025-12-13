@@ -3,8 +3,25 @@
 import { ArrowRight } from "lucide-react";
 import Button from "../../common/Button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SixthSection() {
+  const router = useRouter();
+  // const { user } = useAuth();
+
+  const handleWrite = () => {
+    const isLoggedIn = false; // TODO: user 존재 여부로 교체
+
+    if (!isLoggedIn) {
+      router.push(
+        `/auth/login?callbackUrl=${encodeURIComponent("/capsules/new")}`
+      );
+      return;
+    }
+
+    router.push("/capsules/new");
+  };
+
   return (
     <>
       <section
@@ -24,11 +41,12 @@ export default function SixthSection() {
               특별한 순간을 만들어줄 것입니다
             </p>
             <div className="space-x-4 text-sm md:text-base font-medium mt-8 md:mt-20">
-              <Link href={"/capsules/new"}>
-                <Button className="bg-primary py-4 px-5 font-medium space-x-1">
-                  <span>편지 쓰기</span> <ArrowRight size={20} />
-                </Button>
-              </Link>
+              <Button
+                onClick={handleWrite}
+                className="bg-primary py-4 px-5 font-medium space-x-1"
+              >
+                <span>편지 쓰기</span> <ArrowRight size={20} />
+              </Button>
               <Link href={"/auth/login"}>
                 <Button className="border border-outline text-text py-4 px-5 bg-white hover:bg-button-hover font-normal">
                   로그인

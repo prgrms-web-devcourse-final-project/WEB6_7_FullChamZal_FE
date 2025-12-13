@@ -24,7 +24,7 @@ export default function Input({
   error,
 }: InputProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 text-sm md:text-base">
       <label htmlFor={id}>{label}</label>
 
       <div className="flex gap-2">
@@ -36,7 +36,7 @@ export default function Input({
           onChange={onChange}
           onBlur={onBlur}
           className={`
-            flex-1 border-2 px-4 py-3 rounded-xl bg-white/80 outline-none
+            flex-1 border-2 px-3 py-2 md:px-4 md:py-3 rounded-xl bg-white/80 outline-none
             ${error ? "border-red-500" : "border-outline"}
             focus:border-primary-3
           `}

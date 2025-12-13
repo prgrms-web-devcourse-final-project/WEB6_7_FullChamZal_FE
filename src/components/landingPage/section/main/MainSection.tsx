@@ -5,8 +5,12 @@ import { ArrowRight } from "lucide-react";
 import Background from "./Background";
 import { useEffect, useState } from "react";
 import Button from "@/components/common/Button";
+import { useRouter } from "next/navigation";
 
 export default function MainSection() {
+  const router = useRouter();
+  // const { user } = useAuth();
+
   const words: string[] = ["You", "Time", "There", "Now", "___"];
 
   const [wordIndex, setWordIndex] = useState(0); // 몇 번째 단어인지
@@ -57,6 +61,19 @@ export default function MainSection() {
   const currentWord = words[wordIndex];
   const visibleText = currentWord.slice(0, charIndex);
 
+  const handleWrite = () => {
+    const isLoggedIn = false; // TODO: user 존재 여부로 교체
+
+    if (!isLoggedIn) {
+      router.push(
+        `/auth/login?callbackUrl=${encodeURIComponent("/capsules/new")}`
+      );
+      return;
+    }
+
+    router.push("/capsules/new");
+  };
+
   return (
     <>
       <section
@@ -81,7 +98,10 @@ export default function MainSection() {
               </p>
             </div>
             <div className="text-sm md:text-base font-medium flex gap-4 mt-8 md:mt-20">
-              <Button className="bg-primary py-4 px-5 font-normal space-x-1">
+              <Button
+                onClick={handleWrite}
+                className="bg-primary py-4 px-5 font-normal space-x-1"
+              >
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
               <Button
