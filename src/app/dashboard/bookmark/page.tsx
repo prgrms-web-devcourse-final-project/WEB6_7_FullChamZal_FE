@@ -1,10 +1,23 @@
+import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import MailboxPage from "@/components/dashboard/contents/mailbox/MailboxPage";
-import { Heart } from "lucide-react";
 
-export default function Page() {
+export default async function BookmarkPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string }>;
+}) {
+  const params = await searchParams;
+  const capsuleId = params.id;
+
   return (
     <>
-      <MailboxPage icon={<Heart />} title="소중한 편지" />
+      <MailboxPage type="bookmark" />
+      {capsuleId ? (
+        <LetterDetailModal
+          capsuleId={capsuleId}
+          closeHref="/dashboard/bookmark"
+        />
+      ) : null}
     </>
   );
 }

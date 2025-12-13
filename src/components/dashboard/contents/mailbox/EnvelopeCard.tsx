@@ -1,11 +1,32 @@
 "use client";
 
+import { formatDateTime } from "@/lib/formatDateTime";
 import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock } from "lucide-react";
+import Link from "next/link";
 
-export default function EnvelopeCard() {
+export default function EnvelopeCard({
+  capsule,
+  type,
+}: {
+  capsule: Capsule;
+  type: "send" | "receive" | "bookmark";
+}) {
+  const isTime = capsule.unlockCondition.type === "time";
+
+  const conditionLabel =
+    capsule.unlockCondition.type === "time"
+      ? formatDateTime(capsule.unlockCondition.at)
+      : capsule.unlockCondition.address;
+
+  const statusText = capsule.isUnlocked ? "열람 가능" : "열람 불가능";
+
   return (
-    <div className="relative flex flex-col items-center justify-center py-8 perspective-[1000px] group">
+    <Link
+      href={`/dashboard/${type}?id=${capsule.id}`}
+      scroll={false}
+      className="relative flex flex-col items-center justify-center py-8 perspective-[1000px] group"
+    >
       {/* Flip wrapper */}
       <div className=" relative w-[280px] h-[180px] transition-transform duration-500 transform-3d group-hover:transform-[rotateY(180deg)]">
         {/* ------------------------- 앞면 (기본 보임) ------------------------- */}
@@ -14,15 +35,13 @@ export default function EnvelopeCard() {
             <div className="flex justify-between h-full text-sm">
               {/* 보낸 사람 */}
               <div className="w-2/5">
-                <p>Dear.홍길동</p>
+                <p className="line-clamp-1">Dear.{capsule.to}</p>
                 <div className="space-y-2">
                   <div className="w-full h-px bg-white"></div>
                   <div className="flex gap-0.5">
-                    <div className="w-3 h-3 bg-white"></div>
-                    <div className="w-3 h-3 bg-white"></div>
-                    <div className="w-3 h-3 bg-white"></div>
-                    <div className="w-3 h-3 bg-white"></div>
-                    <div className="w-3 h-3 bg-white"></div>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="w-3 h-3 bg-white" />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -30,15 +49,13 @@ export default function EnvelopeCard() {
               {/* 오른쪽 */}
               <div className="w-2/5 h-full flex flex-col">
                 <div className="flex flex-col items-end mt-auto">
-                  <p>From. 성춘향</p>
+                  <p className="line-clamp-1">From. {capsule.from}</p>
                   <div className="w-full space-y-2">
                     <div className="w-full h-px bg-white"></div>
                     <div className="flex justify-end gap-0.5">
-                      <div className="w-3 h-3 bg-white"></div>
-                      <div className="w-3 h-3 bg-white"></div>
-                      <div className="w-3 h-3 bg-white"></div>
-                      <div className="w-3 h-3 bg-white"></div>
-                      <div className="w-3 h-3 bg-white"></div>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="w-3 h-3 bg-white" />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -48,15 +65,14 @@ export default function EnvelopeCard() {
             {/* 가운데 제목 */}
             <div className="absolute top-1/2 left-1/2 -translate-1/2 w-30">
               <p className="text-center text-sm line-clamp-3">
-                뭐 한 여기쯤에 제목을 이렇게저렇게뭐 이렇게 안녕 이걸 꼭 읽어줘
+                {capsule.title}
               </p>
             </div>
 
             {/* 조건에 따라 시간인지 장소인지 핀으로 표시 */}
             <div className="absolute top-0 right-0">
               <div className="text-primary p-4 space-y-2">
-                <Clock size={16} />
-                <MapPin size={16} />
+                {isTime ? <Clock size={16} /> : <MapPin size={16} />}
               </div>
             </div>
 
@@ -86,18 +102,23 @@ export default function EnvelopeCard() {
               </svg>
             </div>
             <div className="relative text-text-2 flex flex-col items-center justify-center gap-2">
-              <span className="font-medium">열람 불가능{/* 열람 가능 */}</span>
+              <span className="font-medium">{statusText}</span>
               <div className="w-15 h-15 rounded-full bg-white shadow-lg flex items-center justify-center">
-                <Lock />
-                {/* Unlock */}
+                {capsule.isUnlocked ? <Unlock /> : <Lock />}
               </div>
-              {/* <span className="text-xs">클릭하여 읽기</span> */}
-              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white shadow-lg">
-                <Clock size={14} />
-                <span className="text-xs">2029. 04. 12 00:00</span>
-                {/* <MapPin size={14}/>
-                <span className="text-xs">성산일출봉</span> */}
-              </div>
+
+              {/* 열람 가능일 때만 안내 문구 */}
+              {capsule.isUnlocked && !capsule.isRead ? (
+                <span className="text-xs">클릭하여 읽기</span>
+              ) : null}
+
+              {/* 해제 조건 뱃지 */}
+              {!capsule.isUnlocked ? (
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white shadow-lg">
+                  {isTime ? <Clock size={14} /> : <MapPin size={14} />}
+                  <span className="text-xs line-clamp-1">{conditionLabel}</span>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -106,8 +127,8 @@ export default function EnvelopeCard() {
       {/* Shadow */}
       <div
         className="absolute w-60 h-px rounded-[30%]"
-        style={{ boxShadow: "20px 100px 10px 5px #eeeef3" }}
+        style={{ boxShadow: "20px 100px 10px 5px #EEEEF3" }}
       ></div>
-    </div>
+    </Link>
   );
 }

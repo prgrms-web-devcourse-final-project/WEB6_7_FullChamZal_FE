@@ -79,7 +79,8 @@ html {
     scroll-behavior: smooth;
 }
 
-body {
+body,
+pre {
     font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #070D19;
 }

@@ -7,7 +7,7 @@ export default function DashboardLayout({
 }) {
   return (
     <>
-      <main className="w-full h-screen flex overflow-hidden">
+      <main className="relative w-full h-screen flex overflow-hidden">
         <Sidebar />
         <section className="flex-1 h-full overflow-y-auto">{children}</section>
       </main>
