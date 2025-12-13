@@ -18,8 +18,16 @@ import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import Button from "@/components/common/Button";
+import CopyTemplate from "../modal/CopyTemplate";
 
 export default function WriteForm() {
+  const [isCopyOpen, setIsCopyOpen] = useState(false);
+  const [result, setResult] = useState<{
+    userName: string;
+    url: string;
+    password?: string;
+  } | null>(null);
+
   const [visibility, setVisibility] = useState<Visibility>("PRIVATE");
   const [paperTab, setPaperTab] = useState("ENVELOPE");
   const [sendMethod, setSendMethod] = useState("URL");
@@ -61,9 +69,25 @@ export default function WriteForm() {
     setContent(next.slice(0, MAX_CONTENT_LENGTH));
   };
 
+  // 제출 핸들러
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // TODO: 서버 저장
+    // const data = await fetch(...).then(r => r.json());
+
+    const data = {
+      userName: "홍길동",
+      url: "https://dear.com/letter/123",
+      password: "1234",
+    }; // 예시
+    setResult(data);
+    setIsCopyOpen(true);
+  };
+
   return (
     <>
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <WriteDiv title="공개 범위">
           <VisibilityOpt value={visibility} onChange={setVisibility} />
 
@@ -230,6 +254,12 @@ export default function WriteForm() {
           <span>편지 보내기</span>
         </Button>
       </form>
+
+      <CopyTemplate
+        open={isCopyOpen}
+        onClose={() => setIsCopyOpen(false)}
+        data={result}
+      />
     </>
   );
 }

@@ -1,3 +1,4 @@
+import Modal from "@/components/common/Modal";
 import Sidebar from "@/components/dashboard/sidebar/Sidebar";
 
 export default function DashboardLayout({

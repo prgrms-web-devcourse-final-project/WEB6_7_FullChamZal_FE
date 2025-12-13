@@ -151,7 +151,7 @@ export default function RegisterForm({
               type="button"
               onClick={handleSendAuthCode}
               disabled={isSendDisabled}
-              className={"flex flex-col w-19"}
+              className={"flex flex-col w-15 md:w-19"}
             >
               {sendButtonLabel}{" "}
               {countdown !== 0 ? (
@@ -175,7 +175,7 @@ export default function RegisterForm({
                 type="button"
                 onClick={handleVerifyAuthCode}
                 disabled={isVerifyDisabled}
-                className={"w-19"}
+                className={"w-15 md:w-19"}
               >
                 확인
               </Button>

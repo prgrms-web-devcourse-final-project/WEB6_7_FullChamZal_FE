@@ -1,10 +1,23 @@
+"use client";
+
 import { LogOut } from "lucide-react";
 import Logo from "../../common/Logo";
 import MenuTab from "./MenuTab";
 import MyMailbox from "./MyMailbox";
 import Profile from "./Profile";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import ProfileModal from "./profile/ProfileModal";
 
 export default function Sidebar() {
+  const router = useRouter();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const handleLogout = () => {
+    // 로그아웃 로직
+    router.push("/");
+  };
+
   return (
     <>
       <aside className="w-72 h-full border-r border-outline hidden lg:flex flex-col justify-between p-6">
@@ -17,18 +30,27 @@ export default function Sidebar() {
             </span>
           </div>
           {/* 프로필 */}
-          <Profile />
+          <Profile onClick={() => setIsProfileOpen(true)} />
           {/* 메뉴(홈, 지도) */}
           <MenuTab />
           {/* 나의 우체통 */}
           <MyMailbox />
         </div>
 
-        <button className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm">
+        <button
+          onClick={handleLogout}
+          className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm"
+        >
           <LogOut size={20} />
           <span>로그아웃</span>
         </button>
       </aside>
+
+      {/* 모달 */}
+      <ProfileModal
+        open={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
     </>
   );
 }

@@ -10,23 +10,23 @@ export default function AuthHeader({
   return (
     <>
       {/* 로고 */}
-      <header className="space-y-6">
+      <header className="space-y-4 md:space-y-6">
         <div className="text-primary flex items-center gap-2">
-          <Logo className="w-9" />
-          <span className="text-2xl font-paperozi font-extrabold">
+          <Logo className="w-7 md:w-9" />
+          <span className="text-xl md:text-2xl font-paperozi font-extrabold">
             Dear. ___
           </span>
         </div>
         <div className="space-y-3 text-center">
-          <p className="text-3xl font-semibold">{title}</p>
-          <p>{description}</p>
+          <p className="text-xl md:text-3xl font-semibold">{title}</p>
+          <p className="text-sm md:text-base">{description}</p>
         </div>
       </header>
 
       {/* 소셜 로그인 버튼 */}
       <button
         type="button"
-        className="cursor-pointer w-full py-3 bg-white/80 rounded-xl flex items-center justify-center gap-2 border border-outline"
+        className="cursor-pointer w-full py-2 md:py-3 bg-white/80 rounded-xl flex items-center justify-center gap-2 border border-outline"
       >
         <svg
           width="16"
@@ -59,12 +59,11 @@ export default function AuthHeader({
             </clipPath>
           </defs>
         </svg>
-
-        <span>Google</span>
+        <span className="text-sm md:text-base">Google</span>
       </button>
 
       {/* 구분선 */}
-      <div className="py-4">
+      <div className="py-2 md:py-4">
         <div className="w-full h-px bg-text-5"></div>
       </div>
     </>

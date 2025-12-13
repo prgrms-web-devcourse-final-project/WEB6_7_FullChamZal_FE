@@ -12,8 +12,8 @@ export default function LetterDetailView({
   mode: "public" | "protected";
 }) {
   const [isUnlocked, setIsUnlocked] = useState<boolean>(
-    // 보호가 아니거나 이미 해제된 편지는 바로 보여주고 싶으면
-    mode !== "public" || capsule.isUnlocked
+    // 비밀번호가 있는 편지
+    mode !== "public"
   );
 
   // (더미) 비밀번호 검증 함수 — 나중에 API로 교체
