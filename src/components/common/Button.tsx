@@ -7,7 +7,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export default function Button({ className, children, ...props }: ButtonProps) {
   const baseClass =
-    "cursor-pointer inline-flex items-center justify-center rounded-xl rounded-xl text-white font-semibold bg-primary-3 hover:bg-primary-2 disabled:opacity-50 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg";
+    "cursor-pointer inline-flex items-center justify-center rounded-lg md:rounded-xl text-white md:font-semibold bg-primary-3 hover:bg-primary-2 disabled:opacity-50 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg";
 
   return (
     <button className={twMerge(baseClass, className)} {...props}>

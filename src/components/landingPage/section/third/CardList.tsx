@@ -6,7 +6,7 @@ import Clock from "./icon/Clock";
 export default function CardList() {
   return (
     <>
-      <div className="flex gap-8 text-white">
+      <div className="space-y-8 md:flex gap-8 text-white">
         <Card
           title="시간 기반 편지"
           contents="정해진 날짜와 시간이 되어야 열리는 메시지. 생일, 기념일, 미래의 나에게 전하는 편지 등 특별한 순간을 남겨보세요."
