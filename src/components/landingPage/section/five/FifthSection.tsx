@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const items = [
@@ -40,32 +40,42 @@ const items = [
 
 export default function FifthSection() {
   const [activeId, setActiveId] = useState<string>("love");
+  const [isMdUp, setIsMdUp] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)"); // md 기준
+    const onChange = () => setIsMdUp(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   return (
-    <section id="who" className="w-full space-y-10 py-60">
+    <section id="who" className="w-full space-y-4 md:space-y-10 py-20 md:py-60">
       <div className="space-y-3 font-semibold">
         <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
         <p className="text-primary text-3xl">Who?</p>
       </div>
-      <div className="flex gap-5 h-120">
+      <div className="flex flex-col md:flex-row gap-5 md:h-120">
         {items.map((item) => {
-          const isActive = item.id === activeId;
+          const isActive = isMdUp ? item.id === activeId : true;
 
           return (
             <motion.div
               key={item.id}
               layout
-              onHoverStart={() => setActiveId(item.id)}
-              className={`rounded-2xl h-full flex flex-col justify-end overflow-hidden transition-all bg-cover bg-center bg-no-repeat ${
-                isActive ? "flex-2 shadow-xl" : "flex-1"
+              onHoverStart={isMdUp ? () => setActiveId(item.id) : undefined}
+              className={`rounded-2xl h-100 md:h-full flex flex-col justify-end overflow-hidden transition-all bg-cover bg-center bg-no-repeat shadow-xl ${
+                isMdUp ? (isActive ? "flex-2 shadow-xl" : "flex-1") : ""
               }`}
               style={{ backgroundImage: `url(${item.img})` }}
             >
               {/* 카드 안쪽 레이어 컨테이너 */}
               <div className="relative w-full h-full">
                 {/* 활성 내용 */}
+                {/* 모바일에서는 항상 보이도록 */}
                 <motion.div
-                  className="h-full flex flex-col justify-end "
+                  className="h-full flex flex-col justify-end"
                   animate={{
                     opacity: isActive ? 1 : 0,
                     y: isActive ? 0 : 10,
@@ -73,12 +83,16 @@ export default function FifthSection() {
                   transition={{ duration: 0.2 }}
                 >
                   <div className="bg-white/80 pt-8 p-10">
-                    <h3 className="font-semibold text-3xl text-primary mb-2">
-                      <span className="text-4xl text-[#172C51]">Dear.</span>{" "}
-                      {item.title}
+                    <h3 className="flex flex-col font-semibold text-xl md:text-3xl text-primary mb-2">
+                      <span className="text-2xl md:text-4xl text-[#172C51]">
+                        Dear.
+                      </span>
+                      <span>{item.title}</span>
                     </h3>
                     <p className="font-semibold mb-3">{item.step}</p>
-                    <p className="whitespace-pre-line">{item.desc}</p>
+                    <p className="whitespace-pre-line break-keep">
+                      {item.desc}
+                    </p>
                   </div>
                 </motion.div>
 

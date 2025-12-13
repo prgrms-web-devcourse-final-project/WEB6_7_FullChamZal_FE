@@ -1,12 +1,16 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import Button from "../../common/Button";
 import Link from "next/link";
 
 export default function SixthSection() {
   return (
     <>
-      <section id="start" className="relative w-full overflow-hidden py-60">
+      <section
+        id="start"
+        className="relative w-full overflow-hidden py-20 md:py-60"
+      >
         <div className="max-w-80 mx-auto space-y-25">
           <div className="w-full text-center space-y-5">
             <h3 className="text-4xl font-bold leading-12">
@@ -19,10 +23,10 @@ export default function SixthSection() {
               <br />
               특별한 순간을 만들어줄 것입니다
             </p>
-            <div className="space-x-4">
+            <div className="space-x-4 text-sm md:text-base font-medium mt-8 md:mt-20">
               <Link href={"/capsules/new"}>
-                <Button className="border border-primary/50 bg-primary py-4 px-5 font-normal">
-                  편지 쓰러 가기
+                <Button className="bg-primary py-4 px-5 font-medium space-x-1">
+                  <span>편지 쓰기</span> <ArrowRight size={20} />
                 </Button>
               </Link>
               <Link href={"/auth/login"}>

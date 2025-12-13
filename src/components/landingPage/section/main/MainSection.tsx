@@ -61,30 +61,35 @@ export default function MainSection() {
     <>
       <section
         id="main"
-        className="relative w-full min-h-screen overflow-hidden mb-60"
+        className="relative w-full min-h-screen overflow-hidden mb-20 md:mb-60"
       >
         <Background />
-        <div className="relative w-full h-screen z-10 flex items-center justify-center font-paperozi">
+        <div className="relative w-full h-screen z-10 flex items-center justify-center font-paperlogy">
           <div className="max-w-430 min-h-100 flex flex-col items-center justify-center">
-            <h2 className="font-extrabold text-[112px] leading-[132px] bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
+            <h2 className="font-extrabold text-5xl md:text-[112px] md:leading-[132px] bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
               Dear.&nbsp;
               <span>{visibleText}</span>
               <span className="typing-cursor font-normal">|</span>
             </h2>
-            <div className="text-center space-y-4 mt-7">
-              <p className="font-semibold text-2xl">
+            <div className="text-center space-y-4 mt-3 md:mt-7">
+              <p className="font-semibold text-xl md:text-2xl">
                 당신이 도착했을 때 비로소 열리는 편지
               </p>
-              <p>
+              <p className="text-sm">
                 특정한 시간 또는 장소에 도달하면 펼쳐지는 디지털 편지. <br />
                 기다림이 만든 감동을, 가장 적절한 순간에 전하세요.
               </p>
             </div>
-            <div className="font-medium flex gap-4 mt-20">
-              <Button className="bg-primary py-4 px-5 font-normal">
+            <div className="text-sm md:text-base font-medium flex gap-4 mt-8 md:mt-20">
+              <Button className="bg-primary py-4 px-5 font-normal space-x-1">
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
-              <Button className="border border-outline text-text px-5 bg-white hover:bg-button-hover font-normal">
+              <Button
+                onClick={() => {
+                  document.getElementById("why")?.scrollIntoView();
+                }}
+                className="border border-outline text-text px-5 bg-white hover:bg-button-hover font-normal"
+              >
                 자세히 보기
               </Button>
             </div>

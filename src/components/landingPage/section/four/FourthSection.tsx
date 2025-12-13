@@ -73,18 +73,21 @@ export default function FourthSection() {
 
   return (
     <>
-      <section id="how" className="relative flex flex-row gap-18 py-60">
+      <section
+        id="how"
+        className="relative flex flex-col md:flex-row md:gap-18 py-20 md:py-60"
+      >
         {/* left */}
-        <div className="flex-2 max-w-180 sticky top-40 font-semibold space-y-10 self-start">
+        <div className="hidden md:block flex-2 max-w-180 md:sticky md:top-25 lg:top-40 space-y-10 self-start">
           {/* 여기 래퍼 div 추가 */}
           <div key={activeIndex} className="space-y-10 fade-up">
-            <div className="space-y-3">
+            <div className="space-y-3 font-semibold">
               <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
               <p className="text-primary text-3xl">
                 {STEP_LABELS[activeIndex] ?? "Write"}
               </p>
             </div>
-            <div className="w-full h-110 rounded-xl bg-gray-400 shadow-xl">
+            <div className="md:w-full md:h-110 rounded-xl bg-gray-400 shadow-xl">
               <Image
                 src={stepsData[activeIndex].img || ""}
                 alt={stepsData[activeIndex].title}
@@ -97,8 +100,11 @@ export default function FourthSection() {
         </div>
 
         {/* right */}
-        <div className="flex-1 pt-60 pb-25">
-          <div className="space-y-[660px]">
+        <div className="flex-1 pt-20 md:pt-60 pb-25">
+          <h4 className="block mb-4 md:mb-0 md:hidden font-semibold text-[#172C51] text-3xl md:text-4xl">
+            Dear.___
+          </h4>
+          <div className="space-y-20 md:space-y-[660px]">
             {stepsData.map((item, index) => (
               <div
                 key={item.step}
@@ -106,7 +112,14 @@ export default function FourthSection() {
                   stepRefs.current[index] = el;
                 }}
                 data-index={index}
+                className="space-y-3 md:space-y-0"
               >
+                <div className="block md:hidden">
+                  <p className="font-medium md:font-semibold text-primary-3 md:text-primary text-2xl md:text-3xl">
+                    {STEP_LABELS[index]}
+                  </p>
+                  <div className="w-full h-px bg-outline"></div>
+                </div>
                 <Step
                   icon={item.icon}
                   step={item.step}
