@@ -8,7 +8,6 @@ import {
   PaintBucket,
   Send,
 } from "lucide-react";
-import Button from "../../common/Button";
 import WriteDiv from "./WriteDiv";
 import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
@@ -18,6 +17,7 @@ import { useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
+import Button from "@/components/common/Button";
 
 export default function WriteForm() {
   const [visibility, setVisibility] = useState<Visibility>("PRIVATE");

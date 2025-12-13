@@ -1,4 +1,4 @@
-import WritePage from "@/components/new/WritePage";
+import WritePage from "@/components/capsule/new/WritePage";
 
 export default function Page() {
   return (
