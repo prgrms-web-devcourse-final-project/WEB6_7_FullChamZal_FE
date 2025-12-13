@@ -1,6 +1,5 @@
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import MailboxPage from "@/components/dashboard/contents/mailbox/MailboxPage";
-import { Send } from "lucide-react";
 
 export default async function SendPage({
   searchParams,
@@ -12,8 +11,7 @@ export default async function SendPage({
 
   return (
     <>
-      <MailboxPage icon={<Send />} title="보낸 편지" />
-      {capsuleId}
+      <MailboxPage type="send" />
       {capsuleId ? (
         <LetterDetailModal capsuleId={capsuleId} closeHref="/dashboard/send" />
       ) : null}

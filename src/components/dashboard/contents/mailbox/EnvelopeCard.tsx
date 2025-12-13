@@ -5,7 +5,13 @@ import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock } from "lucide-react";
 import Link from "next/link";
 
-export default function EnvelopeCard({ capsule }: { capsule: Capsule }) {
+export default function EnvelopeCard({
+  capsule,
+  type,
+}: {
+  capsule: Capsule;
+  type: "send" | "receive" | "bookmark";
+}) {
   const isTime = capsule.unlockCondition.type === "time";
 
   const conditionLabel =
@@ -17,7 +23,7 @@ export default function EnvelopeCard({ capsule }: { capsule: Capsule }) {
 
   return (
     <Link
-      href={`/dashboard/send?id=${capsule.id}`}
+      href={`/dashboard/${type}?id=${capsule.id}`}
       scroll={false}
       className="relative flex flex-col items-center justify-center py-8 perspective-[1000px] group"
     >

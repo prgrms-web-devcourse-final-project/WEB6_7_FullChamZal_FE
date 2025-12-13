@@ -3,20 +3,36 @@
 import { dummyCapsules } from "@/data/dummyData";
 import { formatDate } from "@/lib/formatDate";
 import { formatDateTime } from "@/lib/formatDateTime";
-import { Bookmark, Clock, LinkIcon, MapPin, Reply, X } from "lucide-react";
+import {
+  Archive,
+  Bookmark,
+  Clock,
+  LinkIcon,
+  MapPin,
+  Reply,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LetterDetailModal({
   capsuleId,
   closeHref,
+  mode,
 }: {
   capsuleId: string;
-  closeHref: string;
+  closeHref?: string;
+  mode?: string;
 }) {
   const router = useRouter();
 
-  const close = () => router.push(closeHref, { scroll: false });
+  const close = () => {
+    if (closeHref) {
+      router.push(closeHref, { scroll: false });
+    } else {
+      router.back();
+    }
+  };
 
   const capsule = dummyCapsules.find((c) => c.id === capsuleId);
 
@@ -55,20 +71,26 @@ export default function LetterDetailModal({
           <div className="shrink-0 border-b px-8 py-4">
             <div className="flex justify-between items-center gap-4">
               <div className="md:flex-1 truncate">{capsule.title}</div>
-              <div className="flex-1 flex items-center justify-center gap-1">
+              <div
+                className={`flex-1 flex items-center gap-1 ${
+                  mode ? "justify-end" : "justify-center"
+                }`}
+              >
                 <span className="hidden md:block text-text-2">해제 조건:</span>
                 <div className="flex items-center gap-1 text-text-3">
                   {isTime ? <Clock size={16} /> : <MapPin size={16} />}
                   <span className="line-clamp-1">{unlockLabel}</span>
                 </div>
               </div>
-              <button
-                type="button"
-                className="md:flex-1 flex justify-end cursor-pointer text-primary"
-                onClick={close}
-              >
-                <X size={24} />
-              </button>
+              {mode ? null : (
+                <button
+                  type="button"
+                  className="md:flex-1 flex justify-end cursor-pointer text-primary"
+                  onClick={close}
+                >
+                  <X size={24} />
+                </button>
+              )}
             </div>
           </div>
 
@@ -85,7 +107,7 @@ export default function LetterDetailModal({
 
                 {/* 본문 */}
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
-                  <pre className="whitespace-pre-wrap wrap-break-word">
+                  <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
                   </pre>
                 </div>
@@ -131,8 +153,17 @@ export default function LetterDetailModal({
                   type="button"
                   className="cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <Bookmark size={16} className="text-primary" />
-                  <span>저장하기</span>
+                  {mode ? (
+                    <>
+                      <Archive size={16} className="text-primary" />
+                      <span>저장하기</span>
+                    </>
+                  ) : (
+                    <>
+                      <Bookmark size={16} className="text-primary" />
+                      <span>북마크</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
