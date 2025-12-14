@@ -1,4 +1,4 @@
-export const USERS: User[] = [
+export const USERS: AdminUser[] = [
   {
     id: 1,
     name: "홍길동",

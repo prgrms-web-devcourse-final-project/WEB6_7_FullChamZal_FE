@@ -21,7 +21,7 @@ export default function ReportSection() {
         <StatsOverview tabs={REPORT_TABS} />
 
         <AdminBody
-          section="capsules"
+          section="reports"
           tabs={REPORT_TABS}
           defaultTab="all"
           searchPlaceholder="신고자 이름 또는 캡슐 아이디로 검색..."
