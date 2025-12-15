@@ -13,13 +13,14 @@ import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
 import WriteInput from "./WriteInput";
 import UnlockConditionTabs from "./UnlockConditionTabs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
 import { API_BASE_URL } from "@/lib/api";
+import { authApi, type MemberMe } from "@/lib/api/auth";
 
 export default function WriteForm() {
   const [isCopyOpen, setIsCopyOpen] = useState(false);
@@ -29,6 +30,7 @@ export default function WriteForm() {
     password?: string;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [me, setMe] = useState<MemberMe | null>(null);
 
   const [visibility, setVisibility] = useState<Visibility>("PRIVATE");
   const [paperTab, setPaperTab] = useState("ENVELOPE");
@@ -50,6 +52,17 @@ export default function WriteForm() {
 
   /* 한글 입력(조합) 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
+
+  useEffect(() => {
+    // 로그인 사용자 정보 조회
+    authApi
+      .me()
+      .then((res) => setMe(res.data))
+      .catch((err) => {
+        console.error(err);
+        // 로그인 안 된 상태라면 이후 제출 시 가드
+      });
+  }, []);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const next = e.target.value;
@@ -106,12 +119,17 @@ export default function WriteForm() {
       return;
     }
 
+    if (!me?.memberId) {
+      window.alert("로그인 후 다시 시도해 주세요.");
+      return;
+    }
+
     const unlockAtIso = new Date(
       `${dayForm.date}T${dayForm.time}:00`
     ).toISOString();
 
     const payload = {
-      memberId: 0, // TODO: 로그인 연동 시 실제 사용자 ID로 교체
+      memberId: me.memberId,
       nickName: senderName,
       title,
       content: contentValue,
@@ -145,6 +163,7 @@ export default function WriteForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
+        credentials: "include",
       });
 
       if (!res.ok) {
