@@ -31,6 +31,7 @@ export default function WriteForm() {
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [me, setMe] = useState<MemberMe | null>(null);
+  const [senderMode, setSenderMode] = useState<"name" | "nickname">("name");
 
   const [visibility, setVisibility] = useState<Visibility>("PRIVATE");
   const [paperTab, setPaperTab] = useState("ENVELOPE");
@@ -50,7 +51,7 @@ export default function WriteForm() {
 
   const [content, setContent] = useState("");
 
-  /* 한글 입력(조합) 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
+  /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
 
   useEffect(() => {
@@ -89,7 +90,9 @@ export default function WriteForm() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const senderName = (formData.get("sendName") as string) || "";
+    // 로그인 사용자의 name을 발신자 이름으로 고정
+    const senderName =
+      senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
     const title = (formData.get("title") as string) || "";
     const contentValue = content.trim();
     const phoneNum =
@@ -222,8 +225,34 @@ export default function WriteForm() {
         </WriteDiv>
 
         <WriteDiv title="보내는 사람">
-          <div>
-            <WriteInput id="sendName" type="text" placeholder="홍길동" />
+          <div className="space-y-2">
+            <div className="flex items-center justify-end gap-3 text-sm text-text-1 -mt-8 mb-2">
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={senderMode === "name"}
+                  onChange={() => setSenderMode("name")}
+                />
+                <span>이름</span>
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={senderMode === "nickname"}
+                  onChange={() => setSenderMode("nickname")}
+                />
+                <span>닉네임</span>
+              </label>
+            </div>
+            <WriteInput
+              id="sendName"
+              type="text"
+              placeholder="홍길동"
+              value={
+                senderMode === "nickname" ? me?.nickname || "" : me?.name || ""
+              }
+              readOnly
+            />
           </div>
         </WriteDiv>
 
