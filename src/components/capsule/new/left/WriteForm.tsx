@@ -19,6 +19,7 @@ import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
+import { API_BASE_URL } from "@/lib/api";
 
 export default function WriteForm() {
   const [isCopyOpen, setIsCopyOpen] = useState(false);
@@ -27,6 +28,7 @@ export default function WriteForm() {
     url: string;
     password?: string;
   } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [visibility, setVisibility] = useState<Visibility>("PRIVATE");
   const [paperTab, setPaperTab] = useState("ENVELOPE");
@@ -73,16 +75,100 @@ export default function WriteForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // TODO: 서버 저장
-    // const data = await fetch(...).then(r => r.json());
+    const formData = new FormData(e.currentTarget);
+    const senderName = (formData.get("sendName") as string) || "";
+    const title = (formData.get("title") as string) || "";
+    const contentValue = content.trim();
+    const phoneNum =
+      sendMethod === "PHONE" ? (formData.get("pagePw") as string) || "" : "";
+    const capsulePassword =
+      sendMethod === "URL" ? (formData.get("pagePw") as string) || "" : "";
 
-    const data = {
-      userName: "홍길동",
-      url: "https://dear.com/letter/123",
-      password: "1234",
-    }; // 예시
-    setResult(data);
-    setIsCopyOpen(true);
+    // 미입력 폼 체크 - 변경 예정
+    if (!title) {
+      window.alert("제목을 입력해 주세요.");
+      return;
+    }
+    if (!contentValue) {
+      window.alert("내용을 입력해 주세요.");
+      return;
+    }
+    if (!dayForm.date || !dayForm.time) {
+      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
+      return;
+    }
+    if (sendMethod === "PHONE" && !phoneNum) {
+      window.alert("전화번호를 입력해 주세요.");
+      return;
+    }
+    if (sendMethod === "URL" && !capsulePassword) {
+      window.alert("비밀번호를 입력해 주세요.");
+      return;
+    }
+
+    const unlockAtIso = new Date(
+      `${dayForm.date}T${dayForm.time}:00`
+    ).toISOString();
+
+    const payload = {
+      memberId: 0, // TODO: 로그인 연동 시 실제 사용자 ID로 교체
+      nickName: senderName,
+      title,
+      content: contentValue,
+      visibility,
+      unlockType: "TIME",
+      unlockAt: unlockAtIso,
+      locationName: "",
+      locationLat: 0,
+      locationIng: 0,
+      viewingRadius: 0,
+      packingColor: "",
+      contentColor: "",
+      maxViewCount: 0,
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      if (!API_BASE_URL) {
+        throw new Error("API base URL이 설정되지 않았습니다.");
+      }
+
+      const url = new URL("/api/v1/capsule/create/private", API_BASE_URL);
+      if (phoneNum) url.searchParams.set("phoneNum", phoneNum);
+      if (capsulePassword)
+        url.searchParams.set("capsulePassword", capsulePassword);
+
+      const res = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        const message =
+          errBody.message || errBody.error || "캡슐 생성에 실패했습니다.";
+        throw new Error(message);
+      }
+
+      const data = await res.json();
+      setResult({
+        userName: senderName || data?.nickName || "",
+        url: data?.url || "",
+        password: data?.capPW,
+      });
+      setIsCopyOpen(true);
+    } catch (error) {
+      console.error(error);
+      const message =
+        error instanceof Error ? error.message : "캡슐 생성에 실패했습니다.";
+      window.alert(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -251,7 +337,7 @@ export default function WriteForm() {
 
         <Button type="submit" className="w-full py-4 space-x-2">
           <Send />
-          <span>편지 보내기</span>
+          <span>{isSubmitting ? "보내는 중..." : "편지 보내기"}</span>
         </Button>
       </form>
 
