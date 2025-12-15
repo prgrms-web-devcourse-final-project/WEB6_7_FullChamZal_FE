@@ -4,6 +4,7 @@ import Modal from "@/components/common/Modal";
 import {
   AlertCircle,
   CheckCircle,
+  Clock5,
   Eye,
   Flag,
   ShieldAlert,
@@ -62,19 +63,19 @@ export default function ReportList({
           </div>
 
           <div className="border-t border-outline flex gap-2 pt-4">
-            <button className="py-2 px-3 flex items-center gap-1 rounded-lg bg-green-100 hover:bg-green-200">
+            <button className="cursor-pointer py-2 px-3 flex items-center gap-1 rounded-lg bg-green-100 hover:bg-green-200">
               <CheckCircle size={16} />
               <span>승인</span>
             </button>
 
-            <button className="py-2 px-3 flex items-center gap-1 rounded-lg bg-red-100 hover:bg-red-200">
+            <button className="cursor-pointer py-2 px-3 flex items-center gap-1 rounded-lg bg-red-100 hover:bg-red-200">
               <XCircle size={16} />
               <span>반려</span>
             </button>
 
             <button
               onClick={() => setOpenDetail(true)}
-              className="py-2 px-3 flex items-center gap-1 rounded-lg bg-gray-100 hover:bg-gray-200"
+              className="cursor-pointer py-2 px-3 flex items-center gap-1 rounded-lg bg-gray-100 hover:bg-gray-200"
             >
               <Eye size={16} />
               <span>상세보기</span>
@@ -196,10 +197,24 @@ export default function ReportList({
               </div>
             </div>
             {/* 신고 접수 타입라인 */}
+            <div className="p-4 bg-sub border border-outline rounded-lg space-y-1">
+              <div className="flex items-center gap-1">
+                <Clock5 size={20} />
+                <span>처리 타임라인</span>
+              </div>
+              <p className="text-sm text-text-3">신고 접수: 2024-12-10 14:30</p>
+            </div>
           </div>
 
           {/* Footer도 인증 전/후 분기 추천 */}
-          <div className="py-6 px-6 flex flex-col gap-3 border-t border-outline"></div>
+          <div className="py-6 px-6 flex gap-3 border-t border-outline">
+            <button className="cursor-pointer flex-1 rounded-xl bg-admin p-2 text-white hover:bg-admin/80">
+              신고 승인 및 제재
+            </button>
+            <button className="cursor-pointer flex-1 rounded-xl p-2 hover:bg-sub border border-outline">
+              신고 반려
+            </button>
+          </div>
         </div>
       </Modal>
     </>

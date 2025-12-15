@@ -11,9 +11,18 @@ function mapTabToFilters(tab: string): {
   return {}; // all
 }
 
+type Counts = {
+  total: number;
+  active: number;
+  stop: number;
+  reported: number;
+};
+
 type State = {
   users: AdminUser[];
   totalElements: number;
+  counts: Counts;
+
   loading: boolean;
   error: string | null;
 
@@ -33,6 +42,7 @@ export const useAdminUsersStore = create<State>()(
   immer((set, get) => ({
     users: [],
     totalElements: 0,
+    counts: { total: 0, active: 0, stop: 0, reported: 0 },
     loading: false,
     error: null,
 
@@ -75,6 +85,12 @@ export const useAdminUsersStore = create<State>()(
         set((s) => {
           s.users = res.data.content;
           s.totalElements = res.data.totalElements;
+          if (res.data.summary) {
+            s.counts.total = res.data.summary.total;
+            s.counts.active = res.data.summary.active;
+            s.counts.stop = res.data.summary.stop;
+            s.counts.reported = res.data.summary.reported;
+          }
         });
       } catch (e: any) {
         if (get().requestId !== nextId) return;
