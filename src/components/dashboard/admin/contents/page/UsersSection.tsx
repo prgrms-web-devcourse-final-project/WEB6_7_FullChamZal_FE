@@ -5,7 +5,7 @@ import StatsOverview from "../StatsOverview";
 const USER_TABS = [
   { key: "all", label: "전체" },
   { key: "active", label: "활성 사용자" },
-  { key: "suspended", label: "정지된 사용자" },
+  { key: "stop", label: "정지된 사용자" },
   { key: "reported", label: "신고 누적" },
 ] as const;
 

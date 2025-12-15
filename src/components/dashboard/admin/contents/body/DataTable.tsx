@@ -24,7 +24,7 @@ export default function DataTable<T>({
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="text-text-2">
           {rows.length === 0 ? (
             <tr>
               <td

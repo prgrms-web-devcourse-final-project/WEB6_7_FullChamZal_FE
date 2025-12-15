@@ -1,19 +1,44 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import Input from "@/components/common/Input";
 import { useState } from "react";
 import Button from "../common/Button";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { login, me } from "@/lib/api/auth/auth";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 로그인 API
+    setErrorMsg(null);
 
-    redirect("/dashboard");
+    setLoading(true);
+    try {
+      // 1) 로그인 성공 (쿠키 저장)
+      await login({ userId: id, password: pw });
+
+      // 2) 내 정보 조회 (role 확인)
+      const profile = await me();
+      console.log(profile.data.role);
+
+      if (profile.data.role === "ADMIN") {
+        router.replace("/admin/dashboard/users");
+        router.refresh();
+      } else {
+        router.replace("/dashboard");
+        router.refresh();
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message ?? "로그인에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,6 +61,8 @@ export default function LoginForm() {
           onChange={(e) => setPw(e.target.value)}
         />
 
+        {errorMsg && <p className="text-xs text-red-600">{errorMsg}</p>}
+
         <div className="text-text-4 text-xs space-x-2 text-right">
           <button
             type="button"
@@ -52,8 +79,8 @@ export default function LoginForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full py-3">
-        로그인
+      <Button type="submit" className="w-full py-3" disabled={loading}>
+        {loading ? "로그인 중..." : "로그인"}
       </Button>
     </form>
   );
