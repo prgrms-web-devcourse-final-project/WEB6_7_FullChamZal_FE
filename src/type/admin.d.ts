@@ -1,4 +1,4 @@
-type AdminTab = "all" | "active" | "suspended" | "reported";
+type AdminTab = "all" | "active" | "stop" | "reported";
 
 type TabItem = { key: string; label: string };
 
@@ -12,28 +12,11 @@ type Column<T> = {
 };
 
 /* ---------------------------------------- */
-/* Users */
-type UserStatus = "active" | "suspended";
-
-type AdminUser = {
-  id: number;
-  name: string;
-  nickname: string;
-  email: string;
-  phone: string;
-  joinedAt: string;
-  sent: number;
-  received: number;
-  reportCount: number;
-  status: UserStatus;
-};
-
-/* ---------------------------------------- */
+/* Capsules */
 type UnlockType = "time" | "location" | "time_location";
 type CapsuleStatus = "locked" | "opened";
 type CapsuleVisibility = "public" | "private";
 
-/* Capsules */
 type AdminCapsule = {
   id: number;
   title: string;
@@ -45,4 +28,24 @@ type AdminCapsule = {
   createdAt: string; // YYYY-MM-DD
   status: CapsuleStatus; // 잠김/열림
   visibility: CapsuleVisibility; // 공개/비공개 (탭용)
+};
+
+/* ---------------------------------------- */
+/* Phone */
+type PhoneVerifyStatus =
+  | "pending" // 대기중
+  | "verified" // 성공
+  | "failed" // 실패
+  | "expired"; // 만료
+
+type PhoneLog = {
+  id: number;
+  userName: string;
+  phone: string;
+  code: string;
+  requestedAt: string; // YYYY-MM-DD HH:mm
+  completedAt: string | null; // 완료 안되면 null
+  ip: string;
+  attempt: number;
+  status: PhoneVerifyStatus;
 };

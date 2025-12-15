@@ -6,6 +6,8 @@ import ContentsList from "./ContentsList";
 import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+type TabItem = { key: string; label: string };
+
 export default function AdminBody({
   section,
   tabs,

@@ -1,28 +1,10 @@
 "use client";
 
-import { USERS } from "@/data/admin/AdminUser";
 import { Ban, CheckCircle } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import DataTable from "../DataTable";
-
-function filterUsers(users: AdminUser[], tab: string, query: string) {
-  let result = [...users];
-
-  if (tab === "active") result = result.filter((u) => u.status === "active");
-  if (tab === "suspended")
-    result = result.filter((u) => u.status === "suspended");
-  if (tab === "reported") result = result.filter((u) => u.reportCount > 0);
-
-  if (query) {
-    const q = query.toLowerCase();
-    result = result.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
-    );
-  }
-
-  return result;
-}
+import Pagination from "@/components/common/Pagination";
+import { useAdminUsersStore } from "@/store/admin/adminUsersStore";
 
 export default function UserList({
   tab,
@@ -31,43 +13,63 @@ export default function UserList({
   tab: string;
   query: string;
 }) {
-  const [users, setUsers] = useState<AdminUser[]>(USERS);
+  const {
+    users,
+    totalElements,
+    loading,
+    page,
+    size,
+    setPage,
+    resetPage,
+    fetchUsers,
+    toggleStatus,
+  } = useAdminUsersStore();
 
-  const toggleStatus = useCallback((id: number) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === id
-          ? { ...u, status: u.status === "active" ? "suspended" : "active" }
-          : u
-      )
-    );
-  }, []);
+  // tab/query 바뀌면 page 리셋
+  useEffect(() => {
+    resetPage();
+  }, [tab, query, resetPage]);
 
-  const filteredUsers = useMemo(
-    () => filterUsers(users, tab, query),
-    [users, tab, query]
-  );
+  // 데이터 fetch
+  useEffect(() => {
+    fetchUsers({ tab, query });
+  }, [tab, query, page, size, fetchUsers]);
 
   const columns = useMemo(
     () => [
       { key: "id", header: "ID", cell: (u: AdminUser) => `#${u.id}` },
-      { key: "name", header: "이름", cell: (u: AdminUser) => u.name },
+      { key: "userId", header: "사용자", cell: (u: AdminUser) => u.userId },
       { key: "nickname", header: "닉네임", cell: (u: AdminUser) => u.nickname },
-      { key: "email", header: "이메일", cell: (u: AdminUser) => u.email },
-      { key: "phone", header: "전화번호", cell: (u: AdminUser) => u.phone },
-      { key: "joinedAt", header: "가입일", cell: (u: AdminUser) => u.joinedAt },
-      { key: "sent", header: "보낸 편지", cell: (u: AdminUser) => u.sent },
       {
-        key: "received",
-        header: "받은 편지",
-        cell: (u: AdminUser) => u.received,
+        key: "phoneNumber",
+        header: "전화번호",
+        cell: (u: AdminUser) => u.phoneNumber,
       },
-      { key: "report", header: "신고", cell: (u: AdminUser) => u.reportCount },
+      {
+        key: "capsuleCount",
+        header: "캡슐",
+        cell: (u: AdminUser) => u.capsuleCount,
+      },
+      {
+        key: "blockedCapsuleCount",
+        header: "차단 캡슐",
+        cell: (u: AdminUser) => u.blockedCapsuleCount,
+      },
+      {
+        key: "reportCount",
+        header: "신고",
+        cell: (u: AdminUser) => u.reportCount,
+      },
+      {
+        key: "createdAt",
+        header: "가입일",
+        cell: (u: AdminUser) => (u.createdAt ? u.createdAt.slice(0, 10) : "-"),
+      },
       {
         key: "status",
         header: "상태",
         cell: (u: AdminUser) =>
-          u.status === "active" ? (
+          u.status === "ACTIVE" ? (
             <div className="inline-flex items-center gap-1 rounded-lg bg-[#DCFCE7] px-3 py-1 text-green-800">
               <CheckCircle size={14} />
               활성
@@ -84,14 +86,21 @@ export default function UserList({
         header: "액션",
         cell: (u: AdminUser) => (
           <button
-            onClick={() => toggleStatus(u.id)}
+            type="button"
+            onClick={async () => {
+              try {
+                await toggleStatus(u.id);
+              } catch {
+                alert("상태 변경에 실패했습니다.");
+              }
+            }}
             className={`cursor-pointer px-3 py-1 rounded-lg text-white ${
-              u.status === "active"
+              u.status === "ACTIVE"
                 ? "bg-primary hover:bg-red-300"
                 : "bg-admin/50 hover:bg-admin"
             }`}
           >
-            {u.status === "active" ? "정지" : "해제"}
+            {u.status === "ACTIVE" ? "정지" : "해제"}
           </button>
         ),
       },
@@ -100,11 +109,22 @@ export default function UserList({
   );
 
   return (
-    <DataTable<AdminUser>
-      columns={columns}
-      rows={filteredUsers}
-      getRowKey={(u) => u.id}
-      emptyMessage="표시할 사용자가 없습니다."
-    />
+    <div className="space-y-3">
+      {loading && <div className="text-sm text-text-4">불러오는 중...</div>}
+
+      <DataTable
+        columns={columns}
+        rows={users}
+        getRowKey={(u: AdminUser) => u.id}
+        emptyMessage="표시할 사용자가 없습니다."
+      />
+
+      <Pagination
+        page={page}
+        size={size}
+        totalElements={totalElements}
+        onPageChange={setPage}
+      />
+    </div>
   );
 }
