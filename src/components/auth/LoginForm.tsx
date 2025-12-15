@@ -5,37 +5,50 @@ import Input from "@/components/common/Input";
 import { useState } from "react";
 import Button from "../common/Button";
 import { useRouter } from "next/navigation";
-import { login, me } from "@/lib/api/auth/auth";
+
+import { authApi } from "@/lib/api/auth";
+
+function getErrorMessage(err: unknown) {
+  if (err instanceof Error) return err.message;
+
+  if (typeof err === "object" && err !== null && "message" in err) {
+    const msg = (err as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+
+  return "로그인 중 오류가 발생했습니다.";
+}
 
 export default function LoginForm() {
   const router = useRouter();
+
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
+
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
 
-    setLoading(true);
+    setError("");
+
+    if (!id.trim() || !pw.trim()) {
+      setError("아이디와 비밀번호를 입력해주세요.");
+      return;
+    }
+
     try {
-      // 1) 로그인 성공 (쿠키 저장)
-      await login({ userId: id, password: pw });
+      setLoading(true);
 
-      // 2) 내 정보 조회 (role 확인)
-      const profile = await me();
-      console.log(profile.data.role);
-
-      if (profile.data.role === "ADMIN") {
-        router.replace("/admin/dashboard/users");
-        router.refresh();
-      } else {
-        router.replace("/dashboard");
-        router.refresh();
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message ?? "로그인에 실패했습니다.");
+      await authApi.login({ userId: id.trim(), password: pw });
+      const me = await authApi.me();
+      const isAdmin = me.data.role === "ADMIN";
+      const target = isAdmin ? "/admin" : "/dashboard";
+      router.replace(target);
+      router.refresh();
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -59,9 +72,8 @@ export default function LoginForm() {
           placeholder="********"
           value={pw}
           onChange={(e) => setPw(e.target.value)}
+          error={error}
         />
-
-        {errorMsg && <p className="text-xs text-red-600">{errorMsg}</p>}
 
         <div className="text-text-4 text-xs space-x-2 text-right">
           <button
