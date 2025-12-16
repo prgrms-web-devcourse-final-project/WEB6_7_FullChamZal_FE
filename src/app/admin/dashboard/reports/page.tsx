@@ -1,9 +1,12 @@
 import ReportSection from "@/components/dashboard/admin/contents/page/ReportSection";
+import { Suspense } from "react";
 
 export default function Page() {
   return (
     <>
-      <ReportSection />
+      <Suspense fallback={<div className="p-8">로딩 중...</div>}>
+        <ReportSection />
+      </Suspense>
     </>
   );
 }

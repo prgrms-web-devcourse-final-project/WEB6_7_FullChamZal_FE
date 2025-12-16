@@ -1,4 +1,5 @@
 import WritePage from "@/components/capsule/new/WritePage";
+import { Suspense } from "react";
 
 export default function Page() {
   // 유저를 확인해서 로그인하지 않은 상태라면 로그인창으로 이동하게
@@ -6,7 +7,9 @@ export default function Page() {
 
   return (
     <>
-      <WritePage />
+      <Suspense fallback={<div className="p-8">로딩 중...</div>}>
+        <WritePage />
+      </Suspense>
     </>
   );
 }
