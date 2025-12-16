@@ -92,7 +92,7 @@ export default function WriteForm() {
     const capsulePassword =
       sendMethod === "URL" ? (formData.get("pagePw") as string) || "" : "";
 
-    // TODO: 미입력 폼 체크 - 변경 예정
+    // TODO: 미입력 폼 체크 - 토스트나 모달등으로 변경 예정
     if (!title) {
       window.alert("제목을 입력해 주세요.");
       return;
@@ -143,7 +143,7 @@ export default function WriteForm() {
       unlockAt: unlockAtIso,
       locationName: "",
       locationLat: 0,
-      locationIng: 0,
+      locationLng: 0,
       viewingRadius: 0,
       packingColor: "",
       contentColor: "",
@@ -224,7 +224,6 @@ export default function WriteForm() {
                 },
               ]}
             />
-            <div></div>
           </div>
         </WriteDiv>
 
