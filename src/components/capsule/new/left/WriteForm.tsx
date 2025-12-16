@@ -13,14 +13,14 @@ import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
 import WriteInput from "./WriteInput";
 import UnlockConditionTabs from "./UnlockConditionTabs";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
-import { authApi, type MemberMe } from "@/lib/api/auth";
-import { apiFetch } from "@/lib/api/fetchClient";
+import { useMe } from "@/lib/hooks/useMe";
+import { apiFetchRaw } from "@/lib/api/fetchClient";
 
 export default function WriteForm() {
   const [isCopyOpen, setIsCopyOpen] = useState(false);
@@ -30,8 +30,10 @@ export default function WriteForm() {
     password?: string;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [me, setMe] = useState<MemberMe | null>(null);
   const [senderMode, setSenderMode] = useState<"name" | "nickname">("name");
+
+  const meQuery = useMe();
+  const me = meQuery.data;
 
   const [visibility, setVisibility] = useState<Visibility>("PRIVATE");
   const [paperTab, setPaperTab] = useState("ENVELOPE");
@@ -53,17 +55,6 @@ export default function WriteForm() {
 
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
-
-  useEffect(() => {
-    // 로그인 사용자 정보 조회
-    authApi
-      .me()
-      .then((res) => setMe(res.data))
-      .catch((err) => {
-        console.error(err);
-        // 로그인 안 된 상태라면 이후 제출 시 가드
-      });
-  }, []);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const next = e.target.value;
@@ -101,7 +92,7 @@ export default function WriteForm() {
     const capsulePassword =
       sendMethod === "URL" ? (formData.get("pagePw") as string) || "" : "";
 
-    // 미입력 폼 체크 - 변경 예정
+    // TODO: 미입력 폼 체크 - 변경 예정
     if (!title) {
       window.alert("제목을 입력해 주세요.");
       return;
@@ -128,6 +119,12 @@ export default function WriteForm() {
     }
 
     if (!me?.memberId) {
+      if (meQuery.isLoading) {
+        window.alert(
+          "사용자 정보를 불러오는 중입니다. 잠시 후 다시 시도해 주세요."
+        );
+        return;
+      }
       window.alert("로그인 후 다시 시도해 주세요.");
       return;
     }
@@ -166,7 +163,7 @@ export default function WriteForm() {
         queryString ? `?${queryString}` : ""
       }`;
 
-      const res = await apiFetch<{
+      const data = await apiFetchRaw<{
         memberId: number;
         capsuleId: number;
         nickName: string;
@@ -184,8 +181,6 @@ export default function WriteForm() {
         method: "POST",
         json: payload,
       });
-
-      const data = res.data;
       setResult({
         userName: senderName || data?.nickName || "",
         url: data?.url || "",
