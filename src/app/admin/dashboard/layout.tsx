@@ -1,6 +1,6 @@
 import AdminSidebar from "@/components/dashboard/admin/sidebar/AdminSidebar";
 
-export default function DashboardLayout({
+export default function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;

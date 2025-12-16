@@ -1,34 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { Lock, Unlock, Clock, MapPin, Trash2, Eye } from "lucide-react";
 import DataTable from "../DataTable";
-import { CAPSULES } from "@/data/admin/AdminCapsule";
-
-function filterCapsules(capsules: AdminCapsule[], tab: string, query: string) {
-  let result = [...capsules];
-
-  // tab 필터
-  if (tab === "public")
-    result = result.filter((c) => c.visibility === "public");
-  if (tab === "private")
-    result = result.filter((c) => c.visibility === "private");
-  if (tab === "locked") result = result.filter((c) => c.status === "locked");
-  if (tab === "opened") result = result.filter((c) => c.status === "opened");
-
-  // 검색어 필터 (제목/발신자/수신자)
-  if (query) {
-    const q = query.toLowerCase();
-    result = result.filter(
-      (c) =>
-        c.title.toLowerCase().includes(q) ||
-        c.sender.toLowerCase().includes(q) ||
-        c.receiver.toLowerCase().includes(q)
-    );
-  }
-
-  return result;
-}
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
+import Pagination from "@/components/common/Pagination";
+import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 
 export default function CapsuleList({
   tab,
@@ -37,22 +21,70 @@ export default function CapsuleList({
   tab: string;
   query: string;
 }) {
-  const [capsules, setCapsules] = useState<AdminCapsule[]>(CAPSULES);
+  const queryClient = useQueryClient();
 
-  const onDelete = useCallback((id: number) => {
-    setCapsules((prev) => prev.filter((c) => c.id !== id));
-  }, []);
+  const [page, setPage] = useState(0);
+  const [size] = useState(10);
 
-  const onViewDetail = useCallback((id: number) => {
-    // TODO: 라우팅/모달로 연결
-    // router.push(`/admin/dashboard/capsules/${id}`);
-    console.log("view detail:", id);
-  }, []);
-
-  const rows = useMemo(
-    () => filterCapsules(capsules, tab, query),
-    [capsules, tab, query]
+  // 모달 상태
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedCapsuleId, setSelectedCapsuleId] = useState<number | null>(
+    null
   );
+
+  // 탭/검색 변경 시 페이지 리셋 + 모달 닫기
+  useEffect(() => {
+    setPage(0);
+    setIsDetailOpen(false);
+    setSelectedCapsuleId(null);
+  }, [tab, query]);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["adminCapsules", tab, query, page, size],
+    queryFn: ({ signal }) =>
+      adminCapsulesApi.list({ tab, query, page, size, signal }),
+    placeholderData: keepPreviousData,
+  });
+
+  const capsulesData = data?.content ?? [];
+  const totalElements = data?.totalElements ?? 0;
+
+  const openDetail = useCallback((id: number) => {
+    setSelectedCapsuleId(id);
+    setIsDetailOpen(true);
+  }, []);
+
+  const closeDetail = useCallback(() => {
+    setIsDetailOpen(false);
+    setSelectedCapsuleId(null);
+  }, []);
+
+  const toggleDeleteMutation = useMutation({
+    mutationFn: (params: { capsuleId: number; deleted: boolean }) =>
+      adminCapsulesApi.toggleDelete(params),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["adminCapsules"],
+      });
+    },
+
+    onError: (error) => {
+      console.error(error);
+      alert("상태 변경에 실패했습니다.");
+    },
+  });
+
+  const handleToggleDelete = (capsule: AdminCapsule) => {
+    const ok = confirm("이 캡슐을 삭제 처리하시겠습니까?");
+
+    if (!ok) return;
+
+    toggleDeleteMutation.mutate({
+      capsuleId: capsule.id,
+      deleted: !capsule.deleted,
+    });
+  };
 
   const columns = useMemo(
     () => [
@@ -63,49 +95,51 @@ export default function CapsuleList({
         cell: (c: AdminCapsule) => (
           <div className="flex gap-2 items-center">
             <span>{c.title}</span>
-            {c.visibility === "public" ? (
+            {c.visibility === "PUBLIC" ? (
               <span className="py-0.5 px-2 text-xs bg-blue-100 text-blue-800 rounded-md">
                 공개
               </span>
-            ) : (
-              ""
-            )}
+            ) : null}
           </div>
         ),
       },
-      { key: "sender", header: "발신자", cell: (c: AdminCapsule) => c.sender },
+      {
+        key: "sender",
+        header: "발신자",
+        cell: (c: AdminCapsule) => c.writerNickname,
+      },
       {
         key: "receiver",
         header: "수신자",
-        cell: (c: AdminCapsule) => c.receiver,
+        cell: (c: AdminCapsule) => (c.receiver ? c.receiver : ""),
       },
       {
         key: "unlockType",
         header: "해제 타입",
         cell: (c: AdminCapsule) => {
           const bgTextClass =
-            c.unlockType === "time"
-              ? "bg-violet-100 text-violet-800" // 시간
-              : c.unlockType === "location"
-              ? "bg-orange-100 text-orange-800" // 위치
-              : "bg-pink-100 text-pink-800"; // 시간+위치
+            c.unlockType === "TIME"
+              ? "bg-violet-100 text-violet-800"
+              : c.unlockType === "LOCATION"
+              ? "bg-orange-100 text-orange-800"
+              : "bg-pink-100 text-pink-800";
 
           return (
             <div
               className={`inline-flex items-center gap-1 py-1 px-3 rounded-lg text-n ${bgTextClass}`}
             >
-              {c.unlockType === "time" && <Clock size={14} />}
-              {c.unlockType === "location" && <MapPin size={14} />}
-              {c.unlockType === "time_location" && (
+              {c.unlockType === "TIME" && <Clock size={14} />}
+              {c.unlockType === "LOCATION" && <MapPin size={14} />}
+              {c.unlockType === "TIME_AND_LOCATION" && (
                 <div className="flex gap-1">
                   <Clock size={14} />
                   <MapPin size={14} />
                 </div>
               )}
               <span>
-                {c.unlockType === "time"
+                {c.unlockType === "TIME"
                   ? "시간"
-                  : c.unlockType === "location"
+                  : c.unlockType === "LOCATION"
                   ? "위치"
                   : "시간+위치"}
               </span>
@@ -131,7 +165,7 @@ export default function CapsuleList({
         key: "status",
         header: "상태",
         cell: (c: AdminCapsule) =>
-          c.status === "locked" ? (
+          c.unlockAt === null ? (
             <div className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-3 py-1 text-amber-800">
               <Lock size={14} />
               잠김
@@ -149,14 +183,14 @@ export default function CapsuleList({
         cell: (c: AdminCapsule) => (
           <div className="flex items-center gap-2">
             <button
-              onClick={() => onViewDetail(c.id)}
+              onClick={() => openDetail(c.id)}
               className="cursor-pointer inline-flex items-center gap-1 rounded-lg bg-admin/70 px-3 py-1 text-white hover:bg-admin"
             >
               <Eye size={14} />
               세부
             </button>
             <button
-              onClick={() => onDelete(c.id)}
+              onClick={() => handleToggleDelete(c)}
               className="cursor-pointer inline-flex items-center gap-1 rounded-lg bg-red-500 px-3 py-1 text-white hover:bg-red-600"
             >
               <Trash2 size={14} />
@@ -166,15 +200,36 @@ export default function CapsuleList({
         ),
       },
     ],
-    [onDelete, onViewDetail]
+    [handleToggleDelete, openDetail]
   );
 
   return (
-    <DataTable<AdminCapsule>
-      columns={columns}
-      rows={rows}
-      getRowKey={(c) => c.id}
-      emptyMessage="표시할 캡슐이 없습니다."
-    />
+    <>
+      <DataTable<AdminCapsule>
+        columns={columns}
+        rows={capsulesData}
+        getRowKey={(c) => c.id}
+        emptyMessage="표시할 캡슐이 없습니다."
+        isLoading={isLoading}
+        skeletonRowCount={size}
+      />
+
+      <Pagination
+        page={page}
+        size={size}
+        totalElements={totalElements}
+        onPageChange={setPage}
+      />
+
+      {/* 모달 렌더링: open일 때만 마운트(원하면 항상 마운트로 바꿔도 됨) */}
+      {selectedCapsuleId !== null && (
+        <LetterDetailModal
+          capsuleId={selectedCapsuleId}
+          open={isDetailOpen}
+          onClose={closeDetail}
+          role="ADMIN"
+        />
+      )}
+    </>
   );
 }

@@ -10,7 +10,7 @@ type PageProps = {
 export default async function Page({ params }: PageProps) {
   const { capsuleId } = await params;
 
-  const capsule = dummyCapsules.find((c) => c.id === capsuleId);
+  const capsule = dummyCapsules.find((c) => c.id === Number(capsuleId));
 
   // 1) 편지 조회 => 편지 없으면 x
   // const letter = await getCapsuleById(capsuleId);

@@ -6,7 +6,7 @@ type UnlockCondition =
 type MailboxType = "send" | "receive" | "bookmark";
 
 interface Capsule {
-  id: string;
+  id: number;
   mailbox: MailboxType; // send/receive/bookmark에서 필터용
   from: string;
   to: string;
