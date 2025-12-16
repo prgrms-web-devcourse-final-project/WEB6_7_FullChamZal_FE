@@ -1,5 +1,6 @@
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import MailboxPage from "@/components/dashboard/contents/mailbox/MailboxPage";
+import { Suspense } from "react";
 
 export default async function ReceivePage({
   searchParams,
@@ -11,13 +12,15 @@ export default async function ReceivePage({
 
   return (
     <>
-      <MailboxPage type="receive" />
-      {capsuleId ? (
-        <LetterDetailModal
-          capsuleId={capsuleId}
-          closeHref="/dashboard/receive"
-        />
-      ) : null}
+      <Suspense fallback={<div className="p-8">로딩 중...</div>}>
+        <MailboxPage type="receive" />
+        {capsuleId ? (
+          <LetterDetailModal
+            capsuleId={capsuleId}
+            closeHref="/dashboard/receive"
+          />
+        ) : null}
+      </Suspense>
     </>
   );
 }

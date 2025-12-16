@@ -1,5 +1,6 @@
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import MailboxPage from "@/components/dashboard/contents/mailbox/MailboxPage";
+import { Suspense } from "react";
 
 export default async function SendPage({
   searchParams,
@@ -11,10 +12,15 @@ export default async function SendPage({
 
   return (
     <>
-      <MailboxPage type="send" />
-      {capsuleId ? (
-        <LetterDetailModal capsuleId={capsuleId} closeHref="/dashboard/send" />
-      ) : null}
+      <Suspense fallback={<div className="p-8">로딩 중...</div>}>
+        <MailboxPage type="send" />
+        {capsuleId ? (
+          <LetterDetailModal
+            capsuleId={capsuleId}
+            closeHref="/dashboard/send"
+          />
+        ) : null}
+      </Suspense>
     </>
   );
 }
