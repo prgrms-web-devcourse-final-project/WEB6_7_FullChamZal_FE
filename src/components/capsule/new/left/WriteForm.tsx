@@ -94,6 +94,7 @@ export default function WriteForm() {
     const senderName =
       senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
     const title = (formData.get("title") as string) || "";
+    const receiveName = (formData.get("receiveName") as string) || "";
     const contentValue = content.trim();
     const phoneNum =
       sendMethod === "PHONE" ? (formData.get("pagePw") as string) || "" : "";
@@ -103,6 +104,10 @@ export default function WriteForm() {
     // 미입력 폼 체크 - 변경 예정
     if (!title) {
       window.alert("제목을 입력해 주세요.");
+      return;
+    }
+    if (!receiveName) {
+      window.alert("받는 사람을 입력해 주세요.");
       return;
     }
     if (!contentValue) {
