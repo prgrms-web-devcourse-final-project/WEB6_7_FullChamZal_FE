@@ -4,15 +4,16 @@ import { ArrowRight } from "lucide-react";
 import Button from "../../common/Button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMe } from "@/lib/hooks/useMe";
 
 export default function SixthSection() {
   const router = useRouter();
-  // const { user } = useAuth();
+  const me = useMe();
 
   const handleWrite = () => {
-    const isLoggedIn = false; // TODO: user 존재 여부로 교체
+    if (me.isLoading) return;
 
-    if (!isLoggedIn) {
+    if (me.isError) {
       router.push(
         `/auth/login?callbackUrl=${encodeURIComponent("/capsules/new")}`
       );

@@ -3,8 +3,10 @@
 import { Search } from "lucide-react";
 import AdminMenuTab from "./AdminMenuTab";
 import ContentsList from "./ContentsList";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+type TabItem = { key: string; label: string };
 
 export default function AdminBody({
   section,
@@ -33,13 +35,6 @@ export default function AdminBody({
   const setTab = (nextTab: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", nextTab);
-    router.replace(`${pathname}?${params.toString()}`);
-  };
-
-  const setQuery = (nextQuery: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (nextQuery) params.set("q", nextQuery);
-    else params.delete("q");
     router.replace(`${pathname}?${params.toString()}`);
   };
 
