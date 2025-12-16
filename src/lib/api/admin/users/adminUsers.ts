@@ -1,35 +1,54 @@
+import { apiFetch } from "../../fetchClient";
+
 export type AdminStatus = "ACTIVE" | "STOP";
 
-export type GetAdminUsersParams = {
-  page?: number;
-  size?: number;
-  status?: AdminStatus;
-  query?: string;
+function mapTabToFilters(tab: string): { status?: AdminStatus } {
+  if (tab === "active") return { status: "ACTIVE" };
+  if (tab === "stop") return { status: "STOP" };
+  return {};
+}
+
+export type AdminUsersSummary = {
+  total: number;
+  active: number;
+  stop: number;
+  reported: number;
 };
 
-export async function getAdminUsers(params: GetAdminUsersParams = {}) {
-  const { page = 0, size = 20, status, query } = params;
+export type AdminUsersResponse = {
+  content: AdminUser[];
+  totalElements: number;
+  summary?: AdminUsersSummary;
+};
 
-  const searchParams = new URLSearchParams();
-  searchParams.set("page", String(page));
-  searchParams.set("size", String(size));
+export async function fetchAdminUsers(params: {
+  tab: string;
+  query: string;
+  page: number;
+  size: number;
+  signal?: AbortSignal;
+}) {
+  const filters = mapTabToFilters(params.tab);
 
-  // all이면 status 자체를 보내지 않는다
-  if (status) searchParams.set("status", status);
-
-  if (query && query.trim()) searchParams.set("query", query.trim());
-
-  const url = `${
-    process.env.NEXT_PUBLIC_API_BASE_URL
-  }/api/v1/admin/members?${searchParams.toString()}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store",
+  const qs = new URLSearchParams({
+    page: String(params.page),
+    size: String(params.size),
+    query: params.query ?? "",
+    ...(filters.status ? { status: filters.status } : {}),
   });
 
-  if (!res.ok) throw new Error("회원 목록을 불러올 수 없습니다.");
+  return apiFetch<AdminUsersResponse>(
+    `/api/v1/admin/members?${qs.toString()}`,
+    { signal: params.signal }
+  );
+}
 
-  return await res.json();
+export async function toggleAdminUserStatus(params: {
+  id: number;
+  nextStatus: AdminStatus;
+}) {
+  return apiFetch<void>(`/api/v1/admin/members/${params.id}/status`, {
+    method: "PATCH",
+    json: { status: params.nextStatus },
+  });
 }

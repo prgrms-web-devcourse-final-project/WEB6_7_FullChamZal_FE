@@ -1,12 +1,11 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import Input from "@/components/common/Input";
 import { useState } from "react";
 import Button from "../common/Button";
 import { useRouter } from "next/navigation";
 
-import { authApi } from "@/lib/api/auth";
+import { authApi } from "@/lib/api/auth/auth";
 
 function getErrorMessage(err: unknown) {
   if (err instanceof Error) return err.message;
@@ -43,8 +42,8 @@ export default function LoginForm() {
 
       await authApi.login({ userId: id.trim(), password: pw });
       const me = await authApi.me();
-      const isAdmin = me.data.role === "ADMIN";
-      const target = isAdmin ? "/admin" : "/dashboard";
+      const isAdmin = me.role === "ADMIN";
+      const target = isAdmin ? "/admin/dashboard/users" : "/dashboard";
       router.replace(target);
       router.refresh();
     } catch (err) {

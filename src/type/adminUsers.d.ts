@@ -29,3 +29,10 @@ type UserListResponse = {
     reported: number;
   };
 };
+
+type GetAdminUsersParams = {
+  page?: number;
+  size?: number;
+  status?: AdminStatus;
+  query?: string;
+};

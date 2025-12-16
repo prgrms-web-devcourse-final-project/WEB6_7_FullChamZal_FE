@@ -1,10 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Ban, CheckCircle } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import DataTable from "../DataTable";
 import Pagination from "@/components/common/Pagination";
-import { useAdminUsersStore } from "@/store/admin/adminUsersStore";
+import {
+  fetchAdminUsers,
+  toggleAdminUserStatus,
+  AdminStatus,
+} from "@/lib/api/admin/users/adminUsers";
 
 export default function UserList({
   tab,
@@ -13,27 +25,71 @@ export default function UserList({
   tab: string;
   query: string;
 }) {
-  const {
-    users,
-    totalElements,
-    loading,
-    page,
-    size,
-    setPage,
-    resetPage,
-    fetchUsers,
-    toggleStatus,
-  } = useAdminUsersStore();
+  const [page, setPage] = useState(0);
+  const [size] = useState(10);
 
-  // tab/query 바뀌면 page 리셋
+  // 탭/검색 변경 시 페이지 리셋
   useEffect(() => {
-    resetPage();
-  }, [tab, query, resetPage]);
+    setPage(0);
+  }, [tab, query]);
 
-  // 데이터 fetch
-  useEffect(() => {
-    fetchUsers({ tab, query });
-  }, [tab, query, page, size, fetchUsers]);
+  const queryClient = useQueryClient();
+
+  const usersQuery = useQuery({
+    queryKey: ["adminUsers", tab, query, page, size],
+    queryFn: ({ signal }) =>
+      fetchAdminUsers({ tab, query, page, size, signal }),
+    placeholderData: keepPreviousData,
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, nextStatus }: { id: number; nextStatus: AdminStatus }) =>
+      toggleAdminUserStatus({ id, nextStatus }),
+
+    // Optimistic update
+    onMutate: async ({ id, nextStatus }) => {
+      await queryClient.cancelQueries({ queryKey: ["adminUsers"] });
+
+      const previous = queryClient.getQueryData<any>([
+        "adminUsers",
+        tab,
+        query,
+        page,
+        size,
+      ]);
+
+      queryClient.setQueryData(
+        ["adminUsers", tab, query, page, size],
+        (old: any) => {
+          if (!old) return old;
+          return {
+            ...old,
+            content: old.content.map((u: AdminUser) =>
+              u.id === id ? { ...u, status: nextStatus } : u
+            ),
+          };
+        }
+      );
+
+      return { previous };
+    },
+
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) {
+        queryClient.setQueryData(
+          ["adminUsers", tab, query, page, size],
+          ctx.previous
+        );
+      }
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
+    },
+  });
+
+  const users = usersQuery.data?.content ?? [];
+  const totalElements = usersQuery.data?.totalElements ?? 0;
 
   const columns = useMemo(
     () => [
@@ -71,52 +127,56 @@ export default function UserList({
         cell: (u: AdminUser) =>
           u.status === "ACTIVE" ? (
             <div className="inline-flex items-center gap-1 rounded-lg bg-[#DCFCE7] px-3 py-1 text-green-800">
-              <CheckCircle size={14} />
-              활성
+              <CheckCircle size={14} /> 활성
             </div>
           ) : (
             <div className="inline-flex items-center gap-1 rounded-lg bg-red-100 px-3 py-1 text-red-800">
-              <Ban size={14} />
-              정지
+              <Ban size={14} /> 정지
             </div>
           ),
       },
       {
         key: "action",
         header: "액션",
-        cell: (u: AdminUser) => (
-          <button
-            type="button"
-            onClick={async () => {
-              try {
-                await toggleStatus(u.id);
-              } catch {
-                alert("상태 변경에 실패했습니다.");
-              }
-            }}
-            className={`cursor-pointer px-3 py-1 rounded-lg text-white ${
-              u.status === "ACTIVE"
-                ? "bg-primary hover:bg-red-300"
-                : "bg-admin/50 hover:bg-admin"
-            }`}
-          >
-            {u.status === "ACTIVE" ? "정지" : "해제"}
-          </button>
-        ),
+        cell: (u: AdminUser) => {
+          const nextStatus: AdminStatus =
+            u.status === "ACTIVE" ? "STOP" : "ACTIVE";
+
+          return (
+            <button
+              type="button"
+              disabled={toggleMutation.isPending}
+              onClick={() => toggleMutation.mutate({ id: u.id, nextStatus })}
+              className={`cursor-pointer px-3 py-1 rounded-lg text-white disabled:opacity-50 ${
+                u.status === "ACTIVE"
+                  ? "bg-primary hover:bg-red-300"
+                  : "bg-admin/50 hover:bg-admin"
+              }`}
+            >
+              {u.status === "ACTIVE" ? "정지" : "해제"}
+            </button>
+          );
+        },
       },
     ],
-    [toggleStatus]
+    [toggleMutation]
   );
+
+  const isInitialLoading = usersQuery.isLoading;
 
   return (
     <div className="space-y-3">
-      {loading && <div className="text-sm text-text-4">불러오는 중...</div>}
-
       <DataTable
         columns={columns}
         rows={users}
         getRowKey={(u: AdminUser) => u.id}
-        emptyMessage="표시할 사용자가 없습니다."
+        emptyMessage={
+          usersQuery.isError
+            ? "불러오기에 실패했습니다."
+            : "표시할 사용자가 없습니다."
+        }
+        isLoading={isInitialLoading}
+        skeletonRowCount={size}
       />
 
       <Pagination
