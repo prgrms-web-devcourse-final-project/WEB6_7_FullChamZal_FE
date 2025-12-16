@@ -19,8 +19,8 @@ import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
-import { API_BASE_URL } from "@/lib/api";
 import { authApi, type MemberMe } from "@/lib/api/auth";
+import { apiFetch } from "@/lib/api/fetchClient";
 
 export default function WriteForm() {
   const [isCopyOpen, setIsCopyOpen] = useState(false);
@@ -151,32 +151,36 @@ export default function WriteForm() {
     try {
       setIsSubmitting(true);
 
-      if (!API_BASE_URL) {
-        throw new Error("API base URL이 설정되지 않았습니다.");
-      }
+      // Query parameter 구성
+      const searchParams = new URLSearchParams();
+      if (phoneNum) searchParams.set("phoneNum", phoneNum);
+      if (capsulePassword) searchParams.set("capsulePassword", capsulePassword);
 
-      const url = new URL("/api/v1/capsule/create/private", API_BASE_URL);
-      if (phoneNum) url.searchParams.set("phoneNum", phoneNum);
-      if (capsulePassword)
-        url.searchParams.set("capsulePassword", capsulePassword);
+      const queryString = searchParams.toString();
+      const path = `/api/v1/capsule/create/private${
+        queryString ? `?${queryString}` : ""
+      }`;
 
-      const res = await fetch(url.toString(), {
+      const res = await apiFetch<{
+        memberId: number;
+        capsuleId: number;
+        nickName: string;
+        url: string;
+        capPW?: string;
+        title: string;
+        content: string;
+        visibility: string;
+        unlockType: string;
+        unlock: unknown;
+        letter: unknown;
+        maxViewCount: number;
+        currentViewCount: number;
+      }>(path, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        credentials: "include",
+        json: payload,
       });
 
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        const message =
-          errBody.message || errBody.error || "캡슐 생성에 실패했습니다.";
-        throw new Error(message);
-      }
-
-      const data = await res.json();
+      const data = res.data;
       setResult({
         userName: senderName || data?.nickName || "",
         url: data?.url || "",
