@@ -10,5 +10,5 @@ export const authApi = {
   me: (signal?: AbortSignal) =>
     apiFetch<MemberMe>("/api/v1/members/me", { signal }),
 
-  logout: () => apiFetch("/api/v1/auth/logout"),
+  logout: () => apiFetch<void>("/api/v1/auth/logout", { method: "POST" }),
 };
