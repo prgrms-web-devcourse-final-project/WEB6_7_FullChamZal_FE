@@ -57,7 +57,22 @@ export default function CapsuleList({
   const columns = useMemo(
     () => [
       { key: "id", header: "ID", cell: (c: AdminCapsule) => `#${c.id}` },
-      { key: "title", header: "제목", cell: (c: AdminCapsule) => c.title },
+      {
+        key: "title",
+        header: "제목",
+        cell: (c: AdminCapsule) => (
+          <div className="flex gap-2 items-center">
+            <span>{c.title}</span>
+            {c.visibility === "public" ? (
+              <span className="py-0.5 px-2 text-xs bg-blue-100 text-blue-800 rounded-md">
+                공개
+              </span>
+            ) : (
+              ""
+            )}
+          </div>
+        ),
+      },
       { key: "sender", header: "발신자", cell: (c: AdminCapsule) => c.sender },
       {
         key: "receiver",

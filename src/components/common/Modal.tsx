@@ -22,7 +22,7 @@ export default function Modal({
           onMouseDown={onClose} // backdrop 클릭 닫기
         >
           <motion.div
-            className="relative p-8"
+            className="relative w-full h-screen p-8"
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}

@@ -1,5 +1,6 @@
 import "@/css/index.css";
 import Script from "next/script";
+import Providers from "./providers";
 
 export const metadata = {
   title: "Next.js",
@@ -14,11 +15,13 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        {children}
-        <Script
-          src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_KEY}&libraries=services,clusterer&autoload=false`}
-          strategy="beforeInteractive"
-        ></Script>
+        <Providers>
+          {children}{" "}
+          <Script
+            src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_KEY}&libraries=services,clusterer&autoload=false`}
+            strategy="beforeInteractive"
+          ></Script>
+        </Providers>
       </body>
     </html>
   );
