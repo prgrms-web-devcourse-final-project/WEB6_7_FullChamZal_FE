@@ -5,14 +5,10 @@ import { useState } from "react";
 import Button from "../common/Button";
 import { useRouter } from "next/navigation";
 
-
-import { authApi } from "@/lib/api/auth";
-
+import { authApi } from "@/lib/api/auth/auth";
 
 function getErrorMessage(err: unknown) {
-  
   if (err instanceof Error) return err.message;
-
 
   if (typeof err === "object" && err !== null && "message" in err) {
     const msg = (err as { message?: unknown }).message;
@@ -28,14 +24,12 @@ export default function LoginForm() {
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
 
- 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    
     setError("");
 
     if (!id.trim() || !pw.trim()) {
@@ -46,11 +40,10 @@ export default function LoginForm() {
     try {
       setLoading(true);
 
-
       await authApi.login({ userId: id.trim(), password: pw });
       const me = await authApi.me();
-      const isAdmin = me.data.role === "ADMIN";
-      const target = isAdmin ? "/admin" : "/dashboard";
+      const isAdmin = me.role === "ADMIN";
+      const target = isAdmin ? "/admin/dashboard/users" : "/dashboard";
       router.replace(target);
       router.refresh();
     } catch (err) {

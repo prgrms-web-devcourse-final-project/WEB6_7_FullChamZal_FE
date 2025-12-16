@@ -1,16 +1,34 @@
 "use client";
 
+type Column<T> = {
+  key: string;
+  header: React.ReactNode;
+  cell: (row: T) => React.ReactNode;
+  skeleton?: React.ReactNode;
+  className?: string;
+};
+
+function SkeletonBar({ w = "w-24" }: { w?: string }) {
+  return <div className={`h-3 ${w} rounded-md bg-[#cecece] animate-pulse`} />;
+}
+
 export default function DataTable<T>({
   columns,
   rows,
   getRowKey,
   emptyMessage = "표시할 데이터가 없습니다.",
+  isLoading = false,
+  skeletonRowCount = 8,
 }: {
   columns: Column<T>[];
   rows: T[];
   getRowKey: (row: T) => string | number;
   emptyMessage?: string;
+  isLoading?: boolean;
+  skeletonRowCount?: number;
 }) {
+  const showEmpty = !isLoading && rows.length === 0;
+
   return (
     <div className="rounded-2xl border border-outline overflow-hidden bg-white">
       <table className="w-full">
@@ -24,17 +42,45 @@ export default function DataTable<T>({
           </tr>
         </thead>
 
-        <tbody>
-          {rows.length === 0 ? (
+        <tbody className="text-text-2" aria-busy={isLoading}>
+          {/* Loading Skeleton */}
+          {isLoading &&
+            Array.from({ length: skeletonRowCount }).map((_, rIdx) => (
+              <tr
+                key={`sk-${rIdx}`}
+                className="text-sm border-b border-sub last:border-b-0 [&>td]:py-4 [&>td]:px-6"
+              >
+                {columns.map((col, cIdx) => (
+                  <td key={`sk-${rIdx}-${col.key}`} className={col.className}>
+                    <SkeletonBar
+                      w={
+                        cIdx % 4 === 0
+                          ? "w-16"
+                          : cIdx % 4 === 1
+                          ? "w-28"
+                          : cIdx % 4 === 2
+                          ? "w-20"
+                          : "w-32"
+                      }
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+
+          {/* Empty */}
+          {showEmpty && (
             <tr>
               <td
                 colSpan={columns.length}
                 className="py-10 text-center text-sm text-text-4"
               >
-                {emptyMessage}
+                {isLoading ? "불러오는 중" : emptyMessage}
               </td>
             </tr>
-          ) : (
+          )}
+
+          {!isLoading &&
             rows.map((row) => (
               <tr
                 key={getRowKey(row)}
@@ -46,8 +92,7 @@ export default function DataTable<T>({
                   </td>
                 ))}
               </tr>
-            ))
-          )}
+            ))}
         </tbody>
       </table>
     </div>

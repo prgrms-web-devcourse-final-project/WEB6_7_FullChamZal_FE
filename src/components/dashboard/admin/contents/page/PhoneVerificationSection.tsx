@@ -4,9 +4,10 @@ import StatsOverview from "../StatsOverview";
 
 const PHONE_TABS = [
   { key: "all", label: "전체" },
-  { key: "success", label: "성공" },
-  { key: "fail", label: "실패" },
-  { key: "locked", label: "만료" },
+  { key: "verified", label: "인증 성공" },
+  { key: "failed", label: "인증 실패" },
+  { key: "expired", label: "만료" },
+  { key: "pending", label: "대기중" },
 ] as const;
 
 export default function PhoneVerificationSection() {

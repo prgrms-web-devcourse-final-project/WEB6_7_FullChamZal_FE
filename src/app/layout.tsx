@@ -1,4 +1,5 @@
 import "@/css/index.css";
+import Providers from "./providers";
 
 export const metadata = {
   title: "Next.js",
@@ -12,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

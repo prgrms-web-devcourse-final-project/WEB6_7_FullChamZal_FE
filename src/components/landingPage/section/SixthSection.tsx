@@ -2,17 +2,30 @@
 
 import { ArrowRight } from "lucide-react";
 import Button from "../../common/Button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMe } from "@/lib/hooks/useMe";
 
 export default function SixthSection() {
   const router = useRouter();
-  // const { user } = useAuth();
+  const me = useMe();
+
+  const handleLogin = () => {
+    if (me.isLoading) return;
+
+    if (me.isError) {
+      router.push(
+        `/auth/login?callbackUrl=${encodeURIComponent("/dashboard")}`
+      );
+      return;
+    }
+
+    router.push("/dashboard");
+  };
 
   const handleWrite = () => {
-    const isLoggedIn = false; // TODO: user 존재 여부로 교체
+    if (me.isLoading) return;
 
-    if (!isLoggedIn) {
+    if (me.isError) {
       router.push(
         `/auth/login?callbackUrl=${encodeURIComponent("/capsules/new")}`
       );
@@ -47,11 +60,12 @@ export default function SixthSection() {
               >
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
-              <Link href={"/auth/login"}>
-                <Button className="border border-outline text-text py-4 px-5 bg-white hover:bg-button-hover font-normal">
-                  로그인
-                </Button>
-              </Link>
+              <Button
+                onClick={handleLogin}
+                className="border border-outline text-text py-4 px-5 bg-white hover:bg-button-hover font-normal"
+              >
+                로그인
+              </Button>
             </div>
           </div>
           <div className="text-[#525252] space-y-4 text-center">
