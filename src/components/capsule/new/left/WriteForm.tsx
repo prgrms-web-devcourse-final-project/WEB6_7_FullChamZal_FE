@@ -19,6 +19,8 @@ import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
+import { useMe } from "@/lib/hooks/useMe";
+import { apiFetchRaw } from "@/lib/api/fetchClient";
 
 export default function WriteForm() {
   const [isCopyOpen, setIsCopyOpen] = useState(false);
@@ -27,6 +29,11 @@ export default function WriteForm() {
     url: string;
     password?: string;
   } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [senderMode, setSenderMode] = useState<"name" | "nickname">("name");
+
+  const meQuery = useMe();
+  const me = meQuery.data;
 
   const [visibility, setVisibility] = useState<Visibility>("PRIVATE");
   const [paperTab, setPaperTab] = useState("ENVELOPE");
@@ -46,7 +53,7 @@ export default function WriteForm() {
 
   const [content, setContent] = useState("");
 
-  /* 한글 입력(조합) 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
+  /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -73,16 +80,121 @@ export default function WriteForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // TODO: 서버 저장
-    // const data = await fetch(...).then(r => r.json());
+    const formData = new FormData(e.currentTarget);
+    // 로그인 사용자의 name을 발신자 이름으로 고정
+    const senderName =
+      senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
+    const title = (formData.get("title") as string) || "";
+    const receiveName = (formData.get("receiveName") as string) || "";
+    const contentValue = content.trim();
+    const phoneNum =
+      sendMethod === "PHONE" ? (formData.get("pagePw") as string) || "" : "";
+    const capsulePassword =
+      sendMethod === "URL" ? (formData.get("pagePw") as string) || "" : "";
 
-    const data = {
-      userName: "홍길동",
-      url: "https://dear.com/letter/123",
-      password: "1234",
-    }; // 예시
-    setResult(data);
-    setIsCopyOpen(true);
+    // TODO: 미입력 폼 체크 - 토스트나 모달등으로 변경 예정
+    if (!title) {
+      window.alert("제목을 입력해 주세요.");
+      return;
+    }
+    if (!receiveName) {
+      window.alert("받는 사람을 입력해 주세요.");
+      return;
+    }
+    if (!contentValue) {
+      window.alert("내용을 입력해 주세요.");
+      return;
+    }
+    if (!dayForm.date || !dayForm.time) {
+      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
+      return;
+    }
+    if (sendMethod === "PHONE" && !phoneNum) {
+      window.alert("전화번호를 입력해 주세요.");
+      return;
+    }
+    if (sendMethod === "URL" && !capsulePassword) {
+      window.alert("비밀번호를 입력해 주세요.");
+      return;
+    }
+
+    if (!me?.memberId) {
+      if (meQuery.isLoading) {
+        window.alert(
+          "사용자 정보를 불러오는 중입니다. 잠시 후 다시 시도해 주세요."
+        );
+        return;
+      }
+      window.alert("로그인 후 다시 시도해 주세요.");
+      return;
+    }
+
+    const unlockAtIso = new Date(
+      `${dayForm.date}T${dayForm.time}:00`
+    ).toISOString();
+
+    const payload = {
+      memberId: me.memberId,
+      nickName: senderName,
+      title,
+      content: contentValue,
+      visibility,
+      unlockType: "TIME",
+      unlockAt: unlockAtIso,
+      locationName: "",
+      locationLat: 0,
+      locationLng: 0,
+      viewingRadius: 0,
+      packingColor: "",
+      contentColor: "",
+      maxViewCount: 0,
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      // Query parameter 구성
+      const searchParams = new URLSearchParams();
+      if (phoneNum) searchParams.set("phoneNum", phoneNum);
+      if (capsulePassword) searchParams.set("capsulePassword", capsulePassword);
+
+      const queryString = searchParams.toString();
+      const path = `/api/v1/capsule/create/private${
+        queryString ? `?${queryString}` : ""
+      }`;
+
+      const data = await apiFetchRaw<{
+        memberId: number;
+        capsuleId: number;
+        nickName: string;
+        url: string;
+        capPW?: string;
+        title: string;
+        content: string;
+        visibility: string;
+        unlockType: string;
+        unlock: unknown;
+        letter: unknown;
+        maxViewCount: number;
+        currentViewCount: number;
+      }>(path, {
+        method: "POST",
+        json: payload,
+      });
+      setResult({
+        userName: senderName || data?.nickName || "",
+        url: data?.url || "",
+        password: data?.capPW,
+      });
+      setIsCopyOpen(true);
+    } catch (error) {
+      console.error(error);
+      const message =
+        error instanceof Error ? error.message : "캡슐 생성에 실패했습니다.";
+      window.alert(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -112,13 +224,38 @@ export default function WriteForm() {
                 },
               ]}
             />
-            <div></div>
           </div>
         </WriteDiv>
 
         <WriteDiv title="보내는 사람">
-          <div>
-            <WriteInput id="sendName" type="text" placeholder="홍길동" />
+          <div className="space-y-2">
+            <div className="flex items-center justify-end gap-3 text-sm text-text-1 -mt-8 mb-2">
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={senderMode === "name"}
+                  onChange={() => setSenderMode("name")}
+                />
+                <span>이름</span>
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={senderMode === "nickname"}
+                  onChange={() => setSenderMode("nickname")}
+                />
+                <span>닉네임</span>
+              </label>
+            </div>
+            <WriteInput
+              id="sendName"
+              type="text"
+              placeholder="홍길동"
+              value={
+                senderMode === "nickname" ? me?.nickname || "" : me?.name || ""
+              }
+              readOnly
+            />
           </div>
         </WriteDiv>
 
@@ -251,7 +388,7 @@ export default function WriteForm() {
 
         <Button type="submit" className="w-full py-4 space-x-2">
           <Send />
-          <span>편지 보내기</span>
+          <span>{isSubmitting ? "보내는 중..." : "편지 보내기"}</span>
         </Button>
       </form>
 
