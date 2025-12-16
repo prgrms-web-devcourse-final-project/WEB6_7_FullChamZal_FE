@@ -6,10 +6,11 @@ import Background from "./Background";
 import { useEffect, useState } from "react";
 import Button from "@/components/common/Button";
 import { useRouter } from "next/navigation";
+import { useMe } from "@/lib/hooks/useMe";
 
 export default function MainSection() {
   const router = useRouter();
-  // const { user } = useAuth();
+  const me = useMe();
 
   const words: string[] = ["You", "Time", "There", "Now", "___"];
 
@@ -62,9 +63,9 @@ export default function MainSection() {
   const visibleText = currentWord.slice(0, charIndex);
 
   const handleWrite = () => {
-    const isLoggedIn = false; // TODO: user 존재 여부로 교체
+    if (me.isLoading) return;
 
-    if (!isLoggedIn) {
+    if (me.isError) {
       router.push(
         `/auth/login?callbackUrl=${encodeURIComponent("/capsules/new")}`
       );

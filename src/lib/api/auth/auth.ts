@@ -7,7 +7,8 @@ export const authApi = {
       json: payload,
     }),
 
-  me: () => apiFetch<MemberMe>("/api/v1/members/me"),
+  me: (signal?: AbortSignal) =>
+    apiFetch<MemberMe>("/api/v1/members/me", { signal }),
 
   logout: () => apiFetch("/api/v1/auth/logout"),
 };
