@@ -129,45 +129,129 @@ export default function WriteForm() {
       return;
     }
 
-    const unlockAtIso = new Date(
-      `${dayForm.date}T${dayForm.time}:00`
-    ).toISOString();
+    // unlockType 매핑: MANUAL → TIME_AND_LOCATION
+    const effectiveUnlockType =
+      unlockType === "MANUAL" ? "TIME_AND_LOCATION" : unlockType;
 
-    const payload = {
+    // 시간/위치 필수 검증 (unlockType에 따라)
+    if (
+      (effectiveUnlockType === "TIME" ||
+        effectiveUnlockType === "TIME_AND_LOCATION") &&
+      (!dayForm.date || !dayForm.time)
+    ) {
+      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
+      return;
+    }
+    if (
+      (effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION") &&
+      (!locationForm.placeName || !locationForm.lat || !locationForm.lng)
+    ) {
+      window.alert("장소를 선택해 주세요.");
+      return;
+    }
+
+    const unlockAtIso =
+      effectiveUnlockType === "TIME" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
+        : undefined;
+
+    // 테마 색상: 디자인 확정 전까지 빈 문자열 유지
+    const capsuleColor = "";
+    const capsulePackingColor = "";
+
+    // PRIVATE 요청 payload
+    const privatePayload = {
       memberId: me.memberId,
       nickName: senderName,
       title,
       content: contentValue,
       visibility,
-      unlockType: "TIME",
+      unlockType: effectiveUnlockType,
       unlockAt: unlockAtIso,
-      locationName: "",
-      locationLat: 0,
-      locationLng: 0,
+      locationName:
+        effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION"
+          ? locationForm.placeName
+          : "",
+      locationLat:
+        effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION"
+          ? locationForm.lat ?? 0
+          : 0,
+      locationLng:
+        effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION"
+          ? locationForm.lng ?? 0
+          : 0,
       viewingRadius: 0,
-      packingColor: "",
-      contentColor: "",
+      packingColor: capsulePackingColor,
+      contentColor: capsuleColor,
+      maxViewCount: 0,
+    };
+
+    // PUBLIC 요청 payload
+    const publicPayload = {
+      memberId: me.memberId,
+      nickname: senderName,
+      title,
+      content: contentValue,
+      capPassword: capsulePassword || undefined,
+      capsuleColor,
+      capsulePackingColor,
+      visibility,
+      unlockType: effectiveUnlockType,
+      unlockAt: unlockAtIso,
+      locationName:
+        effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION"
+          ? locationForm.placeName
+          : "",
+      locationLat:
+        effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION"
+          ? locationForm.lat ?? 0
+          : 0,
+      locationLng:
+        effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION"
+          ? locationForm.lng ?? 0
+          : 0,
+      locationRadiusM:
+        effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION"
+          ? 0
+          : 0,
       maxViewCount: 0,
     };
 
     try {
       setIsSubmitting(true);
 
-      // Query parameter 구성
+      // Query parameter 구성 (private만 사용)
       const searchParams = new URLSearchParams();
-      if (phoneNum) searchParams.set("phoneNum", phoneNum);
-      if (capsulePassword) searchParams.set("capsulePassword", capsulePassword);
+      if (visibility === "PRIVATE") {
+        if (phoneNum) searchParams.set("phoneNum", phoneNum);
+        if (capsulePassword)
+          searchParams.set("capsulePassword", capsulePassword);
+      }
+
+      // 공개 범위에 따라 엔드포인트 및 payload 분기
+      const basePath =
+        visibility === "PRIVATE"
+          ? "/api/v1/capsule/create/private"
+          : "/api/v1/capsule/create/public";
 
       const queryString = searchParams.toString();
-      const path = `/api/v1/capsule/create/private${
-        queryString ? `?${queryString}` : ""
-      }`;
+      const path = `${basePath}${queryString ? `?${queryString}` : ""}`;
 
+      // 응답 타입은 public/private가 조금 다르지만 공통 필드만 우선 사용
       const data = await apiFetchRaw<{
         memberId: number;
         capsuleId: number;
-        nickName: string;
-        url: string;
+        nickName?: string;
+        url?: string;
         capPW?: string;
         title: string;
         content: string;
@@ -179,7 +263,7 @@ export default function WriteForm() {
         currentViewCount: number;
       }>(path, {
         method: "POST",
-        json: payload,
+        json: visibility === "PRIVATE" ? privatePayload : publicPayload,
       });
       setResult({
         userName: senderName || data?.nickName || "",
