@@ -209,7 +209,7 @@ export default function WriteForm() {
             })
           : await createPublicCapsule(publicPayload);
       const baseResult = {
-        userName: senderName || data?.nickName || "",
+        userName: senderName || data?.nickname || "",
         url: data?.url || "",
         password: data?.capPW,
       };

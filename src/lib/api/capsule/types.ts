@@ -2,7 +2,7 @@ export type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
 export interface CreatePrivateCapsuleRequest {
   memberId: number;
-  nickName: string;
+  nickname: string;
   title: string;
   content: string;
   visibility: Visibility;
@@ -38,7 +38,7 @@ export interface CreatePublicCapsuleRequest {
 export interface CapsuleCreateResponse {
   memberId: number;
   capsuleId: number;
-  nickName?: string;
+  nickname?: string;
   title: string;
   content: string;
   visibility: string;

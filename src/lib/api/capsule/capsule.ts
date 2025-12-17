@@ -45,7 +45,7 @@ export function buildPrivatePayload(
 
   return {
     memberId,
-    nickName: senderName,
+    nickname: senderName,
     title,
     content,
     visibility,
