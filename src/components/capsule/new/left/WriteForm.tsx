@@ -20,7 +20,13 @@ import DayLocation from "./unlockOpt/DayLocation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
 import { useMe } from "@/lib/hooks/useMe";
-import { apiFetchRaw } from "@/lib/api/fetchClient";
+import {
+  buildPrivatePayload,
+  buildPublicPayload,
+  createPrivateCapsule,
+  createPublicCapsule,
+} from "@/lib/api/capsule/capsule";
+import type { UnlockType } from "@/lib/api/capsule/types";
 
 export default function WriteForm() {
   const [isCopyOpen, setIsCopyOpen] = useState(false);
@@ -130,8 +136,10 @@ export default function WriteForm() {
     }
 
     // unlockType 매핑: MANUAL → TIME_AND_LOCATION
-    const effectiveUnlockType =
-      unlockType === "MANUAL" ? "TIME_AND_LOCATION" : unlockType;
+    const effectiveUnlockType: UnlockType =
+      unlockType === "MANUAL"
+        ? "TIME_AND_LOCATION"
+        : (unlockType as UnlockType);
 
     // 시간/위치 필수 검증 (unlockType에 따라)
     if (
@@ -151,120 +159,41 @@ export default function WriteForm() {
       return;
     }
 
-    const unlockAtIso =
-      effectiveUnlockType === "TIME" ||
-      effectiveUnlockType === "TIME_AND_LOCATION"
-        ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
-        : undefined;
-
-    // 테마 색상: 디자인 확정 전까지 빈 문자열 유지
-    const capsuleColor = "";
-    const capsulePackingColor = "";
-
-    // PRIVATE 요청 payload
-    const privatePayload = {
+    const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
-      nickName: senderName,
+      senderName,
       title,
       content: contentValue,
       visibility,
-      unlockType: effectiveUnlockType,
-      unlockAt: unlockAtIso,
-      locationName:
-        effectiveUnlockType === "LOCATION" ||
-        effectiveUnlockType === "TIME_AND_LOCATION"
-          ? locationForm.placeName
-          : "",
-      locationLat:
-        effectiveUnlockType === "LOCATION" ||
-        effectiveUnlockType === "TIME_AND_LOCATION"
-          ? locationForm.lat ?? 0
-          : 0,
-      locationLng:
-        effectiveUnlockType === "LOCATION" ||
-        effectiveUnlockType === "TIME_AND_LOCATION"
-          ? locationForm.lng ?? 0
-          : 0,
-      viewingRadius: 0,
-      packingColor: capsulePackingColor,
-      contentColor: capsuleColor,
-      maxViewCount: 0,
-    };
+      effectiveUnlockType,
+      dayForm,
+      locationForm,
+    });
 
-    // PUBLIC 요청 payload
-    const publicPayload = {
+    const publicPayload = buildPublicPayload({
       memberId: me.memberId,
-      nickname: senderName,
+      senderName,
       title,
       content: contentValue,
-      capPassword: capsulePassword || undefined,
-      capsuleColor,
-      capsulePackingColor,
       visibility,
-      unlockType: effectiveUnlockType,
-      unlockAt: unlockAtIso,
-      locationName:
-        effectiveUnlockType === "LOCATION" ||
-        effectiveUnlockType === "TIME_AND_LOCATION"
-          ? locationForm.placeName
-          : "",
-      locationLat:
-        effectiveUnlockType === "LOCATION" ||
-        effectiveUnlockType === "TIME_AND_LOCATION"
-          ? locationForm.lat ?? 0
-          : 0,
-      locationLng:
-        effectiveUnlockType === "LOCATION" ||
-        effectiveUnlockType === "TIME_AND_LOCATION"
-          ? locationForm.lng ?? 0
-          : 0,
-      locationRadiusM:
-        effectiveUnlockType === "LOCATION" ||
-        effectiveUnlockType === "TIME_AND_LOCATION"
-          ? 0
-          : 0,
-      maxViewCount: 0,
-    };
+      effectiveUnlockType,
+      dayForm,
+      locationForm,
+      capsulePassword,
+      capsuleColor: "",
+      capsulePackingColor: "",
+    });
 
     try {
       setIsSubmitting(true);
 
-      // Query parameter 구성 (private만 사용)
-      const searchParams = new URLSearchParams();
-      if (visibility === "PRIVATE") {
-        if (phoneNum) searchParams.set("phoneNum", phoneNum);
-        if (capsulePassword)
-          searchParams.set("capsulePassword", capsulePassword);
-      }
-
-      // 공개 범위에 따라 엔드포인트 및 payload 분기
-      const basePath =
+      const data =
         visibility === "PRIVATE"
-          ? "/api/v1/capsule/create/private"
-          : "/api/v1/capsule/create/public";
-
-      const queryString = searchParams.toString();
-      const path = `${basePath}${queryString ? `?${queryString}` : ""}`;
-
-      // 응답 타입은 public/private가 조금 다르지만 공통 필드만 우선 사용
-      const data = await apiFetchRaw<{
-        memberId: number;
-        capsuleId: number;
-        nickName?: string;
-        url?: string;
-        capPW?: string;
-        title: string;
-        content: string;
-        visibility: string;
-        unlockType: string;
-        unlock: unknown;
-        letter: unknown;
-        maxViewCount: number;
-        currentViewCount: number;
-      }>(path, {
-        method: "POST",
-        json: visibility === "PRIVATE" ? privatePayload : publicPayload,
-      });
+          ? await createPrivateCapsule(privatePayload, {
+              phoneNum,
+              capsulePassword: capsulePassword || undefined,
+            })
+          : await createPublicCapsule(publicPayload);
       setResult({
         userName: senderName || data?.nickName || "",
         url: data?.url || "",
