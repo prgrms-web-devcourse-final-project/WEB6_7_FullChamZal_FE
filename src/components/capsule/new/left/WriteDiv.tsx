@@ -5,7 +5,7 @@ export default function WriteDiv({
   warning,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   warning?: string;
   children: React.ReactNode;
 }) {
@@ -13,7 +13,7 @@ export default function WriteDiv({
     <>
       <div className="w-full p-5 bg-white/80 border border-outline rounded-xl">
         <div className="flex md:items-center flex-col md:flex-row gap-2">
-          <span>{title}</span>
+          {typeof title === "string" ? <span>{title}</span> : title}
           <span className="text-text-4 text-sm">{warning}</span>
         </div>
         <div className="mt-3">{children}</div>
