@@ -17,6 +17,7 @@ import { useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
 import { useMe } from "@/lib/hooks/useMe";
@@ -29,6 +30,7 @@ import {
 import type { UnlockType } from "@/lib/api/capsule/types";
 
 export default function WriteForm() {
+  const router = useRouter();
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [result, setResult] = useState<{
     userName: string;
@@ -408,6 +410,10 @@ export default function WriteForm() {
       <CopyTemplate
         open={isCopyOpen}
         onClose={() => setIsCopyOpen(false)}
+        onConfirm={() => {
+          setIsCopyOpen(false);
+          router.push("/dashboard");
+        }}
         data={result}
       />
     </>

@@ -5,10 +5,12 @@ import { Check } from "lucide-react";
 export default function CopyTemplate({
   open,
   onClose,
+  onConfirm,
   data,
 }: {
   open: boolean;
   onClose: () => void;
+  onConfirm?: () => void;
   data: { userName: string; url: string; password?: string } | null;
 }) {
   return (
@@ -39,7 +41,10 @@ export default function CopyTemplate({
           <Button className="w-full py-1.5 md:py-3 text-text bg-white border-2 border-primary-3 text-sm md:text-base md:font-normal hover:text-white hover:border-primary-2">
             클립보드 복사
           </Button>
-          <Button className="w-full py-1.5 md:py-3 text-sm md:text-base">
+          <Button
+            className="w-full py-1.5 md:py-3 text-sm md:text-base"
+            onClick={onConfirm}
+          >
             확인
           </Button>
         </div>
