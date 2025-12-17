@@ -15,7 +15,7 @@ export default function ReportSection() {
       <div className="w-full space-y-8">
         <AdminHeader
           title="신고 관리"
-          content="신고된 사용자와 캡슐을 관리할 수 있습니다"
+          content="신고된 사용자와 편지을 관리할 수 있습니다"
         />
 
         <StatsOverview tabs={REPORT_TABS} />
@@ -24,7 +24,7 @@ export default function ReportSection() {
           section="reports"
           tabs={REPORT_TABS}
           defaultTab="all"
-          searchPlaceholder="신고자 이름 또는 캡슐 아이디로 검색..."
+          searchPlaceholder="신고자 이름 또는 편지 아이디로 검색..."
         />
       </div>
     </>

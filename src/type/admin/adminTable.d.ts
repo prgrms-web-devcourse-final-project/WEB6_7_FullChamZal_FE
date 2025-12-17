@@ -1,5 +1,3 @@
-type AdminTab = "all" | "active" | "stop" | "reported";
-
 type TabItem = { key: string; label: string };
 
 /* 테이블 속성 타입 */

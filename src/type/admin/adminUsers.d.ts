@@ -1,4 +1,4 @@
-type AdminStatus = "ACTIVE" | "STOP";
+type AdminStatus = "ACTIVE" | "STOP" | "EXIT";
 
 type AdminUser = {
   id: number;

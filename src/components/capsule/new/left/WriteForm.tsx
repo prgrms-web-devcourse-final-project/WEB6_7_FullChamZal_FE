@@ -190,7 +190,7 @@ export default function WriteForm() {
     } catch (error) {
       console.error(error);
       const message =
-        error instanceof Error ? error.message : "캡슐 생성에 실패했습니다.";
+        error instanceof Error ? error.message : "편지 생성에 실패했습니다.";
       window.alert(message);
     } finally {
       setIsSubmitting(false);

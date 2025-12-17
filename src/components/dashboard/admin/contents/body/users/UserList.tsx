@@ -122,12 +122,12 @@ export default function UserList({
       },
       {
         key: "capsuleCount",
-        header: "캡슐",
+        header: "편지",
         cell: (u: AdminUser) => u.capsuleCount,
       },
       {
         key: "blockedCapsuleCount",
-        header: "차단 캡슐",
+        header: "차단 편지",
         cell: (u: AdminUser) => u.blockedCapsuleCount,
       },
       {
