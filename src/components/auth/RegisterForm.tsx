@@ -2,23 +2,23 @@
 
 import Button from "../common/Button";
 import Input from "../common/Input";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { authApi } from "@/lib/api/auth/auth";
-import { ApiError } from "@/lib/api/fetchClient"; 
+import { ApiError } from "@/lib/api/fetchClient";
 
 export default function RegisterForm({
   agreements,
-  
 }: {
   agreements: { terms: boolean; privacy: boolean; marketing: boolean };
-  onBack: () => void;
 }) {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
+  const [nameTouched, setNameTouched] = useState(false);
+  const [nicknameTouched, setNicknameTouched] = useState(false);
 
   const [id, setId] = useState("");
   const [idTouched, setIdTouched] = useState(false);
@@ -39,31 +39,48 @@ export default function RegisterForm({
   const [countdown, setCountdown] = useState(0);
 
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-  const [verifiedPhoneNumber, setVerifiedPhoneNumber] = useState<string | null>(null);
+  const [verifiedPhoneNumber, setVerifiedPhoneNumber] = useState<string | null>(
+    null
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-
-  const [isVerifySuccessModalOpen, setIsVerifySuccessModalOpen] = useState(false);
+  const [isVerifySuccessModalOpen, setIsVerifySuccessModalOpen] =
+    useState(false);
   const [isVerifyFailModalOpen, setIsVerifyFailModalOpen] = useState(false);
-  const [isSignupSuccessModalOpen, setIsSignupSuccessModalOpen] = useState(false);
+  const [isSignupSuccessModalOpen, setIsSignupSuccessModalOpen] =
+    useState(false);
   const [isSignupFailModalOpen, setIsSignupFailModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
   const normalizedPhone = useMemo(() => tel.replace(/\D/g, ""), [tel]);
   const isPhoneValid = /^010\d{8}$/.test(normalizedPhone);
 
- 
+  const idRegex = /^[a-zA-Z0-9_]{4,20}$/;
+  const pwRegex =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/;
+
   useEffect(() => {
     if (verifiedPhoneNumber && normalizedPhone !== verifiedPhoneNumber) {
       setIsPhoneVerified(false);
     }
   }, [normalizedPhone, verifiedPhoneNumber]);
 
-  const idError = idTouched && id.trim().length < 5 ? "아이디는 5글자 이상이어야 합니다." : "";
-  const pwError = pwTouched && pw.length < 8 ? "비밀번호는 8자 이상이어야 합니다." : "";
-  const pwCheckError = pwCheckTouched && pw !== pwCheck ? "비밀번호가 일치하지 않습니다." : "";
+  const nameError = nameTouched && !name.trim() ? "이름을 입력하세요." : "";
+  const nicknameError =
+    nicknameTouched && !nickname.trim() ? "닉네임을 입력하세요." : "";
+
+  const idError =
+    idTouched && !idRegex.test(id.trim())
+      ? "아이디는 4~20자여야 합니다."
+      : "";
+  const pwError =
+    pwTouched && !pwRegex.test(pw)
+      ? "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다."
+      : "";
+  const pwCheckError =
+    pwCheckTouched && pw !== pwCheck ? "비밀번호가 일치하지 않습니다." : "";
   const telError = telTouched && !isPhoneValid ? "전화번호를 입력하세요." : "";
 
   const isSendDisabled = !isPhoneValid || countdown > 0;
@@ -86,7 +103,6 @@ export default function RegisterForm({
       setHasSentOnce(true);
       setCountdown(data.cooldownSeconds ?? 180);
 
-    
       setIsPhoneVerified(false);
       setVerifiedPhoneNumber(null);
     } catch (e) {
@@ -135,7 +151,7 @@ export default function RegisterForm({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitError("");
 
@@ -148,12 +164,22 @@ export default function RegisterForm({
       return;
     }
 
+    setNameTouched(true);
+    setNicknameTouched(true);
     setIdTouched(true);
     setPwTouched(true);
     setPwCheckTouched(true);
     setTelTouched(true);
 
-    if (idError || pwError || pwCheckError || telError) return;
+    if (
+      nameError ||
+      nicknameError ||
+      idError ||
+      pwError ||
+      pwCheckError ||
+      telError
+    )
+      return;
 
     if (!isPhoneVerified) {
       const msg = "전화번호 인증을 완료해주세요.";
@@ -167,7 +193,6 @@ export default function RegisterForm({
     setIsSubmitting(true);
 
     try {
-      
       await authApi.signup({
         userId: id.trim(),
         password: pw,
@@ -176,10 +201,8 @@ export default function RegisterForm({
         phoneNumber: normalizedPhone,
       });
 
-     
       await authApi.login({ userId: id.trim(), password: pw });
 
-     
       const me = await authApi.me();
       const target = me.role === "ADMIN" ? "/admin" : "/dashboard";
 
@@ -200,7 +223,6 @@ export default function RegisterForm({
     }
   };
 
-  
   useEffect(() => {
     if (countdown <= 0) return;
     const timer = setInterval(() => {
@@ -226,6 +248,8 @@ export default function RegisterForm({
             placeholder="홍길동"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => setNameTouched(true)}
+            error={nameError}
           />
 
           <Input
@@ -234,6 +258,8 @@ export default function RegisterForm({
             placeholder="민달팽이"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
+            onBlur={() => setNicknameTouched(true)}
+            error={nicknameError}
           />
 
           <Input
@@ -285,7 +311,8 @@ export default function RegisterForm({
             >
               {countdown > 0 ? (
                 <>
-                  재전송 <span className="text-xs font-normal">({countdown}s)</span>
+                  재전송{" "}
+                  <span className="text-xs font-normal">({countdown}s)</span>
                 </>
               ) : hasSentOnce ? (
                 "재전송"
@@ -314,14 +341,31 @@ export default function RegisterForm({
             </Input>
           )}
 
-          {submitError ? <p className="text-red-500 text-sm">{submitError}</p> : null}
-          {isPhoneVerified ? <p className="text-green-600 text-sm">인증 완료</p> : null}
+          {submitError ? (
+            <p className="text-red-500 text-sm">{submitError}</p>
+          ) : null}
+          {isPhoneVerified ? (
+            <p className="text-green-600 text-sm">인증 완료</p>
+          ) : null}
         </div>
 
         <div className="flex gap-3">
-         
-
-          <Button type="submit" className="w-full py-3" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full py-3"
+            disabled={
+              isSubmitting ||
+              !!(
+                nameError ||
+                nicknameError ||
+                idError ||
+                pwError ||
+                pwCheckError ||
+                telError
+              ) ||
+              !isPhoneVerified
+            }
+          >
             회원가입
           </Button>
         </div>
