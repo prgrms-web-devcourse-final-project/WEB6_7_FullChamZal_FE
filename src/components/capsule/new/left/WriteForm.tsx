@@ -336,44 +336,6 @@ export default function WriteForm() {
           </WriteDiv>
         )}
 
-        {isPrivateOnly && (
-          <WriteDiv title="전달 방법">
-            <div className="space-y-3">
-              <ActionTab
-                value={sendMethod}
-                onChange={setSendMethod}
-                tabs={[
-                  { id: "URL", tabName: "비밀번호" },
-                  { id: "PHONE", tabName: "전화번호" },
-                ]}
-              />
-              {sendMethod === "PHONE" ? (
-                <WriteDiv
-                  title="받는 사람 전화번호"
-                  warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
-                >
-                  <WriteInput
-                    id="pagePw"
-                    type="text"
-                    placeholder="- 없이 입력"
-                  />
-                </WriteDiv>
-              ) : (
-                <WriteDiv
-                  title="편지 열람 비밀번호"
-                  warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
-                >
-                  <WriteInput
-                    id="pagePw"
-                    type="password"
-                    placeholder="비밀번호를 입력하세요."
-                  />
-                </WriteDiv>
-              )}
-            </div>
-          </WriteDiv>
-        )}
-
         <WriteDiv
           title="편지 제목"
           warning="* 상대방이 편지를 열지 않아도 볼 수 있는 제목입니다. 공개를 원하지 않는 내용은 작성을 삼가 주세요."
@@ -412,6 +374,10 @@ export default function WriteForm() {
 
             <input type="hidden" name="content" value={content} />
           </div>
+        </WriteDiv>
+
+        <WriteDiv title="이미지 첨부 (선택사항)">
+          <div></div>
         </WriteDiv>
 
         <WriteDiv title="해제 조건">
@@ -481,9 +447,43 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
-        <WriteDiv title="이미지 첨부 (선택사항)">
-          <div></div>
-        </WriteDiv>
+        {isPrivateOnly && (
+          <WriteDiv title="인증 방법">
+            <div className="space-y-3">
+              <ActionTab
+                value={sendMethod}
+                onChange={setSendMethod}
+                tabs={[
+                  { id: "URL", tabName: "비밀번호" },
+                  { id: "PHONE", tabName: "전화번호" },
+                ]}
+              />
+              {sendMethod === "PHONE" ? (
+                <WriteDiv
+                  title="받는 사람 전화번호"
+                  warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="text"
+                    placeholder="- 없이 입력"
+                  />
+                </WriteDiv>
+              ) : (
+                <WriteDiv
+                  title="편지 열람 비밀번호"
+                  warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="password"
+                    placeholder="비밀번호를 입력하세요."
+                  />
+                </WriteDiv>
+              )}
+            </div>
+          </WriteDiv>
+        )}
 
         <Button type="submit" className="w-full py-4 space-x-2">
           <Send />
