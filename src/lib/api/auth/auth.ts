@@ -1,31 +1,5 @@
 import { apiFetch } from "../fetchClient";
 
-export type MemberRole = "USER" | "ADMIN";
-
-export type MemberMe = {
-  memberId: number;
-  userId: string;
-  name: string;
-  nickname: string;
-  phoneNumber: string;
-  status: string;
-  role: MemberRole;
-  createdAt: string;
-};
-
-export type SignupRequest = {
-  userId: string;
-  password: string;
-  name: string;
-  nickname: string;
-  phoneNumber: string;
-};
-
-export type SignupData = {
-  memberId: number;
-  userId: string;
-};
-
 export const authApi = {
   login: (payload: { userId: string; password: string }) =>
     apiFetch<void>("/api/v1/auth/login", {

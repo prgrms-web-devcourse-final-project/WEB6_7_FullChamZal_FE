@@ -175,48 +175,50 @@ export default function LetterDetailModal({
           </div>
 
           {/* Footer */}
-          <div className="shrink-0 border-t p-5">
-            <div className="flex-1 flex items-center justify-center">
+          {role === "USER" && (
+            <div className="shrink-0 border-t p-5">
               <div className="flex-1 flex items-center justify-center">
-                <button
-                  type="button"
-                  className="cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <LinkIcon size={16} className="text-primary" />
-                  <span>링크 복사</span>
-                </button>
-              </div>
+                <div className="flex-1 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <LinkIcon size={16} className="text-primary" />
+                    <span>링크 복사</span>
+                  </button>
+                </div>
 
-              <div className="flex-1 flex items-center justify-center">
-                <Link
-                  href={"/capsules/new"}
-                  className="flex items-center justify-center gap-2"
-                >
-                  <Reply size={16} className="text-primary" />
-                  <span>답장하기</span>
-                </Link>
-              </div>
+                <div className="flex-1 flex items-center justify-center">
+                  <Link
+                    href={"/capsules/new"}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Reply size={16} className="text-primary" />
+                    <span>답장하기</span>
+                  </Link>
+                </div>
 
-              <div className="flex-1 flex items-center justify-center">
-                <button
-                  type="button"
-                  className="cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {mode ? (
-                    <>
-                      <Archive size={16} className="text-primary" />
-                      <span>저장하기</span>
-                    </>
-                  ) : (
-                    <>
-                      <Bookmark size={16} className="text-primary" />
-                      <span>북마크</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex-1 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {mode ? (
+                      <>
+                        <Archive size={16} className="text-primary" />
+                        <span>저장하기</span>
+                      </>
+                    ) : (
+                      <>
+                        <Bookmark size={16} className="text-primary" />
+                        <span>북마크</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
