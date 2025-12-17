@@ -96,9 +96,13 @@ export default function WriteForm() {
     const receiveName = (formData.get("receiveName") as string) || "";
     const contentValue = content.trim();
     const phoneNum =
-      sendMethod === "PHONE" ? (formData.get("pagePw") as string) || "" : "";
+      visibility === "PRIVATE" && sendMethod === "PHONE"
+        ? (formData.get("pagePw") as string) || ""
+        : "";
     const capsulePassword =
-      sendMethod === "URL" ? (formData.get("pagePw") as string) || "" : "";
+      visibility === "PRIVATE" && sendMethod === "URL"
+        ? (formData.get("pagePw") as string) || ""
+        : "";
 
     // TODO: 미입력 폼 체크 - 토스트나 모달등으로 변경 예정
     if (!title) {
@@ -117,13 +121,15 @@ export default function WriteForm() {
       window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
       return;
     }
-    if (sendMethod === "PHONE" && !phoneNum) {
-      window.alert("전화번호를 입력해 주세요.");
-      return;
-    }
-    if (sendMethod === "URL" && !capsulePassword) {
-      window.alert("비밀번호를 입력해 주세요.");
-      return;
+    if (visibility === "PRIVATE") {
+      if (sendMethod === "PHONE" && !phoneNum) {
+        window.alert("전화번호를 입력해 주세요.");
+        return;
+      }
+      if (sendMethod === "URL" && !capsulePassword) {
+        window.alert("비밀번호를 입력해 주세요.");
+        return;
+      }
     }
 
     if (!me?.memberId) {
@@ -280,37 +286,43 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
-        <WriteDiv title="전달 방법">
-          <div className="space-y-3">
-            <ActionTab
-              value={sendMethod}
-              onChange={setSendMethod}
-              tabs={[
-                { id: "URL", tabName: "비밀번호" },
-                { id: "PHONE", tabName: "전화번호" },
-              ]}
-            />
-            {sendMethod === "PHONE" ? (
-              <WriteDiv
-                title="받는 사람 전화번호"
-                warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
-              >
-                <WriteInput id="pagePw" type="text" placeholder="- 없이 입력" />
-              </WriteDiv>
-            ) : (
-              <WriteDiv
-                title="편지 열람 비밀번호"
-                warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
-              >
-                <WriteInput
-                  id="pagePw"
-                  type="password"
-                  placeholder="비밀번호를 입력하세요."
-                />
-              </WriteDiv>
-            )}
-          </div>
-        </WriteDiv>
+        {visibility === "PRIVATE" && (
+          <WriteDiv title="전달 방법">
+            <div className="space-y-3">
+              <ActionTab
+                value={sendMethod}
+                onChange={setSendMethod}
+                tabs={[
+                  { id: "URL", tabName: "비밀번호" },
+                  { id: "PHONE", tabName: "전화번호" },
+                ]}
+              />
+              {sendMethod === "PHONE" ? (
+                <WriteDiv
+                  title="받는 사람 전화번호"
+                  warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="text"
+                    placeholder="- 없이 입력"
+                  />
+                </WriteDiv>
+              ) : (
+                <WriteDiv
+                  title="편지 열람 비밀번호"
+                  warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="password"
+                    placeholder="비밀번호를 입력하세요."
+                  />
+                </WriteDiv>
+              )}
+            </div>
+          </WriteDiv>
+        )}
 
         <WriteDiv
           title="편지 제목"
