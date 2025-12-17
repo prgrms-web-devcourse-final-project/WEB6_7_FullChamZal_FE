@@ -10,15 +10,15 @@ type PageProps = {
 export default async function Page({ params }: PageProps) {
   const { capsuleId } = await params;
 
-  /* const capsule = dummyCapsules.find((c) => c.id === Number(capsuleId)); */
+  const capsule = dummyCapsules.find((c) => c.id === Number(capsuleId));
 
   // 1) 편지 조회 => 편지 없으면 x
   // const letter = await getCapsuleById(capsuleId);
-  /* if (!capsule) notFound(); */
+  if (!capsule) notFound();
 
   // 2) isProtected === 0이면 비회원 컴포넌트 보여주기
   // if (!capsule.isProtected) {
-  /*  return <LetterDetailView capsule={capsule} mode="public" />; */
+  return <LetterDetailView capsule={capsule} mode="public" />;
   // }
 
   // 3) isProtected === 1이면 회원인지 확인하기
