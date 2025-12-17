@@ -17,18 +17,28 @@ import { useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
+import SuccessModal from "../modal/SuccessModal";
 import { useMe } from "@/lib/hooks/useMe";
-import { apiFetchRaw } from "@/lib/api/fetchClient";
+import {
+  buildPrivatePayload,
+  buildPublicPayload,
+  createPrivateCapsule,
+  createPublicCapsule,
+} from "@/lib/api/capsule/capsule";
+import type { UnlockType } from "@/lib/api/capsule/types";
 
 export default function WriteForm() {
+  const router = useRouter();
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [result, setResult] = useState<{
     userName: string;
     url: string;
     password?: string;
   } | null>(null);
+  const [isPublicDoneOpen, setIsPublicDoneOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [senderMode, setSenderMode] = useState<"name" | "nickname">("name");
 
@@ -85,19 +95,26 @@ export default function WriteForm() {
     const senderName =
       senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
     const title = (formData.get("title") as string) || "";
-    const receiveName = (formData.get("receiveName") as string) || "";
+    const receiveName =
+      visibility === "PRIVATE"
+        ? (formData.get("receiveName") as string) || ""
+        : "";
     const contentValue = content.trim();
     const phoneNum =
-      sendMethod === "PHONE" ? (formData.get("pagePw") as string) || "" : "";
+      visibility === "PRIVATE" && sendMethod === "PHONE"
+        ? (formData.get("pagePw") as string) || ""
+        : "";
     const capsulePassword =
-      sendMethod === "URL" ? (formData.get("pagePw") as string) || "" : "";
+      visibility === "PRIVATE" && sendMethod === "URL"
+        ? (formData.get("pagePw") as string) || ""
+        : "";
 
     // TODO: 미입력 폼 체크 - 토스트나 모달등으로 변경 예정
     if (!title) {
       window.alert("제목을 입력해 주세요.");
       return;
     }
-    if (!receiveName) {
+    if (visibility === "PRIVATE" && !receiveName) {
       window.alert("받는 사람을 입력해 주세요.");
       return;
     }
@@ -109,13 +126,16 @@ export default function WriteForm() {
       window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
       return;
     }
-    if (sendMethod === "PHONE" && !phoneNum) {
-      window.alert("전화번호를 입력해 주세요.");
-      return;
-    }
-    if (sendMethod === "URL" && !capsulePassword) {
-      window.alert("비밀번호를 입력해 주세요.");
-      return;
+    // 비공개 캡슐일 경우에만 검증
+    if (visibility === "PRIVATE") {
+      if (sendMethod === "PHONE" && !phoneNum) {
+        window.alert("전화번호를 입력해 주세요.");
+        return;
+      }
+      if (sendMethod === "URL" && !capsulePassword) {
+        window.alert("비밀번호를 입력해 주세요.");
+        return;
+      }
     }
 
     if (!me?.memberId) {
@@ -129,64 +149,78 @@ export default function WriteForm() {
       return;
     }
 
-    const unlockAtIso = new Date(
-      `${dayForm.date}T${dayForm.time}:00`
-    ).toISOString();
+    // unlockType 매핑: MANUAL -> TIME_AND_LOCATION
+    const effectiveUnlockType: UnlockType =
+      unlockType === "MANUAL"
+        ? "TIME_AND_LOCATION"
+        : (unlockType as UnlockType);
 
-    const payload = {
+    // 시간/위치 필수 검증 (unlockType에 따라)
+    if (
+      (effectiveUnlockType === "TIME" ||
+        effectiveUnlockType === "TIME_AND_LOCATION") &&
+      (!dayForm.date || !dayForm.time)
+    ) {
+      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
+      return;
+    }
+    if (
+      (effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION") &&
+      (!locationForm.placeName || !locationForm.lat || !locationForm.lng)
+    ) {
+      window.alert("장소를 선택해 주세요.");
+      return;
+    }
+
+    const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
-      nickName: senderName,
+      senderName,
       title,
       content: contentValue,
       visibility,
-      unlockType: "TIME",
-      unlockAt: unlockAtIso,
-      locationName: "",
-      locationLat: 0,
-      locationLng: 0,
-      viewingRadius: 0,
-      packingColor: "",
-      contentColor: "",
-      maxViewCount: 0,
-    };
+      effectiveUnlockType,
+      dayForm,
+      locationForm,
+    });
+
+    const publicPayload = buildPublicPayload({
+      memberId: me.memberId,
+      senderName,
+      title,
+      content: contentValue,
+      visibility,
+      effectiveUnlockType,
+      dayForm,
+      locationForm,
+      capsulePassword,
+      capsuleColor: "",
+      capsulePackingColor: "",
+    });
 
     try {
       setIsSubmitting(true);
 
-      // Query parameter 구성
-      const searchParams = new URLSearchParams();
-      if (phoneNum) searchParams.set("phoneNum", phoneNum);
-      if (capsulePassword) searchParams.set("capsulePassword", capsulePassword);
-
-      const queryString = searchParams.toString();
-      const path = `/api/v1/capsule/create/private${
-        queryString ? `?${queryString}` : ""
-      }`;
-
-      const data = await apiFetchRaw<{
-        memberId: number;
-        capsuleId: number;
-        nickName: string;
-        url: string;
-        capPW?: string;
-        title: string;
-        content: string;
-        visibility: string;
-        unlockType: string;
-        unlock: unknown;
-        letter: unknown;
-        maxViewCount: number;
-        currentViewCount: number;
-      }>(path, {
-        method: "POST",
-        json: payload,
-      });
-      setResult({
+      const data =
+        visibility === "PRIVATE"
+          ? await createPrivateCapsule(privatePayload, {
+              phoneNum,
+              capsulePassword: capsulePassword || undefined,
+            })
+          : await createPublicCapsule(publicPayload);
+      const baseResult = {
         userName: senderName || data?.nickName || "",
         url: data?.url || "",
         password: data?.capPW,
-      });
-      setIsCopyOpen(true);
+      };
+
+      if (visibility === "PRIVATE") {
+        setResult(baseResult);
+        setIsCopyOpen(true);
+      } else {
+        setResult(baseResult);
+        setIsPublicDoneOpen(true);
+      }
     } catch (error) {
       console.error(error);
       const message =
@@ -259,43 +293,55 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
-        <WriteDiv title="받는 사람">
-          <div>
-            <WriteInput id="receiveName" type="text" placeholder="미래의 나" />
-          </div>
-        </WriteDiv>
+        {visibility === "PRIVATE" && (
+          <WriteDiv title="받는 사람">
+            <div>
+              <WriteInput
+                id="receiveName"
+                type="text"
+                placeholder="미래의 나"
+              />
+            </div>
+          </WriteDiv>
+        )}
 
-        <WriteDiv title="전달 방법">
-          <div className="space-y-3">
-            <ActionTab
-              value={sendMethod}
-              onChange={setSendMethod}
-              tabs={[
-                { id: "URL", tabName: "비밀번호" },
-                { id: "PHONE", tabName: "전화번호" },
-              ]}
-            />
-            {sendMethod === "PHONE" ? (
-              <WriteDiv
-                title="받는 사람 전화번호"
-                warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
-              >
-                <WriteInput id="pagePw" type="text" placeholder="- 없이 입력" />
-              </WriteDiv>
-            ) : (
-              <WriteDiv
-                title="편지 열람 비밀번호"
-                warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
-              >
-                <WriteInput
-                  id="pagePw"
-                  type="password"
-                  placeholder="비밀번호를 입력하세요."
-                />
-              </WriteDiv>
-            )}
-          </div>
-        </WriteDiv>
+        {visibility === "PRIVATE" && (
+          <WriteDiv title="전달 방법">
+            <div className="space-y-3">
+              <ActionTab
+                value={sendMethod}
+                onChange={setSendMethod}
+                tabs={[
+                  { id: "URL", tabName: "비밀번호" },
+                  { id: "PHONE", tabName: "전화번호" },
+                ]}
+              />
+              {sendMethod === "PHONE" ? (
+                <WriteDiv
+                  title="받는 사람 전화번호"
+                  warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="text"
+                    placeholder="- 없이 입력"
+                  />
+                </WriteDiv>
+              ) : (
+                <WriteDiv
+                  title="편지 열람 비밀번호"
+                  warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="password"
+                    placeholder="비밀번호를 입력하세요."
+                  />
+                </WriteDiv>
+              )}
+            </div>
+          </WriteDiv>
+        )}
 
         <WriteDiv
           title="편지 제목"
@@ -395,7 +441,19 @@ export default function WriteForm() {
       <CopyTemplate
         open={isCopyOpen}
         onClose={() => setIsCopyOpen(false)}
+        onConfirm={() => {
+          setIsCopyOpen(false);
+          router.push("/dashboard");
+        }}
         data={result}
+      />
+      <SuccessModal
+        open={isPublicDoneOpen}
+        onClose={() => setIsPublicDoneOpen(false)}
+        onConfirm={() => {
+          setIsPublicDoneOpen(false);
+          router.push("/dashboard");
+        }}
       />
     </>
   );
