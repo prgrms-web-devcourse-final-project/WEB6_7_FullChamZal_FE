@@ -20,6 +20,7 @@ import DayLocation from "./unlockOpt/DayLocation";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
+import SuccessModal from "../modal/SuccessModal";
 import { useMe } from "@/lib/hooks/useMe";
 import {
   buildPrivatePayload,
@@ -37,6 +38,7 @@ export default function WriteForm() {
     url: string;
     password?: string;
   } | null>(null);
+  const [isPublicDoneOpen, setIsPublicDoneOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [senderMode, setSenderMode] = useState<"name" | "nickname">("name");
 
@@ -202,12 +204,19 @@ export default function WriteForm() {
               capsulePassword: capsulePassword || undefined,
             })
           : await createPublicCapsule(publicPayload);
-      setResult({
+      const baseResult = {
         userName: senderName || data?.nickName || "",
         url: data?.url || "",
         password: data?.capPW,
-      });
-      setIsCopyOpen(true);
+      };
+
+      if (visibility === "PRIVATE") {
+        setResult(baseResult);
+        setIsCopyOpen(true);
+      } else {
+        setResult(baseResult);
+        setIsPublicDoneOpen(true);
+      }
     } catch (error) {
       console.error(error);
       const message =
@@ -427,6 +436,14 @@ export default function WriteForm() {
           router.push("/dashboard");
         }}
         data={result}
+      />
+      <SuccessModal
+        open={isPublicDoneOpen}
+        onClose={() => setIsPublicDoneOpen(false)}
+        onConfirm={() => {
+          setIsPublicDoneOpen(false);
+          router.push("/dashboard");
+        }}
       />
     </>
   );
