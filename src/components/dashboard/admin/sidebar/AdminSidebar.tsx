@@ -3,7 +3,7 @@
 import Logo from "@/components/common/Logo";
 import MenuTab from "@/components/dashboard/sidebar/menu/MenuTab";
 import Profile from "@/components/dashboard/sidebar/Profile";
-import { authApi } from "@/lib/api/auth/auth";
+import { authApiClient } from "@/lib/api/auth/auth.client";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -11,7 +11,7 @@ export default function AdminSidebar() {
   const router = useRouter();
 
   const handleLogout = () => {
-    authApi.logout();
+    authApiClient.logout();
     router.push("/");
   };
 
