@@ -18,6 +18,7 @@ export default async function SendPage({
           <LetterDetailModal
             capsuleId={capsuleId}
             closeHref="/dashboard/send"
+            role="USER"
           />
         ) : null}
       </Suspense>

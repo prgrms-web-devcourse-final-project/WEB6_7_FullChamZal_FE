@@ -17,9 +17,13 @@ export default function UsersSection() {
   const base = { query: "", page: 0, size: 1 as const };
 
   const qAll = useQuery({
-    queryKey: ["adminUsersCount", "all"],
+    queryKey: ["adminUsersCount"],
     queryFn: ({ signal }) =>
-      adminUsersApi.list({ tab: "all", ...base, signal }),
+      adminUsersApi.list({
+        ...base,
+        signal,
+        tab: "",
+      }),
     staleTime: 30_000,
   });
 

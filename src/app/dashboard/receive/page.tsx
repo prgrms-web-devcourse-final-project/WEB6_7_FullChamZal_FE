@@ -17,6 +17,9 @@ export default async function ReceivePage({
         {capsuleId ? (
           <LetterDetailModal
             capsuleId={capsuleId}
+            open={true}
+            role="USER"
+            viewerType="RECEIVE"
             closeHref="/dashboard/receive"
           />
         ) : null}

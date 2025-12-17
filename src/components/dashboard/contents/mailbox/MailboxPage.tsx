@@ -1,6 +1,11 @@
+"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { useQuery } from "@tanstack/react-query";
 import DivBox from "../../DivBox";
 import EnvelopeCard from "./EnvelopeCard";
 import { Bookmark, Inbox, Send } from "lucide-react";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 
 export default function MailboxPage({
   type,
@@ -22,6 +27,28 @@ export default function MailboxPage({
     },
   }[type];
 
+  const isBookmark = type === "bookmark";
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["capsuleDashboard", type],
+    queryFn: ({ signal }) => {
+      if (type === "send") return capsuleDashboardApi.sendDashboard(signal);
+      if (type === "receive")
+        return capsuleDashboardApi.receiveDashboard(signal);
+      // bookmark는 호출 안 함
+      return Promise.resolve([] as any[]);
+    },
+    enabled: !isBookmark, // bookmark는 일단 제외
+  });
+
+  if (isBookmark) {
+    return <div>북마크는 준비중!</div>;
+  }
+
+  if (isLoading) return <div>로딩중...</div>;
+  if (error) return <div>에러 발생</div>;
+  if (!data?.length) return <div>편지가 없어요</div>;
+
   return (
     <>
       <section className="flex-1 w-full">
@@ -35,15 +62,22 @@ export default function MailboxPage({
                   <span className="text-primary px-1">_</span>
                 </p>
                 <p className="text-sm text-text-3">
-                  <span className="text-primary font-semibold">1통</span>의 편지
+                  <span className="text-primary font-semibold">
+                    {data.length}통
+                  </span>
+                  의 편지
                 </p>
               </div>
             </div>
 
             <div className="flex flex-wrap justify-between">
               {/* 편지 */}
-              {dummyCapsules.map((capsule) => (
-                <EnvelopeCard key={capsule.id} capsule={capsule} type={type} />
+              {data.map((capsule) => (
+                <EnvelopeCard
+                  key={capsule.capsuleId}
+                  capsule={capsule}
+                  type={type}
+                />
               ))}
             </div>
           </DivBox>

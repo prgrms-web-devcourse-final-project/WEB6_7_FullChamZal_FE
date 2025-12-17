@@ -18,28 +18,28 @@ export default function ReportSection() {
   const base = { query: "", page: 0, size: 1 as const };
 
   const qAll = useQuery({
-    queryKey: ["adminUsersCount", "all"],
+    queryKey: ["adminReportCount", "all"],
     queryFn: ({ signal }) =>
       adminReportApi.list({ tab: "all", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qAccepted = useQuery({
-    queryKey: ["adminUsersCount", "accepted"],
+    queryKey: ["adminReportCount", "accepted"],
     queryFn: ({ signal }) =>
       adminReportApi.list({ tab: "accepted", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qRejected = useQuery({
-    queryKey: ["adminUsersCount", "rejected"],
+    queryKey: ["adminReportCount", "rejected"],
     queryFn: ({ signal }) =>
       adminReportApi.list({ tab: "rejected", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qPending = useQuery({
-    queryKey: ["adminUsersCount", "pending"],
+    queryKey: ["adminReportCount", "pending"],
     queryFn: ({ signal }) =>
       adminReportApi.list({ tab: "pending", ...base, signal }),
     staleTime: 30_000,
