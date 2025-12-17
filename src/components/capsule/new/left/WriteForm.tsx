@@ -133,10 +133,6 @@ export default function WriteForm() {
       window.alert("내용을 입력해 주세요.");
       return;
     }
-    if (!dayForm.date || !dayForm.time) {
-      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
-      return;
-    }
     // 비공개 캡슐일 경우에만 검증
     if (isPrivateOnly) {
       if (sendMethod === "PHONE" && !phoneNum) {
