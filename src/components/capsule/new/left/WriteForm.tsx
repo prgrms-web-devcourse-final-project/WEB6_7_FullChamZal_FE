@@ -13,7 +13,7 @@ import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
 import WriteInput from "./WriteInput";
 import UnlockConditionTabs from "./UnlockConditionTabs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
@@ -70,6 +70,13 @@ export default function WriteForm() {
   const isPrivateOnly = visibility === "PRIVATE";
   const isSelf = visibility === "MYSELF";
   const effectiveVisibility: Visibility = isSelf ? "PRIVATE" : visibility;
+
+  // 공개 선택 시 TIME 옵션을 사용하지 않도록 강제
+  useEffect(() => {
+    if (visibility === "PUBLIC" && unlockType === "TIME") {
+      setUnlockType("LOCATION");
+    }
+  }, [visibility, unlockType]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const next = e.target.value;
@@ -158,6 +165,12 @@ export default function WriteForm() {
       unlockType === "MANUAL"
         ? "TIME_AND_LOCATION"
         : (unlockType as UnlockType);
+
+    // 공개 캡슐은 장소 기반이어야 함 (TIME만 선택 불가)
+    if (visibility === "PUBLIC" && effectiveUnlockType === "TIME") {
+      window.alert("공개 캡슐은 '장소' 또는 '시간+장소'만 선택할 수 있습니다.");
+      return;
+    }
 
     // 시간/위치 필수 검증 (unlockType에 따라)
     if (
@@ -407,27 +420,49 @@ export default function WriteForm() {
 
         <WriteDiv title="해제 조건">
           <div className="space-y-3">
+            {visibility === "PUBLIC" && (
+              <p className="text-xs text-text-3">
+                공개 캡슐은 지도 노출을 위해 장소 기반이어야 합니다.
+              </p>
+            )}
             <UnlockConditionTabs
-              tabs={[
-                {
-                  id: "TIME",
-                  title: "시간",
-                  description: "특정 날짜와 시간에 열람",
-                  icon: <Clock size={20} />,
-                },
-                {
-                  id: "LOCATION",
-                  title: "장소",
-                  description: "특정 장소에 도착 시 열람",
-                  icon: <MapPin size={20} />,
-                },
-                {
-                  id: "MANUAL",
-                  title: "시간 + 장소",
-                  description: "시간과 장소 모두 충족 시 열람",
-                  icon: <Hand size={20} />,
-                },
-              ]}
+              tabs={
+                visibility === "PUBLIC"
+                  ? [
+                      {
+                        id: "LOCATION",
+                        title: "장소",
+                        description: "특정 장소에 도착 시 열람",
+                        icon: <MapPin size={20} />,
+                      },
+                      {
+                        id: "MANUAL",
+                        title: "시간 + 장소",
+                        description: "시간과 장소 모두 충족 시 열람",
+                        icon: <Hand size={20} />,
+                      },
+                    ]
+                  : [
+                      {
+                        id: "TIME",
+                        title: "시간",
+                        description: "특정 날짜와 시간에 열람",
+                        icon: <Clock size={20} />,
+                      },
+                      {
+                        id: "LOCATION",
+                        title: "장소",
+                        description: "특정 장소에 도착 시 열람",
+                        icon: <MapPin size={20} />,
+                      },
+                      {
+                        id: "MANUAL",
+                        title: "시간 + 장소",
+                        description: "시간과 장소 모두 충족 시 열람",
+                        icon: <Hand size={20} />,
+                      },
+                    ]
+              }
               value={unlockType}
               onChange={setUnlockType}
             />
