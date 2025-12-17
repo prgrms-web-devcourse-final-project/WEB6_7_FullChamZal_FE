@@ -2,8 +2,8 @@
 "use client";
 
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
-import { formatDate } from "@/lib/formatDate";
-import { formatDateTime } from "@/lib/formatDateTime";
+import { formatDate } from "@/lib/hooks/formatDate";
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { useQuery } from "@tanstack/react-query";
 import {
   Archive,
@@ -49,8 +49,6 @@ export default function LetterDetailModal({
   });
 
   const capsule = data;
-
-  console.log(capsule);
 
   // 로딩 UI
   if (isLoading) {

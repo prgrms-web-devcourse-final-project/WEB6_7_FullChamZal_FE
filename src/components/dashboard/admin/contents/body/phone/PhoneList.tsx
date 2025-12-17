@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-query";
 import Pagination from "@/components/common/Pagination";
 import { adminPhoneApi } from "@/lib/api/admin/phone/adminPhone";
-import { formatDate } from "@/lib/formatDate";
+import { formatDate } from "@/lib/hooks/formatDate";
 
 function StatusBadge({ status }: { status: AdminPhoneStatus }) {
   if (status === "VERIFIED") {
