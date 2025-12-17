@@ -13,6 +13,7 @@ import {
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import Pagination from "@/components/common/Pagination";
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
+import { formatDate } from "@/lib/formatDate";
 
 export default function CapsuleList({
   tab,
@@ -22,6 +23,8 @@ export default function CapsuleList({
   query: string;
 }) {
   const queryClient = useQueryClient();
+  const listQueryKey = (p: number) =>
+    ["adminCapsules", tab, query, p, size] as const;
 
   const [page, setPage] = useState(0);
   const [size] = useState(10);
@@ -40,7 +43,7 @@ export default function CapsuleList({
   }, [tab, query]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["adminCapsules", tab, query, page, size],
+    queryKey: listQueryKey(page),
     queryFn: ({ signal }) =>
       adminCapsulesApi.list({ tab, query, page, size, signal }),
     placeholderData: keepPreviousData,
@@ -48,6 +51,27 @@ export default function CapsuleList({
 
   const capsulesData = data?.content ?? [];
   const totalElements = data?.totalElements ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+  const lastPage = totalPages - 1;
+
+  // 인접 페이지(이전/다음) 프리패치
+  useEffect(() => {
+    if (!data) return; // totalElements 없으면 lastPage 판단이 애매하니 스킵
+
+    const prefetch = (p: number) =>
+      queryClient.prefetchQuery({
+        queryKey: listQueryKey(p),
+        queryFn: ({ signal }) =>
+          adminCapsulesApi.list({ tab, query, page: p, size, signal }),
+        staleTime: 30_000,
+      });
+
+    // 이전 페이지 (0이면 스킵)
+    if (page > 0) prefetch(page - 1);
+
+    // 다음 페이지 (마지막이면 스킵)
+    if (page < lastPage) prefetch(page + 1);
+  }, [data, lastPage, listQueryKey, page, size, query, queryClient, tab]);
 
   const openDetail = useCallback((id: number) => {
     setSelectedCapsuleId(id);
@@ -159,7 +183,7 @@ export default function CapsuleList({
       {
         key: "createdAt",
         header: "생성일",
-        cell: (c: AdminCapsule) => c.createdAt,
+        cell: (c: AdminCapsule) => formatDate(c.createdAt),
       },
       {
         key: "status",

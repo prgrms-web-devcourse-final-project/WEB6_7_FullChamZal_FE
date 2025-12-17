@@ -30,7 +30,7 @@ export default function DataTable<T>({
   const showEmpty = !isLoading && rows.length === 0;
 
   return (
-    <div className="rounded-2xl border border-outline overflow-hidden bg-white">
+    <div className="rounded-2xl border border-outline overflow-x-auto overflow-y-hidden bg-white">
       <table className="w-full">
         <thead>
           <tr className="border-b border-outline text-left [&>th]:py-4 [&>th]:px-6">

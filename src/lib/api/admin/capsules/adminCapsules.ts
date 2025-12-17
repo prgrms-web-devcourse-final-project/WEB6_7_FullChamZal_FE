@@ -9,9 +9,22 @@ export const adminCapsulesApi = {
     size: number;
     signal?: AbortSignal;
   }) => {
-    return apiFetch<AdminCapsulesResponse>(`/api/v1/admin/capsules`, {
-      signal: params.signal,
-    });
+    const { tab, query, page, size, signal } = params;
+
+    const qs = new URLSearchParams();
+    qs.set("tab", tab);
+    if (query) qs.set("query", query);
+    qs.set("page", String(page));
+    qs.set("size", String(size));
+
+    qs.set("sort", "createdAt,desc");
+
+    return apiFetch<AdminCapsulesResponse>(
+      `/api/v1/admin/capsules?${qs.toString()}`,
+      {
+        signal,
+      }
+    );
   },
 
   /* 캡슐 상세 조회 */
