@@ -82,7 +82,7 @@ export default function FourthSection() {
           {/* 여기 래퍼 div 추가 */}
           <div key={activeIndex} className="space-y-10 fade-up">
             <div className="space-y-3 font-semibold">
-              <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
+              <h4 className="text-admin text-4xl">Dear.___</h4>
               <p className="text-primary text-3xl">
                 {STEP_LABELS[activeIndex] ?? "Write"}
               </p>
@@ -101,7 +101,7 @@ export default function FourthSection() {
 
         {/* right */}
         <div className="flex-1 pt-20 md:pt-60 pb-25">
-          <h4 className="block mb-4 md:mb-0 md:hidden font-semibold text-[#172C51] text-3xl md:text-4xl">
+          <h4 className="block mb-4 md:mb-0 md:hidden font-semibold text-admin text-3xl md:text-4xl">
             Dear.___
           </h4>
           <div className="space-y-20 md:space-y-[660px]">

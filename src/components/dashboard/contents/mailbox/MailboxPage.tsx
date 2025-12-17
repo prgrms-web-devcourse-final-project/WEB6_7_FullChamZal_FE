@@ -1,4 +1,3 @@
-import { dummyCapsules } from "@/data/dummyData";
 import DivBox from "../../DivBox";
 import EnvelopeCard from "./EnvelopeCard";
 import { Bookmark, Inbox, Send } from "lucide-react";
@@ -36,10 +35,7 @@ export default function MailboxPage({
                   <span className="text-primary px-1">_</span>
                 </p>
                 <p className="text-sm text-text-3">
-                  <span className="text-primary font-semibold">
-                    {dummyCapsules.length}통
-                  </span>
-                  의 편지
+                  <span className="text-primary font-semibold">1통</span>의 편지
                 </p>
               </div>
             </div>
