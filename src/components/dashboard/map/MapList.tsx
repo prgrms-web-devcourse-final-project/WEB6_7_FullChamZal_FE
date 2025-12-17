@@ -1,6 +1,13 @@
 import Card from "./Card";
 
-export default function MapList() {
+type MapListProps = {
+  myLocation: {
+    lat: number;
+    lng: number;
+  };
+};
+
+export default function MapList({ myLocation }: MapListProps) {
   return (
     <>
       {/* 리스트 스크롤 */}

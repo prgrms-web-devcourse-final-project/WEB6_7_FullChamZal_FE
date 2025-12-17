@@ -7,7 +7,7 @@ import FilterArea from "./FilterArea";
 
 //서버 렌더링 방지
 import dynamic from "next/dynamic";
-const KakaoMap = dynamic(() => import("./KakaoMap"), {
+const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
 
@@ -156,7 +156,7 @@ export default function MapContents() {
           )}
 
           {/* 지도 컴포넌트 */}
-          {location ? <KakaoMap location={location} /> : error}
+          {location ? <PublicCapsuleMap location={location} /> : error}
 
           {/* 사용자 위치 불러오기 버튼 */}
           <button
@@ -203,7 +203,7 @@ export default function MapContents() {
 
           {/* 리스트 영역 */}
           {myLocation ? (
-            <MapList />
+            <MapList myLocation={myLocation} />
           ) : (
             <div className="text-center text-text-3 text-sm">
               위치 정보 접근을 허용해주세요.

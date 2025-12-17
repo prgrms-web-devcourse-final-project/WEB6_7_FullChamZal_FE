@@ -3,13 +3,13 @@
 import { useEffect, useRef } from "react";
 import { Map } from "react-kakao-maps-sdk";
 
-type KakaoMapProps = {
+type PublicCapsuleMapProps = {
   location: {
     lat: number;
     lng: number;
   };
 };
-export default function KakaoMap({ location }: KakaoMapProps) {
+export default function PublicCapsuleMap({ location }: PublicCapsuleMapProps) {
   const mapRef = useRef<kakao.maps.Map | null>(null);
 
   //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경
