@@ -2,16 +2,23 @@
 
 import Button from "../common/Button";
 import Input from "../common/Input";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { phoneVerificationApi } from "@/lib/api/phoneVerification";
+import { authApi } from "@/lib/api/auth/auth";
+import { ApiError } from "@/lib/api/fetchClient"; 
 
 export default function RegisterForm({
   agreements,
-  onBack,
+  
 }: {
   agreements: { terms: boolean; privacy: boolean; marketing: boolean };
   onBack: () => void;
 }) {
-  const [showAuthInput, setShowAuthInput] = useState(false);
+  const router = useRouter();
+
+  const [name, setName] = useState("");
+  const [nickname, setNickname] = useState("");
 
   const [id, setId] = useState("");
   const [idTouched, setIdTouched] = useState(false);
@@ -27,83 +34,207 @@ export default function RegisterForm({
 
   const [authCode, setAuthCode] = useState("");
 
-  // 인증 버튼 관련 상태
-  const [hasSentOnce, setHasSentOnce] = useState(false); // 재전송 상태
-  const [countdown, setCountdown] = useState(0); // 180초 카운트다운
+  const [showAuthInput, setShowAuthInput] = useState(false);
+  const [hasSentOnce, setHasSentOnce] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
-  // 정규식: 010XXXXXXXX
-  const phoneRegex = /^010\d{8}$/;
-  const isPhoneValid = phoneRegex.test(tel.trim());
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [verifiedPhoneNumber, setVerifiedPhoneNumber] = useState<string | null>(null);
 
-  const handleSendAuthCode = () => {
-    // 전화번호 칸을 건드린 상태로 표시
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+
+
+  const [isVerifySuccessModalOpen, setIsVerifySuccessModalOpen] = useState(false);
+  const [isVerifyFailModalOpen, setIsVerifyFailModalOpen] = useState(false);
+  const [isSignupSuccessModalOpen, setIsSignupSuccessModalOpen] = useState(false);
+  const [isSignupFailModalOpen, setIsSignupFailModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const normalizedPhone = useMemo(() => tel.replace(/\D/g, ""), [tel]);
+  const isPhoneValid = /^010\d{8}$/.test(normalizedPhone);
+
+ 
+  useEffect(() => {
+    if (verifiedPhoneNumber && normalizedPhone !== verifiedPhoneNumber) {
+      setIsPhoneVerified(false);
+    }
+  }, [normalizedPhone, verifiedPhoneNumber]);
+
+  const idError = idTouched && id.trim().length < 5 ? "아이디는 5글자 이상이어야 합니다." : "";
+  const pwError = pwTouched && pw.length < 8 ? "비밀번호는 8자 이상이어야 합니다." : "";
+  const pwCheckError = pwCheckTouched && pw !== pwCheck ? "비밀번호가 일치하지 않습니다." : "";
+  const telError = telTouched && !isPhoneValid ? "전화번호를 입력하세요." : "";
+
+  const isSendDisabled = !isPhoneValid || countdown > 0;
+  const isVerifyDisabled = !authCode.trim() || !isPhoneValid;
+
+  const handleSendAuthCode = async () => {
     setTelTouched(true);
+    setSubmitError("");
 
-    // 유효하지 않으면 전송 X
     if (!isPhoneValid) return;
 
-    // 여기서 실제 인증번호 요청 API 호출
-    // await fetch("/api/v1/phone-verifications/0", { ... })
+    try {
+      const data = await phoneVerificationApi.send({
+        phoneNumber: normalizedPhone,
+        purpose: "SIGNUP",
+        resend: hasSentOnce,
+      });
 
-    setShowAuthInput(true);
-    setHasSentOnce(true);
-    setCountdown(60 * 3); // 60초 타이머 시작
+      setShowAuthInput(true);
+      setHasSentOnce(true);
+      setCountdown(data.cooldownSeconds ?? 180);
+
+    
+      setIsPhoneVerified(false);
+      setVerifiedPhoneNumber(null);
+    } catch (e) {
+      const err = e as unknown;
+      const msg =
+        err instanceof ApiError ? err.message : "인증번호 요청에 실패했습니다.";
+      setSubmitError(msg);
+      setModalMessage(msg);
+      setIsVerifyFailModalOpen(true);
+    }
   };
 
-  const handleVerifyAuthCode = () => {
+  const handleVerifyAuthCode = async () => {
+    setSubmitError("");
+
     if (!authCode.trim()) return;
+    if (!isPhoneValid) return;
 
-    // 여기서 실제 인증번호 검증 API 호출
-    // ex) await fetch("/api/v1/phone-verifications/1", { ... })
+    try {
+      const data = await phoneVerificationApi.confirm({
+        phoneNumber: normalizedPhone,
+        verificationCode: authCode.trim(),
+        purpose: "SIGNUP",
+      });
 
-    // 필요하면 인증 완료 상태를 따로 들고 성공 메시지도 보여줄 수 있음
-    alert("인증이 완료되었습니다.");
+      if (data.verified) {
+        setIsPhoneVerified(true);
+        setVerifiedPhoneNumber(normalizedPhone);
+
+        setModalMessage("인증이 완료되었습니다.");
+        setIsVerifySuccessModalOpen(true);
+      } else {
+        setIsPhoneVerified(false);
+        setVerifiedPhoneNumber(null);
+
+        setModalMessage("인증에 실패했습니다.");
+        setIsVerifyFailModalOpen(true);
+      }
+    } catch (e) {
+      const err = e as unknown;
+      const msg =
+        err instanceof ApiError ? err.message : "인증번호 확인에 실패했습니다.";
+      setSubmitError(msg);
+      setModalMessage(msg);
+      setIsVerifyFailModalOpen(true);
+    }
   };
 
-  // 180초 카운트다운 타이머
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError("");
+
+    // 약관 체크(필요한 것만)
+    if (!agreements.terms || !agreements.privacy) {
+      const msg = "필수 약관에 동의해주세요.";
+      setSubmitError(msg);
+      setModalMessage(msg);
+      setIsSignupFailModalOpen(true);
+      return;
+    }
+
+    setIdTouched(true);
+    setPwTouched(true);
+    setPwCheckTouched(true);
+    setTelTouched(true);
+
+    if (idError || pwError || pwCheckError || telError) return;
+
+    if (!isPhoneVerified) {
+      const msg = "전화번호 인증을 완료해주세요.";
+      setSubmitError(msg);
+      setModalMessage(msg);
+      setIsSignupFailModalOpen(true);
+      return;
+    }
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      
+      await authApi.signup({
+        userId: id.trim(),
+        password: pw,
+        name: name.trim(),
+        nickname: nickname.trim(),
+        phoneNumber: normalizedPhone,
+      });
+
+     
+      await authApi.login({ userId: id.trim(), password: pw });
+
+     
+      const me = await authApi.me();
+      const target = me.role === "ADMIN" ? "/admin" : "/dashboard";
+
+      setModalMessage("회원가입이 완료되었습니다.");
+      setIsSignupSuccessModalOpen(true);
+
+      router.replace(target);
+      router.refresh();
+    } catch (e) {
+      const err = e as unknown;
+      const msg =
+        err instanceof ApiError ? err.message : "회원가입에 실패했습니다.";
+      setSubmitError(msg);
+      setModalMessage(msg);
+      setIsSignupFailModalOpen(true);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  
   useEffect(() => {
     if (countdown <= 0) return;
-
     const timer = setInterval(() => {
       setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
-
     return () => clearInterval(timer);
   }, [countdown]);
 
-  // 에러 메시지들
-  const idError =
-    idTouched && id.length < 5 ? "아이디는 5글자 이상이어야 합니다." : "";
-
-  const pwError =
-    pwTouched && pw.length < 8 ? "비밀번호는 8자 이상이어야 합니다." : "";
-
-  const pwCheckError =
-    pwCheckTouched && pw !== pwCheck ? "비밀번호가 일치하지 않습니다." : "";
-
-  const telError = telTouched && !isPhoneValid ? "전화번호를 입력하세요." : "";
-
-  // 인증 버튼 라벨
-  const sendButtonLabel =
-    countdown > 0
-      ? hasSentOnce
-        ? "재전송"
-        : "인증"
-      : hasSentOnce
-      ? "재전송"
-      : "인증";
-
-  // 인증 버튼 disabled 조건: 전화번호 형식이 유효하지 않거나, 타이머 동작 중일 때
-  const isSendDisabled = !isPhoneValid || countdown > 0;
-
-  // 인증번호 확인 버튼 disabled
-  const isVerifyDisabled = !authCode.trim();
-
   return (
     <>
-      <form className="space-y-6">
+      {/* 모달 placeholder */}
+      {isVerifySuccessModalOpen && null}
+      {isVerifyFailModalOpen && null}
+      {isSignupSuccessModalOpen && null}
+      {isSignupFailModalOpen && null}
+      {modalMessage && null}
+
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-5">
-          <Input id="name" label="이름" placeholder="홍길동" />
+          <Input
+            id="name"
+            label="이름"
+            placeholder="홍길동"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <Input
+            id="nickname"
+            label="닉네임"
+            placeholder="민달팽이"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+          />
 
           <Input
             id="id"
@@ -137,7 +268,6 @@ export default function RegisterForm({
             error={pwCheckError}
           />
 
-          {/* 전화번호 + 인증 버튼 */}
           <Input
             id="tel"
             label="전화번호"
@@ -153,16 +283,18 @@ export default function RegisterForm({
               disabled={isSendDisabled}
               className={"flex flex-col w-15 md:w-19"}
             >
-              {sendButtonLabel}{" "}
-              {countdown !== 0 ? (
-                <span className="text-xs font-normal">({countdown}s)</span>
+              {countdown > 0 ? (
+                <>
+                  재전송 <span className="text-xs font-normal">({countdown}s)</span>
+                </>
+              ) : hasSentOnce ? (
+                "재전송"
               ) : (
-                ""
+                "인증"
               )}
             </Button>
           </Input>
 
-          {/* 인증번호 입력창: 버튼 누른 뒤에만 보이게 */}
           {showAuthInput && (
             <Input
               id="authCode"
@@ -181,11 +313,18 @@ export default function RegisterForm({
               </Button>
             </Input>
           )}
+
+          {submitError ? <p className="text-red-500 text-sm">{submitError}</p> : null}
+          {isPhoneVerified ? <p className="text-green-600 text-sm">인증 완료</p> : null}
         </div>
 
-        <Button type="submit" className="w-full py-3">
-          회원가입
-        </Button>
+        <div className="flex gap-3">
+         
+
+          <Button type="submit" className="w-full py-3" disabled={isSubmitting}>
+            회원가입
+          </Button>
+        </div>
       </form>
     </>
   );
