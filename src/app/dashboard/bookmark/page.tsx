@@ -8,7 +8,7 @@ export default async function BookmarkPage({
   searchParams: Promise<{ id?: string }>;
 }) {
   const params = await searchParams;
-  const capsuleId = params.id;
+  const capsuleId = Number(params.id);
 
   return (
     <>

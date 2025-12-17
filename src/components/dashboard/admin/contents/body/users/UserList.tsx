@@ -12,11 +12,7 @@ import {
 } from "@tanstack/react-query";
 import DataTable from "../DataTable";
 import Pagination from "@/components/common/Pagination";
-import {
-  fetchAdminUsers,
-  toggleAdminUserStatus,
-  AdminStatus,
-} from "@/lib/api/admin/users/adminUsers";
+import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
 
 export default function UserList({
   tab,
@@ -38,16 +34,16 @@ export default function UserList({
   const usersQuery = useQuery({
     queryKey: ["adminUsers", tab, query, page, size],
     queryFn: ({ signal }) =>
-      fetchAdminUsers({ tab, query, page, size, signal }),
+      adminUsersApi.list({ tab, query, page, size, signal }),
     placeholderData: keepPreviousData,
   });
 
   const toggleMutation = useMutation({
-    mutationFn: ({ id, nextStatus }: { id: number; nextStatus: AdminStatus }) =>
-      toggleAdminUserStatus({ id, nextStatus }),
+    mutationFn: (params: { id: number; nextStatus: AdminStatus }) =>
+      adminUsersApi.toggleStatus(params),
 
     // Optimistic update
-    onMutate: async ({ id, nextStatus }) => {
+    onMutate: async (params) => {
       await queryClient.cancelQueries({ queryKey: ["adminUsers"] });
 
       const previous = queryClient.getQueryData<any>([
@@ -65,7 +61,7 @@ export default function UserList({
           return {
             ...old,
             content: old.content.map((u: AdminUser) =>
-              u.id === id ? { ...u, status: nextStatus } : u
+              u.id === params.id ? { ...u, status: params.nextStatus } : u
             ),
           };
         }

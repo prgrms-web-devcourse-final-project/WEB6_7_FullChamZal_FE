@@ -30,9 +30,15 @@ type UserListResponse = {
   };
 };
 
-type GetAdminUsersParams = {
-  page?: number;
-  size?: number;
-  status?: AdminStatus;
-  query?: string;
+type AdminUsersSummary = {
+  total: number;
+  active: number;
+  stop: number;
+  reported: number;
+};
+
+type AdminUsersResponse = {
+  content: AdminUser[];
+  totalElements: number;
+  summary?: AdminUsersSummary;
 };

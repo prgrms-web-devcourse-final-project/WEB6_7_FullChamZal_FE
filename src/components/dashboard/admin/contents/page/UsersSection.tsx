@@ -4,7 +4,7 @@ import AdminBody from "../body/AdminBody";
 import AdminHeader from "../AdminHeader";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAdminUsers } from "@/lib/api/admin/users/adminUsers";
+import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
 
 const USER_TABS = [
   { key: "all", label: "전체" },
@@ -18,7 +18,7 @@ export default function UsersSection() {
   const summaryQuery = useQuery({
     queryKey: ["adminUsersSummary"],
     queryFn: ({ signal }) =>
-      fetchAdminUsers({
+      adminUsersApi.list({
         tab: "all",
         query: "",
         page: 0,
