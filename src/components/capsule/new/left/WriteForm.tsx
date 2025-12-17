@@ -27,6 +27,8 @@ import {
   buildPublicPayload,
   createPrivateCapsule,
   createPublicCapsule,
+  buildMyPayload,
+  createMyCapsule,
 } from "@/lib/api/capsule/capsule";
 import type { UnlockType } from "@/lib/api/capsule/types";
 
@@ -65,6 +67,9 @@ export default function WriteForm() {
 
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
+  const isPrivateOnly = visibility === "PRIVATE";
+  const isSelf = visibility === "MYSELF";
+  const effectiveVisibility: Visibility = isSelf ? "PRIVATE" : visibility;
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const next = e.target.value;
@@ -95,10 +100,9 @@ export default function WriteForm() {
     const senderName =
       senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
     const title = (formData.get("title") as string) || "";
-    const receiveName =
-      visibility === "PRIVATE"
-        ? (formData.get("receiveName") as string) || ""
-        : "";
+    const receiveName = isPrivateOnly
+      ? (formData.get("receiveName") as string) || ""
+      : "";
     const contentValue = content.trim();
     const phoneNum =
       visibility === "PRIVATE" && sendMethod === "PHONE"
@@ -114,7 +118,7 @@ export default function WriteForm() {
       window.alert("제목을 입력해 주세요.");
       return;
     }
-    if (visibility === "PRIVATE" && !receiveName) {
+    if (isPrivateOnly && !receiveName) {
       window.alert("받는 사람을 입력해 주세요.");
       return;
     }
@@ -127,7 +131,7 @@ export default function WriteForm() {
       return;
     }
     // 비공개 캡슐일 경우에만 검증
-    if (visibility === "PRIVATE") {
+    if (isPrivateOnly) {
       if (sendMethod === "PHONE" && !phoneNum) {
         window.alert("전화번호를 입력해 주세요.");
         return;
@@ -178,7 +182,7 @@ export default function WriteForm() {
       senderName,
       title,
       content: contentValue,
-      visibility,
+      visibility: effectiveVisibility,
       effectiveUnlockType,
       dayForm,
       locationForm,
@@ -189,7 +193,7 @@ export default function WriteForm() {
       senderName,
       title,
       content: contentValue,
-      visibility,
+      visibility: effectiveVisibility,
       effectiveUnlockType,
       dayForm,
       locationForm,
@@ -201,20 +205,38 @@ export default function WriteForm() {
     try {
       setIsSubmitting(true);
 
-      const data =
-        visibility === "PRIVATE"
-          ? await createPrivateCapsule(privatePayload, {
-              phoneNum,
-              capsulePassword: capsulePassword || undefined,
-            })
-          : await createPublicCapsule(publicPayload);
+      const data = isSelf
+        ? await (async () => {
+            const phoneRaw = me.phoneNumber || "";
+            const phoneDigits = phoneRaw.replace(/\D/g, "");
+            if (!phoneDigits) {
+              throw new Error("로그인 정보에서 전화번호를 확인할 수 없습니다.");
+            }
+            const myPayload = buildMyPayload({
+              memberId: me.memberId,
+              senderName,
+              title,
+              content: contentValue,
+              visibility: effectiveVisibility,
+              effectiveUnlockType,
+              dayForm,
+              locationForm,
+            });
+            return createMyCapsule(myPayload, phoneDigits);
+          })()
+        : isPrivateOnly
+        ? await createPrivateCapsule(privatePayload, {
+            phoneNum,
+            capsulePassword: capsulePassword || undefined,
+          })
+        : await createPublicCapsule(publicPayload);
       const baseResult = {
         userName: senderName || data?.nickname || "",
         url: data?.url || "",
         password: data?.capPW,
       };
 
-      if (visibility === "PRIVATE") {
+      if (isPrivateOnly) {
         setResult(baseResult);
         setIsCopyOpen(true);
       } else {
@@ -293,7 +315,7 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
-        {visibility === "PRIVATE" && (
+        {isPrivateOnly && (
           <WriteDiv title="받는 사람">
             <div>
               <WriteInput
@@ -305,7 +327,7 @@ export default function WriteForm() {
           </WriteDiv>
         )}
 
-        {visibility === "PRIVATE" && (
+        {isPrivateOnly && (
           <WriteDiv title="전달 방법">
             <div className="space-y-3">
               <ActionTab

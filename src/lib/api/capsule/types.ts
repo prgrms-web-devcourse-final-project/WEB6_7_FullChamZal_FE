@@ -17,6 +17,26 @@ export interface CreatePrivateCapsuleRequest {
   maxViewCount: number;
 }
 
+export interface CreateMyCapsuleRequest {
+  memberId: number;
+  nickname: string;
+  receiverNickname: string;
+  title: string;
+  content: string;
+  visibility: Visibility;
+  unlockType: UnlockType;
+  unlockAt?: string;
+  unlockUntil?: string;
+  locationName: string;
+  address?: string;
+  locationLat: number;
+  locationLng: number;
+  viewingRadius: number;
+  packingColor: string;
+  contentColor: string;
+  maxViewCount: number;
+}
+
 export interface CreatePublicCapsuleRequest {
   memberId: number;
   nickname: string;
@@ -39,6 +59,7 @@ export interface CapsuleCreateResponse {
   memberId: number;
   capsuleId: number;
   nickname?: string;
+  receiverNickname?: string;
   title: string;
   content: string;
   visibility: string;
