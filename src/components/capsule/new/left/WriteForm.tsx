@@ -95,7 +95,10 @@ export default function WriteForm() {
     const senderName =
       senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
     const title = (formData.get("title") as string) || "";
-    const receiveName = (formData.get("receiveName") as string) || "";
+    const receiveName =
+      visibility === "PRIVATE"
+        ? (formData.get("receiveName") as string) || ""
+        : "";
     const contentValue = content.trim();
     const phoneNum =
       visibility === "PRIVATE" && sendMethod === "PHONE"
@@ -111,7 +114,7 @@ export default function WriteForm() {
       window.alert("제목을 입력해 주세요.");
       return;
     }
-    if (!receiveName) {
+    if (visibility === "PRIVATE" && !receiveName) {
       window.alert("받는 사람을 입력해 주세요.");
       return;
     }
@@ -123,6 +126,7 @@ export default function WriteForm() {
       window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
       return;
     }
+    // 비공개 캡슐일 경우에만 검증
     if (visibility === "PRIVATE") {
       if (sendMethod === "PHONE" && !phoneNum) {
         window.alert("전화번호를 입력해 주세요.");
@@ -145,7 +149,7 @@ export default function WriteForm() {
       return;
     }
 
-    // unlockType 매핑: MANUAL → TIME_AND_LOCATION
+    // unlockType 매핑: MANUAL -> TIME_AND_LOCATION
     const effectiveUnlockType: UnlockType =
       unlockType === "MANUAL"
         ? "TIME_AND_LOCATION"
@@ -289,11 +293,17 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
-        <WriteDiv title="받는 사람">
-          <div>
-            <WriteInput id="receiveName" type="text" placeholder="미래의 나" />
-          </div>
-        </WriteDiv>
+        {visibility === "PRIVATE" && (
+          <WriteDiv title="받는 사람">
+            <div>
+              <WriteInput
+                id="receiveName"
+                type="text"
+                placeholder="미래의 나"
+              />
+            </div>
+          </WriteDiv>
+        )}
 
         {visibility === "PRIVATE" && (
           <WriteDiv title="전달 방법">
