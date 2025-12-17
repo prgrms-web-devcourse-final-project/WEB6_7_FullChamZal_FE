@@ -2,7 +2,7 @@ type ReportTargetType = "CAPSULE" | "LETTER" | "COMMENT";
 
 type ReportReasonType = "SPAM" | "ABUSE" | "HATE" | "SEXUAL" | "ETC";
 
-type ReportStatus = "PENDING" | "APPROVED" | "REJECTED";
+type ReportStatus = "PENDING" | "REVIEWING" | "ACCEPTED" | "REJECTED";
 
 type AdminReport = {
   id: number;
@@ -18,4 +18,7 @@ type AdminReport = {
   createdAt: string; // 신고 접수 시각
 };
 
-type AdminReportResponse = ApiResponse<AdminReport>;
+type AdminReportResponse = {
+  content: AdminReport[];
+  totalElements: number;
+};

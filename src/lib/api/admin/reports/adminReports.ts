@@ -1,5 +1,13 @@
 import { apiFetch } from "../../fetchClient";
 
+function mapTabToFilters(tab: string): { status?: ReportStatus } {
+  if (tab === "accepted") return { status: "ACCEPTED" };
+  if (tab === "rejected") return { status: "REJECTED" };
+  if (tab === "pending") return { status: "PENDING" };
+  if (tab === "reviewing") return { status: "REVIEWING" };
+  return {};
+}
+
 export const adminReportApi = {
   /* 전화번호 인증 목록 조회 */
   list: (params: {
@@ -9,18 +17,19 @@ export const adminReportApi = {
     size: number;
     signal?: AbortSignal;
   }) => {
-    const { tab, query, page, size, signal } = params;
+    const filters = mapTabToFilters(params.tab);
 
-    const qs = new URLSearchParams();
-    qs.set("tab", tab);
-    if (query) qs.set("query", query);
-    qs.set("page", String(page));
-    qs.set("size", String(size));
+    const qs = new URLSearchParams({
+      page: String(params.page),
+      size: String(params.size),
+      query: params.query ?? "",
+      ...(filters.status ? { status: filters.status } : {}),
+    });
 
     return apiFetch<AdminReportResponse>(
       `/api/v1/admin/reports?${qs.toString()}`,
       {
-        signal: signal,
+        signal: params.signal,
       }
     );
   },
