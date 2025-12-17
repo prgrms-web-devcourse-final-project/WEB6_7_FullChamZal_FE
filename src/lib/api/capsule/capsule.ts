@@ -23,12 +23,23 @@ type BuildCommonArgs = {
 /**
  * 화면 상태(폼) -> 비공개 캡슐 생성 DTO로 변환한다.
  * - unlockType/날짜/위치 상태를 백엔드가 기대하는 스키마에 맞춘다.
- * - 디자인 미확정 컬러는 빈 문자열로 전달한다.
  */
-export function buildPrivatePayload(args: BuildCommonArgs): CreatePrivateCapsuleRequest {
-  const { memberId, senderName, title, content, visibility, effectiveUnlockType, dayForm, locationForm } = args;
+export function buildPrivatePayload(
+  args: BuildCommonArgs
+): CreatePrivateCapsuleRequest {
+  const {
+    memberId,
+    senderName,
+    title,
+    content,
+    visibility,
+    effectiveUnlockType,
+    dayForm,
+    locationForm,
+  } = args;
   const unlockAt =
-    effectiveUnlockType === "TIME" || effectiveUnlockType === "TIME_AND_LOCATION"
+    effectiveUnlockType === "TIME" ||
+    effectiveUnlockType === "TIME_AND_LOCATION"
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
       : undefined;
 
@@ -41,15 +52,18 @@ export function buildPrivatePayload(args: BuildCommonArgs): CreatePrivateCapsule
     unlockType: effectiveUnlockType,
     unlockAt,
     locationName:
-      effectiveUnlockType === "LOCATION" || effectiveUnlockType === "TIME_AND_LOCATION"
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.placeName
         : "",
     locationLat:
-      effectiveUnlockType === "LOCATION" || effectiveUnlockType === "TIME_AND_LOCATION"
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lat ?? 0
         : 0,
     locationLng:
-      effectiveUnlockType === "LOCATION" || effectiveUnlockType === "TIME_AND_LOCATION"
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lng ?? 0
         : 0,
     viewingRadius: 0,
@@ -60,10 +74,12 @@ export function buildPrivatePayload(args: BuildCommonArgs): CreatePrivateCapsule
 }
 
 /**
- * 화면 상태(폼) → 공개 캡슐 생성 DTO로 변환한다.
+ * 화면 상태(폼) -> 공개 캡슐 생성 DTO로 변환한다.
  * - capPassword, 색상, 위치 반경 등 공개 스펙 필드를 포함한다.
  */
-export function buildPublicPayload(args: BuildCommonArgs): CreatePublicCapsuleRequest {
+export function buildPublicPayload(
+  args: BuildCommonArgs
+): CreatePublicCapsuleRequest {
   const {
     memberId,
     senderName,
@@ -79,7 +95,8 @@ export function buildPublicPayload(args: BuildCommonArgs): CreatePublicCapsuleRe
   } = args;
 
   const unlockAt =
-    effectiveUnlockType === "TIME" || effectiveUnlockType === "TIME_AND_LOCATION"
+    effectiveUnlockType === "TIME" ||
+    effectiveUnlockType === "TIME_AND_LOCATION"
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
       : undefined;
 
@@ -95,19 +112,23 @@ export function buildPublicPayload(args: BuildCommonArgs): CreatePublicCapsuleRe
     unlockType: effectiveUnlockType,
     unlockAt,
     locationName:
-      effectiveUnlockType === "LOCATION" || effectiveUnlockType === "TIME_AND_LOCATION"
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.placeName
         : "",
     locationLat:
-      effectiveUnlockType === "LOCATION" || effectiveUnlockType === "TIME_AND_LOCATION"
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lat ?? 0
         : 0,
     locationLng:
-      effectiveUnlockType === "LOCATION" || effectiveUnlockType === "TIME_AND_LOCATION"
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lng ?? 0
         : 0,
     locationRadiusM:
-      effectiveUnlockType === "LOCATION" || effectiveUnlockType === "TIME_AND_LOCATION"
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
         ? 0
         : 0,
     maxViewCount: 0,
@@ -125,10 +146,13 @@ export async function createPrivateCapsule(
 ): Promise<CapsuleCreateResponse> {
   const searchParams = new URLSearchParams();
   if (query?.phoneNum) searchParams.set("phoneNum", query.phoneNum);
-  if (query?.capsulePassword) searchParams.set("capsulePassword", query.capsulePassword);
+  if (query?.capsulePassword)
+    searchParams.set("capsulePassword", query.capsulePassword);
 
   const queryString = searchParams.toString();
-  const path = `/api/v1/capsule/create/private${queryString ? `?${queryString}` : ""}`;
+  const path = `/api/v1/capsule/create/private${
+    queryString ? `?${queryString}` : ""
+  }`;
 
   return apiFetchRaw<CapsuleCreateResponse>(path, {
     method: "POST",
@@ -148,4 +172,3 @@ export async function createPublicCapsule(
     json: payload,
   });
 }
-
