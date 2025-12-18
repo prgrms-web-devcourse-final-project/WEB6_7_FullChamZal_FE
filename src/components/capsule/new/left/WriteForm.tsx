@@ -32,7 +32,19 @@ import {
 } from "@/lib/api/capsule/capsule";
 import type { UnlockType } from "@/lib/api/capsule/types";
 
-export default function WriteForm() {
+type PreviewState = {
+  title: string;
+  senderName: string;
+  receiverName: string;
+  content: string;
+};
+
+export default function WriteForm({
+  onPreviewChange,
+}: {
+  preview: PreviewState;
+  onPreviewChange: (next: PreviewState) => void;
+}) {
   const router = useRouter();
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [result, setResult] = useState<{
@@ -63,6 +75,8 @@ export default function WriteForm() {
   /* 편지 내용 글자 수 제한 길이 */
   const MAX_CONTENT_LENGTH = 3000;
 
+  const [title, setTitle] = useState("");
+  const [receiveName, setReceiveName] = useState("");
   const [content, setContent] = useState("");
 
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
@@ -70,6 +84,19 @@ export default function WriteForm() {
   const isPrivateOnly = visibility === "PRIVATE";
   const isSelf = visibility === "MYSELF";
   const effectiveVisibility: Visibility = isSelf ? "PRIVATE" : visibility;
+
+  const senderName =
+    senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
+
+  // 미리보기 데이터 동기화
+  useEffect(() => {
+    onPreviewChange({
+      title,
+      senderName,
+      receiverName: receiveName,
+      content,
+    });
+  }, [title, senderName, receiveName, content, onPreviewChange]);
 
   // 공개 선택 시 TIME 옵션을 사용하지 않도록 강제
   useEffect(() => {
@@ -103,13 +130,8 @@ export default function WriteForm() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    // 로그인 사용자의 name을 발신자 이름으로 고정
-    const senderName =
-      senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
-    const title = (formData.get("title") as string) || "";
-    const receiveName = isPrivateOnly
-      ? (formData.get("receiveName") as string) || ""
-      : "";
+    const titleValue = title.trim();
+    const receiveNameValue = isPrivateOnly ? receiveName.trim() : "";
     const contentValue = content.trim();
     const phoneNum =
       visibility === "PRIVATE" && sendMethod === "PHONE"
@@ -121,11 +143,11 @@ export default function WriteForm() {
         : "";
 
     // TODO: 미입력 폼 체크 - 토스트나 모달등으로 변경 예정
-    if (!title) {
+    if (!titleValue) {
       window.alert("제목을 입력해 주세요.");
       return;
     }
-    if (isPrivateOnly && !receiveName) {
+    if (isPrivateOnly && !receiveNameValue) {
       window.alert("받는 사람을 입력해 주세요.");
       return;
     }
@@ -189,8 +211,8 @@ export default function WriteForm() {
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
       senderName,
-      receiverNickname: receiveName,
-      title,
+      receiverNickname: receiveNameValue,
+      title: titleValue,
       content: contentValue,
       visibility: effectiveVisibility,
       effectiveUnlockType,
@@ -201,7 +223,7 @@ export default function WriteForm() {
     const publicPayload = buildPublicPayload({
       memberId: me.memberId,
       senderName,
-      title,
+      title: titleValue,
       content: contentValue,
       visibility: effectiveVisibility,
       effectiveUnlockType,
@@ -332,6 +354,8 @@ export default function WriteForm() {
                 id="receiveName"
                 type="text"
                 placeholder="미래의 나"
+                value={receiveName}
+                onChange={(e) => setReceiveName(e.target.value)}
               />
             </div>
           </WriteDiv>
@@ -345,6 +369,8 @@ export default function WriteForm() {
             <WriteInput
               id="title"
               type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="미리 노출되는 제목을 작성해보세요."
             />
           </div>
