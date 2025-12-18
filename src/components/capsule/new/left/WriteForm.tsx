@@ -121,10 +121,13 @@ export default function WriteForm({
         ? "TIME_AND_LOCATION"
         : "TIME";
 
+    // 내게쓰기일 경우 받는 사람 이름을 보내는 사람 이름으로 설정
+    const receiverLabel = isSelf ? senderName : receiveName;
+
     onPreviewChange({
       title,
       senderName,
-      receiverName: receiveName,
+      receiverName: receiverLabel,
       content,
       visibility: visibilityLabel,
       authMethod: authMethodLabel,
@@ -135,6 +138,7 @@ export default function WriteForm({
     title,
     senderName,
     receiveName,
+    isSelf,
     content,
     visibility,
     sendMethod,
@@ -175,7 +179,11 @@ export default function WriteForm({
 
     const formData = new FormData(e.currentTarget);
     const titleValue = title.trim();
-    const receiveNameValue = isPrivateOnly ? receiveName.trim() : "";
+    const receiveNameValue = isSelf
+      ? senderName
+      : isPrivateOnly
+      ? receiveName.trim()
+      : "";
     const contentValue = content.trim();
     const phoneNum =
       visibility === "PRIVATE" && sendMethod === "PHONE"
