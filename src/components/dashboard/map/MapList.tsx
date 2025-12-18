@@ -5,9 +5,10 @@ import { Search } from "lucide-react";
 
 type MapListProps = {
   listData?: PublicCapsule[];
+  onClick: (lat: number, lng: number) => void;
 };
 
-export default function MapList({ listData }: MapListProps) {
+export default function MapList({ listData, onClick }: MapListProps) {
   //검색 키워드
   const [keyword, setKeyword] = useState("");
   const searchResultList = listData?.filter((d) => d.title.includes(keyword));
@@ -43,7 +44,14 @@ export default function MapList({ listData }: MapListProps) {
           </p>
         ) : (
           searchResultList?.map((d) => (
-            <Card key={d.capsuleId} data={d} keyword={keyword} />
+            <button
+              key={d.capsuleId}
+              type="button"
+              className="w-full text-left"
+              onClick={() => onClick(d.capsuleLatitude, d.capsuleLongitude)}
+            >
+              <Card key={d.capsuleId} data={d} keyword={keyword} />
+            </button>
           ))
         )}
       </div>

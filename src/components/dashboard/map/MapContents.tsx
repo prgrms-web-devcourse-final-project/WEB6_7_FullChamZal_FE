@@ -12,6 +12,11 @@ const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
 
+type location = {
+  lat: number;
+  lng: number;
+} | null;
+
 //필터링 타입
 export type Radius = 1500 | 1000 | 500;
 export type ViewedFilter = "ALL" | "UNREAD" | "READ";
@@ -25,15 +30,12 @@ export default function MapContents() {
   const filterRef = useRef<HTMLDivElement | null>(null);
 
   //map center 위치
-  const [mapLocation, setMapLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>({ lat: 37.579763, lng: 126.977045 });
+  const [mapLocation, setMapLocation] = useState<location>({
+    lat: 37.579763,
+    lng: 126.977045,
+  });
   //사용자 위치
-  const [myLocation, setMyLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [myLocation, setMyLocation] = useState<location>(null);
   //위치 에러 메세지
   const [error, setError] = useState<string | null>(null);
 
@@ -212,7 +214,10 @@ export default function MapContents() {
 
           {/* 리스트 영역 */}
           {myLocation ? (
-            <MapList listData={data} />
+            <MapList
+              listData={data}
+              onClick={(lat, lng) => setMapLocation({ lat, lng })}
+            />
           ) : (
             <div className="text-center text-text-3 text-sm">
               위치 정보 접근을 허용해주세요.
