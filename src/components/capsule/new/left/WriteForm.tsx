@@ -358,7 +358,7 @@ export default function WriteForm() {
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={handleCompositionEnd}
               maxLength={MAX_CONTENT_LENGTH}
-              className="w-full h-60 bg-sub-2 p-3 rounded-lg resize-none"
+              className="w-full h-60 bg-sub-2 p-3 rounded-lg resize-none outline-none border border-white focus:border focus:border-primary-2"
               placeholder="마음을 담아 편지를 써보세요..."
             />
 
