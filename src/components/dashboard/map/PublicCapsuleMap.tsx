@@ -28,7 +28,7 @@ export default function PublicCapsuleMap({
     <>
       <Map
         center={location} //중심 좌표
-        level={7} //줌 레벨
+        level={6} //줌 레벨
         isPanto={false} //부드럽게 이동
         style={{ width: "100%", height: "100%", borderRadius: "12px" }}
         //생성 시 해당 지도 객체를 저장
@@ -38,7 +38,39 @@ export default function PublicCapsuleMap({
       >
         <MarkerClusterer
           averageCenter={true} // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
-          minLevel={10} // 클러스터 할 최소 지도 레벨
+          minLevel={1} // 클러스터 할 최소 지도 레벨
+          styles={[
+            {
+              // 1~9개
+              width: "48px",
+              height: "48px",
+              background: "#FF583B",
+              textAlign: "center",
+              color: "#fff",
+              borderRadius: "50%",
+              lineHeight: "48px",
+            },
+            {
+              // 10~99개
+              width: "48px",
+              height: "48px",
+              background: "#FF583B",
+              textAlign: "center",
+              color: "#fff",
+              borderRadius: "50%",
+              lineHeight: "48px",
+            },
+            {
+              // 100개 이상
+              width: "48px",
+              height: "48px",
+              background: "#FF583B",
+              textAlign: "center",
+              color: "#fff",
+              borderRadius: "50%",
+              lineHeight: "48px",
+            },
+          ]}
         >
           {data?.map((d) => (
             <MapMarker

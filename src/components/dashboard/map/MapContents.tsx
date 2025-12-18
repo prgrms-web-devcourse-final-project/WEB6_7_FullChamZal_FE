@@ -33,8 +33,8 @@ export default function MapContents() {
   const [myLocation, setMyLocation] = useState<{
     lat: number;
     lng: number;
-  } | null>({ lat: 37.57553314541359, lng: 127.00269112529695 });
-
+  } | null>(null);
+  //위치 에러 메세지
   const [error, setError] = useState<string | null>(null);
 
   //위치 정보 가져오기 실패했을 때 상황에 따른 에러 메세지
@@ -91,19 +91,19 @@ export default function MapContents() {
   };
 
   useEffect(() => {
-    // if ("geolocation" in navigator) {
-    //   navigator.geolocation.getCurrentPosition(
-    //     (position) => {
-    //       setMyLocation({
-    //         lat: position.coords.latitude, //위도값 저장
-    //         lng: position.coords.longitude, //경도값 저장
-    //       });
-    //     },
-    //     (err) => {
-    //       showErrorMsg(err);
-    //     }
-    //   );
-    // }
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setMyLocation({
+            lat: position.coords.latitude, //위도값 저장
+            lng: position.coords.longitude, //경도값 저장
+          });
+        },
+        (err) => {
+          showErrorMsg(err);
+        }
+      );
+    }
 
     const onDown = (e: MouseEvent) => {
       if (!filterRef.current) return;
@@ -114,12 +114,11 @@ export default function MapContents() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  //주변 캡슐 조회
   const { data } = usePublicCapsules({
     myLocation,
     radius,
   });
-
-  console.log(data);
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -136,19 +135,6 @@ export default function MapContents() {
           </span>
           의 편지를 찾아보세요
         </p>
-      </div>
-
-      {/* 검색 */}
-      <div className="relative w-full">
-        <Search
-          size={20}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-text-4"
-        />
-        <input
-          type="text"
-          placeholder="장소, 제목으로 검색..."
-          className="w-full p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
-        />
       </div>
 
       {/* 지도 + 리스트 영역 */}
@@ -192,7 +178,7 @@ export default function MapContents() {
         </div>
 
         {/* 리스트 */}
-        <div className="w-[360px] rounded-xl bg-white/80 border border-outline flex flex-col gap-8 min-h-0 py-6">
+        <div className="w-[360px] rounded-xl bg-white/80 border border-outline flex flex-col gap-6 min-h-0 py-6">
           <div className="flex justify-between flex-none px-6 items-center">
             <span className="text-lg">주변 편지</span>
 
