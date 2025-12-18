@@ -10,25 +10,46 @@ const USER_TABS = [
   { key: "all", label: "전체" },
   { key: "active", label: "활성 사용자" },
   { key: "stop", label: "정지된 사용자" },
-  { key: "reported", label: "신고 누적" },
+  { key: "exit", label: "탈퇴한 사용자" },
 ] as const;
 
 export default function UsersSection() {
-  // 상단 통계는 "요약값"만 가져오면 되니까 page=0, size=1 정도로 최소 요청
-  const summaryQuery = useQuery({
-    queryKey: ["adminUsersSummary"],
+  const base = { query: "", page: 0, size: 1 as const };
+
+  const qAll = useQuery({
+    queryKey: ["adminUsersCount", "all"],
     queryFn: ({ signal }) =>
-      adminUsersApi.list({
-        tab: "all",
-        query: "",
-        page: 0,
-        size: 1,
-        signal,
-      }),
+      adminUsersApi.list({ tab: "all", ...base, signal }),
     staleTime: 30_000,
   });
 
-  const totals = summaryQuery.data?.totalElements ?? 0;
+  const qActive = useQuery({
+    queryKey: ["adminUsersCount", "active"],
+    queryFn: ({ signal }) =>
+      adminUsersApi.list({ tab: "active", ...base, signal }),
+    staleTime: 30_000,
+  });
+
+  const qStop = useQuery({
+    queryKey: ["adminUsersCount", "stop"],
+    queryFn: ({ signal }) =>
+      adminUsersApi.list({ tab: "stop", ...base, signal }),
+    staleTime: 30_000,
+  });
+
+  const qExit = useQuery({
+    queryKey: ["adminUsersCount", "exit"],
+    queryFn: ({ signal }) =>
+      adminUsersApi.list({ tab: "exit", ...base, signal }),
+    staleTime: 30_000,
+  });
+
+  const counts = {
+    total: qAll.data?.totalElements ?? 0,
+    active: qActive.data?.totalElements ?? 0,
+    stopped: qStop.data?.totalElements ?? 0,
+    reported: qExit.data?.totalElements ?? 0,
+  };
 
   return (
     <div className="w-full space-y-8">
@@ -39,14 +60,10 @@ export default function UsersSection() {
 
       <StatsOverview
         tabs={USER_TABS}
-        totals={totals}
-        // 만약 StatsOverview가 탭별 카운트를 받을 수 있다면
-        // counts={{
-        //   active: summaryQuery.data?.summary?.active ?? 0,
-        //   stop: summaryQuery.data?.summary?.stop ?? 0,
-        //   reported: summaryQuery.data?.summary?.reported ?? 0,
-        // }}
-        // isLoading={summaryQuery.isLoading}
+        totals={counts.total ?? 0}
+        second={counts.active ?? 0}
+        third={counts.stopped ?? 0}
+        fourth={counts.reported ?? 0}
       />
 
       <AdminBody

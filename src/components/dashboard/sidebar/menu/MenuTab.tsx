@@ -15,8 +15,8 @@ const ADMIN_ITEMS: MenuItem[] = [
   {
     href: "/admin/dashboard/capsules",
     activePrefix: "/admin/dashboard/capsules",
-    title: "캡슐 관리",
-    desc: "전체 캡슐 관리",
+    title: "편지 관리",
+    desc: "전체 편지 관리",
     icon: Map,
   },
   {

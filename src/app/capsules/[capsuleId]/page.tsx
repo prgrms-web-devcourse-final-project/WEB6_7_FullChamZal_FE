@@ -1,6 +1,6 @@
 // app/capsule/[capsuleId]/page.tsx
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
-import { dummyCapsules } from "@/data/dummyData";
+
 import { redirect, notFound } from "next/navigation";
 
 type PageProps = {

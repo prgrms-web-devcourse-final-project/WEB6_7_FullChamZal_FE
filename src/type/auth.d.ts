@@ -12,3 +12,16 @@ type MemberMe = {
   role: MemberRole;
   createdAt: string;
 };
+
+type SignupRequest = {
+  userId: string;
+  password: string;
+  name: string;
+  nickname: string;
+  phoneNumber: string;
+};
+
+type SignupData = {
+  memberId: number;
+  userId: string;
+};

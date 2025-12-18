@@ -22,7 +22,7 @@ const stepsData: StepData[] = [
     step: "2",
     title: "편지가 열릴 순간을 정해요",
     contents:
-      "이 편지를 ‘언제’ 또는 ‘어디에서’ 열고 싶나요?\n기념일, 여행지, 추억의 장소처럼 특별한 조건을 설정하면 캡슐은 잠긴 채로, 당신이 정한 순간을 조용히 기다립니다.",
+      "이 편지를 ‘언제’ 또는 ‘어디에서’ 열고 싶나요?\n기념일, 여행지, 추억의 장소처럼 특별한 조건을 설정하면 편지은 잠긴 채로, 당신이 정한 순간을 조용히 기다립니다.",
   },
   {
     img: "https://cdn.pixabay.com/photo/2016/11/29/09/58/dog-1868871_640.jpg",
@@ -82,7 +82,7 @@ export default function FourthSection() {
           {/* 여기 래퍼 div 추가 */}
           <div key={activeIndex} className="space-y-10 fade-up">
             <div className="space-y-3 font-semibold">
-              <h4 className="text-[#172C51] text-4xl">Dear.___</h4>
+              <h4 className="text-admin text-4xl">Dear.___</h4>
               <p className="text-primary text-3xl">
                 {STEP_LABELS[activeIndex] ?? "Write"}
               </p>
@@ -101,7 +101,7 @@ export default function FourthSection() {
 
         {/* right */}
         <div className="flex-1 pt-20 md:pt-60 pb-25">
-          <h4 className="block mb-4 md:mb-0 md:hidden font-semibold text-[#172C51] text-3xl md:text-4xl">
+          <h4 className="block mb-4 md:mb-0 md:hidden font-semibold text-admin text-3xl md:text-4xl">
             Dear.___
           </h4>
           <div className="space-y-20 md:space-y-[660px]">

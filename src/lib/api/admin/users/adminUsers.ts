@@ -3,6 +3,7 @@ import { apiFetch } from "../../fetchClient";
 function mapTabToFilters(tab: string): { status?: AdminStatus } {
   if (tab === "active") return { status: "ACTIVE" };
   if (tab === "stop") return { status: "STOP" };
+  if (tab === "exit") return { status: "EXIT" };
   return {};
 }
 
