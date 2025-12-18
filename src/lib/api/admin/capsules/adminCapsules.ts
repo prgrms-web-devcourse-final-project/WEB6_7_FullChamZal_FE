@@ -51,7 +51,7 @@ export const adminCapsulesApi = {
   }) => {
     const { capsuleId, deleted, signal } = params;
 
-    return apiFetch<void>(`/api/v1/admin/capsules/${capsuleId}/delete`, {
+    return apiFetch<void>(`/api/v1/admin/capsules/${capsuleId}/deleted`, {
       method: "PATCH",
       json: { deleted },
       signal,

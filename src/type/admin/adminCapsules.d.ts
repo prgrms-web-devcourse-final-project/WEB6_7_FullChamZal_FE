@@ -1,20 +1,39 @@
 type CapsuleUnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 type CapsuleVisibility = "PUBLIC" | "PRIVATE";
+type CapsuleLocation = {
+  locationAlias: string | null;
+  address: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
+};
 
-type AdminCapsule = {
+type AdminCapsuleBase = {
   id: number;
+  uuid: string;
   title: string;
   writerNickname: string;
   visibility: CapsuleVisibility;
   unlockType: CapsuleUnlockType;
-  unlockAt: string | null;
-  createdAt: string;
+
+  unlockAt: string | null; // ISO string
+  unlockUntil: string | null; // ISO string
+
+  recipientName: string | null;
+
   currentViewCount: number;
   maxViewCount: number;
+
   deleted: boolean;
+  protectedCapsule: boolean;
+
   reportCount: number;
   bookmarkCount: number;
+
+  createdAt: string;
 };
+
+// 최종 캡슐 타입 (조합)
+interface AdminCapsule extends AdminCapsuleBase, CapsuleLocation {}
 
 type AdminCapsulesResponse = {
   content: AdminCapsule[];

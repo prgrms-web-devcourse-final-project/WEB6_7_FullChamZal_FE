@@ -23,6 +23,7 @@ import Pagination from "@/components/common/Pagination";
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import { formatDate } from "@/lib/hooks/formatDate";
 import Modal from "@/components/common/Modal";
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
 
 export default function CapsuleList({
   tab,
@@ -164,7 +165,7 @@ export default function CapsuleList({
       {
         key: "receiver",
         header: "수신자",
-        cell: (c: AdminCapsule) => /* c.receiver ? c.receiver :  */ "",
+        cell: (c: AdminCapsule) => c.recipientName,
       },
       {
         key: "unlockType",
@@ -203,11 +204,37 @@ export default function CapsuleList({
       {
         key: "unlockCondition",
         header: "해제 조건",
-        cell: (c: AdminCapsule) => (
-          <span className="line-clamp-1 max-w-60 inline-block">
-            {/* {c.unlockCondition} */}
-          </span>
-        ),
+        cell: (c: AdminCapsule) => {
+          // 시간 포맷 (필요하면 기존 util로 교체)
+          const timeText = c.unlockAt ? formatDateTime(c.unlockAt) : "-";
+
+          // 장소 텍스트 (별칭 > 주소 > -)
+          const locationText = c.locationAlias || c.address || "-";
+
+          if (c.unlockType === "TIME") {
+            return (
+              <span className="line-clamp-1 max-w-60 inline-block">
+                {timeText}
+              </span>
+            );
+          }
+
+          if (c.unlockType === "LOCATION") {
+            return (
+              <span className="line-clamp-1 max-w-60 inline-block">
+                {locationText}
+              </span>
+            );
+          }
+
+          // TIME_AND_LOCATION
+          return (
+            <div className="flex flex-col text-sm max-w-60">
+              <span className="line-clamp-1">{timeText}</span>
+              <span className="line-clamp-1 text-text-3">{locationText}</span>
+            </div>
+          );
+        },
       },
       {
         key: "createdAt",
