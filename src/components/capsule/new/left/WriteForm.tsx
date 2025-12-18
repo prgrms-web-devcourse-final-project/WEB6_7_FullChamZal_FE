@@ -37,6 +37,10 @@ type PreviewState = {
   senderName: string;
   receiverName: string;
   content: string;
+  visibility: Visibility | "MYSELF";
+  authMethod: string;
+  unlockType: string;
+  charCount: number;
 };
 
 export default function WriteForm({
@@ -90,13 +94,50 @@ export default function WriteForm({
 
   // 미리보기 데이터 동기화
   useEffect(() => {
+    const visibilityLabel =
+      // 공개 범위
+      visibility === "PUBLIC"
+        ? "PUBLIC"
+        : visibility === "MYSELF"
+        ? "MYSELF"
+        : "PRIVATE";
+    // 인증 방법
+    const authMethodLabel =
+      visibility === "PUBLIC"
+        ? "NONE"
+        : visibility === "MYSELF"
+        ? "NONE"
+        : sendMethod === "PHONE"
+        ? "PHONE"
+        : "PASSWORD";
+    // 해제 조건
+    const unlockLabel =
+      unlockType === "LOCATION"
+        ? "LOCATION"
+        : unlockType === "MANUAL"
+        ? "TIME_AND_LOCATION"
+        : "TIME";
+
     onPreviewChange({
       title,
       senderName,
       receiverName: receiveName,
       content,
+      visibility: visibilityLabel,
+      authMethod: authMethodLabel,
+      unlockType: unlockLabel,
+      charCount: content.length,
     });
-  }, [title, senderName, receiveName, content, onPreviewChange]);
+  }, [
+    title,
+    senderName,
+    receiveName,
+    content,
+    visibility,
+    sendMethod,
+    unlockType,
+    onPreviewChange,
+  ]);
 
   // 공개 선택 시 TIME 옵션을 사용하지 않도록 강제
   useEffect(() => {

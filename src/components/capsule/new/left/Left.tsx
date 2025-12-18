@@ -5,6 +5,10 @@ type PreviewState = {
   senderName: string;
   receiverName: string;
   content: string;
+  visibility: Visibility | "MYSELF";
+  authMethod: string;
+  unlockType: string;
+  charCount: number;
 };
 
 export default function Left({

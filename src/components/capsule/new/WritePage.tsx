@@ -11,6 +11,10 @@ export default function WritePage() {
     senderName: "",
     receiverName: "",
     content: "",
+    visibility: "PRIVATE" as Visibility | "MYSELF",
+    authMethod: "URL",
+    unlockType: "TIME",
+    charCount: 0,
   });
 
   return (

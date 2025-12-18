@@ -5,11 +5,35 @@ type PreviewState = {
   senderName: string;
   receiverName: string;
   content: string;
+  visibility: Visibility | "MYSELF";
+  authMethod: string;
+  unlockType: string;
+  charCount: number;
 };
 
 export default function Right({ preview }: { preview: PreviewState }) {
   const { title, senderName, receiverName, content } = preview;
   const todayLabel = formatDate(new Date().toISOString());
+
+  const visibilityLabel =
+    preview.visibility === "PUBLIC"
+      ? "공개"
+      : preview.visibility === "MYSELF"
+      ? "내게 쓰기"
+      : "비공개";
+  const authLabel =
+    preview.authMethod === "NONE"
+      ? "인증 없음"
+      : preview.authMethod === "PHONE"
+      ? "전화번호"
+      : "비밀번호";
+  const unlockLabel =
+    preview.unlockType === "LOCATION"
+      ? "장소"
+      : preview.unlockType === "TIME_AND_LOCATION"
+      ? "시간 + 장소"
+      : "시간";
+  const charCountLabel = `${preview.charCount}자`;
 
   return (
     <section className="w-full h-full p-8 min-h-0 flex flex-col">
@@ -55,10 +79,10 @@ export default function Right({ preview }: { preview: PreviewState }) {
           <p>편지 정보</p>
           <ul className="space-y-1">
             <li>• 테마: (편지봉투 명) & (편지지 명)</li>
-            <li>• 공개 범위: 비공개</li>
-            <li>• 인증 방법: 비밀번호</li>
-            <li>• 해제 조건: 시간</li>
-            <li>• 글자 수: 0자</li>
+            <li>• 공개 범위: {visibilityLabel}</li>
+            <li>• 인증 방법: {authLabel}</li>
+            <li>• 해제 조건: {unlockLabel}</li>
+            <li>• 글자 수: {charCountLabel}</li>
           </ul>
         </div>
       </div>
