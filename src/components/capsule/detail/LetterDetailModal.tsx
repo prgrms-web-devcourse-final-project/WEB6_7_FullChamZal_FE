@@ -26,6 +26,7 @@ export default function LetterDetailModal({
   role = "USER",
   onClose,
   // USER read 호출에 필요한 값들
+  isSendSelf,
   locationLat = null,
   locationLng = null,
   password = null,
@@ -37,12 +38,10 @@ export default function LetterDetailModal({
   role?: MemberRole;
   onClose?: () => void;
 
-  viewerType?: "SEND" | "RECEIVE" | "BOOKMARK" | string;
   isSendSelf?: 0 | 1;
   locationLat?: number | null;
   locationLng?: number | null;
   password?: string | number | null;
-  url?: string | number | null;
 }) {
   const router = useRouter();
   if (!open) return null;

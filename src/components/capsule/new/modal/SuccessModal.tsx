@@ -3,10 +3,14 @@ import Button from "@/components/common/Button";
 import { Check } from "lucide-react";
 
 export default function SuccessModal({
+  title,
+  content,
   open,
   onClose,
   onConfirm,
 }: {
+  title: string;
+  content: string;
   open: boolean;
   onClose: () => void;
   onConfirm?: () => void;
@@ -18,8 +22,8 @@ export default function SuccessModal({
           <Check size={32} strokeWidth={1} />
         </div>
         <div className="text-center space-y-1">
-          <p className="text-base md:text-lg">편지 생성 완료</p>
-          <p className="text-text-2 text-sm">성공적으로 편지가 생성되었습니다.</p>
+          <p className="text-base md:text-lg">{title}</p>
+          <p className="text-text-2 text-sm">{content}</p>
         </div>
         <Button
           className="w-full py-2 md:py-3 text-sm md:text-base"
@@ -31,4 +35,3 @@ export default function SuccessModal({
     </Modal>
   );
 }
-

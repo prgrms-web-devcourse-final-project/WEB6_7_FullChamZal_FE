@@ -448,6 +448,8 @@ export default function WriteForm() {
         data={result}
       />
       <SuccessModal
+        title="편지 생성 성공"
+        content="성공적으로 편지가 생성되었습니다."
         open={isPublicDoneOpen}
         onClose={() => setIsPublicDoneOpen(false)}
         onConfirm={() => {

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { ApiError } from "@/lib/api/fetchClient";
 import { authApiClient } from "@/lib/api/auth/auth.client";
+import SuccessModal from "../capsule/new/modal/SuccessModal";
 
 export default function RegisterForm({
   agreements,
@@ -16,6 +17,8 @@ export default function RegisterForm({
   onBack?: () => void;
 }) {
   const router = useRouter();
+
+  const [redirectTarget, setRedirectTarget] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
@@ -52,7 +55,7 @@ export default function RegisterForm({
     useState(false);
   const [isVerifyFailModalOpen, setIsVerifyFailModalOpen] = useState(false);
   const [isSignupSuccessModalOpen, setIsSignupSuccessModalOpen] =
-    useState(false);
+    useState(true);
   const [isSignupFailModalOpen, setIsSignupFailModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
@@ -206,11 +209,9 @@ export default function RegisterForm({
       const me = await authApiClient.me();
       const target = me.role === "ADMIN" ? "/admin" : "/dashboard";
 
+      setRedirectTarget(target);
       setModalMessage("회원가입이 완료되었습니다.");
       setIsSignupSuccessModalOpen(true);
-
-      router.replace(target);
-      router.refresh();
     } catch (e) {
       const err = e as unknown;
       const msg =
@@ -231,12 +232,26 @@ export default function RegisterForm({
     return () => clearInterval(timer);
   }, [countdown]);
 
+  const handleRouter = () => {
+    if (!redirectTarget) return;
+    router.replace(redirectTarget);
+    router.refresh();
+  };
+
   return (
     <>
       {/* 모달 placeholder */}
       {isVerifySuccessModalOpen && null}
       {isVerifyFailModalOpen && null}
-      {isSignupSuccessModalOpen && null}
+      {isSignupSuccessModalOpen && (
+        <SuccessModal
+          title={"회원가입 완료"}
+          content={"성공적으로 회원가입이 완료되었습니다."}
+          open={isSignupSuccessModalOpen}
+          onClose={() => setIsSignupSuccessModalOpen(false)}
+          onConfirm={() => handleRouter()}
+        />
+      )}
       {isSignupFailModalOpen && null}
       {modalMessage && null}
 
