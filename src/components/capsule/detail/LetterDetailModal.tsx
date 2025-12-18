@@ -37,7 +37,6 @@ export default function LetterDetailModal({
   mode?: string;
   role?: MemberRole;
   onClose?: () => void;
-
   isSendSelf?: 0 | 1;
   locationLat?: number | null;
   locationLng?: number | null;
@@ -53,43 +52,15 @@ export default function LetterDetailModal({
 
   const isAdmin = role === "ADMIN";
 
-  const { data, isLoading } = useQuery({
-    queryKey: [isAdmin ? "adminCapsuleDetail" : "userCapsuleRead", capsuleId],
-    queryFn: ({ signal }) => {
-      if (isAdmin) {
-        return adminCapsulesApi.detail({ capsuleId, signal });
-      }
-      /* return capsuleReadApi.read(
-        {
-          capsuleId,
-          unlockAt,
-          locationLat,
-          locationLng,
-          password,
-        },
-        signal
-      ); */
-    },
-    enabled: open && capsuleId > 0,
+  // 나중에 ADMIN일 경우에는 아래 api만 USER이면 USER 세부 api만 호출
+  const { data: adminData, isLoading } = useQuery<AdminCapsuleDetail>({
+    queryKey: ["adminCapsuleDetail", capsuleId],
+    queryFn: ({ signal }) => adminCapsulesApi.detail({ capsuleId, signal }),
+    enabled: open && capsuleId > 0 && isAdmin,
   });
 
   // UI에서 쓰는 형태로 통일 (ADMIN/USER 필드명 다름)
-  const capsule = data
-    ? isAdmin
-      ? data
-      : {
-          // USER 응답 -> UI 공통 형태로 매핑
-          title: data.title,
-          content: data.content,
-          createdAt: data.createAt,
-          writerNickname: data.senderNickname,
-          recipient: data.recipient,
-          unlockType: data.unlockType,
-          unlockAt: data.unlockAt,
-          locationName: data.locationName,
-        }
-    : null;
-
+  const capsule = isAdmin ? adminData : /* ...user mapping... */ null;
   // 로딩 UI
   if (isLoading) {
     return (
@@ -141,10 +112,10 @@ export default function LetterDetailModal({
         ? formatDateTime(capsule.unlockAt)
         : "시간 조건 없음"
       : capsule.unlockType === "LOCATION"
-      ? capsule.locationName ?? "위치 조건 없음"
+      ? (capsule.locationAlias || capsule.address) ?? "위치 조건 없음"
       : `${
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
-        } · ${capsule.locationName ?? "위치 조건 없음"}`;
+        } · ${(capsule.locationAlias || capsule.address) ?? "위치 조건 없음"}`;
 
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
@@ -183,9 +154,7 @@ export default function LetterDetailModal({
               <div className="w-full h-full flex flex-col justify-between gap-8">
                 <div className="text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span className="text-text-3">
-                    {capsule.recipient ?? "(수신자 정보 없음)"}
-                  </span>
+                  <span>{capsule.recipientName ?? "(수신자 정보 없음)"}</span>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">

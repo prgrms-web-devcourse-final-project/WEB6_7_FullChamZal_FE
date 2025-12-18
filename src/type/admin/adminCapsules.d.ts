@@ -1,5 +1,7 @@
 type CapsuleUnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
+
 type CapsuleVisibility = "PUBLIC" | "PRIVATE";
+
 type CapsuleLocation = {
   locationAlias: string | null;
   address: string | null;
@@ -40,26 +42,24 @@ type AdminCapsulesResponse = {
   totalElements: number;
 };
 
-type AdminCapsuleDetail = {
+/* ----------------------------------------------- */
+type AdminCapsuleDetailBase = {
   id: number;
+  uuid: string;
+
   title: string;
   content: string;
 
+  writerId: number;
   writerNickname: string;
 
-  capsuleColor: "RED" | "BLUE" | "GREEN" | "YELLOW" | "PURPLE";
-  capsulePackingColor: "RED" | "BLUE" | "GREEN" | "YELLOW" | "PURPLE";
+  visibility: CapsuleVisibility;
+  unlockType: CapsuleUnlockType;
 
-  visibility: "PUBLIC" | "PRIVATE";
+  unlockAt: string | null; // ISO string
+  unlockUntil: string | null; // ISO string
 
-  unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
-  unlockAt: string | null;
-
-  // LOCATION 관련
-  locationName: string | null;
-  locationLat: number | null;
-  locationLng: number | null;
-  locationRadiusM: number | null;
+  recipientName: string | null;
 
   currentViewCount: number;
   maxViewCount: number;
@@ -67,11 +67,11 @@ type AdminCapsuleDetail = {
   deleted: boolean;
   protectedCapsule: boolean;
 
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
-
   reportCount: number;
   bookmarkCount: number;
+
+  createdAt: string;
 };
+interface AdminCapsuleDetail extends AdminCapsuleDetailBase, CapsuleLocation {}
 
 type AdminCapsuleDetailResponse = ApiResponse<AdminCapsuleDetail>;
