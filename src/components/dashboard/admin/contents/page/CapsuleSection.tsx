@@ -18,21 +18,21 @@ export default function CapsuleSection() {
   const base = { query: "", page: 0, size: 1 as const };
 
   const qAll = useQuery({
-    queryKey: ["adminUsersCount", "all"],
+    queryKey: ["adminCapsulesCount"],
     queryFn: ({ signal }) =>
-      adminCapsulesApi.list({ tab: "all", ...base, signal }),
+      adminCapsulesApi.list({ tab: "", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qPublic = useQuery({
-    queryKey: ["adminUsersCount", "public"],
+    queryKey: ["adminCapsulesCount", "public"],
     queryFn: ({ signal }) =>
       adminCapsulesApi.list({ tab: "public", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qPrivate = useQuery({
-    queryKey: ["adminUsersCount", "private"],
+    queryKey: ["adminCapsulesCount", "private"],
     queryFn: ({ signal }) =>
       adminCapsulesApi.list({ tab: "private", ...base, signal }),
     staleTime: 30_000,

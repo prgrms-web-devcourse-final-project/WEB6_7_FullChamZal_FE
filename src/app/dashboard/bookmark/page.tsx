@@ -18,6 +18,7 @@ export default async function BookmarkPage({
           <LetterDetailModal
             capsuleId={capsuleId}
             closeHref="/dashboard/bookmark"
+            role="USER"
           />
         ) : null}
       </Suspense>

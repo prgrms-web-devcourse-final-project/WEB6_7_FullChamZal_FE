@@ -1,5 +1,7 @@
+/* eslint-disable react-hooks/purity */
 // app/capsule/[capsuleId]/page.tsx
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
+import LetterLockedView from "@/components/capsule/detail/LetterLockedView";
 
 import { redirect, notFound } from "next/navigation";
 
@@ -9,16 +11,15 @@ type PageProps = {
 
 export default async function Page({ params }: PageProps) {
   const { capsuleId } = await params;
-
-  const capsule = dummyCapsules.find((c) => c.id === Number(capsuleId));
+  console.log(capsuleId);
 
   // 1) 편지 조회 => 편지 없으면 x
   // const letter = await getCapsuleById(capsuleId);
-  if (!capsule) notFound();
+  // if (!capsule) notFound();
 
   // 2) isProtected === 0이면 비회원 컴포넌트 보여주기
   // if (!capsule.isProtected) {
-  return <LetterDetailView capsule={capsule} mode="public" />;
+  // return <LetterDetailView capsule={capsule} mode="public" />;
   // }
 
   // 3) isProtected === 1이면 회원인지 확인하기
@@ -37,4 +38,10 @@ export default async function Page({ params }: PageProps) {
 
   // 5) 권한 OK
   // return <CapsuleDetailView capsule={capsule} mode="protected" />;
+
+  return (
+    <LetterLockedView
+      unlockAt={new Date(Date.now() + 2000 * 60 * 1000).toISOString()}
+    />
+  );
 }

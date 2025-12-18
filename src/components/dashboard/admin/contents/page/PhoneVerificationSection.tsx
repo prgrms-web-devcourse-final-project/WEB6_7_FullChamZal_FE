@@ -17,28 +17,32 @@ export default function PhoneVerificationSection() {
   const base = { query: "", page: 0, size: 1 as const };
 
   const qAll = useQuery({
-    queryKey: ["adminUsersCount", "all"],
+    queryKey: ["adminPhoneCount", "all"],
     queryFn: ({ signal }) =>
-      adminPhoneApi.list({ tab: "all", ...base, signal }),
+      adminPhoneApi.list({
+        ...base,
+        signal,
+        tab: "",
+      }),
     staleTime: 30_000,
   });
 
   const qVerified = useQuery({
-    queryKey: ["adminUsersCount", "verified"],
+    queryKey: ["adminPhoneCount", "verified"],
     queryFn: ({ signal }) =>
       adminPhoneApi.list({ tab: "verified", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qExpired = useQuery({
-    queryKey: ["adminUsersCount", "expired"],
+    queryKey: ["adminPhoneCount", "expired"],
     queryFn: ({ signal }) =>
       adminPhoneApi.list({ tab: "expired", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qPending = useQuery({
-    queryKey: ["adminUsersCount", "pending"],
+    queryKey: ["adminPhoneCount", "pending"],
     queryFn: ({ signal }) =>
       adminPhoneApi.list({ tab: "pending", ...base, signal }),
     staleTime: 30_000,

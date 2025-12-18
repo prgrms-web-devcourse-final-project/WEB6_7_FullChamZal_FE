@@ -7,8 +7,8 @@ const links = [
     href: "#main",
   },
   {
-    title: "??",
-    href: "#",
+    title: "Why",
+    href: "#why",
   },
   {
     title: "What",
