@@ -22,7 +22,7 @@ export default function WritePage() {
           <div className="w-full lg:w-1/2 overflow-y-auto">
             <Left preview={preview} onPreviewChange={setPreview} />
           </div>
-          <div className="w-1/2 hidden lg:block border-l border-outline">
+          <div className="w-1/2 hidden lg:flex border-l border-outline overflow-hidden min-h-0">
             <Right preview={preview} />
           </div>
         </div>
