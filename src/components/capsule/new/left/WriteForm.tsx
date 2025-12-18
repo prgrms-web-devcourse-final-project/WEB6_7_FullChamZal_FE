@@ -285,16 +285,9 @@ export default function WriteForm({
 
       const data = isSelf
         ? await (async () => {
-            const phoneRaw = me.phoneNumber || "";
-            const phoneDigits = phoneRaw.replace(/\D/g, "");
-            if (!phoneDigits) {
-              throw new Error("로그인 정보에서 전화번호를 확인할 수 없습니다.");
-            }
             const myPayload = buildMyPayload({
               memberId: me.memberId,
               senderName,
-              recipientPhone: phoneDigits,
-              capsulePassword: null,
               title,
               content: contentValue,
               visibility: effectiveVisibility,

@@ -26,8 +26,6 @@ export interface CreateMyCapsuleRequest {
   memberId: number;
   nickname: string;
   receiverNickname: string;
-  recipientPhone?: string | null;
-  capsulePassword?: string | null;
   title: string;
   content: string;
   visibility: Visibility;

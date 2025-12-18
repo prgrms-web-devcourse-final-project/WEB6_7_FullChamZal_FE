@@ -32,8 +32,6 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
   const {
     memberId,
     senderName,
-    recipientPhone = null,
-    capsulePassword = null,
     title,
     content,
     visibility,
@@ -52,8 +50,6 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     memberId,
     nickname: senderName,
     receiverNickname: senderName,
-    recipientPhone,
-    capsulePassword,
     title,
     content,
     visibility,
