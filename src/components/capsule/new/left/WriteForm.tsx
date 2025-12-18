@@ -40,7 +40,7 @@ type PreviewState = {
   senderName: string;
   receiverName: string;
   content: string;
-  visibility: Visibility | "MYSELF";
+  visibility: Visibility | "SELF";
   authMethod: string;
   unlockType: string;
   charCount: number;
@@ -89,8 +89,8 @@ export default function WriteForm({
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
   const isPrivateOnly = visibility === "PRIVATE";
-  const isSelf = visibility === "MYSELF";
-  const effectiveVisibility: Visibility = isSelf ? "PRIVATE" : visibility;
+  const isSelf = visibility === "SELF";
+  const effectiveVisibility: Visibility = isSelf ? "SELF" : visibility;
 
   const senderName =
     senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
@@ -101,14 +101,14 @@ export default function WriteForm({
       // 공개 범위
       visibility === "PUBLIC"
         ? "PUBLIC"
-        : visibility === "MYSELF"
-        ? "MYSELF"
+        : visibility === "SELF"
+        ? "SELF"
         : "PRIVATE";
     // 인증 방법
     const authMethodLabel =
       visibility === "PUBLIC"
         ? "NONE"
-        : visibility === "MYSELF"
+        : visibility === "SELF"
         ? "NONE"
         : sendMethod === "PHONE"
         ? "PHONE"

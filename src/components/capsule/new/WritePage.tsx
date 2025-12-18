@@ -11,7 +11,7 @@ export default function WritePage() {
     senderName: "",
     receiverName: "",
     content: "",
-    visibility: "PRIVATE" as Visibility | "MYSELF",
+    visibility: "PRIVATE" as Visibility | "SELF",
     authMethod: "URL",
     unlockType: "TIME",
     charCount: 0,

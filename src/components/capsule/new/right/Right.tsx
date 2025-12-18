@@ -5,7 +5,7 @@ type PreviewState = {
   senderName: string;
   receiverName: string;
   content: string;
-  visibility: Visibility | "MYSELF";
+  visibility: Visibility | "SELF";
   authMethod: string;
   unlockType: string;
   charCount: number;
@@ -18,7 +18,7 @@ export default function Right({ preview }: { preview: PreviewState }) {
   const visibilityLabel =
     preview.visibility === "PUBLIC"
       ? "공개"
-      : preview.visibility === "MYSELF"
+      : preview.visibility === "SELF"
       ? "내게 쓰기"
       : "비공개";
   const authLabel =
