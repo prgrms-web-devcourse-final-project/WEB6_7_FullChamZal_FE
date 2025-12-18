@@ -11,13 +11,14 @@ type BuildCommonArgs = {
   memberId: number;
   senderName: string;
   receiverNickname?: string;
+  recipientPhone?: string | null;
   title: string;
   content: string;
   visibility: Visibility;
   effectiveUnlockType: UnlockType;
   dayForm: DayForm;
   locationForm: LocationForm;
-  capsulePassword?: string;
+  capsulePassword?: string | null;
   capsuleColor?: string;
   capsulePackingColor?: string;
 };
@@ -31,6 +32,8 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
   const {
     memberId,
     senderName,
+    recipientPhone = null,
+    capsulePassword = null,
     title,
     content,
     visibility,
@@ -49,6 +52,8 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     memberId,
     nickname: senderName,
     receiverNickname: senderName,
+    recipientPhone,
+    capsulePassword,
     title,
     content,
     visibility,
@@ -93,6 +98,8 @@ export function buildPrivatePayload(
     memberId,
     senderName,
     receiverNickname = "",
+    recipientPhone = null,
+    capsulePassword = null,
     title,
     content,
     visibility,
@@ -110,15 +117,23 @@ export function buildPrivatePayload(
     memberId,
     nickname: senderName,
     receiverNickname,
+    recipientPhone,
+    capsulePassword,
     title,
     content,
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
+    unlockUntil: undefined,
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.placeName
+        : "",
+    address:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.address
         : "",
     locationLat:
       effectiveUnlockType === "LOCATION" ||
@@ -147,13 +162,13 @@ export function buildPublicPayload(
   const {
     memberId,
     senderName,
+    capsulePassword = null,
     title,
     content,
     visibility,
     effectiveUnlockType,
     dayForm,
     locationForm,
-    capsulePassword,
     capsuleColor = "",
     capsulePackingColor = "",
   } = args;
@@ -175,6 +190,12 @@ export function buildPublicPayload(
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
+    unlockUntil: undefined,
+    address:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.address
+        : "",
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
@@ -202,23 +223,11 @@ export function buildPublicPayload(
 /**
  * 비공개 캡슐 생성 API 호출
  * @param payload 빌드된 비공개 DTO
- * @param query   전화번호/비밀번호 전송 방식에 따른 쿼리 파라미터
  */
 export async function createPrivateCapsule(
-  payload: CreatePrivateCapsuleRequest,
-  query?: { phoneNum?: string; capsulePassword?: string }
+  payload: CreatePrivateCapsuleRequest
 ): Promise<CapsuleCreateResponse> {
-  const searchParams = new URLSearchParams();
-  if (query?.phoneNum) searchParams.set("phoneNum", query.phoneNum);
-  if (query?.capsulePassword)
-    searchParams.set("capsulePassword", query.capsulePassword);
-
-  const queryString = searchParams.toString();
-  const path = `/api/v1/capsule/create/private${
-    queryString ? `?${queryString}` : ""
-  }`;
-
-  return apiFetchRaw<CapsuleCreateResponse>(path, {
+  return apiFetchRaw<CapsuleCreateResponse>("/api/v1/capsule/create/private", {
     method: "POST",
     json: payload,
   });
@@ -240,18 +249,11 @@ export async function createPublicCapsule(
 /**
  * 내게쓰기 캡슐 생성 API 호출
  * @param payload 빌드된 내게쓰기 DTO
- * @param phone 로그인 사용자의 전화번호(숫자만)
  */
 export async function createMyCapsule(
-  payload: CreateMyCapsuleRequest,
-  phone: string
+  payload: CreateMyCapsuleRequest
 ): Promise<CapsuleCreateResponse> {
-  const searchParams = new URLSearchParams();
-  searchParams.set("phone", phone);
-
-  const path = `/api/v1/capsule/create/me?${searchParams.toString()}`;
-
-  return apiFetchRaw<CapsuleCreateResponse>(path, {
+  return apiFetchRaw<CapsuleCreateResponse>("/api/v1/capsule/create/me", {
     method: "POST",
     json: payload,
   });

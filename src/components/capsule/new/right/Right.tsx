@@ -1,4 +1,4 @@
-import { formatDate } from "@/lib/formatDate";
+import { formatDate } from "@/lib/hooks/formatDate";
 
 type PreviewState = {
   title: string;

@@ -253,6 +253,8 @@ export default function WriteForm({
       memberId: me.memberId,
       senderName,
       receiverNickname: receiveNameValue,
+      recipientPhone: phoneNum || null,
+      capsulePassword: capsulePassword || null,
       title: titleValue,
       content: contentValue,
       visibility: effectiveVisibility,
@@ -288,6 +290,8 @@ export default function WriteForm({
             const myPayload = buildMyPayload({
               memberId: me.memberId,
               senderName,
+              recipientPhone: phoneDigits,
+              capsulePassword: null,
               title,
               content: contentValue,
               visibility: effectiveVisibility,
@@ -295,13 +299,10 @@ export default function WriteForm({
               dayForm,
               locationForm,
             });
-            return createMyCapsule(myPayload, phoneDigits);
+            return createMyCapsule(myPayload);
           })()
         : isPrivateOnly
-        ? await createPrivateCapsule(privatePayload, {
-            phoneNum,
-            capsulePassword: capsulePassword || undefined,
-          })
+        ? await createPrivateCapsule(privatePayload)
         : await createPublicCapsule(publicPayload);
       const baseResult = {
         userName: senderName || data?.nickname || "",
