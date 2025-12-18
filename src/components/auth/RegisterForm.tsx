@@ -10,8 +10,10 @@ import { authApiClient } from "@/lib/api/auth/auth.client";
 
 export default function RegisterForm({
   agreements,
+  onBack,
 }: {
   agreements: { terms: boolean; privacy: boolean; marketing: boolean };
+  onBack?: () => void;
 }) {
   const router = useRouter();
 
