@@ -19,7 +19,6 @@ export default async function ReceivePage({
             capsuleId={capsuleId}
             open={true}
             role="USER"
-            viewerType="RECEIVE"
             closeHref="/dashboard/receive"
           />
         ) : null}
