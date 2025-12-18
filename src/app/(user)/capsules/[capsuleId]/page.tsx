@@ -13,11 +13,13 @@ export default async function Page({ params }: PageProps) {
   const { capsuleId } = await params;
   console.log(capsuleId);
 
-  // 1) 편지 조회 => 편지 없으면 x
+  // 1) 편지 조회
+  // 편지 없으면 x
   // const letter = await getCapsuleById(capsuleId);
   // if (!capsule) notFound();
 
-  // 2) isProtected === 0이면 비회원 컴포넌트 보여주기
+  // 2) 비밀번호가 있는 상태면 비밀번호 창 보여주기
+
   // if (!capsule.isProtected) {
   // return <LetterDetailView capsule={capsule} mode="public" />;
   // }

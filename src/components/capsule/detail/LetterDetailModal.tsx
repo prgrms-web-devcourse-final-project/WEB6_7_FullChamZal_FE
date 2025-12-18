@@ -26,12 +26,9 @@ export default function LetterDetailModal({
   role = "USER",
   onClose,
   // USER read 호출에 필요한 값들
-  viewerType = "RECEIVE",
-  isSendSelf = 0,
   locationLat = null,
   locationLng = null,
   password = null,
-  url = null,
 }: {
   capsuleId: number;
   open?: boolean;
@@ -58,28 +55,21 @@ export default function LetterDetailModal({
   const isAdmin = role === "ADMIN";
 
   const { data, isLoading } = useQuery({
-    queryKey: [
-      isAdmin ? "adminCapsuleDetail" : "userCapsuleRead",
-      capsuleId,
-      viewerType,
-    ],
+    queryKey: [isAdmin ? "adminCapsuleDetail" : "userCapsuleRead", capsuleId],
     queryFn: ({ signal }) => {
       if (isAdmin) {
         return adminCapsulesApi.detail({ capsuleId, signal });
       }
-      return capsuleReadApi.read(
+      /* return capsuleReadApi.read(
         {
           capsuleId,
-          viewerType,
-          isSendSelf,
-          unlockAt: null,
+          unlockAt,
           locationLat,
           locationLng,
-          url,
           password,
         },
         signal
-      );
+      ); */
     },
     enabled: open && capsuleId > 0,
   });

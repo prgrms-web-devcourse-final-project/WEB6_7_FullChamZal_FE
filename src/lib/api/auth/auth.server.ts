@@ -1,5 +1,5 @@
 import "server-only";
-import { apiFetchServer } from "../fetchClientServer";
+import { apiFetchServer } from "../fetchServer";
 
 export const authApiServer = {
   me: () => apiFetchServer<MemberMe>("/api/v1/members/me"),
