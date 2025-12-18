@@ -2,6 +2,7 @@ import { apiFetchRaw } from "../fetchClient";
 import {
   CapsuleCreateResponse,
   CreatePrivateCapsuleRequest,
+  CreateMyCapsuleRequest,
   CreatePublicCapsuleRequest,
   UnlockType,
 } from "./types";
@@ -9,6 +10,7 @@ import {
 type BuildCommonArgs = {
   memberId: number;
   senderName: string;
+  receiverNickname?: string;
   title: string;
   content: string;
   visibility: Visibility;
@@ -21,6 +23,66 @@ type BuildCommonArgs = {
 };
 
 /**
+ * 화면 상태(폼) -> 내게쓰기 캡슐 DTO로 변환한다.
+ * - receiverNickname은 발신자 이름을 그대로 사용
+ * - address/unlockUntil은 옵션으로 둔다
+ */
+export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
+  const {
+    memberId,
+    senderName,
+    title,
+    content,
+    visibility,
+    effectiveUnlockType,
+    dayForm,
+    locationForm,
+  } = args;
+
+  const unlockAt =
+    effectiveUnlockType === "TIME" ||
+    effectiveUnlockType === "TIME_AND_LOCATION"
+      ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
+      : undefined;
+
+  return {
+    memberId,
+    nickname: senderName,
+    receiverNickname: senderName,
+    title,
+    content,
+    visibility,
+    unlockType: effectiveUnlockType,
+    unlockAt,
+    unlockUntil: undefined,
+    locationName:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.placeName
+        : "",
+    address:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.address
+        : "",
+    locationLat:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.lat ?? 0
+        : 0,
+    locationLng:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.lng ?? 0
+        : 0,
+    viewingRadius: 0,
+    packingColor: "",
+    contentColor: "",
+    maxViewCount: 0,
+  };
+}
+
+/**
  * 화면 상태(폼) -> 비공개 캡슐 생성 DTO로 변환한다.
  * - unlockType/날짜/위치 상태를 백엔드가 기대하는 스키마에 맞춘다.
  */
@@ -30,6 +92,7 @@ export function buildPrivatePayload(
   const {
     memberId,
     senderName,
+    receiverNickname = "",
     title,
     content,
     visibility,
@@ -45,7 +108,8 @@ export function buildPrivatePayload(
 
   return {
     memberId,
-    nickName: senderName,
+    nickname: senderName,
+    receiverNickname,
     title,
     content,
     visibility,
@@ -168,6 +232,26 @@ export async function createPublicCapsule(
   payload: CreatePublicCapsuleRequest
 ): Promise<CapsuleCreateResponse> {
   return apiFetchRaw<CapsuleCreateResponse>("/api/v1/capsule/create/public", {
+    method: "POST",
+    json: payload,
+  });
+}
+
+/**
+ * 내게쓰기 캡슐 생성 API 호출
+ * @param payload 빌드된 내게쓰기 DTO
+ * @param phone 로그인 사용자의 전화번호(숫자만)
+ */
+export async function createMyCapsule(
+  payload: CreateMyCapsuleRequest,
+  phone: string
+): Promise<CapsuleCreateResponse> {
+  const searchParams = new URLSearchParams();
+  searchParams.set("phone", phone);
+
+  const path = `/api/v1/capsule/create/me?${searchParams.toString()}`;
+
+  return apiFetchRaw<CapsuleCreateResponse>(path, {
     method: "POST",
     json: payload,
   });

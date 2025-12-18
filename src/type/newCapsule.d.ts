@@ -1,4 +1,4 @@
-type Visibility = "PRIVATE" | "PUBLIC";
+type Visibility = "PRIVATE" | "PUBLIC" | "MYSELF";
 
 type DayForm = {
   date: string; // "2025-12-12"
