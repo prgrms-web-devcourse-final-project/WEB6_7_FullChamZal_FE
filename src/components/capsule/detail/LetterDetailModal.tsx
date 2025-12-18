@@ -1,29 +1,37 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
+/* eslint-disable react-hooks/rules-of-hooks */
 
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
+import { capsuleReadApi } from "@/lib/api/capsule/capsuleDetail";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Archive,
-  Bookmark,
   Clock,
   LinkIcon,
   MapPin,
   Reply,
   X,
+  Archive,
+  Bookmark,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LetterDetailModal({
   capsuleId,
-  open,
+  open = true,
   closeHref,
   mode,
   role = "USER",
   onClose,
+  // USER read 호출에 필요한 값들
+  viewerType = "RECEIVE",
+  isSendSelf = 0,
+  locationLat = null,
+  locationLng = null,
+  password = null,
+  url = null,
 }: {
   capsuleId: number;
   open?: boolean;
@@ -31,10 +39,15 @@ export default function LetterDetailModal({
   mode?: string;
   role?: MemberRole;
   onClose?: () => void;
+
+  viewerType?: "SEND" | "RECEIVE" | "BOOKMARK" | string;
+  isSendSelf?: 0 | 1;
+  locationLat?: number | null;
+  locationLng?: number | null;
+  password?: string | number | null;
+  url?: string | number | null;
 }) {
   const router = useRouter();
-
-  // open이 false면 아예 렌더하지 않기
   if (!open) return null;
 
   const close = () => {
@@ -42,13 +55,51 @@ export default function LetterDetailModal({
     else router.back();
   };
 
+  const isAdmin = role === "ADMIN";
+
   const { data, isLoading } = useQuery({
-    queryKey: ["adminCapsuleDetail", capsuleId],
-    queryFn: ({ signal }) => adminCapsulesApi.detail({ capsuleId, signal }),
+    queryKey: [
+      isAdmin ? "adminCapsuleDetail" : "userCapsuleRead",
+      capsuleId,
+      viewerType,
+    ],
+    queryFn: ({ signal }) => {
+      if (isAdmin) {
+        return adminCapsulesApi.detail({ capsuleId, signal });
+      }
+      return capsuleReadApi.read(
+        {
+          capsuleId,
+          viewerType,
+          isSendSelf,
+          unlockAt: null,
+          locationLat,
+          locationLng,
+          url,
+          password,
+        },
+        signal
+      );
+    },
     enabled: open && capsuleId > 0,
   });
 
-  const capsule = data;
+  // UI에서 쓰는 형태로 통일 (ADMIN/USER 필드명 다름)
+  const capsule = data
+    ? isAdmin
+      ? data
+      : {
+          // USER 응답 -> UI 공통 형태로 매핑
+          title: data.title,
+          content: data.content,
+          createdAt: data.createAt,
+          writerNickname: data.senderNickname,
+          recipient: data.recipient,
+          unlockType: data.unlockType,
+          unlockAt: data.unlockAt,
+          locationName: data.locationName,
+        }
+    : null;
 
   // 로딩 UI
   if (isLoading) {
@@ -68,7 +119,6 @@ export default function LetterDetailModal({
     );
   }
 
-  /* 데이터가 없을경우 */
   if (!capsule) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
@@ -93,7 +143,6 @@ export default function LetterDetailModal({
     );
   }
 
-  // 해제 조건 표시
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
 
@@ -104,8 +153,7 @@ export default function LetterDetailModal({
         : "시간 조건 없음"
       : capsule.unlockType === "LOCATION"
       ? capsule.locationName ?? "위치 조건 없음"
-      : // TIME_AND_LOCATION
-        `${
+      : `${
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
         } · ${capsule.locationName ?? "위치 조건 없음"}`;
 
@@ -144,13 +192,13 @@ export default function LetterDetailModal({
           <div className="flex-1 overflow-hidden">
             <div className="w-full h-full py-15 px-15">
               <div className="w-full h-full flex flex-col justify-between gap-8">
-                {/* Dear */}
                 <div className="text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span className="text-text-3">(수신자 정보 없음)</span>
+                  <span className="text-text-3">
+                    {capsule.recipient ?? "(수신자 정보 없음)"}
+                  </span>
                 </div>
 
-                {/* 본문 */}
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
                   <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
@@ -162,7 +210,6 @@ export default function LetterDetailModal({
                     {formatDate(capsule.createdAt)}
                   </span>
 
-                  {/* From */}
                   <div className="text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
                     <span>{capsule.writerNickname}</span>

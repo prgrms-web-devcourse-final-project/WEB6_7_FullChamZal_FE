@@ -4,8 +4,7 @@ import Input from "@/components/common/Input";
 import { useState } from "react";
 import Button from "../common/Button";
 import { useRouter } from "next/navigation";
-
-import { authApi } from "@/lib/api/auth/auth";
+import { authApiClient } from "@/lib/api/auth/auth.client";
 
 function getErrorMessage(err: unknown) {
   if (err instanceof Error) return err.message;
@@ -40,8 +39,8 @@ export default function LoginForm() {
     try {
       setLoading(true);
 
-      await authApi.login({ userId: id.trim(), password: pw });
-      const me = await authApi.me();
+      await authApiClient.login({ userId: id.trim(), password: pw });
+      const me = await authApiClient.me();
       const isAdmin = me.role === "ADMIN";
       const target = isAdmin ? "/admin/dashboard/users" : "/dashboard";
       router.replace(target);

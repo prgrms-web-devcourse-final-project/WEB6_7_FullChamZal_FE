@@ -5,13 +5,15 @@ import Input from "../common/Input";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
-import { authApi } from "@/lib/api/auth/auth";
 import { ApiError } from "@/lib/api/fetchClient";
+import { authApiClient } from "@/lib/api/auth/auth.client";
 
 export default function RegisterForm({
   agreements,
+  onBack,
 }: {
   agreements: { terms: boolean; privacy: boolean; marketing: boolean };
+  onBack?: () => void;
 }) {
   const router = useRouter();
 
@@ -72,9 +74,7 @@ export default function RegisterForm({
     nicknameTouched && !nickname.trim() ? "닉네임을 입력하세요." : "";
 
   const idError =
-    idTouched && !idRegex.test(id.trim())
-      ? "아이디는 4~20자여야 합니다."
-      : "";
+    idTouched && !idRegex.test(id.trim()) ? "아이디는 4~20자여야 합니다." : "";
   const pwError =
     pwTouched && !pwRegex.test(pw)
       ? "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다."
@@ -193,7 +193,7 @@ export default function RegisterForm({
     setIsSubmitting(true);
 
     try {
-      await authApi.signup({
+      await authApiClient.signup({
         userId: id.trim(),
         password: pw,
         name: name.trim(),
@@ -201,9 +201,9 @@ export default function RegisterForm({
         phoneNumber: normalizedPhone,
       });
 
-      await authApi.login({ userId: id.trim(), password: pw });
+      await authApiClient.login({ userId: id.trim(), password: pw });
 
-      const me = await authApi.me();
+      const me = await authApiClient.me();
       const target = me.role === "ADMIN" ? "/admin" : "/dashboard";
 
       setModalMessage("회원가입이 완료되었습니다.");

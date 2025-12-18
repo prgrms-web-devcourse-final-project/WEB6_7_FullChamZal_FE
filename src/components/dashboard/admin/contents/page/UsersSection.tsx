@@ -14,13 +14,16 @@ const USER_TABS = [
 ] as const;
 
 export default function UsersSection() {
-  // 상단 통계는 "요약값"만 가져오면 되니까 page=0, size=1 정도로 최소 요청
   const base = { query: "", page: 0, size: 1 as const };
 
   const qAll = useQuery({
-    queryKey: ["adminUsersCount", "all"],
+    queryKey: ["adminUsersCount"],
     queryFn: ({ signal }) =>
-      adminUsersApi.list({ tab: "all", ...base, signal }),
+      adminUsersApi.list({
+        ...base,
+        signal,
+        tab: "",
+      }),
     staleTime: 30_000,
   });
 

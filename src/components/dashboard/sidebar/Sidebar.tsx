@@ -8,14 +8,14 @@ import Profile from "./Profile";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProfileModal from "./profile/ProfileModal";
-import { authApi } from "@/lib/api/auth/auth";
+import { authApiClient } from "@/lib/api/auth/auth.client";
 
 export default function Sidebar() {
   const router = useRouter();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLogout = () => {
-    authApi.logout();
+    authApiClient.logout();
     router.push("/");
   };
 

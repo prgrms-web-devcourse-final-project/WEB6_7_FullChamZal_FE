@@ -4,6 +4,8 @@ import { Heart, Inbox, MailPlus, Send } from "lucide-react";
 import DivBox from "../DivBox";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import { useQuery } from "@tanstack/react-query";
 
 export default function MyMailbox() {
   const pathname = usePathname();
@@ -15,6 +17,18 @@ export default function MyMailbox() {
   const baseBoxClass = "px-5 py-3 rounded-[10px]";
   const activeBoxClass =
     "bg-primary-2 border-primary-2/0 text-white shadow-md hover:bg-primary-2";
+
+  /** 보낸 편지 */
+  const { data: sendList } = useQuery({
+    queryKey: ["capsuleDashboard", "send"],
+    queryFn: ({ signal }) => capsuleDashboardApi.sendDashboard(signal),
+  });
+
+  /** 받은 편지 */
+  const { data: receiveList } = useQuery({
+    queryKey: ["capsuleDashboard", "receive"],
+    queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+  });
 
   return (
     <div className="space-y-3">
@@ -41,7 +55,7 @@ export default function MyMailbox() {
                 >
                   보낸 편지
                 </span>
-                <span className="text-2xl">24</span>
+                <span className="text-2xl">{sendList?.length ?? 0}</span>
               </div>
             </div>
           </DivBox>
@@ -62,7 +76,7 @@ export default function MyMailbox() {
                 >
                   받은 편지
                 </span>
-                <span className="text-2xl">12</span>
+                <span className="text-2xl">{receiveList?.length ?? 0}</span>
               </div>
             </div>
           </DivBox>
@@ -83,7 +97,7 @@ export default function MyMailbox() {
                 >
                   소중한 편지
                 </span>
-                <span className="text-2xl">12</span>
+                <span className="text-2xl">연결 필요</span>
               </div>
             </div>
           </DivBox>

@@ -15,7 +15,7 @@ export default function ReportActions({
 }) {
   if (report.status === "PENDING") {
     return (
-      <div className="border-t border-outline flex gap-2 pt-4">
+      <div className="border-t border-outline flex gap-2 pt-4 text-sm">
         <button
           onClick={() => onApprove(report.id)}
           className="cursor-pointer py-2 px-3 flex items-center gap-1 rounded-lg bg-green-100 hover:bg-green-200"
@@ -44,7 +44,7 @@ export default function ReportActions({
   }
 
   return (
-    <div className="border-t border-outline flex gap-2 pt-4">
+    <div className="border-t border-outline flex gap-2 pt-4 text-sm">
       <button
         onClick={() => onOpenDetail(report.id)}
         className="cursor-pointer py-2 px-3 flex items-center gap-1 rounded-lg bg-gray-100 hover:bg-gray-200"
