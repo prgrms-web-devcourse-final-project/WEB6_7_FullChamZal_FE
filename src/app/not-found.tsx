@@ -34,7 +34,7 @@ export default function NotFound() {
         <div className="mb-8 flex items-center gap-2 rounded-full px-4 py-2 backdrop-blur text-primary">
           <Logo className="h-8 w-8" />
           <span className="text-2xl font-medium">
-            Deer.<span className="tracking-wide">___</span>
+            Dear.<span className="tracking-wide">___</span>
           </span>
         </div>
 
