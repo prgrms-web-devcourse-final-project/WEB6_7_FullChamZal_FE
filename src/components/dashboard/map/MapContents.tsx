@@ -4,18 +4,13 @@ import { Filter as FilterIcon, LocateFixed, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import MapList from "./MapList";
 import FilterArea from "./FilterArea";
-
+import { useQuery } from "@tanstack/react-query";
+import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
 //서버 렌더링 방지
 import dynamic from "next/dynamic";
-import { usePublicCapsules } from "@/lib/hooks/usePublicCapsules";
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
-
-type location = {
-  lat: number;
-  lng: number;
-} | null;
 
 //필터링 타입
 export type Radius = 1500 | 1000 | 500;
@@ -30,13 +25,16 @@ export default function MapContents() {
   const filterRef = useRef<HTMLDivElement | null>(null);
 
   //map center 위치
-  const [mapLocation, setMapLocation] = useState<location>({
-    lat: 37.579763,
-    lng: 126.977045,
-  });
+  const [mapLocation, setMapLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>({ lat: 37.579763, lng: 126.977045 });
   //사용자 위치
-  const [myLocation, setMyLocation] = useState<location>(null);
-  //위치 에러 메세지
+  const [myLocation, setMyLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>({ lat: 37.57553314541359, lng: 127.00269112529695 });
+
   const [error, setError] = useState<string | null>(null);
 
   //위치 정보 가져오기 실패했을 때 상황에 따른 에러 메세지
@@ -116,11 +114,25 @@ export default function MapContents() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  //주변 캡슐 조회
-  const { data } = usePublicCapsules({
-    myLocation,
-    radius,
+  //근처 공개 캡슐 조회
+  const { data } = useQuery({
+    queryKey: ["publicCapsules", myLocation?.lat, myLocation?.lng, radius],
+    queryFn: () => {
+      if (!myLocation) {
+        throw new Error("현재 위치 정보 없음");
+      }
+
+      return fetchPublicCapsules({
+        lat: myLocation.lat,
+        lng: myLocation.lng,
+        radius,
+      });
+    },
+    enabled: !!myLocation,
+    staleTime: 1000 * 30,
   });
+
+  console.log(data);
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -180,7 +192,7 @@ export default function MapContents() {
         </div>
 
         {/* 리스트 */}
-        <div className="w-[360px] rounded-xl bg-white/80 border border-outline flex flex-col gap-6 min-h-0 py-6">
+        <div className="w-[360px] rounded-xl bg-white/80 border border-outline flex flex-col gap-8 min-h-0 py-6">
           <div className="flex justify-between flex-none px-6 items-center">
             <span className="text-lg">주변 편지</span>
 

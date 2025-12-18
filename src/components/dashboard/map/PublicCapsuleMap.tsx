@@ -1,7 +1,60 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import {
+  CustomOverlayMap,
+  Map,
+  MapMarker,
+  MarkerClusterer,
+  useMap,
+} from "react-kakao-maps-sdk";
+
+const onClusterclick = () => {};
+
+const EventMarkerContainer = ({
+  position,
+  content,
+}: {
+  position: { lat: number; lng: number };
+  content: string;
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <CustomOverlayMap position={position} yAnchor={0}>
+      <div
+        className="relative flex flex-col items-center"
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+        onClick={() => {}}
+      >
+        {/* title */}
+        <div
+          className={`
+            absolute bottom-full mb-2
+            p-3 text-sm rounded-lg shadow
+            bg-white 
+            ${
+              isVisible
+                ? "opacity-100 cursor-pointer"
+                : "opacity-0 pointer-none"
+            }
+          `}
+        >
+          {content}
+        </div>
+        <Image
+          src="/img/marker.png"
+          alt="marker"
+          width={88}
+          height={88}
+          unoptimized
+        />
+      </div>
+    </CustomOverlayMap>
+  );
+};
 
 type PublicCapsuleMapProps = {
   location: {
@@ -71,25 +124,16 @@ export default function PublicCapsuleMap({
               lineHeight: "48px",
             },
           ]}
+          onClusterclick={onClusterclick}
         >
           {data?.map((d) => (
-            <MapMarker
+            <EventMarkerContainer
               key={d.capsuleId}
               position={{
-                // 마커가 표시될 위치입니다
                 lat: d.capsuleLatitude,
                 lng: d.capsuleLongitude,
               }}
-              image={{
-                src: "/img/marker.png",
-                size: {
-                  width: 88,
-                  height: 88,
-                },
-                options: {
-                  offset: { x: 44, y: 44 },
-                },
-              }}
+              content={d.title}
             />
           ))}
         </MarkerClusterer>
