@@ -20,7 +20,7 @@ import DayLocation from "./unlockOpt/DayLocation";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
-import SuccessModal from "../modal/SuccessModal";
+import ActiveModal from "../../../common/ActiveModal";
 import { useMe } from "@/lib/hooks/useMe";
 import {
   buildPrivatePayload,
@@ -447,7 +447,8 @@ export default function WriteForm() {
         }}
         data={result}
       />
-      <SuccessModal
+      <ActiveModal
+        active="success"
         title="편지 생성 성공"
         content="성공적으로 편지가 생성되었습니다."
         open={isPublicDoneOpen}
