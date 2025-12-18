@@ -189,6 +189,7 @@ export default function WriteForm() {
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
       senderName,
+      receiverNickname: receiveName,
       title,
       content: contentValue,
       visibility: effectiveVisibility,

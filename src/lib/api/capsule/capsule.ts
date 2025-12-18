@@ -10,6 +10,7 @@ import {
 type BuildCommonArgs = {
   memberId: number;
   senderName: string;
+  receiverNickname?: string;
   title: string;
   content: string;
   visibility: Visibility;
@@ -91,6 +92,7 @@ export function buildPrivatePayload(
   const {
     memberId,
     senderName,
+    receiverNickname = "",
     title,
     content,
     visibility,
@@ -107,6 +109,7 @@ export function buildPrivatePayload(
   return {
     memberId,
     nickname: senderName,
+    receiverNickname,
     title,
     content,
     visibility,
