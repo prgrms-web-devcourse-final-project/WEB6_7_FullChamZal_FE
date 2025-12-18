@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { ApiError } from "@/lib/api/fetchClient";
 import { authApiClient } from "@/lib/api/auth/auth.client";
+import ActiveModal from "../common/ActiveModal";
 
 export default function RegisterForm({
   agreements,
@@ -16,6 +17,8 @@ export default function RegisterForm({
   onBack?: () => void;
 }) {
   const router = useRouter();
+
+  const [redirectTarget, setRedirectTarget] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
@@ -206,11 +209,9 @@ export default function RegisterForm({
       const me = await authApiClient.me();
       const target = me.role === "ADMIN" ? "/admin" : "/dashboard";
 
+      setRedirectTarget(target);
       setModalMessage("회원가입이 완료되었습니다.");
       setIsSignupSuccessModalOpen(true);
-
-      router.replace(target);
-      router.refresh();
     } catch (e) {
       const err = e as unknown;
       const msg =
@@ -231,14 +232,52 @@ export default function RegisterForm({
     return () => clearInterval(timer);
   }, [countdown]);
 
+  const handleRouter = () => {
+    if (!redirectTarget) return;
+    router.replace(redirectTarget);
+    router.refresh();
+  };
+
   return (
     <>
       {/* 모달 placeholder */}
-      {isVerifySuccessModalOpen && null}
-      {isVerifyFailModalOpen && null}
-      {isSignupSuccessModalOpen && null}
-      {isSignupFailModalOpen && null}
-      {modalMessage && null}
+      {isVerifySuccessModalOpen && (
+        <ActiveModal
+          active={"success"}
+          title={"인증 완료"}
+          content={"성공적으로 인증이 완료되었습니다."}
+          open={isVerifySuccessModalOpen}
+          onClose={() => setIsVerifySuccessModalOpen(false)}
+        />
+      )}
+      {isVerifyFailModalOpen && (
+        <ActiveModal
+          active={"fail"}
+          title={"인증 실패"}
+          content={"인증이 실패했습니다."}
+          open={isVerifyFailModalOpen}
+          onClose={() => setIsVerifyFailModalOpen(false)}
+        />
+      )}
+      {isSignupSuccessModalOpen && (
+        <ActiveModal
+          active={"success"}
+          title={"회원가입 완료"}
+          content={"성공적으로 회원가입이 완료되었습니다."}
+          open={isSignupSuccessModalOpen}
+          onClose={() => setIsSignupSuccessModalOpen(false)}
+          onConfirm={() => handleRouter()}
+        />
+      )}
+      {isSignupFailModalOpen && (
+        <ActiveModal
+          active={"fail"}
+          title={"회원가입 실패"}
+          content={`${modalMessage} 회원가입에 실패했습니다.`}
+          open={isSignupFailModalOpen}
+          onClose={() => setIsSignupFailModalOpen(false)}
+        />
+      )}
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-5">

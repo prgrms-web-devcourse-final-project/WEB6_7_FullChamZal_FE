@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/static-components */
 "use client";
 
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import Logo from "@/components/common/Logo";
-import { formatDateTime } from "@/lib/formatDateTime";
 import { Clock, Lock, MapPin, Unlock } from "lucide-react";
 import Link from "next/link";
 

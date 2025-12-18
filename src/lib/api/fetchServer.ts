@@ -1,4 +1,3 @@
-// src/lib/api/fetchClientServer.ts
 import "server-only";
 import { cookies } from "next/headers";
 import { ApiError, type ApiEnvelope } from "./fetchClient";
@@ -11,10 +10,10 @@ export async function apiFetchServer<T>(
   path: string,
   options: ApiFetchOptions = {}
 ): Promise<T> {
-  const cookieStore = await cookies(); // Next 버전 차이 안전
+  const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
-  const url = new URL(path, API_BASE).toString(); // URL 조합 안전
+  const url = new URL(path, API_BASE).toString();
 
   const res = await fetch(url, {
     method: options.method ?? "GET",

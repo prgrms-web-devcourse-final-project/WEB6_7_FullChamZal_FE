@@ -21,7 +21,7 @@ import {
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import Pagination from "@/components/common/Pagination";
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
-import { formatDate } from "@/lib/formatDate";
+import { formatDate } from "@/lib/hooks/formatDate";
 import Modal from "@/components/common/Modal";
 
 export default function CapsuleList({

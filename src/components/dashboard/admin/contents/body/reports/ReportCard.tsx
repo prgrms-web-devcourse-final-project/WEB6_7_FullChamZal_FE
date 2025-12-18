@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDate } from "@/lib/formatDate";
+import { formatDate } from "@/lib/hooks/formatDate";
 import ReportActions from "./ReportActions";
 import ReportStatusBadge, { REPORT_STATUS_UI } from "./ReportStatusBadge";
 
