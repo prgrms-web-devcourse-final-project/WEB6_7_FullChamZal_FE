@@ -17,26 +17,31 @@ export default function Right({ preview }: { preview: PreviewState }) {
           <div className="flex-1 flex flex-col gap-4">
             <span className="text-xl">미리보기</span>
             <div className=" w-full h-full p-8 rounded-2xl bg-[#F5F1E8] border border-outline space-y-6">
-              <p className="font-semibold">{title || "제목을 입력하세요"}</p>
-              <div className="text-2xl space-x-1">
-                <span className="text-primary font-bold">Dear.</span>
-                <span className="text-text-3">
-                  {senderName || "작성자 이름"}
-                </span>
-              </div>
-              <div className="flex-1 mx-1 overflow-x-hidden overflow-y-auto">
-                <pre className="whitespace-pre-wrap wrap-break-word text-lg leading-7">
-                  {content || "편지 내용을 입력하세요"}
-                </pre>
-              </div>
-              <div className="shrink-0 flex flex-col items-end gap-1">
-                <span className="text-text-3">{todayLabel}</span>
-                <p className="text-right text-2xl space-x-1">
-                  <span className="text-primary font-bold">From.</span>
+              <div className="flex flex-col h-full justify-between">
+                <div className="text-2xl space-x-1">
+                  <p className="font-semibold">
+                    {title || "제목을 입력하세요"}
+                  </p>
+
+                  <span className="text-primary font-bold">Dear.</span>
                   <span className="text-text-3">
-                    {receiverName || "수신자 이름"}
+                    {senderName || "작성자 이름"}
                   </span>
-                </p>
+                </div>
+                <div className="flex-1 mx-1 overflow-hidden">
+                  <pre className="whitespace-pre-wrap wrap-break-word text-lg leading-7 overflow-y-auto overflow-x-hidden">
+                    {content || "편지 내용을 입력하세요"}
+                  </pre>
+                </div>
+                <div className="shrink-0 flex flex-col items-end gap-1">
+                  <span className="text-text-3">{todayLabel}</span>
+                  <p className="text-right text-2xl space-x-1">
+                    <span className="text-primary font-bold">From.</span>
+                    <span className="text-text-3">
+                      {receiverName || "수신자 이름"}
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
