@@ -6,6 +6,7 @@ import DivBox from "../../DivBox";
 import EnvelopeCard from "./EnvelopeCard";
 import { Bookmark, Inbox, Send } from "lucide-react";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import MailboxSkeleton from "@/components/skeleton/MailboxSkeleton";
 
 export default function MailboxPage({
   type,
@@ -45,9 +46,8 @@ export default function MailboxPage({
     return <div>북마크는 준비중!</div>;
   }
 
-  if (isLoading) return <div>로딩중...</div>;
+  if (isLoading) return <MailboxSkeleton />;
   if (error) return <div>에러 발생</div>;
-  if (!data?.length) return <div>편지가 없어요</div>;
 
   return (
     <>
@@ -63,7 +63,7 @@ export default function MailboxPage({
                 </p>
                 <p className="text-sm text-text-3">
                   <span className="text-primary font-semibold">
-                    {data.length}통
+                    {data?.length ? data?.length : 0}통
                   </span>
                   의 편지
                 </p>
@@ -71,14 +71,20 @@ export default function MailboxPage({
             </div>
 
             <div className="flex flex-wrap justify-between">
-              {/* 편지 */}
-              {data.map((capsule) => (
-                <EnvelopeCard
-                  key={capsule.capsuleId}
-                  capsule={capsule}
-                  type={type}
-                />
-              ))}
+              {!data?.length ? (
+                <p>받은 편지가 없습니다</p>
+              ) : (
+                <>
+                  {/* 편지 */}
+                  {data.map((capsule) => (
+                    <EnvelopeCard
+                      key={capsule.capsuleId}
+                      capsule={capsule}
+                      type={type}
+                    />
+                  ))}
+                </>
+              )}
             </div>
           </DivBox>
         </div>
