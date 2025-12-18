@@ -7,6 +7,7 @@ import FilterArea from "./FilterArea";
 
 //서버 렌더링 방지
 import dynamic from "next/dynamic";
+import { usePublicCapsules } from "@/lib/hooks/usePublicCapsules";
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
@@ -18,20 +19,21 @@ export type ViewedFilter = "ALL" | "UNREAD" | "READ";
 export default function MapContents() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const [radius, setRadius] = useState<Radius>(1500);
+  const [radius, setRadius] = useState<Radius>(1000);
   const [viewed, setViewed] = useState<ViewedFilter>("ALL");
 
   const filterRef = useRef<HTMLDivElement | null>(null);
 
-  //map 이동 위치
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
-    { lat: 37.579763, lng: 126.977045 }
-  );
+  //map center 위치
+  const [mapLocation, setMapLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>({ lat: 37.579763, lng: 126.977045 });
   //사용자 위치
   const [myLocation, setMyLocation] = useState<{
     lat: number;
     lng: number;
-  } | null>(null);
+  } | null>({ lat: 37.57553314541359, lng: 127.00269112529695 });
 
   const [error, setError] = useState<string | null>(null);
 
@@ -55,46 +57,53 @@ export default function MapContents() {
     }
   };
 
-  const getUserLocation = () => {
-    if ("geolocation" in navigator) {
-      //현 브라우저가 Geolocation API를 지원하는지 확인
-      navigator.geolocation.getCurrentPosition(
-        //사용자의 현재 위치를 요청
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude, //위도값 저장
-            lng: position.coords.longitude, //경도값 저장
-          });
-        },
-        (err) => {
-          showErrorMsg(err); //상황에 따른 에러메세지 호출
-        },
-        {
-          //옵션 객체
-          enableHighAccuracy: true, // 정확도 우선모드
-          timeout: 60000, // 1분 이내에 응답 없으면 에러 발생
-          maximumAge: Infinity, //항상 캐시 값 저장된 위치 정보 반환
-        }
-      );
-    } else {
-      setError("브라우저가 Geolocation을 지원하지 않습니다.");
-    }
+  //현재 내 위치를 가져오는 함수
+  // const getMyLocation = () => {
+  //   if ("geolocation" in navigator) {
+  //     //현 브라우저가 Geolocation API를 지원하는지 확인
+  //     navigator.geolocation.getCurrentPosition(
+  //       //사용자의 현재 위치를 요청
+  //       (position) => {
+  //         setMapLocation({
+  //           lat: position.coords.latitude, //위도값 저장
+  //           lng: position.coords.longitude, //경도값 저장
+  //         });
+  //       },
+  //       (err) => {
+  //         showErrorMsg(err); //상황에 따른 에러메세지 호출
+  //       },
+  //       {
+  //         //옵션 객체
+  //         enableHighAccuracy: true, // 정확도 우선모드
+  //         timeout: 60000, // 1분 이내에 응답 없으면 에러 발생
+  //         maximumAge: Infinity, //항상 캐시 값 저장된 위치 정보 반환
+  //       }
+  //     );
+  //   } else {
+  //     setError("브라우저가 Geolocation을 지원하지 않습니다.");
+  //   }
+  // };
+
+  //현재 사용자 위치로 map center 이동
+  const MoveMyLocation = () => {
+    if (!myLocation) return;
+    setMapLocation({ ...myLocation });
   };
 
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setMyLocation({
-            lat: position.coords.latitude, //위도값 저장
-            lng: position.coords.longitude, //경도값 저장
-          });
-        },
-        (err) => {
-          showErrorMsg(err);
-        }
-      );
-    }
+    // if ("geolocation" in navigator) {
+    //   navigator.geolocation.getCurrentPosition(
+    //     (position) => {
+    //       setMyLocation({
+    //         lat: position.coords.latitude, //위도값 저장
+    //         lng: position.coords.longitude, //경도값 저장
+    //       });
+    //     },
+    //     (err) => {
+    //       showErrorMsg(err);
+    //     }
+    //   );
+    // }
 
     const onDown = (e: MouseEvent) => {
       if (!filterRef.current) return;
@@ -105,6 +114,13 @@ export default function MapContents() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  const { data } = usePublicCapsules({
+    myLocation,
+    radius,
+  });
+
+  console.log(data);
+
   return (
     <div className="h-full flex flex-col gap-4">
       {/* 헤더 */}
@@ -114,7 +130,10 @@ export default function MapContents() {
           <span className="text-primary px-1">_</span>
         </h3>
         <p className="text-text-2">
-          주변에 숨겨진 <span className="text-primary font-semibold">6개</span>
+          주변에 숨겨진{" "}
+          <span className="text-primary font-semibold">
+            {data?.length ?? "-"}개
+          </span>
           의 편지를 찾아보세요
         </p>
       </div>
@@ -137,9 +156,7 @@ export default function MapContents() {
         {/* 지도 */}
         <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden ">
           {/* 위치 정보 접근 불가능 시 안내*/}
-          {myLocation ? (
-            ""
-          ) : (
+          {error ? (
             <div className="w-full h-full absolute z-20 flex items-center justify-center">
               <div className="inset-0 absolute bg-black opacity-50"></div>
               <div className="absolute text-sm z-3 text-white text-center">
@@ -153,16 +170,22 @@ export default function MapContents() {
                 </p>
               </div>
             </div>
+          ) : (
+            ""
           )}
 
           {/* 지도 컴포넌트 */}
-          {location ? <PublicCapsuleMap location={location} /> : error}
+          {mapLocation ? (
+            <PublicCapsuleMap location={mapLocation} data={data ?? []} />
+          ) : (
+            error
+          )}
 
           {/* 사용자 위치 불러오기 버튼 */}
           <button
             type="button"
             className="bg-white absolute bottom-4 right-4 p-3 rounded-xl z-10 shadow-lg text-primary"
-            onClick={getUserLocation}
+            onClick={MoveMyLocation}
           >
             <LocateFixed size={24} />
           </button>
@@ -193,7 +216,7 @@ export default function MapContents() {
                   onViewedChange={setViewed}
                   onClose={() => setIsFilterOpen(false)}
                   onReset={() => {
-                    setRadius(500);
+                    setRadius(1000);
                     setViewed("ALL");
                   }}
                 />
@@ -203,7 +226,7 @@ export default function MapContents() {
 
           {/* 리스트 영역 */}
           {myLocation ? (
-            <MapList myLocation={myLocation} />
+            <MapList listData={data} />
           ) : (
             <div className="text-center text-text-3 text-sm">
               위치 정보 접근을 허용해주세요.

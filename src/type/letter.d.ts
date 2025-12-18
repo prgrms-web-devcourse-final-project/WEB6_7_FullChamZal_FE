@@ -19,3 +19,15 @@ interface Capsule {
   isBookmarked: boolean; // ✅ 저장하기 상태
   sharePath: string; // ✅ 공개 링크 (/capsules/[id] 같은)
 }
+
+interface PublicCapsule {
+  capsuleId: string;
+  writerNickname: string;
+  title: string;
+  content: string;
+  capsuleCreatedAt: string;
+  capsuleLatitude: number;
+  capsuleLongitude: number;
+  distanceToCapsule: number;
+  capsuleUnlockType: string;
+}
