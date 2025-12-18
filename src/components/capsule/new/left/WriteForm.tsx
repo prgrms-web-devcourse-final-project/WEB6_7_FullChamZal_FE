@@ -30,7 +30,10 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
-import type { UnlockType } from "@/lib/api/capsule/types";
+import type {
+  UnlockType,
+  CapsuleCreateResponse,
+} from "@/lib/api/capsule/types";
 
 type PreviewState = {
   title: string;
@@ -304,10 +307,18 @@ export default function WriteForm({
         : isPrivateOnly
         ? await createPrivateCapsule(privatePayload)
         : await createPublicCapsule(publicPayload);
+
+      // 응답은 { code, message, data } 래핑 형태로 옴
+      const result = (data as unknown as { data: CapsuleCreateResponse }).data;
+
+      const url = result?.url ?? "";
+      const password = result?.capPW;
+      const userName = senderName || result?.nickname || "";
+
       const baseResult = {
-        userName: senderName || data?.nickname || "",
-        url: data?.url || "",
-        password: data?.capPW,
+        userName,
+        url,
+        password,
       };
 
       if (isPrivateOnly) {
