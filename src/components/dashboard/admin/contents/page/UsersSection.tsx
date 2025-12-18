@@ -74,7 +74,7 @@ export default function UsersSection() {
         section="users"
         tabs={USER_TABS}
         defaultTab="all"
-        searchPlaceholder="이름 또는 이메일로 검색..."
+        searchPlaceholder="이름 또는 닉네임으로 검색..."
       />
     </div>
   );

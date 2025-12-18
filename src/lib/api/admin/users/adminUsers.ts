@@ -25,6 +25,9 @@ export const adminUsersApi = {
       ...(filters.status ? { status: filters.status } : {}),
     });
 
+    const keyword = (params.query ?? "").trim();
+    if (keyword) qs.set("keyword", keyword);
+
     return apiFetch<AdminUsersResponse>(
       `/api/v1/admin/members?${qs.toString()}`,
       { signal: params.signal }

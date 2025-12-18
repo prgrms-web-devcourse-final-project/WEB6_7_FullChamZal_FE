@@ -159,7 +159,7 @@ export default function CapsuleList({
       },
       {
         key: "sender",
-        header: "발신자",
+        header: "작성자",
         cell: (c: AdminCapsule) => c.writerNickname,
       },
       {

@@ -20,10 +20,12 @@ export const adminCapsulesApi = {
     const qs = new URLSearchParams({
       page: String(params.page),
       size: String(params.size),
-      query: params.query ?? "",
       ...(filters.visibility ? { visibility: filters.visibility } : {}),
       sort: "createdAt,desc",
     });
+
+    const keyword = (params.query ?? "").trim();
+    if (keyword) qs.set("keyword", keyword);
 
     return apiFetch<AdminCapsulesResponse>(
       `/api/v1/admin/capsules?${qs.toString()}`,
