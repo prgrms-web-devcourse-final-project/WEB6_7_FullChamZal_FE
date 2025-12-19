@@ -88,12 +88,12 @@ export default function WriteForm({
   const [content, setContent] = useState("");
   const envelopeThemes = [
     "#F5F1E8",
-    "#FBF2DE",
-    "#F7DADA",
-    "#DCECF7",
-    "#E8E0FF",
-    "#E6F8EB",
-    "#FAE2C9",
+    "#FEF7E7",
+    "#FCE8EC",
+    "#E8F4FC",
+    "#F0E8FC",
+    "#E8FCF4",
+    "#FFE8D6",
   ];
   const [selectedEnvelope, setSelectedEnvelope] = useState(0);
   const paperThemes = envelopeThemes;
