@@ -374,7 +374,7 @@ export default function WriteForm({
                 },
                 {
                   id: "PAPER",
-                  tabName: "편지지(추가예정)",
+                  tabName: "편지지",
                   icon: <ImageIcon size={16} />,
                 },
               ]}
@@ -386,15 +386,15 @@ export default function WriteForm({
                     key={color + idx}
                     type="button"
                     onClick={() => setSelectedEnvelope(idx)}
-                    className={`relative aspect-square rounded-2xl border transition ${
+                    className={`relative aspect-square rounded-2xl border-2 transition ${
                       selectedEnvelope === idx
-                        ? "border-primary shadow-[0_0_0_3px_rgba(255,87,34,0.15)]"
+                        ? "border-primary bg-primary/10"
                         : "border-outline"
                     }`}
                     style={{ backgroundColor: color }}
                   >
                     {selectedEnvelope === idx && (
-                      <span className="absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
+                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
                         <Check size={18} />
                       </span>
                     )}
@@ -411,15 +411,15 @@ export default function WriteForm({
                     key={color + idx}
                     type="button"
                     onClick={() => setSelectedPaper(idx)}
-                    className={`relative aspect-square rounded-2xl border transition ${
+                    className={`relative aspect-square rounded-2xl border-2 transition ${
                       selectedPaper === idx
-                        ? "border-primary shadow-[0_0_0_3px_rgba(255,87,34,0.15)]"
+                        ? "border-primary bg-primary/10"
                         : "border-outline"
                     }`}
                     style={{ backgroundColor: color }}
                   >
                     {selectedPaper === idx && (
-                      <span className="absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
+                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
                         <Check size={18} />
                       </span>
                     )}
