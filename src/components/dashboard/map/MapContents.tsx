@@ -1,6 +1,6 @@
 "use client";
 
-import { Filter as FilterIcon, LocateFixed, Search } from "lucide-react";
+import { Filter as FilterIcon, LocateFixed } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import MapList from "./MapList";
 import FilterArea from "./FilterArea";
@@ -132,7 +132,19 @@ export default function MapContents() {
     staleTime: 1000 * 30,
   });
 
-  console.log(data);
+  //조회 상태 필터
+  const filterData = (data: PublicCapsule[] | undefined) => {
+    if (data) {
+      switch (viewed) {
+        case "ALL":
+          return data;
+        case "UNREAD":
+          return data.filter((d) => d.isViewed === false);
+        case "READ":
+          return data.filter((d) => d.isViewed === true);
+      }
+    } else return [];
+  };
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -145,7 +157,7 @@ export default function MapContents() {
         <p className="text-text-2">
           주변에 숨겨진{" "}
           <span className="text-primary font-semibold">
-            {data?.length ?? "-"}개
+            {filterData(data).length}개
           </span>
           의 편지를 찾아보세요
         </p>
@@ -176,7 +188,7 @@ export default function MapContents() {
 
           {/* 지도 컴포넌트 */}
           {mapLocation ? (
-            <PublicCapsuleMap location={mapLocation} data={data ?? []} />
+            <PublicCapsuleMap location={mapLocation} data={filterData(data)} />
           ) : (
             error
           )}
@@ -227,7 +239,7 @@ export default function MapContents() {
           {/* 리스트 영역 */}
           {myLocation ? (
             <MapList
-              listData={data}
+              listData={filterData(data)}
               onClick={(lat, lng) => setMapLocation({ lat, lng })}
             />
           ) : (

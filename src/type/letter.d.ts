@@ -22,12 +22,14 @@ interface Capsule {
 
 interface PublicCapsule {
   capsuleId: string;
+  capsuleLocationName: string;
   writerNickname: string;
   title: string;
   content: string;
   capsuleCreatedAt: string;
+  capsuleUnlockType: string;
   capsuleLatitude: number;
   capsuleLongitude: number;
   distanceToCapsule: number;
-  capsuleUnlockType: string;
+  isViewed: boolean;
 }
