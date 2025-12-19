@@ -204,7 +204,7 @@ export default function MapContents() {
         </div>
 
         {/* 리스트 */}
-        <div className="w-[360px] rounded-xl bg-white/80 border border-outline flex flex-col gap-8 min-h-0 py-6">
+        <div className="w-[360px] rounded-xl bg-white/80 border border-outline flex flex-col gap-3 min-h-0 py-6">
           <div className="flex justify-between flex-none px-6 items-center">
             <span className="text-lg">주변 편지</span>
 

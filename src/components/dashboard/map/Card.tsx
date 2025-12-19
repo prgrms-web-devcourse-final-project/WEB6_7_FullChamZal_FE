@@ -10,7 +10,7 @@ export default function Card({ data, keyword }: CardProps) {
     if (!keyword) return text;
     const index = text.toLowerCase().indexOf(keyword.toLowerCase());
     //키워드 일치하는 부분 없으면 반환
-    // if (index === -1) return text;
+    if (index === -1) return text;
 
     const before = text.slice(0, index);
     const match = text.slice(index, index + keyword.length);
@@ -31,7 +31,8 @@ export default function Card({ data, keyword }: CardProps) {
           <p>{highlightText(data.title, keyword)}</p>
           <div className="text-xs flex items-center gap-1 text-text-3">
             <div className="flex items-center gap-1">
-              <MapPin size={12} /> <span>장소 연결 X</span>
+              <MapPin size={12} />{" "}
+              <span>{highlightText(data.capsuleLocationName, keyword)}</span>
             </div>
             <span>•</span>
             <span className="text-primary-2">

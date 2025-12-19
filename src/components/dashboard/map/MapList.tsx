@@ -11,7 +11,9 @@ type MapListProps = {
 export default function MapList({ listData, onClick }: MapListProps) {
   //검색 키워드
   const [keyword, setKeyword] = useState("");
-  const searchResultList = listData?.filter((d) => d.title.includes(keyword));
+  const searchResultList = listData?.filter(
+    (d) => d.title.includes(keyword) || d.capsuleLocationName.includes(keyword)
+  );
 
   if (listData?.length === 0)
     return (
