@@ -57,7 +57,7 @@ export default function EnvelopeCard({ capsule, type }: Props) {
     ) : null;
 
   const CardInner = () => (
-    <div className="relative flex flex-col items-center justify-center py-8 perspective-[1000px] group">
+    <div className="relative flex flex-col items-center justify-center p-2 perspective-[1000px] group">
       {/* 읽음 UI 슬롯 */}
       <ReadBadgeSlot />
 

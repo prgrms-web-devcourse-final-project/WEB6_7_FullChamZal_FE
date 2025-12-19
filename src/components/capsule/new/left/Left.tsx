@@ -1,19 +1,27 @@
 import WriteForm from "./WriteForm";
-export default function Left() {
-  /*  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const payload = {
-      visibility, // 여기로 전달됨
-    };
+type PreviewState = {
+  title: string;
+  senderName: string;
+  receiverName: string;
+  content: string;
+  visibility: Visibility | "SELF";
+  authMethod: string;
+  unlockType: string;
+  charCount: number;
+};
 
-    console.log(payload);
-  }; */
-
+export default function Left({
+  preview,
+  onPreviewChange,
+}: {
+  preview: PreviewState;
+  onPreviewChange: (next: PreviewState) => void;
+}) {
   return (
     <>
       <section className="p-8">
-        <WriteForm />
+        <WriteForm preview={preview} onPreviewChange={onPreviewChange} />
       </section>
     </>
   );

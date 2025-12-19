@@ -2,13 +2,38 @@ export type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
 export interface CreatePrivateCapsuleRequest {
   memberId: number;
-  nickName: string;
+  nickname: string;
+  receiverNickname: string;
+  recipientPhone?: string | null;
+  capsulePassword?: string | null;
   title: string;
   content: string;
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;
+  unlockUntil?: string;
   locationName: string;
+  address?: string;
+  locationLat: number;
+  locationLng: number;
+  viewingRadius: number;
+  packingColor: string;
+  contentColor: string;
+  maxViewCount: number;
+}
+
+export interface CreateMyCapsuleRequest {
+  memberId: number;
+  nickname: string;
+  receiverNickname: string;
+  title: string;
+  content: string;
+  visibility: Visibility;
+  unlockType: UnlockType;
+  unlockAt?: string;
+  unlockUntil?: string;
+  locationName: string;
+  address?: string;
   locationLat: number;
   locationLng: number;
   viewingRadius: number;
@@ -28,7 +53,9 @@ export interface CreatePublicCapsuleRequest {
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;
+  unlockUntil?: string;
   locationName: string;
+  address?: string;
   locationLat: number;
   locationLng: number;
   locationRadiusM: number;
@@ -38,7 +65,8 @@ export interface CreatePublicCapsuleRequest {
 export interface CapsuleCreateResponse {
   memberId: number;
   capsuleId: number;
-  nickName?: string;
+  nickname?: string;
+  receiverNickname?: string;
   title: string;
   content: string;
   visibility: string;

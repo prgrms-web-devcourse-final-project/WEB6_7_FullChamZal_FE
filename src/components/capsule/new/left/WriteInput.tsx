@@ -1,15 +1,19 @@
+import type { ChangeEventHandler } from "react";
+
 export default function WriteInput({
   id,
   type,
   placeholder,
   value,
   readOnly = false,
+  onChange,
 }: {
   id: string;
   type: string;
   placeholder: string;
   value?: string;
   readOnly?: boolean;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
 }) {
   return (
     <>
@@ -19,6 +23,7 @@ export default function WriteInput({
         type={type}
         placeholder={placeholder}
         value={value}
+        onChange={onChange}
         readOnly={readOnly}
         className="py-2.5 px-3 bg-sub-2 rounded-lg w-full outline-none border border-white focus:border focus:border-primary-2"
       />

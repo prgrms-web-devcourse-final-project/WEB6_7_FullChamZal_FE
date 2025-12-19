@@ -2,6 +2,7 @@ import { apiFetchRaw } from "../fetchClient";
 import {
   CapsuleCreateResponse,
   CreatePrivateCapsuleRequest,
+  CreateMyCapsuleRequest,
   CreatePublicCapsuleRequest,
   UnlockType,
 } from "./types";
@@ -9,16 +10,78 @@ import {
 type BuildCommonArgs = {
   memberId: number;
   senderName: string;
+  receiverNickname?: string;
+  recipientPhone?: string | null;
   title: string;
   content: string;
   visibility: Visibility;
   effectiveUnlockType: UnlockType;
   dayForm: DayForm;
   locationForm: LocationForm;
-  capsulePassword?: string;
+  capsulePassword?: string | null;
   capsuleColor?: string;
   capsulePackingColor?: string;
 };
+
+/**
+ * 화면 상태(폼) -> 내게쓰기 캡슐 DTO로 변환한다.
+ * - receiverNickname은 발신자 이름을 그대로 사용
+ * - address/unlockUntil은 옵션으로 둔다
+ */
+export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
+  const {
+    memberId,
+    senderName,
+    title,
+    content,
+    visibility,
+    effectiveUnlockType,
+    dayForm,
+    locationForm,
+  } = args;
+
+  const unlockAt =
+    effectiveUnlockType === "TIME" ||
+    effectiveUnlockType === "TIME_AND_LOCATION"
+      ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
+      : undefined;
+
+  return {
+    memberId,
+    nickname: senderName,
+    receiverNickname: senderName,
+    title,
+    content,
+    visibility,
+    unlockType: effectiveUnlockType,
+    unlockAt,
+    unlockUntil: undefined,
+    locationName:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.placeName
+        : "",
+    address:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.address
+        : "",
+    locationLat:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.lat ?? 0
+        : 0,
+    locationLng:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.lng ?? 0
+        : 0,
+    viewingRadius: 0,
+    packingColor: "",
+    contentColor: "",
+    maxViewCount: 0,
+  };
+}
 
 /**
  * 화면 상태(폼) -> 비공개 캡슐 생성 DTO로 변환한다.
@@ -30,6 +93,9 @@ export function buildPrivatePayload(
   const {
     memberId,
     senderName,
+    receiverNickname = "",
+    recipientPhone = null,
+    capsulePassword = null,
     title,
     content,
     visibility,
@@ -45,16 +111,25 @@ export function buildPrivatePayload(
 
   return {
     memberId,
-    nickName: senderName,
+    nickname: senderName,
+    receiverNickname,
+    recipientPhone,
+    capsulePassword,
     title,
     content,
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
+    unlockUntil: undefined,
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.placeName
+        : "",
+    address:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.address
         : "",
     locationLat:
       effectiveUnlockType === "LOCATION" ||
@@ -83,13 +158,13 @@ export function buildPublicPayload(
   const {
     memberId,
     senderName,
+    capsulePassword = null,
     title,
     content,
     visibility,
     effectiveUnlockType,
     dayForm,
     locationForm,
-    capsulePassword,
     capsuleColor = "",
     capsulePackingColor = "",
   } = args;
@@ -111,6 +186,12 @@ export function buildPublicPayload(
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
+    unlockUntil: undefined,
+    address:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.address
+        : "",
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
@@ -138,23 +219,11 @@ export function buildPublicPayload(
 /**
  * 비공개 캡슐 생성 API 호출
  * @param payload 빌드된 비공개 DTO
- * @param query   전화번호/비밀번호 전송 방식에 따른 쿼리 파라미터
  */
 export async function createPrivateCapsule(
-  payload: CreatePrivateCapsuleRequest,
-  query?: { phoneNum?: string; capsulePassword?: string }
+  payload: CreatePrivateCapsuleRequest
 ): Promise<CapsuleCreateResponse> {
-  const searchParams = new URLSearchParams();
-  if (query?.phoneNum) searchParams.set("phoneNum", query.phoneNum);
-  if (query?.capsulePassword)
-    searchParams.set("capsulePassword", query.capsulePassword);
-
-  const queryString = searchParams.toString();
-  const path = `/api/v1/capsule/create/private${
-    queryString ? `?${queryString}` : ""
-  }`;
-
-  return apiFetchRaw<CapsuleCreateResponse>(path, {
+  return apiFetchRaw<CapsuleCreateResponse>("/api/v1/capsule/create/private", {
     method: "POST",
     json: payload,
   });
@@ -168,6 +237,19 @@ export async function createPublicCapsule(
   payload: CreatePublicCapsuleRequest
 ): Promise<CapsuleCreateResponse> {
   return apiFetchRaw<CapsuleCreateResponse>("/api/v1/capsule/create/public", {
+    method: "POST",
+    json: payload,
+  });
+}
+
+/**
+ * 내게쓰기 캡슐 생성 API 호출
+ * @param payload 빌드된 내게쓰기 DTO
+ */
+export async function createMyCapsule(
+  payload: CreateMyCapsuleRequest
+): Promise<CapsuleCreateResponse> {
+  return apiFetchRaw<CapsuleCreateResponse>("/api/v1/capsule/create/me", {
     method: "POST",
     json: payload,
   });
