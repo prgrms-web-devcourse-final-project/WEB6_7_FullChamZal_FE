@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
 import Button from "@/components/common/Button";
 import Logo from "@/components/common/Logo";
+import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 
 export default function LetterUnlockModal({
-  onVerify,
+  capsuleId,
   onSuccess,
 }: {
-  onVerify: (password: string) => Promise<boolean>;
-  onSuccess: () => void;
+  capsuleId: number;
+  onSuccess: (password: string) => void;
 }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -21,12 +23,34 @@ export default function LetterUnlockModal({
     setIsLoading(true);
 
     try {
-      const ok = await onVerify(password);
-      if (!ok) {
-        setError("비밀번호가 올바르지 않아요.");
-        return;
-      }
-      onSuccess();
+      // 여기서 한 번 read를 실제로 때려서 비번 검증까지 끝내고 넘어가면 UX가 안정적임
+      const unlockAt = new Date().toISOString();
+
+      const pos = await new Promise<{ lat: number; lng: number }>(
+        (resolve, reject) => {
+          if (!navigator.geolocation)
+            reject(new Error("위치 정보를 사용할 수 없습니다."));
+          navigator.geolocation.getCurrentPosition(
+            (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+            reject,
+            { enableHighAccuracy: true, timeout: 10_000 }
+          );
+        }
+      );
+
+      await guestCapsuleApi.read({
+        capsuleId,
+        unlockAt,
+        locationLat: pos.lat,
+        locationLng: pos.lng,
+        password,
+      });
+
+      onSuccess(password);
+    } catch (err: any) {
+      setError(
+        err?.message || "비밀번호가 올바르지 않거나 조건이 충족되지 않았어요."
+      );
     } finally {
       setIsLoading(false);
     }

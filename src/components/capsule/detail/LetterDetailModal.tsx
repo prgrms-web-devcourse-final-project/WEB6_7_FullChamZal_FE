@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
-import { capsuleReadApi } from "@/lib/api/capsule/capsuleDetail";
+import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +18,20 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+type UICapsule = {
+  title: string;
+  content: string;
+  createdAt: string;
+  writerNickname: string;
+  recipient: string | null;
+
+  unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION" | string;
+  unlockAt: string | null;
+  unlockUntil?: string | null;
+
+  locationName: string | null; // (USER: locationName / ADMIN: alias/address)
+};
+
 export default function LetterDetailModal({
   capsuleId,
   open = true,
@@ -25,8 +39,8 @@ export default function LetterDetailModal({
   mode,
   role = "USER",
   onClose,
+
   // USER read 호출에 필요한 값들
-  isSendSelf,
   locationLat = null,
   locationLng = null,
   password = null,
@@ -37,7 +51,7 @@ export default function LetterDetailModal({
   mode?: string;
   role?: MemberRole;
   onClose?: () => void;
-  isSendSelf?: 0 | 1;
+
   locationLat?: number | null;
   locationLng?: number | null;
   password?: string | number | null;
@@ -53,14 +67,80 @@ export default function LetterDetailModal({
   const isAdmin = role === "ADMIN";
 
   // 나중에 ADMIN일 경우에는 아래 api만 USER이면 USER 세부 api만 호출
-  const { data: adminData, isLoading } = useQuery<AdminCapsuleDetail>({
-    queryKey: ["adminCapsuleDetail", capsuleId],
-    queryFn: ({ signal }) => adminCapsulesApi.detail({ capsuleId, signal }),
-    enabled: open && capsuleId > 0 && isAdmin,
+  const { data, isLoading } = useQuery<UICapsule>({
+    queryKey: ["capsuleDetailModal", role, capsuleId, password],
+    queryFn: async ({ signal }) => {
+      if (isAdmin) {
+        const a = await adminCapsulesApi.detail({ capsuleId, signal });
+        return {
+          title: a.data.title,
+          content: a.data.content,
+          createdAt: a.data.createdAt,
+          writerNickname: a.data.writerNickname,
+          recipient: a.data.recipientName ?? null,
+
+          unlockType: a.data.unlockType,
+          unlockAt: a.data.unlockAt,
+          unlockUntil: a.data.unlockUntil ?? null,
+
+          locationName: a.data.locationAlias || a.data.address || null,
+        };
+      }
+
+      // USER: read API (조건 검증 포함)
+      const unlockAt = new Date().toISOString();
+
+      // 위치가 없으면 여기서 받아서 보냄 (시간/위치 캡슐 공통)
+      const pos =
+        locationLat != null && locationLng != null
+          ? { lat: locationLat, lng: locationLng }
+          : await new Promise<{ lat: number; lng: number }>(
+              (resolve, reject) => {
+                if (!navigator.geolocation)
+                  reject(new Error("위치 정보를 사용할 수 없습니다."));
+                navigator.geolocation.getCurrentPosition(
+                  (p) =>
+                    resolve({
+                      lat: p.coords.latitude,
+                      lng: p.coords.longitude,
+                    }),
+                  reject,
+                  { enableHighAccuracy: true, timeout: 10_000 }
+                );
+              }
+            );
+
+      const r = await guestCapsuleApi.read(
+        {
+          capsuleId,
+          unlockAt,
+          locationLat: pos.lat,
+          locationLng: pos.lng,
+          password,
+        },
+        signal
+      );
+
+      const u = r.data;
+
+      return {
+        title: u.title,
+        content: u.content,
+        createdAt: u.createAt,
+        writerNickname: u.senderNickname,
+        recipient: u.recipient ?? null,
+
+        unlockType: u.unlockType,
+        unlockAt: u.unlockAt,
+        unlockUntil: u.unlockUntil,
+
+        locationName: u.locationName ?? null,
+      };
+    },
+    enabled: open && capsuleId > 0,
+    retry: false,
   });
 
-  // UI에서 쓰는 형태로 통일 (ADMIN/USER 필드명 다름)
-  const capsule = isAdmin ? adminData : /* ...user mapping... */ null;
   // 로딩 UI
   if (isLoading) {
     return (
@@ -79,7 +159,7 @@ export default function LetterDetailModal({
     );
   }
 
-  if (!capsule) {
+  if (!data) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center py-15">
@@ -103,6 +183,8 @@ export default function LetterDetailModal({
     );
   }
 
+  const capsule = data;
+
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
 
@@ -112,11 +194,10 @@ export default function LetterDetailModal({
         ? formatDateTime(capsule.unlockAt)
         : "시간 조건 없음"
       : capsule.unlockType === "LOCATION"
-      ? (capsule.locationAlias || capsule.address) ?? "위치 조건 없음"
+      ? capsule.locationName ?? "위치 조건 없음"
       : `${
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
-        } · ${(capsule.locationAlias || capsule.address) ?? "위치 조건 없음"}`;
-
+        } · ${capsule.locationName ?? "위치 조건 없음"}`;
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
       <div className="flex h-full justify-center md:p-15 p-6">
@@ -154,7 +235,7 @@ export default function LetterDetailModal({
               <div className="w-full h-full flex flex-col justify-between gap-8">
                 <div className="text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span>{capsule.recipientName ?? "(수신자 정보 없음)"}</span>
+                  <span>{capsule.recipient ?? "(수신자 정보 없음)"}</span>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
