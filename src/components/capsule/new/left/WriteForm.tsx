@@ -9,6 +9,7 @@ import {
   Send,
   Check,
 } from "lucide-react";
+import { useMemo } from "react";
 import WriteDiv from "./WriteDiv";
 import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
@@ -45,6 +46,9 @@ type PreviewState = {
   authMethod: string;
   unlockType: string;
   charCount: number;
+  envelopeColorName: string;
+  paperColorName: string;
+  paperColorHex: string;
 };
 
 export default function WriteForm({
@@ -86,15 +90,18 @@ export default function WriteForm({
   const [title, setTitle] = useState("");
   const [receiveName, setReceiveName] = useState("");
   const [content, setContent] = useState("");
-  const envelopeThemes = [
-    "#F5F1E8",
-    "#FEF7E7",
-    "#FCE8EC",
-    "#E8F4FC",
-    "#F0E8FC",
-    "#E8FCF4",
-    "#FFE8D6",
-  ];
+  const envelopeThemes = useMemo(
+    () => [
+      { name: "BEIGE", color: "#F5F1E8" },
+      { name: "YELLOW", color: "#FEF7E7" },
+      { name: "PINK", color: "#FCE8EC" },
+      { name: "BLUE", color: "#E8F4FC" },
+      { name: "LAVENDER", color: "#F0E8FC" },
+      { name: "MINT", color: "#E8FCF4" },
+      { name: "PEACH", color: "#FFE8D6" },
+    ],
+    []
+  );
   const [selectedEnvelope, setSelectedEnvelope] = useState(0);
   const paperThemes = envelopeThemes;
   const [selectedPaper, setSelectedPaper] = useState(0);
@@ -133,6 +140,8 @@ export default function WriteForm({
         : unlockType === "MANUAL"
         ? "TIME_AND_LOCATION"
         : "TIME";
+    const envelopeSelected = envelopeThemes[selectedEnvelope];
+    const paperSelected = paperThemes[selectedPaper];
 
     // 내게쓰기일 경우 받는 사람 이름을 보내는 사람 이름으로 설정
     const receiverLabel = isSelf ? senderName : receiveName;
@@ -146,6 +155,9 @@ export default function WriteForm({
       authMethod: authMethodLabel,
       unlockType: unlockLabel,
       charCount: content.length,
+      envelopeColorName: envelopeSelected?.name ?? "",
+      paperColorName: paperSelected?.name ?? "",
+      paperColorHex: paperSelected?.color ?? "#F5F1E8",
     });
   }, [
     title,
@@ -156,6 +168,10 @@ export default function WriteForm({
     visibility,
     sendMethod,
     unlockType,
+    selectedEnvelope,
+    selectedPaper,
+    envelopeThemes,
+    paperThemes,
     onPreviewChange,
   ]);
 
@@ -273,6 +289,9 @@ export default function WriteForm({
       return;
     }
 
+    const envelopeSelected = envelopeThemes[selectedEnvelope];
+    const paperSelected = paperThemes[selectedPaper];
+
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
       senderName,
@@ -285,6 +304,10 @@ export default function WriteForm({
       effectiveUnlockType,
       dayForm,
       locationForm,
+      packingColor: envelopeSelected?.name ?? "",
+      contentColor: paperSelected?.name ?? "",
+      capsuleColor: paperSelected?.name ?? "",
+      capsulePackingColor: envelopeSelected?.name ?? "",
     });
 
     const publicPayload = buildPublicPayload({
@@ -297,8 +320,10 @@ export default function WriteForm({
       dayForm,
       locationForm,
       capsulePassword,
-      capsuleColor: "",
-      capsulePackingColor: "",
+      capsuleColor: paperSelected?.name ?? "",
+      capsulePackingColor: envelopeSelected?.name ?? "",
+      packingColor: envelopeSelected?.name ?? "",
+      contentColor: paperSelected?.name ?? "",
     });
 
     try {
@@ -381,9 +406,9 @@ export default function WriteForm({
             />
             {paperTab === "ENVELOPE" ? (
               <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
-                {envelopeThemes.map((color, idx) => (
+                {envelopeThemes.map((item, idx) => (
                   <button
-                    key={color + idx}
+                    key={`${item.name}-${idx}`}
                     type="button"
                     onClick={() => setSelectedEnvelope(idx)}
                     className={`relative aspect-square rounded-2xl border-2 transition ${
@@ -391,7 +416,10 @@ export default function WriteForm({
                         ? "border-primary bg-primary/10"
                         : "border-outline"
                     }`}
-                    style={{ backgroundColor: color }}
+                    style={{
+                      backgroundColor:
+                        item.color as React.CSSProperties["backgroundColor"],
+                    }}
                   >
                     {selectedEnvelope === idx && (
                       <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
@@ -406,9 +434,9 @@ export default function WriteForm({
               </div>
             ) : (
               <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
-                {paperThemes.map((color, idx) => (
+                {paperThemes.map((item, idx) => (
                   <button
-                    key={color + idx}
+                    key={`${item.name}-${idx}`}
                     type="button"
                     onClick={() => setSelectedPaper(idx)}
                     className={`relative aspect-square rounded-2xl border-2 transition ${
@@ -416,7 +444,10 @@ export default function WriteForm({
                         ? "border-primary bg-primary/10"
                         : "border-outline"
                     }`}
-                    style={{ backgroundColor: color }}
+                    style={{
+                      backgroundColor:
+                        item.color as React.CSSProperties["backgroundColor"],
+                    }}
                   >
                     {selectedPaper === idx && (
                       <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
