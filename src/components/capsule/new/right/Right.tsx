@@ -44,12 +44,12 @@ export default function Right({ preview }: { preview: PreviewState }) {
 
           <div className="flex-1 min-h-0 p-8 rounded-2xl bg-[#F5F1E8] border border-outline overflow-hidden">
             <div className="h-full min-h-0 flex flex-col justify-between gap-6">
-              {/* 제목 + Dear */}
+              {/* 제목 + Dear (수신자) */}
               <div className="text-2xl space-x-1">
                 <p className="font-semibold">{title || "제목을 입력하세요"}</p>
                 <span className="text-primary font-bold">Dear.</span>
                 <span className="text-text-3">
-                  {senderName || "작성자 이름"}
+                  {receiverName || "수신자 이름"}
                 </span>
               </div>
 
@@ -60,13 +60,13 @@ export default function Right({ preview }: { preview: PreviewState }) {
                 </pre>
               </div>
 
-              {/* From */}
+              {/* From (발신자) */}
               <div className="shrink-0 flex flex-col items-end gap-1">
                 <span className="text-text-3">{todayLabel}</span>
                 <p className="text-right text-2xl space-x-1">
                   <span className="text-primary font-bold">From.</span>
                   <span className="text-text-3">
-                    {receiverName || "수신자 이름"}
+                    {senderName || "작성자 이름"}
                   </span>
                 </p>
               </div>
