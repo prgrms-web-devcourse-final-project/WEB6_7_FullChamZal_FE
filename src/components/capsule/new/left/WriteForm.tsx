@@ -9,7 +9,10 @@ import {
   Send,
   Check,
 } from "lucide-react";
-import { useMemo } from "react";
+import {
+  CAPTURE_ENVELOPE_PALETTE,
+  type CapsuleColor,
+} from "@/constants/capsulePalette";
 import WriteDiv from "./WriteDiv";
 import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
@@ -90,18 +93,7 @@ export default function WriteForm({
   const [title, setTitle] = useState("");
   const [receiveName, setReceiveName] = useState("");
   const [content, setContent] = useState("");
-  const envelopeThemes = useMemo(
-    () => [
-      { name: "BEIGE", color: "#F5F1E8" },
-      { name: "YELLOW", color: "#FEF7E7" },
-      { name: "PINK", color: "#FCE8EC" },
-      { name: "BLUE", color: "#E8F4FC" },
-      { name: "LAVENDER", color: "#F0E8FC" },
-      { name: "MINT", color: "#E8FCF4" },
-      { name: "PEACH", color: "#FFE8D6" },
-    ],
-    []
-  );
+  const envelopeThemes = CAPTURE_ENVELOPE_PALETTE;
   const [selectedEnvelope, setSelectedEnvelope] = useState(0);
   const paperThemes = envelopeThemes;
   const [selectedPaper, setSelectedPaper] = useState(0);
@@ -406,7 +398,7 @@ export default function WriteForm({
             />
             {paperTab === "ENVELOPE" ? (
               <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
-                {envelopeThemes.map((item, idx) => (
+                {envelopeThemes.map((item: CapsuleColor, idx: number) => (
                   <button
                     key={`${item.name}-${idx}`}
                     type="button"
@@ -434,7 +426,7 @@ export default function WriteForm({
               </div>
             ) : (
               <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
-                {paperThemes.map((item, idx) => (
+                {paperThemes.map((item: CapsuleColor, idx: number) => (
                   <button
                     key={`${item.name}-${idx}`}
                     type="button"
