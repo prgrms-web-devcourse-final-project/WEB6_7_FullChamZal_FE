@@ -22,7 +22,7 @@ export default function UserList({
   query: string;
 }) {
   const [page, setPage] = useState(0);
-  const [size] = useState(10);
+  const [size] = useState(6);
 
   // 탭/검색 변경 시 페이지 리셋
   useEffect(() => {

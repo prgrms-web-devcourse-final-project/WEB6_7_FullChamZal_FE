@@ -20,10 +20,12 @@ export const adminCapsulesApi = {
     const qs = new URLSearchParams({
       page: String(params.page),
       size: String(params.size),
-      query: params.query ?? "",
       ...(filters.visibility ? { visibility: filters.visibility } : {}),
       sort: "createdAt,desc",
     });
+
+    const keyword = (params.query ?? "").trim();
+    if (keyword) qs.set("keyword", keyword);
 
     return apiFetch<AdminCapsulesResponse>(
       `/api/v1/admin/capsules?${qs.toString()}`,
@@ -51,7 +53,7 @@ export const adminCapsulesApi = {
   }) => {
     const { capsuleId, deleted, signal } = params;
 
-    return apiFetch<void>(`/api/v1/admin/capsules/${capsuleId}/delete`, {
+    return apiFetch<void>(`/api/v1/admin/capsules/${capsuleId}/deleted`, {
       method: "PATCH",
       json: { deleted },
       signal,

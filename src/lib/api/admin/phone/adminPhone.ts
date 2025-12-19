@@ -26,6 +26,8 @@ export const adminPhoneApi = {
     });
 
     qs.set("sort", "id,desc");
+    const keyword = (params.query ?? "").trim();
+    if (keyword) qs.set("purpose", keyword);
 
     return apiFetch<AdminPhoneResponse>(
       `/api/v1/admin/phone-verifications?${qs.toString()}`,

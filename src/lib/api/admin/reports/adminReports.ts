@@ -26,6 +26,9 @@ export const adminReportApi = {
       ...(filters.status ? { status: filters.status } : {}),
     });
 
+    const keyword = (params.query ?? "").trim();
+    if (keyword) qs.set("keyword", keyword);
+
     return apiFetch<AdminReportResponse>(
       `/api/v1/admin/reports?${qs.toString()}`,
       {
