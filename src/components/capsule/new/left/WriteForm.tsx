@@ -386,7 +386,7 @@ export default function WriteForm({
                     key={color + idx}
                     type="button"
                     onClick={() => setSelectedEnvelope(idx)}
-                    className={`relative h-30 rounded-2xl border transition ${
+                    className={`relative aspect-square rounded-2xl border transition ${
                       selectedEnvelope === idx
                         ? "border-primary shadow-[0_0_0_3px_rgba(255,87,34,0.15)]"
                         : "border-outline"
@@ -400,7 +400,7 @@ export default function WriteForm({
                     )}
                   </button>
                 ))}
-                <div className="h-30 rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
+                <div className="aspect-square rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
                   업로드
                 </div>
               </div>
@@ -411,7 +411,7 @@ export default function WriteForm({
                     key={color + idx}
                     type="button"
                     onClick={() => setSelectedPaper(idx)}
-                    className={`relative h-40 rounded-2xl border transition ${
+                    className={`relative aspect-square rounded-2xl border transition ${
                       selectedPaper === idx
                         ? "border-primary shadow-[0_0_0_3px_rgba(255,87,34,0.15)]"
                         : "border-outline"
@@ -425,7 +425,7 @@ export default function WriteForm({
                     )}
                   </button>
                 ))}
-                <div className="h-40 rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
+                <div className="aspect-square rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
                   업로드
                 </div>
               </div>
