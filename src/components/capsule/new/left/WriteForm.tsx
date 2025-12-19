@@ -13,22 +13,53 @@ import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
 import WriteInput from "./WriteInput";
 import UnlockConditionTabs from "./UnlockConditionTabs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
+import ActiveModal from "../../../common/ActiveModal";
 import { useMe } from "@/lib/hooks/useMe";
-import { apiFetchRaw } from "@/lib/api/fetchClient";
+import {
+  buildPrivatePayload,
+  buildPublicPayload,
+  createPrivateCapsule,
+  createPublicCapsule,
+  buildMyPayload,
+  createMyCapsule,
+} from "@/lib/api/capsule/capsule";
+import type {
+  UnlockType,
+  CapsuleCreateResponse,
+} from "@/lib/api/capsule/types";
 
-export default function WriteForm() {
+type PreviewState = {
+  title: string;
+  senderName: string;
+  receiverName: string;
+  content: string;
+  visibility: Visibility | "SELF";
+  authMethod: string;
+  unlockType: string;
+  charCount: number;
+};
+
+export default function WriteForm({
+  onPreviewChange,
+}: {
+  preview: PreviewState;
+  onPreviewChange: (next: PreviewState) => void;
+}) {
+  const router = useRouter();
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [result, setResult] = useState<{
     userName: string;
     url: string;
     password?: string;
   } | null>(null);
+  const [isPublicDoneOpen, setIsPublicDoneOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [senderMode, setSenderMode] = useState<"name" | "nickname">("name");
 
@@ -51,10 +82,76 @@ export default function WriteForm() {
   /* 편지 내용 글자 수 제한 길이 */
   const MAX_CONTENT_LENGTH = 3000;
 
+  const [title, setTitle] = useState("");
+  const [receiveName, setReceiveName] = useState("");
   const [content, setContent] = useState("");
 
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
+  const isPrivateOnly = visibility === "PRIVATE";
+  const isSelf = visibility === "SELF";
+  const effectiveVisibility: Visibility = isSelf ? "SELF" : visibility;
+
+  const senderName =
+    senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
+
+  // 미리보기 데이터 동기화
+  useEffect(() => {
+    const visibilityLabel =
+      // 공개 범위
+      visibility === "PUBLIC"
+        ? "PUBLIC"
+        : visibility === "SELF"
+        ? "SELF"
+        : "PRIVATE";
+    // 인증 방법
+    const authMethodLabel =
+      visibility === "PUBLIC"
+        ? "NONE"
+        : visibility === "SELF"
+        ? "NONE"
+        : sendMethod === "PHONE"
+        ? "PHONE"
+        : "PASSWORD";
+    // 해제 조건
+    const unlockLabel =
+      unlockType === "LOCATION"
+        ? "LOCATION"
+        : unlockType === "MANUAL"
+        ? "TIME_AND_LOCATION"
+        : "TIME";
+
+    // 내게쓰기일 경우 받는 사람 이름을 보내는 사람 이름으로 설정
+    const receiverLabel = isSelf ? senderName : receiveName;
+
+    onPreviewChange({
+      title,
+      senderName,
+      receiverName: receiverLabel,
+      content,
+      visibility: visibilityLabel,
+      authMethod: authMethodLabel,
+      unlockType: unlockLabel,
+      charCount: content.length,
+    });
+  }, [
+    title,
+    senderName,
+    receiveName,
+    isSelf,
+    content,
+    visibility,
+    sendMethod,
+    unlockType,
+    onPreviewChange,
+  ]);
+
+  // 공개 선택 시 TIME 옵션을 사용하지 않도록 강제
+  useEffect(() => {
+    if (visibility === "PUBLIC" && unlockType === "TIME") {
+      setUnlockType("LOCATION");
+    }
+  }, [visibility, unlockType]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const next = e.target.value;
@@ -81,23 +178,28 @@ export default function WriteForm() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    // 로그인 사용자의 name을 발신자 이름으로 고정
-    const senderName =
-      senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
-    const title = (formData.get("title") as string) || "";
-    const receiveName = (formData.get("receiveName") as string) || "";
+    const titleValue = title.trim();
+    const receiveNameValue = isSelf
+      ? senderName
+      : isPrivateOnly
+      ? receiveName.trim()
+      : "";
     const contentValue = content.trim();
     const phoneNum =
-      sendMethod === "PHONE" ? (formData.get("pagePw") as string) || "" : "";
+      visibility === "PRIVATE" && sendMethod === "PHONE"
+        ? (formData.get("pagePw") as string) || ""
+        : "";
     const capsulePassword =
-      sendMethod === "URL" ? (formData.get("pagePw") as string) || "" : "";
+      visibility === "PRIVATE" && sendMethod === "URL"
+        ? (formData.get("pagePw") as string) || ""
+        : "";
 
     // TODO: 미입력 폼 체크 - 토스트나 모달등으로 변경 예정
-    if (!title) {
+    if (!titleValue) {
       window.alert("제목을 입력해 주세요.");
       return;
     }
-    if (!receiveName) {
+    if (isPrivateOnly && !receiveNameValue) {
       window.alert("받는 사람을 입력해 주세요.");
       return;
     }
@@ -105,17 +207,16 @@ export default function WriteForm() {
       window.alert("내용을 입력해 주세요.");
       return;
     }
-    if (!dayForm.date || !dayForm.time) {
-      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
-      return;
-    }
-    if (sendMethod === "PHONE" && !phoneNum) {
-      window.alert("전화번호를 입력해 주세요.");
-      return;
-    }
-    if (sendMethod === "URL" && !capsulePassword) {
-      window.alert("비밀번호를 입력해 주세요.");
-      return;
+    // 비공개 캡슐일 경우에만 검증
+    if (isPrivateOnly) {
+      if (sendMethod === "PHONE" && !phoneNum) {
+        window.alert("전화번호를 입력해 주세요.");
+        return;
+      }
+      if (sendMethod === "URL" && !capsulePassword) {
+        window.alert("비밀번호를 입력해 주세요.");
+        return;
+      }
     }
 
     if (!me?.memberId) {
@@ -129,68 +230,109 @@ export default function WriteForm() {
       return;
     }
 
-    const unlockAtIso = new Date(
-      `${dayForm.date}T${dayForm.time}:00`
-    ).toISOString();
+    // unlockType 매핑: MANUAL -> TIME_AND_LOCATION
+    const effectiveUnlockType: UnlockType =
+      unlockType === "MANUAL"
+        ? "TIME_AND_LOCATION"
+        : (unlockType as UnlockType);
 
-    const payload = {
+    // 공개 캡슐은 장소 기반이어야 함 (TIME만 선택 불가)
+    if (visibility === "PUBLIC" && effectiveUnlockType === "TIME") {
+      window.alert("공개 캡슐은 '장소' 또는 '시간+장소'만 선택할 수 있습니다.");
+      return;
+    }
+
+    // 시간/위치 필수 검증 (unlockType에 따라)
+    if (
+      (effectiveUnlockType === "TIME" ||
+        effectiveUnlockType === "TIME_AND_LOCATION") &&
+      (!dayForm.date || !dayForm.time)
+    ) {
+      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
+      return;
+    }
+    if (
+      (effectiveUnlockType === "LOCATION" ||
+        effectiveUnlockType === "TIME_AND_LOCATION") &&
+      (!locationForm.placeName || !locationForm.lat || !locationForm.lng)
+    ) {
+      window.alert("장소를 선택해 주세요.");
+      return;
+    }
+
+    const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
-      nickName: senderName,
-      title,
+      senderName,
+      receiverNickname: receiveNameValue,
+      recipientPhone: phoneNum || null,
+      capsulePassword: capsulePassword || null,
+      title: titleValue,
       content: contentValue,
-      visibility,
-      unlockType: "TIME",
-      unlockAt: unlockAtIso,
-      locationName: "",
-      locationLat: 0,
-      locationLng: 0,
-      viewingRadius: 0,
-      packingColor: "",
-      contentColor: "",
-      maxViewCount: 0,
-    };
+      visibility: effectiveVisibility,
+      effectiveUnlockType,
+      dayForm,
+      locationForm,
+    });
+
+    const publicPayload = buildPublicPayload({
+      memberId: me.memberId,
+      senderName,
+      title: titleValue,
+      content: contentValue,
+      visibility: effectiveVisibility,
+      effectiveUnlockType,
+      dayForm,
+      locationForm,
+      capsulePassword,
+      capsuleColor: "",
+      capsulePackingColor: "",
+    });
 
     try {
       setIsSubmitting(true);
 
-      // Query parameter 구성
-      const searchParams = new URLSearchParams();
-      if (phoneNum) searchParams.set("phoneNum", phoneNum);
-      if (capsulePassword) searchParams.set("capsulePassword", capsulePassword);
+      const data = isSelf
+        ? await (async () => {
+            const myPayload = buildMyPayload({
+              memberId: me.memberId,
+              senderName,
+              title,
+              content: contentValue,
+              visibility: effectiveVisibility,
+              effectiveUnlockType,
+              dayForm,
+              locationForm,
+            });
+            return createMyCapsule(myPayload);
+          })()
+        : isPrivateOnly
+        ? await createPrivateCapsule(privatePayload)
+        : await createPublicCapsule(publicPayload);
 
-      const queryString = searchParams.toString();
-      const path = `/api/v1/capsule/create/private${
-        queryString ? `?${queryString}` : ""
-      }`;
+      // 응답은 { code, message, data } 래핑 형태로 옴
+      const result = (data as unknown as { data: CapsuleCreateResponse }).data;
 
-      const data = await apiFetchRaw<{
-        memberId: number;
-        capsuleId: number;
-        nickName: string;
-        url: string;
-        capPW?: string;
-        title: string;
-        content: string;
-        visibility: string;
-        unlockType: string;
-        unlock: unknown;
-        letter: unknown;
-        maxViewCount: number;
-        currentViewCount: number;
-      }>(path, {
-        method: "POST",
-        json: payload,
-      });
-      setResult({
-        userName: senderName || data?.nickName || "",
-        url: data?.url || "",
-        password: data?.capPW,
-      });
-      setIsCopyOpen(true);
+      const url = result?.url ?? "";
+      const password = result?.capPW;
+      const userName = senderName || result?.nickname || "";
+
+      const baseResult = {
+        userName,
+        url,
+        password,
+      };
+
+      if (isPrivateOnly) {
+        setResult(baseResult);
+        setIsCopyOpen(true);
+      } else {
+        setResult(baseResult);
+        setIsPublicDoneOpen(true);
+      }
     } catch (error) {
       console.error(error);
       const message =
-        error instanceof Error ? error.message : "캡슐 생성에 실패했습니다.";
+        error instanceof Error ? error.message : "편지 생성에 실패했습니다.";
       window.alert(message);
     } finally {
       setIsSubmitting(false);
@@ -259,43 +401,19 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
-        <WriteDiv title="받는 사람">
-          <div>
-            <WriteInput id="receiveName" type="text" placeholder="미래의 나" />
-          </div>
-        </WriteDiv>
-
-        <WriteDiv title="전달 방법">
-          <div className="space-y-3">
-            <ActionTab
-              value={sendMethod}
-              onChange={setSendMethod}
-              tabs={[
-                { id: "URL", tabName: "비밀번호" },
-                { id: "PHONE", tabName: "전화번호" },
-              ]}
-            />
-            {sendMethod === "PHONE" ? (
-              <WriteDiv
-                title="받는 사람 전화번호"
-                warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
-              >
-                <WriteInput id="pagePw" type="text" placeholder="- 없이 입력" />
-              </WriteDiv>
-            ) : (
-              <WriteDiv
-                title="편지 열람 비밀번호"
-                warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
-              >
-                <WriteInput
-                  id="pagePw"
-                  type="password"
-                  placeholder="비밀번호를 입력하세요."
-                />
-              </WriteDiv>
-            )}
-          </div>
-        </WriteDiv>
+        {isPrivateOnly && (
+          <WriteDiv title="받는 사람">
+            <div>
+              <WriteInput
+                id="receiveName"
+                type="text"
+                placeholder="미래의 나"
+                value={receiveName}
+                onChange={(e) => setReceiveName(e.target.value)}
+              />
+            </div>
+          </WriteDiv>
+        )}
 
         <WriteDiv
           title="편지 제목"
@@ -305,6 +423,8 @@ export default function WriteForm() {
             <WriteInput
               id="title"
               type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="미리 노출되는 제목을 작성해보세요."
             />
           </div>
@@ -318,7 +438,7 @@ export default function WriteForm() {
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={handleCompositionEnd}
               maxLength={MAX_CONTENT_LENGTH}
-              className="w-full h-60 bg-sub-2 p-3 rounded-lg resize-none"
+              className="w-full h-60 bg-sub-2 p-3 rounded-lg resize-none outline-none border border-white focus:border focus:border-primary-2"
               placeholder="마음을 담아 편지를 써보세요..."
             />
 
@@ -337,29 +457,55 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
+        <WriteDiv title="이미지 첨부 (선택사항)">
+          <div></div>
+        </WriteDiv>
+
         <WriteDiv title="해제 조건">
           <div className="space-y-3">
+            {visibility === "PUBLIC" && (
+              <p className="text-xs text-text-3">
+                공개 캡슐은 지도 노출을 위해 장소 기반이어야 합니다.
+              </p>
+            )}
             <UnlockConditionTabs
-              tabs={[
-                {
-                  id: "TIME",
-                  title: "시간",
-                  description: "특정 날짜와 시간에 열람",
-                  icon: <Clock size={20} />,
-                },
-                {
-                  id: "LOCATION",
-                  title: "장소",
-                  description: "특정 장소에 도착 시 열람",
-                  icon: <MapPin size={20} />,
-                },
-                {
-                  id: "MANUAL",
-                  title: "시간 + 장소",
-                  description: "시간과 장소 모두 충족 시 열람",
-                  icon: <Hand size={20} />,
-                },
-              ]}
+              tabs={
+                visibility === "PUBLIC"
+                  ? [
+                      {
+                        id: "LOCATION",
+                        title: "장소",
+                        description: "특정 장소에 도착 시 열람",
+                        icon: <MapPin size={20} />,
+                      },
+                      {
+                        id: "MANUAL",
+                        title: "시간 + 장소",
+                        description: "시간과 장소 모두 충족 시 열람",
+                        icon: <Hand size={20} />,
+                      },
+                    ]
+                  : [
+                      {
+                        id: "TIME",
+                        title: "시간",
+                        description: "특정 날짜와 시간에 열람",
+                        icon: <Clock size={20} />,
+                      },
+                      {
+                        id: "LOCATION",
+                        title: "장소",
+                        description: "특정 장소에 도착 시 열람",
+                        icon: <MapPin size={20} />,
+                      },
+                      {
+                        id: "MANUAL",
+                        title: "시간 + 장소",
+                        description: "시간과 장소 모두 충족 시 열람",
+                        icon: <Hand size={20} />,
+                      },
+                    ]
+              }
               value={unlockType}
               onChange={setUnlockType}
             />
@@ -382,9 +528,43 @@ export default function WriteForm() {
           </div>
         </WriteDiv>
 
-        <WriteDiv title="이미지 첨부 (선택사항)">
-          <div></div>
-        </WriteDiv>
+        {isPrivateOnly && (
+          <WriteDiv title="인증 방법">
+            <div className="space-y-3">
+              <ActionTab
+                value={sendMethod}
+                onChange={setSendMethod}
+                tabs={[
+                  { id: "URL", tabName: "비밀번호" },
+                  { id: "PHONE", tabName: "전화번호" },
+                ]}
+              />
+              {sendMethod === "PHONE" ? (
+                <WriteDiv
+                  title="받는 사람 전화번호"
+                  warning="* 회원으로 등록된 전화번호만 사용할 수 있습니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="text"
+                    placeholder="- 없이 입력"
+                  />
+                </WriteDiv>
+              ) : (
+                <WriteDiv
+                  title="편지 열람 비밀번호"
+                  warning="* 상대방이 해당 편지를 확인하기 위해 사용하는 비밀번호입니다."
+                >
+                  <WriteInput
+                    id="pagePw"
+                    type="password"
+                    placeholder="비밀번호를 입력하세요."
+                  />
+                </WriteDiv>
+              )}
+            </div>
+          </WriteDiv>
+        )}
 
         <Button type="submit" className="w-full py-4 space-x-2">
           <Send />
@@ -395,7 +575,22 @@ export default function WriteForm() {
       <CopyTemplate
         open={isCopyOpen}
         onClose={() => setIsCopyOpen(false)}
+        onConfirm={() => {
+          setIsCopyOpen(false);
+          router.push("/dashboard");
+        }}
         data={result}
+      />
+      <ActiveModal
+        active="success"
+        title="편지 생성 성공"
+        content="성공적으로 편지가 생성되었습니다."
+        open={isPublicDoneOpen}
+        onClose={() => setIsPublicDoneOpen(false)}
+        onConfirm={() => {
+          setIsPublicDoneOpen(false);
+          router.push("/dashboard");
+        }}
       />
     </>
   );

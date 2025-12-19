@@ -231,3 +231,21 @@ pre {
     --color-sub: #F8F8F8;
     --color-sub-2: #F3F3F5;
 }
+
+.fly {
+    animation: fly 3s ease-in-out infinite;
+}
+
+@keyframes fly {
+    0% {
+        transform: translateX(0) rotate(-2deg);
+    }
+
+    50% {
+        transform: translateX(340px) translateY(-8px) rotate(2deg);
+    }
+
+    100% {
+        transform: translateX(0) rotate(-2deg);
+    }
+}

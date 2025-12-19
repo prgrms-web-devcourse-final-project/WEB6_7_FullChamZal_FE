@@ -22,6 +22,12 @@ export default function VisibilityOpt({
         title="공개"
         desc="모두 공개"
       />
+      <OptionCard
+        selected={value === "SELF"}
+        onClick={() => onChange("SELF")}
+        title="내게쓰기"
+        desc="나만 보기"
+      />
     </div>
   );
 }

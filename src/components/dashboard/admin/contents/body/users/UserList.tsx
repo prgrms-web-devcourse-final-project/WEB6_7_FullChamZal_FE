@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Ban, CheckCircle } from "lucide-react";
@@ -12,11 +12,7 @@ import {
 } from "@tanstack/react-query";
 import DataTable from "../DataTable";
 import Pagination from "@/components/common/Pagination";
-import {
-  fetchAdminUsers,
-  toggleAdminUserStatus,
-  AdminStatus,
-} from "@/lib/api/admin/users/adminUsers";
+import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
 
 export default function UserList({
   tab,
@@ -26,7 +22,7 @@ export default function UserList({
   query: string;
 }) {
   const [page, setPage] = useState(0);
-  const [size] = useState(10);
+  const [size] = useState(6);
 
   // 탭/검색 변경 시 페이지 리셋
   useEffect(() => {
@@ -34,20 +30,46 @@ export default function UserList({
   }, [tab, query]);
 
   const queryClient = useQueryClient();
+  const listQueryKey = (p: number) =>
+    ["adminUsers", tab, query, p, size] as const;
 
-  const usersQuery = useQuery({
-    queryKey: ["adminUsers", tab, query, page, size],
+  const { data, isLoading } = useQuery({
+    queryKey: listQueryKey(page),
     queryFn: ({ signal }) =>
-      fetchAdminUsers({ tab, query, page, size, signal }),
+      adminUsersApi.list({ tab, query, page, size, signal }),
     placeholderData: keepPreviousData,
   });
 
+  const users = data?.content ?? [];
+  const totalElements = data?.totalElements ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+  const lastPage = totalPages - 1;
+
+  // 인접 페이지(이전/다음) 프리패치
+  useEffect(() => {
+    if (!data) return; // totalElements 없으면 lastPage 판단이 애매하니 스킵
+
+    const prefetch = (p: number) =>
+      queryClient.prefetchQuery({
+        queryKey: listQueryKey(p),
+        queryFn: ({ signal }) =>
+          adminUsersApi.list({ tab, query, page: p, size, signal }),
+        staleTime: 30_000,
+      });
+
+    // 이전 페이지 (0이면 스킵)
+    if (page > 0) prefetch(page - 1);
+
+    // 다음 페이지 (마지막이면 스킵)
+    if (page < lastPage) prefetch(page + 1);
+  }, [data, lastPage, listQueryKey, page, size, query, queryClient, tab]);
+
   const toggleMutation = useMutation({
-    mutationFn: ({ id, nextStatus }: { id: number; nextStatus: AdminStatus }) =>
-      toggleAdminUserStatus({ id, nextStatus }),
+    mutationFn: (params: { id: number; nextStatus: AdminStatus }) =>
+      adminUsersApi.toggleStatus(params),
 
     // Optimistic update
-    onMutate: async ({ id, nextStatus }) => {
+    onMutate: async (params) => {
       await queryClient.cancelQueries({ queryKey: ["adminUsers"] });
 
       const previous = queryClient.getQueryData<any>([
@@ -65,7 +87,7 @@ export default function UserList({
           return {
             ...old,
             content: old.content.map((u: AdminUser) =>
-              u.id === id ? { ...u, status: nextStatus } : u
+              u.id === params.id ? { ...u, status: params.nextStatus } : u
             ),
           };
         }
@@ -88,9 +110,6 @@ export default function UserList({
     },
   });
 
-  const users = usersQuery.data?.content ?? [];
-  const totalElements = usersQuery.data?.totalElements ?? 0;
-
   const columns = useMemo(
     () => [
       { key: "id", header: "ID", cell: (u: AdminUser) => `#${u.id}` },
@@ -103,12 +122,12 @@ export default function UserList({
       },
       {
         key: "capsuleCount",
-        header: "캡슐",
+        header: "편지",
         cell: (u: AdminUser) => u.capsuleCount,
       },
       {
         key: "blockedCapsuleCount",
-        header: "차단 캡슐",
+        header: "차단 편지",
         cell: (u: AdminUser) => u.blockedCapsuleCount,
       },
       {
@@ -162,20 +181,14 @@ export default function UserList({
     [toggleMutation]
   );
 
-  const isInitialLoading = usersQuery.isLoading;
-
   return (
     <div className="space-y-3">
       <DataTable
         columns={columns}
         rows={users}
         getRowKey={(u: AdminUser) => u.id}
-        emptyMessage={
-          usersQuery.isError
-            ? "불러오기에 실패했습니다."
-            : "표시할 사용자가 없습니다."
-        }
-        isLoading={isInitialLoading}
+        emptyMessage={"표시할 사용자가 없습니다."}
+        isLoading={isLoading}
         skeletonRowCount={size}
       />
 

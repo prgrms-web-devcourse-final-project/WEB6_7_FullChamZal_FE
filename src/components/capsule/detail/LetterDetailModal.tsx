@@ -1,42 +1,84 @@
 "use client";
+/* eslint-disable react-hooks/rules-of-hooks */
 
-import { dummyCapsules } from "@/data/dummyData";
-import { formatDate } from "@/lib/formatDate";
-import { formatDateTime } from "@/lib/formatDateTime";
+import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
+import { capsuleReadApi } from "@/lib/api/capsule/capsuleDetail";
+import { formatDate } from "@/lib/hooks/formatDate";
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Archive,
-  Bookmark,
   Clock,
   LinkIcon,
   MapPin,
   Reply,
   X,
+  Archive,
+  Bookmark,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LetterDetailModal({
   capsuleId,
+  open = true,
   closeHref,
   mode,
+  role = "USER",
+  onClose,
+  // USER read 호출에 필요한 값들
+  isSendSelf,
+  locationLat = null,
+  locationLng = null,
+  password = null,
 }: {
-  capsuleId: string;
+  capsuleId: number;
+  open?: boolean;
   closeHref?: string;
   mode?: string;
+  role?: MemberRole;
+  onClose?: () => void;
+  isSendSelf?: 0 | 1;
+  locationLat?: number | null;
+  locationLng?: number | null;
+  password?: string | number | null;
 }) {
   const router = useRouter();
+  if (!open) return null;
 
   const close = () => {
-    if (closeHref) {
-      router.push(closeHref, { scroll: false });
-    } else {
-      router.back();
-    }
+    if (closeHref) router.push(closeHref, { scroll: false });
+    else router.back();
   };
 
-  const capsule = dummyCapsules.find((c) => c.id === capsuleId);
+  const isAdmin = role === "ADMIN";
 
-  /* 데이터가 없을경우 */
+  // 나중에 ADMIN일 경우에는 아래 api만 USER이면 USER 세부 api만 호출
+  const { data: adminData, isLoading } = useQuery<AdminCapsuleDetail>({
+    queryKey: ["adminCapsuleDetail", capsuleId],
+    queryFn: ({ signal }) => adminCapsulesApi.detail({ capsuleId, signal }),
+    enabled: open && capsuleId > 0 && isAdmin,
+  });
+
+  // UI에서 쓰는 형태로 통일 (ADMIN/USER 필드명 다름)
+  const capsule = isAdmin ? adminData : /* ...user mapping... */ null;
+  // 로딩 UI
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-9999 bg-black/50">
+        <div className="flex h-full justify-center py-15">
+          <div className="max-w-330 w-full rounded-2xl bg-white p-8">
+            <div className="flex items-center justify-between">
+              <div className="text-lg font-semibold">불러오는 중...</div>
+              <button onClick={close} className="cursor-pointer text-primary">
+                <X size={24} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!capsule) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
@@ -44,7 +86,11 @@ export default function LetterDetailModal({
           <div className="max-w-330 w-full rounded-2xl bg-white p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">편지를 찾을 수 없어요</div>
-              <button onClick={close} className="cursor-pointer text-primary">
+              <button
+                type="button"
+                onClick={role === "ADMIN" ? onClose : close}
+                className="cursor-pointer text-primary"
+              >
                 <X size={24} />
               </button>
             </div>
@@ -57,20 +103,29 @@ export default function LetterDetailModal({
     );
   }
 
-  const isTime = capsule.unlockCondition.type === "time";
+  const isTime =
+    capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
+
   const unlockLabel =
-    capsule.unlockCondition.type === "time"
-      ? formatDateTime(capsule.unlockCondition.at)
-      : capsule.unlockCondition.address;
+    capsule.unlockType === "TIME"
+      ? capsule.unlockAt
+        ? formatDateTime(capsule.unlockAt)
+        : "시간 조건 없음"
+      : capsule.unlockType === "LOCATION"
+      ? (capsule.locationAlias || capsule.address) ?? "위치 조건 없음"
+      : `${
+          capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
+        } · ${(capsule.locationAlias || capsule.address) ?? "위치 조건 없음"}`;
 
   return (
-    <div className="absolute inset-0 z-9999 bg-black/50 w-full min-h-screen">
+    <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
           <div className="shrink-0 border-b px-8 py-4">
             <div className="flex justify-between items-center gap-4">
               <div className="md:flex-1 truncate">{capsule.title}</div>
+
               <div
                 className={`flex-1 flex items-center gap-1 ${
                   mode ? "justify-end" : "justify-center"
@@ -82,30 +137,26 @@ export default function LetterDetailModal({
                   <span className="line-clamp-1">{unlockLabel}</span>
                 </div>
               </div>
-              {mode ? null : (
-                <button
-                  type="button"
-                  className="md:flex-1 flex justify-end cursor-pointer text-primary"
-                  onClick={close}
-                >
-                  <X size={24} />
-                </button>
-              )}
+
+              <button
+                type="button"
+                className="md:flex-1 flex justify-end cursor-pointer text-primary"
+                onClick={role === "ADMIN" ? onClose : close}
+              >
+                <X size={24} />
+              </button>
             </div>
           </div>
 
-          {/* modal box */}
-          {/* 첫번째 div에 편지지 색상이 들어갈 예정 */}
+          {/* Body */}
           <div className="flex-1 overflow-hidden">
             <div className="w-full h-full py-15 px-15">
               <div className="w-full h-full flex flex-col justify-between gap-8">
-                {/* 보낸 사람 */}
                 <div className="text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span>{capsule.to}</span>
+                  <span>{capsule.recipientName ?? "(수신자 정보 없음)"}</span>
                 </div>
 
-                {/* 본문 */}
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
                   <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
@@ -113,14 +164,13 @@ export default function LetterDetailModal({
                 </div>
 
                 <div className="shrink-0 flex flex-col items-end gap-2">
-                  {/* 보낸 날짜 */}
                   <span className="text-text-3">
                     {formatDate(capsule.createdAt)}
                   </span>
-                  {/* 받는 사람 */}
+
                   <div className="text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
-                    <span>{capsule.from}</span>
+                    <span>{capsule.writerNickname}</span>
                   </div>
                 </div>
               </div>
@@ -129,44 +179,48 @@ export default function LetterDetailModal({
 
           {/* Footer */}
           <div className="shrink-0 border-t p-5">
-            <div className="flex-1 flex items-center justify-center">
+            {role === "ADMIN" ? null : (
               <div className="flex-1 flex items-center justify-center">
-                <button
-                  type="button"
-                  className="cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <LinkIcon size={16} className="text-primary" />
-                  <span>링크 복사</span>
-                </button>
+                <div className="flex-1 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <LinkIcon size={16} className="text-primary" />
+                    <span>링크 복사</span>
+                  </button>
+                </div>
+
+                <div className="flex-1 flex items-center justify-center">
+                  <Link
+                    href={"/capsules/new"}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Reply size={16} className="text-primary" />
+                    <span>답장하기</span>
+                  </Link>
+                </div>
+
+                <div className="flex-1 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {mode ? (
+                      <>
+                        <Archive size={16} className="text-primary" />
+                        <span>저장하기</span>
+                      </>
+                    ) : (
+                      <>
+                        <Bookmark size={16} className="text-primary" />
+                        <span>북마크</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-              <div className="flex-1 flex items-center justify-center">
-                <Link
-                  href={"/capsules/new"}
-                  className="flex items-center justify-center gap-2"
-                >
-                  <Reply size={16} className="text-primary" />
-                  <span>답장하기</span>
-                </Link>
-              </div>
-              <div className="flex-1 flex items-center justify-center">
-                <button
-                  type="button"
-                  className="cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {mode ? (
-                    <>
-                      <Archive size={16} className="text-primary" />
-                      <span>저장하기</span>
-                    </>
-                  ) : (
-                    <>
-                      <Bookmark size={16} className="text-primary" />
-                      <span>북마크</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
