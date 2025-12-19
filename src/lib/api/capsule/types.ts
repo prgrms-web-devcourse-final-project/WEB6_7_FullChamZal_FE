@@ -4,12 +4,16 @@ export interface CreatePrivateCapsuleRequest {
   memberId: number;
   nickname: string;
   receiverNickname: string;
+  recipientPhone?: string | null;
+  capsulePassword?: string | null;
   title: string;
   content: string;
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;
+  unlockUntil?: string;
   locationName: string;
+  address?: string;
   locationLat: number;
   locationLng: number;
   viewingRadius: number;
@@ -49,7 +53,9 @@ export interface CreatePublicCapsuleRequest {
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;
+  unlockUntil?: string;
   locationName: string;
+  address?: string;
   locationLat: number;
   locationLng: number;
   locationRadiusM: number;

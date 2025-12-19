@@ -30,14 +30,17 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
-import type { UnlockType } from "@/lib/api/capsule/types";
+import type {
+  UnlockType,
+  CapsuleCreateResponse,
+} from "@/lib/api/capsule/types";
 
 type PreviewState = {
   title: string;
   senderName: string;
   receiverName: string;
   content: string;
-  visibility: Visibility | "MYSELF";
+  visibility: Visibility | "SELF";
   authMethod: string;
   unlockType: string;
   charCount: number;
@@ -86,8 +89,8 @@ export default function WriteForm({
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
   const isPrivateOnly = visibility === "PRIVATE";
-  const isSelf = visibility === "MYSELF";
-  const effectiveVisibility: Visibility = isSelf ? "PRIVATE" : visibility;
+  const isSelf = visibility === "SELF";
+  const effectiveVisibility: Visibility = isSelf ? "SELF" : visibility;
 
   const senderName =
     senderMode === "nickname" ? me?.nickname || "" : me?.name || "";
@@ -98,14 +101,14 @@ export default function WriteForm({
       // 공개 범위
       visibility === "PUBLIC"
         ? "PUBLIC"
-        : visibility === "MYSELF"
-        ? "MYSELF"
+        : visibility === "SELF"
+        ? "SELF"
         : "PRIVATE";
     // 인증 방법
     const authMethodLabel =
       visibility === "PUBLIC"
         ? "NONE"
-        : visibility === "MYSELF"
+        : visibility === "SELF"
         ? "NONE"
         : sendMethod === "PHONE"
         ? "PHONE"
@@ -118,10 +121,13 @@ export default function WriteForm({
         ? "TIME_AND_LOCATION"
         : "TIME";
 
+    // 내게쓰기일 경우 받는 사람 이름을 보내는 사람 이름으로 설정
+    const receiverLabel = isSelf ? senderName : receiveName;
+
     onPreviewChange({
       title,
       senderName,
-      receiverName: receiveName,
+      receiverName: receiverLabel,
       content,
       visibility: visibilityLabel,
       authMethod: authMethodLabel,
@@ -132,6 +138,7 @@ export default function WriteForm({
     title,
     senderName,
     receiveName,
+    isSelf,
     content,
     visibility,
     sendMethod,
@@ -172,7 +179,11 @@ export default function WriteForm({
 
     const formData = new FormData(e.currentTarget);
     const titleValue = title.trim();
-    const receiveNameValue = isPrivateOnly ? receiveName.trim() : "";
+    const receiveNameValue = isSelf
+      ? senderName
+      : isPrivateOnly
+      ? receiveName.trim()
+      : "";
     const contentValue = content.trim();
     const phoneNum =
       visibility === "PRIVATE" && sendMethod === "PHONE"
@@ -253,6 +264,8 @@ export default function WriteForm({
       memberId: me.memberId,
       senderName,
       receiverNickname: receiveNameValue,
+      recipientPhone: phoneNum || null,
+      capsulePassword: capsulePassword || null,
       title: titleValue,
       content: contentValue,
       visibility: effectiveVisibility,
@@ -280,11 +293,6 @@ export default function WriteForm({
 
       const data = isSelf
         ? await (async () => {
-            const phoneRaw = me.phoneNumber || "";
-            const phoneDigits = phoneRaw.replace(/\D/g, "");
-            if (!phoneDigits) {
-              throw new Error("로그인 정보에서 전화번호를 확인할 수 없습니다.");
-            }
             const myPayload = buildMyPayload({
               memberId: me.memberId,
               senderName,
@@ -295,18 +303,23 @@ export default function WriteForm({
               dayForm,
               locationForm,
             });
-            return createMyCapsule(myPayload, phoneDigits);
+            return createMyCapsule(myPayload);
           })()
         : isPrivateOnly
-        ? await createPrivateCapsule(privatePayload, {
-            phoneNum,
-            capsulePassword: capsulePassword || undefined,
-          })
+        ? await createPrivateCapsule(privatePayload)
         : await createPublicCapsule(publicPayload);
+
+      // 응답은 { code, message, data } 래핑 형태로 옴
+      const result = (data as unknown as { data: CapsuleCreateResponse }).data;
+
+      const url = result?.url ?? "";
+      const password = result?.capPW;
+      const userName = senderName || result?.nickname || "";
+
       const baseResult = {
-        userName: senderName || data?.nickname || "",
-        url: data?.url || "",
-        password: data?.capPW,
+        userName,
+        url,
+        password,
       };
 
       if (isPrivateOnly) {

@@ -23,8 +23,8 @@ export default function VisibilityOpt({
         desc="모두 공개"
       />
       <OptionCard
-        selected={value === "MYSELF"}
-        onClick={() => onChange("MYSELF")}
+        selected={value === "SELF"}
+        onClick={() => onChange("SELF")}
         title="내게쓰기"
         desc="나만 보기"
       />
