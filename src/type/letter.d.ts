@@ -21,7 +21,7 @@ interface Capsule {
 }
 
 interface PublicCapsule {
-  capsuleId: string;
+  capsuleId: number;
   capsuleLocationName: string;
   writerNickname: string;
   title: string;

@@ -1,23 +1,20 @@
 "use client";
 
-import Image from "next/image";
+import { MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  CustomOverlayMap,
-  Map,
-  MapMarker,
-  MarkerClusterer,
-  useMap,
-} from "react-kakao-maps-sdk";
+import { CustomOverlayMap, Map, MarkerClusterer } from "react-kakao-maps-sdk";
 
 const onClusterclick = () => {};
 
+//마커 컨테이너
 const EventMarkerContainer = ({
   position,
   content,
+  onClick,
 }: {
   position: { lat: number; lng: number };
   content: string;
+  onClick: () => void;
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -27,7 +24,7 @@ const EventMarkerContainer = ({
         className="relative flex flex-col items-center"
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
-        onClick={() => {}}
+        onClick={onClick}
       >
         {/* title */}
         <div
@@ -44,13 +41,12 @@ const EventMarkerContainer = ({
         >
           {content}
         </div>
-        <Image
-          src="/img/marker.png"
-          alt="marker"
-          width={88}
-          height={88}
-          unoptimized
-        />
+        <div
+          className="flex items-center justify-center w-11 h-11 rounded-full bg-primary-2"
+          onClick={onClick}
+        >
+          <MapPin color="white"></MapPin>
+        </div>
       </div>
     </CustomOverlayMap>
   );
@@ -62,10 +58,12 @@ type PublicCapsuleMapProps = {
     lng: number;
   };
   data: PublicCapsule[];
+  onClick: (id: number) => void;
 };
 export default function PublicCapsuleMap({
   location,
   data,
+  onClick,
 }: PublicCapsuleMapProps) {
   const mapRef = useRef<kakao.maps.Map | null>(null);
 
@@ -134,6 +132,7 @@ export default function PublicCapsuleMap({
                 lng: d.capsuleLongitude,
               }}
               content={d.title}
+              onClick={() => onClick(d.capsuleId)}
             />
           ))}
         </MarkerClusterer>

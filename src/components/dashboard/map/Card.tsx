@@ -26,7 +26,7 @@ export default function Card({ data, keyword }: CardProps) {
   }
   return (
     <>
-      <div className="border border-outline rounded-xl p-4 space-y-4">
+      <div className="border border-outline rounded-xl p-4 space-y-4 hover:bg-button-hover">
         <div className="space-y-1">
           <p>{highlightText(data.title, keyword)}</p>
           <div className="text-xs flex items-center gap-1 text-text-3">

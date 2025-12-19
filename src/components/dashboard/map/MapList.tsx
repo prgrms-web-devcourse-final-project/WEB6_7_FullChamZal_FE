@@ -1,19 +1,36 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import Card from "./Card";
 import { Search } from "lucide-react";
 
 type MapListProps = {
   listData?: PublicCapsule[];
   onClick: (lat: number, lng: number) => void;
+  focus: { id: number; ts: number } | null;
 };
 
-export default function MapList({ listData, onClick }: MapListProps) {
+export default function MapList({ listData, onClick, focus }: MapListProps) {
   //검색 키워드
   const [keyword, setKeyword] = useState("");
+  const cardFocus = useRef<Record<number, HTMLButtonElement | null>>({});
   const searchResultList = listData?.filter(
     (d) => d.title.includes(keyword) || d.capsuleLocationName.includes(keyword)
   );
+
+  useEffect(() => {
+    if (focus == null) return;
+
+    const target = cardFocus.current[focus.id];
+    if (!target) return;
+
+    // 포커스 주기 (접근성 + 키보드 이동)
+    target.focus();
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [focus]);
 
   if (listData?.length === 0)
     return (
@@ -21,6 +38,7 @@ export default function MapList({ listData, onClick }: MapListProps) {
         주변에 편지가 없습니다.
       </p>
     );
+
   return (
     <>
       {/* 검색 */}
@@ -49,10 +67,13 @@ export default function MapList({ listData, onClick }: MapListProps) {
             <button
               key={d.capsuleId}
               type="button"
-              className="w-full text-left"
+              className="w-full text-left focus:bg-button-hover"
               onClick={() => onClick(d.capsuleLatitude, d.capsuleLongitude)}
+              ref={(val) => {
+                cardFocus.current[d.capsuleId] = val;
+              }}
             >
-              <Card key={d.capsuleId} data={d} keyword={keyword} />
+              <Card data={d} keyword={keyword} />
             </button>
           ))
         )}

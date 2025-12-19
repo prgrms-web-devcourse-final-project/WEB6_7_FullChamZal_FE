@@ -6,6 +6,7 @@ import MapList from "./MapList";
 import FilterArea from "./FilterArea";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
+
 //서버 렌더링 방지
 import dynamic from "next/dynamic";
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
@@ -18,10 +19,8 @@ export type ViewedFilter = "ALL" | "UNREAD" | "READ";
 
 export default function MapContents() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
   const [radius, setRadius] = useState<Radius>(1000);
   const [viewed, setViewed] = useState<ViewedFilter>("ALL");
-
   const filterRef = useRef<HTMLDivElement | null>(null);
 
   //map center 위치
@@ -33,9 +32,11 @@ export default function MapContents() {
   const [myLocation, setMyLocation] = useState<{
     lat: number;
     lng: number;
-  } | null>({ lat: 37.57553314541359, lng: 127.00269112529695 });
-
+  } | null>(null);
+  //위치 정보 에러 메세지
   const [error, setError] = useState<string | null>(null);
+  //포커스 된 card
+  const [focus, setFocus] = useState<{ id: number; ts: number } | null>(null);
 
   //위치 정보 가져오기 실패했을 때 상황에 따른 에러 메세지
   const showErrorMsg = (error: GeolocationPositionError) => {
@@ -146,6 +147,8 @@ export default function MapContents() {
     } else return [];
   };
 
+  console.log(focus);
+
   return (
     <div className="h-full flex flex-col gap-4">
       {/* 헤더 */}
@@ -157,7 +160,7 @@ export default function MapContents() {
         <p className="text-text-2">
           주변에 숨겨진{" "}
           <span className="text-primary font-semibold">
-            {filterData(data).length}개
+            {myLocation ? filterData(data).length : "-"}개
           </span>
           의 편지를 찾아보세요
         </p>
@@ -169,7 +172,7 @@ export default function MapContents() {
         <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden ">
           {/* 위치 정보 접근 불가능 시 안내*/}
           {error ? (
-            <div className="w-full h-full absolute z-20 flex items-center justify-center">
+            <div className="w-full h-full absolute z-20 flex items-center justify-center select-none">
               <div className="inset-0 absolute bg-black opacity-50"></div>
               <div className="absolute text-sm z-3 text-white text-center">
                 <p className="text-xl font-semibold">
@@ -188,7 +191,13 @@ export default function MapContents() {
 
           {/* 지도 컴포넌트 */}
           {mapLocation ? (
-            <PublicCapsuleMap location={mapLocation} data={filterData(data)} />
+            <PublicCapsuleMap
+              location={mapLocation}
+              data={filterData(data)}
+              onClick={(id) => {
+                setFocus({ id, ts: Date.now() });
+              }}
+            />
           ) : (
             error
           )}
@@ -241,6 +250,7 @@ export default function MapContents() {
             <MapList
               listData={filterData(data)}
               onClick={(lat, lng) => setMapLocation({ lat, lng })}
+              focus={focus}
             />
           ) : (
             <div className="text-center text-text-3 text-sm">
