@@ -7,6 +7,7 @@ import {
   MapPin,
   PaintBucket,
   Send,
+  Check,
 } from "lucide-react";
 import WriteDiv from "./WriteDiv";
 import ActionTab from "./ActionTab";
@@ -85,6 +86,18 @@ export default function WriteForm({
   const [title, setTitle] = useState("");
   const [receiveName, setReceiveName] = useState("");
   const [content, setContent] = useState("");
+  const envelopeThemes = [
+    "#F5F1E8",
+    "#FBF2DE",
+    "#F7DADA",
+    "#DCECF7",
+    "#E8E0FF",
+    "#E6F8EB",
+    "#FAE2C9",
+  ];
+  const [selectedEnvelope, setSelectedEnvelope] = useState(0);
+  const paperThemes = envelopeThemes;
+  const [selectedPaper, setSelectedPaper] = useState(0);
 
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
@@ -349,7 +362,7 @@ export default function WriteForm({
         </WriteDiv>
 
         <WriteDiv title="편지지 & 편지 봉투 테마">
-          <div>
+          <div className="space-y-4">
             <ActionTab
               value={paperTab}
               onChange={setPaperTab}
@@ -366,6 +379,57 @@ export default function WriteForm({
                 },
               ]}
             />
+            {paperTab === "ENVELOPE" ? (
+              <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
+                {envelopeThemes.map((color, idx) => (
+                  <button
+                    key={color + idx}
+                    type="button"
+                    onClick={() => setSelectedEnvelope(idx)}
+                    className={`relative h-30 rounded-2xl border transition ${
+                      selectedEnvelope === idx
+                        ? "border-primary shadow-[0_0_0_3px_rgba(255,87,34,0.15)]"
+                        : "border-outline"
+                    }`}
+                    style={{ backgroundColor: color }}
+                  >
+                    {selectedEnvelope === idx && (
+                      <span className="absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
+                        <Check size={18} />
+                      </span>
+                    )}
+                  </button>
+                ))}
+                <div className="h-30 rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
+                  업로드
+                </div>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
+                {paperThemes.map((color, idx) => (
+                  <button
+                    key={color + idx}
+                    type="button"
+                    onClick={() => setSelectedPaper(idx)}
+                    className={`relative h-40 rounded-2xl border transition ${
+                      selectedPaper === idx
+                        ? "border-primary shadow-[0_0_0_3px_rgba(255,87,34,0.15)]"
+                        : "border-outline"
+                    }`}
+                    style={{ backgroundColor: color }}
+                  >
+                    {selectedPaper === idx && (
+                      <span className="absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
+                        <Check size={18} />
+                      </span>
+                    )}
+                  </button>
+                ))}
+                <div className="h-40 rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
+                  업로드
+                </div>
+              </div>
+            )}
           </div>
         </WriteDiv>
 
