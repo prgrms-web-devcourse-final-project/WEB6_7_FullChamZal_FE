@@ -3,14 +3,13 @@ import { authApiServer } from "@/lib/api/auth/auth.server";
 import { redirect } from "next/navigation";
 
 type PageProps = {
-  params: Promise<{ capsuleId: string }>;
+  params: Promise<{ uuId: string }>;
 };
 
 export default async function Page({ params }: PageProps) {
-  const { capsuleId } = await params;
-  const id = Number(capsuleId);
+  const { uuId } = await params;
 
-  if (!Number.isFinite(id) || id <= 0) {
+  if (!uuId) {
     redirect("/404"); // or notFound()
   }
 
@@ -19,10 +18,10 @@ export default async function Page({ params }: PageProps) {
   // 로그인 필수 정책이면 바로 리다이렉트
   if (!me) {
     redirect(
-      `/login?callbackUrl=/dashboard/capsules/${encodeURIComponent(capsuleId)}`
+      `/login?callbackUrl=/dashboard/capsules/${encodeURIComponent(uuId)}`
     );
   }
 
   // 클라이언트에서 비번 여부 확인 + UI 분기
-  return <CapsuleGate capsuleId={id} />;
+  return <CapsuleGate uuId={uuId} />;
 }

@@ -1,6 +1,6 @@
 /* 비밀번호 유무 */
 type ReadCapsuleRequest = {
-  capsuleId: number;
+  uuId: string;
 };
 
 type ReadCapsulePasswordData = {
@@ -21,7 +21,7 @@ type ApiResponse<T> = {
 };
 
 type CapsuleReadRequest = {
-  capsuleId: number;
+  uuId: string;
   unlockAt?: string | null; // ISO string
   locationLat?: number | null;
   locationLng?: number | null;

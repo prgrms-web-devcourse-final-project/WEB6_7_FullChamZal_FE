@@ -7,10 +7,10 @@ import Logo from "@/components/common/Logo";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 
 export default function LetterUnlockModal({
-  capsuleId,
+  uuId,
   onSuccess,
 }: {
-  capsuleId: number;
+  uuId: string;
   onSuccess: (password: string) => void;
 }) {
   const [password, setPassword] = useState("");
@@ -39,7 +39,7 @@ export default function LetterUnlockModal({
       );
 
       await guestCapsuleApi.read({
-        capsuleId,
+        uuId,
         unlockAt,
         locationLat: pos.lat,
         locationLng: pos.lng,

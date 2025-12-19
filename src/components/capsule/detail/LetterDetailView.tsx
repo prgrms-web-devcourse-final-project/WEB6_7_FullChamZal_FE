@@ -31,16 +31,13 @@ function extractUnlockAtFromError(err: unknown): string | null {
 }
 
 type Props = {
-  capsuleId: number;
+  uuId: string;
   password?: string | number | null;
 };
 
-export default function LetterDetailView({
-  capsuleId,
-  password = null,
-}: Props) {
+export default function LetterDetailView({ uuId, password = null }: Props) {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["capsuleRead", capsuleId, password],
+    queryKey: ["capsuleRead", uuId, password],
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
 
@@ -55,7 +52,7 @@ export default function LetterDetailView({
 
       return guestCapsuleApi.read(
         {
-          capsuleId,
+          uuId,
           unlockAt,
           locationLat: pos.coords.latitude ?? null,
           locationLng: pos.coords.longitude ?? null,
@@ -64,7 +61,6 @@ export default function LetterDetailView({
         signal
       );
     },
-    enabled: capsuleId > 0,
     retry: false,
   });
 
@@ -99,7 +95,7 @@ export default function LetterDetailView({
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
         <LetterDetailModal
-          capsuleId={capsuleId}
+          capsuleId={capsule.capsuleId}
           role="USER"
           open={true}
           password={password}

@@ -33,6 +33,7 @@ type UICapsule = {
 };
 
 export default function LetterDetailModal({
+  uuId = "",
   capsuleId,
   open = true,
   closeHref,
@@ -45,6 +46,7 @@ export default function LetterDetailModal({
   locationLng = null,
   password = null,
 }: {
+  uuId?: string;
   capsuleId: number;
   open?: boolean;
   closeHref?: string;
@@ -112,7 +114,7 @@ export default function LetterDetailModal({
 
       const r = await guestCapsuleApi.read(
         {
-          capsuleId,
+          uuId,
           unlockAt,
           locationLat: pos.lat,
           locationLng: pos.lng,
