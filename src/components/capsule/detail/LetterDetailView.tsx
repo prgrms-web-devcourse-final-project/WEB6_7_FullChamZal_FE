@@ -38,18 +38,7 @@ export default function LetterDetailView({
         console.log("✅ /capsule/read success payload:", res);
         return res;
       } catch (e: any) {
-        // apiFetch 구현에 따라 아래 중 하나에 들어있음
-        const status = e?.status ?? e?.response?.status;
-        const body = e?.body ?? e?.response?.data ?? e?.data;
-
-        console.error("❌ /capsule/read failed", {
-          status,
-          message: e?.message,
-          body,
-          raw: e,
-        });
-
-        throw e;
+        throw new Error(e);
       }
     },
     retry: false,
