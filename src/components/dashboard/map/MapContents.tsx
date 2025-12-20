@@ -9,6 +9,8 @@ import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
 
 //서버 렌더링 방지
 import dynamic from "next/dynamic";
+import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
+import { useSearchParams } from "next/navigation";
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
@@ -39,6 +41,8 @@ export default function MapContents() {
   const [error, setError] = useState<string | null>(null);
   //포커스 된 card
   const [focus, setFocus] = useState<{ id: number; ts: number } | null>(null);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   //위치 정보 가져오기 실패했을 때 상황에 따른 에러 메세지
   const showErrorMsg = (error: GeolocationPositionError) => {
@@ -157,11 +161,17 @@ export default function MapContents() {
     } else return [];
   };
 
-  console.log(focus);
   const filteredData = filter(data);
 
   return (
     <div className="h-full flex flex-col gap-4">
+      {id ? (
+        <LetterDetailModal
+          capsuleId={Number(id)}
+          closeHref="/dashboard/map"
+          role="USER"
+        />
+      ) : null}
       {/* 헤더 */}
       <div className="space-y-2">
         <h3 className="text-3xl font-medium">
@@ -206,8 +216,9 @@ export default function MapContents() {
               location={mapLocation}
               data={filteredData}
               focus={focus?.id}
-              onClick={(id) => {
+              onClick={(id, lat, lng) => {
                 setFocus({ id, ts: Date.now() });
+                setMapLocation({ lat, lng });
               }}
             />
           ) : (

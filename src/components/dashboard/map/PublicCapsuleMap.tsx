@@ -1,6 +1,7 @@
 "use client";
 
 import { MapPin } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { CustomOverlayMap, Map, MarkerClusterer } from "react-kakao-maps-sdk";
 
@@ -12,11 +13,13 @@ const EventMarkerContainer = ({
   content,
   onClick,
   isFocus,
+  showCapsule,
 }: {
   position: { lat: number; lng: number };
   content: string;
   onClick: () => void;
   isFocus: boolean;
+  showCapsule: () => void;
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -44,6 +47,7 @@ const EventMarkerContainer = ({
                 : "opacity-0 pointer-none"
             }
           `}
+          onClick={showCapsule}
         >
           {content}
         </div>
@@ -67,17 +71,18 @@ type PublicCapsuleMapProps = {
   };
   data: PublicCapsule[];
   focus?: number;
-  onClick: (id: number) => void;
+  onClick: (id: number, lat: number, lng: number) => void;
 };
 
 export default function PublicCapsuleMap({
   location,
   data,
   onClick,
+
   focus,
 }: PublicCapsuleMapProps) {
   const mapRef = useRef<kakao.maps.Map | null>(null);
-
+  const router = useRouter();
   //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경
   useEffect(() => {
     //지도가 아직 안그려진 상태면 return
@@ -143,8 +148,13 @@ export default function PublicCapsuleMap({
                 lng: d.capsuleLongitude,
               }}
               content={d.title}
-              onClick={() => onClick(d.capsuleId)}
+              onClick={() =>
+                onClick(d.capsuleId, d.capsuleLatitude, d.capsuleLongitude)
+              }
               isFocus={!!(d.capsuleId === focus)}
+              showCapsule={() => {
+                router.push(`/dashboard/map?id=${d.capsuleId}`);
+              }}
             />
           ))}
         </MarkerClusterer>
