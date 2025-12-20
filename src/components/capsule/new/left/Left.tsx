@@ -9,6 +9,9 @@ type PreviewState = {
   authMethod: string;
   unlockType: string;
   charCount: number;
+  envelopeColorName: string;
+  paperColorName: string;
+  paperColorHex: string;
 };
 
 export default function Left({

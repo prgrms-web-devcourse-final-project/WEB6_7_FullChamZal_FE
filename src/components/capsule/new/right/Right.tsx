@@ -9,6 +9,9 @@ type PreviewState = {
   authMethod: string;
   unlockType: string;
   charCount: number;
+  envelopeColorName: string;
+  paperColorName: string;
+  paperColorHex: string;
 };
 
 export default function Right({ preview }: { preview: PreviewState }) {
@@ -34,6 +37,10 @@ export default function Right({ preview }: { preview: PreviewState }) {
       ? "시간 + 장소"
       : "시간";
   const charCountLabel = `${preview.charCount}자`;
+  const paperColor = preview.paperColorHex || "#F5F1E8";
+  const themeLabel = `${preview.envelopeColorName || "-"} & ${
+    preview.paperColorName || "-"
+  }`;
 
   return (
     <section className="w-full h-full p-8 min-h-0 flex flex-col">
@@ -42,14 +49,17 @@ export default function Right({ preview }: { preview: PreviewState }) {
         <div className="flex-1 min-h-0 flex flex-col gap-4">
           <span className="text-xl">미리보기</span>
 
-          <div className="flex-1 min-h-0 p-8 rounded-2xl bg-[#F5F1E8] border border-outline overflow-hidden">
+          <div
+            className="flex-1 min-h-0 p-8 rounded-2xl border border-outline overflow-hidden"
+            style={{ backgroundColor: paperColor }}
+          >
             <div className="h-full min-h-0 flex flex-col justify-between gap-6">
-              {/* 제목 + Dear */}
+              {/* 제목 + Dear (수신자) */}
               <div className="text-2xl space-x-1">
                 <p className="font-semibold">{title || "제목을 입력하세요"}</p>
                 <span className="text-primary font-bold">Dear.</span>
                 <span className="text-text-3">
-                  {senderName || "작성자 이름"}
+                  {receiverName || "수신자 이름"}
                 </span>
               </div>
 
@@ -60,13 +70,13 @@ export default function Right({ preview }: { preview: PreviewState }) {
                 </pre>
               </div>
 
-              {/* From */}
+              {/* From (발신자) */}
               <div className="shrink-0 flex flex-col items-end gap-1">
                 <span className="text-text-3">{todayLabel}</span>
                 <p className="text-right text-2xl space-x-1">
                   <span className="text-primary font-bold">From.</span>
                   <span className="text-text-3">
-                    {receiverName || "수신자 이름"}
+                    {senderName || "작성자 이름"}
                   </span>
                 </p>
               </div>
@@ -78,7 +88,7 @@ export default function Right({ preview }: { preview: PreviewState }) {
         <div className="shrink-0 w-full text-xs text-text-4 p-4 border border-outline rounded-xl bg-white/60">
           <p>편지 정보</p>
           <ul className="space-y-1">
-            <li>• 테마: (편지봉투 명) & (편지지 명)</li>
+            <li>• 테마: {themeLabel}</li>
             <li>• 공개 범위: {visibilityLabel}</li>
             <li>• 인증 방법: {authLabel}</li>
             <li>• 해제 조건: {unlockLabel}</li>

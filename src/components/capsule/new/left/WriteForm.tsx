@@ -7,7 +7,12 @@ import {
   MapPin,
   PaintBucket,
   Send,
+  Check,
 } from "lucide-react";
+import {
+  CAPTURE_ENVELOPE_PALETTE,
+  type CapsuleColor,
+} from "@/constants/capsulePalette";
 import WriteDiv from "./WriteDiv";
 import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";
@@ -44,6 +49,9 @@ type PreviewState = {
   authMethod: string;
   unlockType: string;
   charCount: number;
+  envelopeColorName: string;
+  paperColorName: string;
+  paperColorHex: string;
 };
 
 export default function WriteForm({
@@ -85,6 +93,10 @@ export default function WriteForm({
   const [title, setTitle] = useState("");
   const [receiveName, setReceiveName] = useState("");
   const [content, setContent] = useState("");
+  const envelopeThemes = CAPTURE_ENVELOPE_PALETTE;
+  const [selectedEnvelope, setSelectedEnvelope] = useState(0);
+  const paperThemes = envelopeThemes;
+  const [selectedPaper, setSelectedPaper] = useState(0);
 
   /* 한글 입력 중인지 체크 (조합 중엔 강제 slice 하면 입력이 깨질 수 있음) */
   const isComposingRef = useRef(false);
@@ -120,6 +132,8 @@ export default function WriteForm({
         : unlockType === "MANUAL"
         ? "TIME_AND_LOCATION"
         : "TIME";
+    const envelopeSelected = envelopeThemes[selectedEnvelope];
+    const paperSelected = paperThemes[selectedPaper];
 
     // 내게쓰기일 경우 받는 사람 이름을 보내는 사람 이름으로 설정
     const receiverLabel = isSelf ? senderName : receiveName;
@@ -133,6 +147,9 @@ export default function WriteForm({
       authMethod: authMethodLabel,
       unlockType: unlockLabel,
       charCount: content.length,
+      envelopeColorName: envelopeSelected?.name ?? "",
+      paperColorName: paperSelected?.name ?? "",
+      paperColorHex: paperSelected?.color ?? "#F5F1E8",
     });
   }, [
     title,
@@ -143,6 +160,10 @@ export default function WriteForm({
     visibility,
     sendMethod,
     unlockType,
+    selectedEnvelope,
+    selectedPaper,
+    envelopeThemes,
+    paperThemes,
     onPreviewChange,
   ]);
 
@@ -260,6 +281,9 @@ export default function WriteForm({
       return;
     }
 
+    const envelopeSelected = envelopeThemes[selectedEnvelope];
+    const paperSelected = paperThemes[selectedPaper];
+
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
       senderName,
@@ -272,6 +296,10 @@ export default function WriteForm({
       effectiveUnlockType,
       dayForm,
       locationForm,
+      packingColor: envelopeSelected?.name ?? "",
+      contentColor: paperSelected?.name ?? "",
+      capsuleColor: paperSelected?.name ?? "",
+      capsulePackingColor: envelopeSelected?.name ?? "",
     });
 
     const publicPayload = buildPublicPayload({
@@ -284,8 +312,10 @@ export default function WriteForm({
       dayForm,
       locationForm,
       capsulePassword,
-      capsuleColor: "",
-      capsulePackingColor: "",
+      capsuleColor: paperSelected?.name ?? "",
+      capsulePackingColor: envelopeSelected?.name ?? "",
+      packingColor: envelopeSelected?.name ?? "",
+      contentColor: paperSelected?.name ?? "",
     });
 
     try {
@@ -349,7 +379,7 @@ export default function WriteForm({
         </WriteDiv>
 
         <WriteDiv title="편지지 & 편지 봉투 테마">
-          <div>
+          <div className="space-y-4">
             <ActionTab
               value={paperTab}
               onChange={setPaperTab}
@@ -361,11 +391,68 @@ export default function WriteForm({
                 },
                 {
                   id: "PAPER",
-                  tabName: "편지지(추가예정)",
+                  tabName: "편지지",
                   icon: <ImageIcon size={16} />,
                 },
               ]}
             />
+            {paperTab === "ENVELOPE" ? (
+              <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
+                {envelopeThemes.map((item: CapsuleColor, idx: number) => (
+                  <button
+                    key={`${item.name}-${idx}`}
+                    type="button"
+                    onClick={() => setSelectedEnvelope(idx)}
+                    className={`relative aspect-square rounded-2xl border-2 transition ${
+                      selectedEnvelope === idx
+                        ? "border-primary bg-primary/10"
+                        : "border-outline"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        item.color as React.CSSProperties["backgroundColor"],
+                    }}
+                  >
+                    {selectedEnvelope === idx && (
+                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
+                        <Check size={18} />
+                      </span>
+                    )}
+                  </button>
+                ))}
+                <div className="aspect-square rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
+                  업로드
+                </div>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
+                {paperThemes.map((item: CapsuleColor, idx: number) => (
+                  <button
+                    key={`${item.name}-${idx}`}
+                    type="button"
+                    onClick={() => setSelectedPaper(idx)}
+                    className={`relative aspect-square rounded-2xl border-2 transition ${
+                      selectedPaper === idx
+                        ? "border-primary bg-primary/10"
+                        : "border-outline"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        item.color as React.CSSProperties["backgroundColor"],
+                    }}
+                  >
+                    {selectedPaper === idx && (
+                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow">
+                        <Check size={18} />
+                      </span>
+                    )}
+                  </button>
+                ))}
+                <div className="aspect-square rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
+                  업로드
+                </div>
+              </div>
+            )}
           </div>
         </WriteDiv>
 
