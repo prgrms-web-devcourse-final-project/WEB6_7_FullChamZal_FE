@@ -20,6 +20,8 @@ export interface CreatePrivateCapsuleRequest {
   packingColor: string;
   contentColor: string;
   maxViewCount: number;
+  capsuleColor?: string;
+  capsulePackingColor?: string;
 }
 
 export interface CreateMyCapsuleRequest {
@@ -50,6 +52,8 @@ export interface CreatePublicCapsuleRequest {
   capPassword?: string;
   capsuleColor: string;
   capsulePackingColor: string;
+  packingColor?: string;
+  contentColor?: string;
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;

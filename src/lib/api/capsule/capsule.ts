@@ -21,6 +21,8 @@ type BuildCommonArgs = {
   capsulePassword?: string | null;
   capsuleColor?: string;
   capsulePackingColor?: string;
+  packingColor?: string;
+  contentColor?: string;
 };
 
 /**
@@ -77,8 +79,8 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
         ? locationForm.lng ?? 0
         : 0,
     viewingRadius: 0,
-    packingColor: "",
-    contentColor: "",
+    packingColor: args.packingColor ?? "",
+    contentColor: args.contentColor ?? "",
     maxViewCount: 0,
   };
 }
@@ -102,6 +104,8 @@ export function buildPrivatePayload(
     effectiveUnlockType,
     dayForm,
     locationForm,
+    packingColor = "",
+    contentColor = "",
   } = args;
   const unlockAt =
     effectiveUnlockType === "TIME" ||
@@ -142,8 +146,8 @@ export function buildPrivatePayload(
         ? locationForm.lng ?? 0
         : 0,
     viewingRadius: 0,
-    packingColor: "",
-    contentColor: "",
+    packingColor,
+    contentColor,
     maxViewCount: 0,
   };
 }
@@ -167,6 +171,8 @@ export function buildPublicPayload(
     locationForm,
     capsuleColor = "",
     capsulePackingColor = "",
+    packingColor = "",
+    contentColor = "",
   } = args;
 
   const unlockAt =
@@ -183,6 +189,8 @@ export function buildPublicPayload(
     capPassword: capsulePassword || undefined,
     capsuleColor,
     capsulePackingColor,
+    packingColor,
+    contentColor,
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,

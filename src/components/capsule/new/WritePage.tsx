@@ -15,6 +15,9 @@ export default function WritePage() {
     authMethod: "URL",
     unlockType: "TIME",
     charCount: 0,
+    envelopeColorName: "",
+    paperColorName: "",
+    paperColorHex: "#F5F1E8",
   });
 
   return (

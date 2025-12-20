@@ -8,6 +8,11 @@ import { Lock, Mail, Phone, User, UserCircle, X } from "lucide-react";
 import { Field } from "./Field";
 import PhoneEditModal from "./PhoneEditModal";
 import PasswordEditModal from "./PasswordEditModal";
+import {
+  getMeDetail,
+  updateMe,
+  verifyMemberPassword,
+} from "@/lib/api/members/members";
 
 type ProfileForm = {
   name: string;
@@ -56,7 +61,6 @@ export default function ProfileModal({
       setIsVerifying(false);
       setError(null);
 
-      // 원하면 편집상태도 초기화
       setIsEditing(false);
       setForm(initialForm);
     }
@@ -67,10 +71,8 @@ export default function ProfileModal({
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
     };
 
-  const isDirty =
-    form.name !== initialForm.name ||
-    form.nickname !== initialForm.nickname ||
-    form.email !== initialForm.email;
+  // name/email은 서버 수정 스펙에 없어서 "기본수정"에서는 닉네임만 dirty 체크 권장
+  const isDirty = form.nickname !== initialForm.nickname;
 
   const onSave = async () => {
     if (!isDirty) return;
@@ -79,11 +81,33 @@ export default function ProfileModal({
     setError(null);
 
     try {
-      await new Promise((r) => setTimeout(r, 700));
-      setInitialForm(form);
+      const payload: { nickname?: string } = {};
+
+      if (form.nickname !== initialForm.nickname) {
+        payload.nickname = form.nickname;
+      }
+
+      if (Object.keys(payload).length === 0) {
+        setIsEditing(false);
+        return;
+      }
+
+      await updateMe(payload);
+
+      // ✅ 서버 기준으로 다시 동기화
+      const data = await getMeDetail();
+      const nextForm: ProfileForm = {
+        name: data.name ?? "",
+        nickname: data.nickname ?? "",
+        email: data.userId ?? "",
+        phoneNumber: data.phoneNumber ?? "",
+      };
+
+      setForm(nextForm);
+      setInitialForm(nextForm);
       setIsEditing(false);
-    } catch {
-      setError("저장에 실패했어요. 잠시 후 다시 시도해주세요.");
+    } catch (e: any) {
+      setError(e.message ?? "저장에 실패했어요. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsSaving(false);
     }
@@ -101,7 +125,7 @@ export default function ProfileModal({
     onClose();
   };
 
-  // 비밀번호 확인 로직 (서버로 확인 요청)
+ 
   const verifyPassword = async () => {
     if (!password.trim()) return;
 
@@ -109,10 +133,22 @@ export default function ProfileModal({
     setError(null);
 
     try {
-      // 예: POST /api/auth/verify-password
+      await verifyMemberPassword(password);
 
       setIsVerified(true);
       setPassword("");
+
+      // ✅ 본인 확인 성공 후 실제 회원정보 로드
+      const data = await getMeDetail();
+      const nextForm: ProfileForm = {
+        name: data.name ?? "",
+        nickname: data.nickname ?? "",
+        email: data.userId ?? "",
+        phoneNumber: data.phoneNumber ?? "",
+      };
+
+      setForm(nextForm);
+      setInitialForm(nextForm);
     } catch (e: any) {
       setError(e.message ?? "비밀번호 확인에 실패했어요.");
     } finally {
@@ -201,6 +237,7 @@ export default function ProfileModal({
                     value={form.name}
                     isEditing={isEditing}
                     onChange={updateField("name")}
+                    readOnly
                   />
 
                   <Field
@@ -218,6 +255,7 @@ export default function ProfileModal({
                     isEditing={isEditing}
                     onChange={updateField("email")}
                     disabled
+                    readOnly
                   />
 
                   <Field
@@ -260,7 +298,7 @@ export default function ProfileModal({
             )}
           </div>
 
-          {/* Footer도 인증 전/후 분기 추천 */}
+          {/* Footer */}
           <div className="py-6 px-6 flex flex-col gap-3 border-t border-outline">
             {!isVerified ? (
               <Button
