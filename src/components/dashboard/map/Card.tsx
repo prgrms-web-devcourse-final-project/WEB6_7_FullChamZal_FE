@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { Heart, MapPin } from "lucide-react";
 type CardProps = {
   data: PublicCapsule;
   keyword: string;
@@ -26,16 +26,22 @@ export default function Card({ data, keyword }: CardProps) {
   }
   return (
     <>
-      <div className="border border-outline rounded-xl p-4 space-y-4 hover:bg-button-hover">
+      <div className="group border border-outline rounded-xl p-4 space-y-4 focus:bg-primary-3 group-focus:text-white">
         <div className="space-y-1">
-          <p>{highlightText(data.title, keyword)}</p>
-          <div className="text-xs flex items-center gap-1 text-text-3">
-            <div className="flex items-center gap-1">
+          <div className="flex justify-between group-focus:text-white">
+            <p>{highlightText(data.title, keyword)}</p>
+            <div className="flex items-center text-sm gap-1">
+              <Heart size={14}></Heart>
+              <p>0</p>
+            </div>
+          </div>
+          <div className="text-xs flex items-center gap-1 text-text-3 group-focus:text-white">
+            <div className="flex items-center gap-1 ">
               <MapPin size={12} />{" "}
               <span>{highlightText(data.capsuleLocationName, keyword)}</span>
             </div>
             <span>•</span>
-            <span className="text-primary-2">
+            <span className="text-primary-2 group-focus:text-white">
               {Math.floor(data.distanceToCapsule)}m
             </span>
           </div>
@@ -43,7 +49,7 @@ export default function Card({ data, keyword }: CardProps) {
         {/* <div className="text-sm">
           <p>벚꽃이 피는 이 거리에서 당신을 떠올립니다...</p>
         </div> */}
-        <div className="flex justify-between text-xs text-text-2">
+        <div className="flex justify-between text-xs text-text-2 group-focus:text-white">
           <span>from. {data.writerNickname}</span>{" "}
           <span>{data.capsuleCreatedAt.slice(0, 10)}</span>
         </div>

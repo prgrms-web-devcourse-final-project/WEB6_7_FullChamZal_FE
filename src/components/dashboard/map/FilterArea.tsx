@@ -1,10 +1,13 @@
 import FilterRow from "./FilterRow";
+import { AccessibleFilter } from "./MapContents";
 
 export default function FilterArea({
   radius,
   onRadiusChange,
   viewed,
   onViewedChange,
+  accessible,
+  onAccessibleChange,
   onReset,
   onClose,
 }: {
@@ -12,6 +15,8 @@ export default function FilterArea({
   onRadiusChange: (v: Radius) => void;
   viewed: ViewedFilter;
   onViewedChange: (v: ViewedFilter) => void;
+  accessible: AccessibleFilter;
+  onAccessibleChange: (v: AccessibleFilter) => void;
   onReset: () => void;
   onClose: () => void;
 }) {
@@ -64,6 +69,29 @@ export default function FilterArea({
             label="본 편지만"
             active={viewed === "READ"}
             onClick={() => onViewedChange("READ")}
+          />
+        </div>
+      </div>
+
+      {/* 조회 가능 여부 */}
+      <div className="space-y-2">
+        <p className="text-sm text-text-2">조회 가능 여부</p>
+
+        <div className="space-y-1">
+          <FilterRow
+            label="전체"
+            active={accessible === "ALL"}
+            onClick={() => onAccessibleChange("ALL")}
+          />
+          <FilterRow
+            label="열람 가능"
+            active={accessible === "ACCESSIBLE"}
+            onClick={() => onAccessibleChange("ACCESSIBLE")}
+          />
+          <FilterRow
+            label="열람 불가능"
+            active={accessible === "INACCESSIBLE"}
+            onClick={() => onAccessibleChange("INACCESSIBLE")}
           />
         </div>
       </div>
