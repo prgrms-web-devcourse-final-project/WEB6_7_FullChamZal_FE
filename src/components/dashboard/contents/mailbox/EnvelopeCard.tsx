@@ -22,9 +22,10 @@ function getUnlockInfo(capsule: CapsuleDashboardItem) {
     : capsule.locationName ?? "위치 조건 없음";
 
   const isUnlockedByTime =
-    isTime && capsule.unlockAt ? capsule.unlockAt : false;
+    isTime && capsule.unlockAt
+      ? Date.now() >= new Date(capsule.unlockAt).getTime()
+      : true;
 
-  console.log(isUnlockedByTime);
   const isUnlocked =
     unlockType === "TIME"
       ? isUnlockedByTime
@@ -33,8 +34,7 @@ function getUnlockInfo(capsule: CapsuleDashboardItem) {
       : unlockType === "TIME_AND_LOCATION"
       ? false
       : true;
-  console.log(isUnlocked);
-  const isRead = Boolean(capsule.viewStatus);
+  const isRead = capsule.viewStatus;
   const statusText = isUnlocked ? "열람 가능" : "열람 불가능";
 
   return { isTime, conditionLabel, isUnlocked, isRead, statusText };

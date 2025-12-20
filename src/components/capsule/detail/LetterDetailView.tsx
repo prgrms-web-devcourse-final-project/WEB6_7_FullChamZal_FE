@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/purity */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/purity */
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -7,59 +7,50 @@ import LetterDetailModal from "./LetterDetailModal";
 import LetterLockedView from "./LetterLockedView";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 
-// 에러 응답(JSON)에서 unlockAt 뽑기 (apiFetch 구현에 따라 경로가 다를 수 있어서 방어적으로)
-function extractUnlockAtFromError(err: unknown): string | null {
-  const e: any = err;
-
-  // 흔한 케이스들:
-  // 1) e.data.data.unlockAt
-  // 2) e.data.unlockAt
-  // 3) e.response.data.data.unlockAt (axios 스타일)
-  // 4) e.response.data.unlockAt
-  // 5) e.cause?.data...
-  const candidates = [
-    e?.data?.data?.unlockAt,
-    e?.data?.unlockAt,
-    e?.response?.data?.data?.unlockAt,
-    e?.response?.data?.unlockAt,
-    e?.cause?.data?.data?.unlockAt,
-    e?.cause?.data?.unlockAt,
-  ];
-
-  const v = candidates.find((x) => typeof x === "string" && x.length > 0);
-  return v ?? null;
-}
-
 type Props = {
-  uuId: string;
-  password?: string | number | null;
+  capsuleId: number;
+  isProtected: number;
+  password?: string | null;
 };
 
-export default function LetterDetailView({ uuId, password = null }: Props) {
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["capsuleRead", uuId, password],
+export default function LetterDetailView({
+  capsuleId,
+  isProtected,
+  password = null,
+}: Props) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["capsuleRead", capsuleId],
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
 
-      const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
-        if (!navigator.geolocation)
-          reject(new Error("위치 정보를 사용할 수 없습니다."));
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10_000,
-        });
-      });
+      try {
+        const res = await guestCapsuleApi.read(
+          {
+            capsuleId,
+            unlockAt,
+            locationLat: 0,
+            locationLng: 0,
+            password,
+          },
+          signal
+        );
 
-      return guestCapsuleApi.read(
-        {
-          uuId,
-          unlockAt,
-          locationLat: pos.coords.latitude ?? null,
-          locationLng: pos.coords.longitude ?? null,
-          password,
-        },
-        signal
-      );
+        console.log("✅ /capsule/read success payload:", res);
+        return res;
+      } catch (e: any) {
+        // apiFetch 구현에 따라 아래 중 하나에 들어있음
+        const status = e?.status ?? e?.response?.status;
+        const body = e?.body ?? e?.response?.data ?? e?.data;
+
+        console.error("❌ /capsule/read failed", {
+          status,
+          message: e?.message,
+          body,
+          raw: e,
+        });
+
+        throw e;
+      }
     },
     retry: false,
   });
@@ -74,21 +65,16 @@ export default function LetterDetailView({ uuId, password = null }: Props) {
 
   // 조건 미충족으로 서버가 4xx를 주는 경우: 에러 바디에 unlockAt이 있으면 그걸 사용
   if (isError || !data) {
-    const unlockAtFromServer = extractUnlockAtFromError(error);
-
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
         <LetterLockedView
-          unlockAt={
-            unlockAtFromServer ??
-            new Date(Date.now() + 10 * 60 * 1000).toISOString()
-          }
+          unlockAt={new Date(Date.now() + 10 * 60 * 1000).toISOString()}
         />
       </div>
     );
   }
 
-  const capsule = data.data;
+  const capsule = data;
 
   // read 성공(열람 가능)
   if (capsule.viewStatus) {
@@ -96,6 +82,7 @@ export default function LetterDetailView({ uuId, password = null }: Props) {
       <div className="min-h-screen w-full flex items-center justify-center p-8">
         <LetterDetailModal
           capsuleId={capsule.capsuleId}
+          isProtected={isProtected}
           role="USER"
           open={true}
           password={password}

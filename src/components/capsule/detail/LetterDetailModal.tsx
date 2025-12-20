@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import ActiveModal from "@/components/common/ActiveModal";
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
+import { authApiClient } from "@/lib/api/auth/auth.client";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Clock,
   LinkIcon,
@@ -16,7 +19,13 @@ import {
   Bookmark,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+  redirect,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type UICapsule = {
   title: string;
@@ -32,12 +41,24 @@ type UICapsule = {
   locationName: string | null; // (USER: locationName / ADMIN: alias/address)
 };
 
+type PostLoginAction = {
+  type: "SAVE_CAPSULE";
+  payload: { capsuleId: number; isSendSelf: 0 | 1 };
+};
+
+const POST_LOGIN_ACTION_KEY = "postLoginAction";
+
+function isAuthMissingError(err: any) {
+  // apiFetch 구현에 따라 다름: status / response.status / code 등으로 판별
+  const status = err?.status ?? err?.response?.status;
+  return status === 401 || status === 403;
+}
+
 export default function LetterDetailModal({
-  uuId = "",
   capsuleId,
   open = true,
   closeHref,
-  mode,
+  isProtected,
   role = "USER",
   onClose,
 
@@ -50,15 +71,18 @@ export default function LetterDetailModal({
   capsuleId: number;
   open?: boolean;
   closeHref?: string;
-  mode?: string;
+  isProtected?: number;
   role?: MemberRole;
   onClose?: () => void;
 
   locationLat?: number | null;
   locationLng?: number | null;
-  password?: string | number | null;
+  password?: string | null;
 }) {
+  const isAdmin = role === "ADMIN";
   const router = useRouter();
+  const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
+
   if (!open) return null;
 
   const close = () => {
@@ -66,10 +90,103 @@ export default function LetterDetailModal({
     else router.back();
   };
 
-  const isAdmin = role === "ADMIN";
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+
+  // ✅ 현재 페이지 returnUrl 만들기 (쿼리까지 포함)
+  const returnUrl = useMemo(() => {
+    const qs = searchParams?.toString();
+    return qs ? `${pathname}?${qs}` : `${pathname}`;
+  }, [pathname, searchParams]);
+
+  const saveMutation = useMutation({
+    mutationKey: ["capsuleSave", capsuleId],
+    mutationFn: (payload: {
+      capsuleId: number;
+      isSendSelf: 0 | 1;
+      unlockAt: string;
+    }) => guestCapsuleApi.save(payload),
+    onSuccess: () => {
+      setIsSaveSuccessOpen(true);
+    },
+  });
+  /**
+   * ✅ 로그인/회원가입 후 돌아왔을 때 자동 재시도
+   * - 컴포넌트 마운트 시 sessionStorage 확인
+   */
+  useEffect(() => {
+    if (!open) return;
+
+    const raw = sessionStorage.getItem(POST_LOGIN_ACTION_KEY);
+    if (!raw) return;
+
+    let action: PostLoginAction | null = null;
+    try {
+      action = JSON.parse(raw);
+    } catch {
+      sessionStorage.removeItem(POST_LOGIN_ACTION_KEY);
+      return;
+    }
+
+    if (!action) return;
+
+    // SAVE_CAPSULE 재시도
+    if (action.type === "SAVE_CAPSULE") {
+      // 여기서 “이미 로그인 성공했는지”까지 한 번 더 확인하고 싶으면 me를 한 번 더 호출해도 됨
+      const unlockAt = new Date().toISOString();
+      saveMutation.mutate({
+        capsuleId: action.payload.capsuleId,
+        isSendSelf: action.payload.isSendSelf,
+        unlockAt,
+      });
+
+      // 재시도는 1회만 (무한루프 방지)
+      sessionStorage.removeItem(POST_LOGIN_ACTION_KEY);
+    }
+  }, [open, saveMutation]);
+
+  /**
+   * 저장 버튼 핸들러
+   * - me 조회 -> 있으면 저장
+   * - 없으면 login/signup으로 보내고 돌아오면 재시도
+   */
+  const handleSave = async () => {
+    try {
+      // 1) me 조회로 로그인 여부 확인
+      const me = await authApiClient.me(); // TODO: signal 필요하면 authApi.me(signal) 형태로
+      // me가 null일 수 있는 구현이면 여기서 분기
+      if (!me) {
+        throw Object.assign(new Error("NO_ME"), { status: 401 });
+      }
+
+      // 2) 로그인 상태면 저장 실행
+      const unlockAt = new Date().toISOString();
+      saveMutation.mutate({ capsuleId, isSendSelf: 0, unlockAt });
+    } catch (err: any) {
+      // 3) 인증 없으면: 돌아와서 재시도할 액션 저장
+      if (isAuthMissingError(err)) {
+        const action: PostLoginAction = {
+          type: "SAVE_CAPSULE",
+          payload: { capsuleId, isSendSelf: 0 },
+        };
+        sessionStorage.setItem(POST_LOGIN_ACTION_KEY, JSON.stringify(action));
+
+        // 4) 로그인 or 회원가입으로 이동
+        //    - 여기서 "아이디가 없으면 회원가입" 플로우는 로그인 화면에서 처리하는 게 일반적임.
+        //    - 예: 로그인 페이지에 "회원가입" 버튼, 또는 로그인 실패 시 "회원가입" 유도.
+        router.push(`/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+        return;
+      }
+
+      // 인증 문제 아니면 진짜 에러
+      console.error("❌ save error:", err);
+      // TODO: 토스트/에러 UI
+    }
+  };
 
   // 나중에 ADMIN일 경우에는 아래 api만 USER이면 USER 세부 api만 호출
-  const { data, isLoading } = useQuery<UICapsule>({
+  const { data, isLoading, isError, error } = useQuery<UICapsule>({
     queryKey: ["capsuleDetailModal", role, capsuleId, password],
     queryFn: async ({ signal }) => {
       if (isAdmin) {
@@ -92,7 +209,6 @@ export default function LetterDetailModal({
       // USER: read API (조건 검증 포함)
       const unlockAt = new Date().toISOString();
 
-      // 위치가 없으면 여기서 받아서 보냄 (시간/위치 캡슐 공통)
       const pos =
         locationLat != null && locationLng != null
           ? { lat: locationLat, lng: locationLng }
@@ -114,16 +230,18 @@ export default function LetterDetailModal({
 
       const r = await guestCapsuleApi.read(
         {
-          uuId,
+          capsuleId,
           unlockAt,
-          locationLat: pos.lat,
-          locationLng: pos.lng,
+          locationLat: pos.lat ?? 0,
+          locationLng: pos.lng ?? 0,
           password,
         },
         signal
       );
 
-      const u = r.data;
+      const u = r;
+
+      console.log(u);
 
       return {
         title: u.title,
@@ -155,6 +273,27 @@ export default function LetterDetailModal({
                 <X size={24} />
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="fixed inset-0 z-9999 bg-black/50">
+        <div className="flex h-full justify-center py-15">
+          <div className="max-w-330 w-full rounded-2xl bg-white p-8">
+            <div className="flex items-center justify-between">
+              <div className="text-lg font-semibold">불러오기 실패</div>
+              <button onClick={close} className="cursor-pointer text-primary">
+                <X size={24} />
+              </button>
+            </div>
+
+            <pre className="mt-4 text-xs whitespace-pre-wrap">
+              {String((error as any)?.message ?? error)}
+            </pre>
           </div>
         </div>
       </div>
@@ -200,8 +339,20 @@ export default function LetterDetailModal({
       : `${
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
         } · ${capsule.locationName ?? "위치 조건 없음"}`;
+
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
+      {/* 모달 placeholder */}
+      {isSaveSuccessOpen && (
+        <ActiveModal
+          active={"success"}
+          title={"저장 완료"}
+          content={"저장이 완료되었습니다."}
+          open={isSaveSuccessOpen}
+          onClose={() => setIsSaveSuccessOpen(false)}
+          onConfirm={() => redirect("/dashboard")}
+        />
+      )}
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
@@ -211,7 +362,7 @@ export default function LetterDetailModal({
 
               <div
                 className={`flex-1 flex items-center gap-1 ${
-                  mode ? "justify-end" : "justify-center"
+                  isProtected ? "justify-end" : "justify-center"
                 }`}
               >
                 <span className="hidden md:block text-text-2">해제 조건:</span>
@@ -286,10 +437,11 @@ export default function LetterDetailModal({
 
                 <div className="flex-1 flex items-center justify-center">
                   <button
+                    onClick={handleSave}
                     type="button"
                     className="cursor-pointer flex items-center justify-center gap-2"
                   >
-                    {mode ? (
+                    {!isProtected ? (
                       <>
                         <Archive size={16} className="text-primary" />
                         <span>저장하기</span>

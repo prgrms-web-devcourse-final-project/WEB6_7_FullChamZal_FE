@@ -1,9 +1,9 @@
 "use client";
 
 import Input from "@/components/common/Input";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "../common/Button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 
 function getErrorMessage(err: unknown) {
@@ -20,15 +20,20 @@ function getErrorMessage(err: unknown) {
 export default function LoginForm() {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
+  const returnUrl = useMemo(() => {
+    const cb = searchParams.get("returnUrl") || searchParams.get("callback");
+    return cb && cb.startsWith("/") ? cb : null;
+  }, [searchParams]);
+
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
-
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setError("");
 
     if (!id.trim() || !pw.trim()) {
@@ -39,10 +44,19 @@ export default function LoginForm() {
     try {
       setLoading(true);
 
+      // 로그인
       await authApiClient.login({ userId: id.trim(), password: pw });
+
+      // 내 정보 조회
       const me = await authApiClient.me();
       const isAdmin = me.role === "ADMIN";
-      const target = isAdmin ? "/admin/dashboard/users" : "/dashboard";
+
+      // 이동 경로 결정
+      const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
+
+      const target = returnUrl ?? fallbackTarget;
+
+      // 이동
       router.replace(target);
       router.refresh();
     } catch (err) {
