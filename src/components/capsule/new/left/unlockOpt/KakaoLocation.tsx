@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { LocateFixed } from "lucide-react";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
 import {
   type KakaoGeocoderService,
@@ -79,6 +80,7 @@ export default function KakaoLocation({
   onPick,
 }: KakaoLocationProps) {
   const ready = useKakaoReady();
+  const mapRef = useRef<kakao.maps.Map | null>(null);
 
   const initialCenter = useMemo(() => {
     if (typeof value?.lat === "number" && typeof value?.lng === "number") {
@@ -100,6 +102,7 @@ export default function KakaoLocation({
 
   const [results, setResults] = useState<KakaoPlaceItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const placesRef = useRef<KakaoPlacesService | null>(null);
@@ -152,7 +155,45 @@ export default function KakaoLocation({
   const handlePick = async (picked: PickedLocation) => {
     setCenter({ lat: picked.lat, lng: picked.lng });
     setMarker({ lat: picked.lat, lng: picked.lng });
+    if (mapRef.current) {
+      const moveLatLng = new kakao.maps.LatLng(picked.lat, picked.lng);
+      mapRef.current.setCenter(moveLatLng);
+    }
     onPick(picked);
+  };
+
+  // 내 위치로 지도 중심 이동 (선택값은 건드리지 않음)
+  const moveToMyLocation = () => {
+    if (!("geolocation" in navigator)) {
+      setError("브라우저가 Geolocation을 지원하지 않습니다.");
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const next = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setError(null);
+        setCenter(next);
+        if (mapRef.current) {
+          const moveLatLng = new kakao.maps.LatLng(next.lat, next.lng);
+          mapRef.current.setCenter(moveLatLng);
+        }
+        setIsLocating(false);
+      },
+      () => {
+        setError("현재 위치를 가져오지 못했어요. 위치 권한을 확인해 주세요.");
+        setIsLocating(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 60_000,
+      }
+    );
   };
 
   // 검색 트리거 (Location.tsx에서 버튼/엔터로 searchSignal 증가)
@@ -192,12 +233,15 @@ export default function KakaoLocation({
 
   return (
     <div className="space-y-2">
-      <div className="h-68 rounded-lg bg-sub-2 overflow-hidden">
+      <div className="relative h-68 rounded-lg bg-sub-2 overflow-hidden">
         {ready ? (
           <Map
             center={center}
             level={5}
             style={{ width: "100%", height: "100%" }}
+            onCreate={(map) => {
+              mapRef.current = map;
+            }}
             // 클릭한 위치 좌표 가져오기
             onClick={async (_map, mouseEvent) => {
               const lat = mouseEvent.latLng.getLat();
@@ -219,6 +263,17 @@ export default function KakaoLocation({
             지도를 불러오는 중...
           </div>
         )}
+
+        {/* 내 위치로 이동 버튼 (우측 하단) */}
+        <button
+          type="button"
+          onClick={moveToMyLocation}
+          disabled={!ready || isLocating}
+          aria-label="내 위치로 이동"
+          className="bg-white absolute bottom-3 right-3 p-3 rounded-xl z-10 shadow-lg text-primary disabled:opacity-50"
+        >
+          <LocateFixed size={22} />
+        </button>
       </div>
 
       <div className="text-xs text-text-3">
