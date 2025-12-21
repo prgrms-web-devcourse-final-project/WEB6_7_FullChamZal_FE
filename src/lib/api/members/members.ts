@@ -52,3 +52,8 @@ export async function verifyMemberPassword(password: string) {
 }
 
 
+export async function deleteMe() {
+  return apiFetch<Record<string, never>>("/api/v1/members/me", {
+    method: "DELETE",
+  });
+}
