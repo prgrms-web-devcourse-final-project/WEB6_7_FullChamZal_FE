@@ -59,28 +59,9 @@ export default function Location({
         </div>
       </div>
 
-      {/* 선택된 장소 표시 */}
+      {/* 선택 정보 표시 */}
       <div className="text-xs text-text-3">
-        {value.placeName ? (
-          <>
-            선택된 장소: <span className="text-text-2">{value.placeName}</span>
-          </>
-        ) : (
-          "아직 선택된 장소가 없어요."
-        )}
-        {value.address ? (
-          <div className="mt-1">
-            주소: <span className="text-text-2">{value.address}</span>
-          </div>
-        ) : null}
-        {typeof value.lat === "number" && typeof value.lng === "number" ? (
-          <div className="mt-1">
-            좌표:{" "}
-            <span className="text-text-2">
-              {value.lat.toFixed(6)}, {value.lng.toFixed(6)}
-            </span>
-          </div>
-        ) : null}
+        {!value.placeName ? "아직 선택된 장소가 없어요." : null}
       </div>
 
       <KakaoLocation
@@ -88,16 +69,40 @@ export default function Location({
         value={value}
         searchSignal={searchSignal}
         onPick={(picked) => {
+          // 사용자가 별칭을 입력했다면 별칭을 자동으로 채우지 않음
+          const prevLabel = value.locationLabel?.trim() ?? "";
+          const shouldAutoFillLabel =
+            !prevLabel || prevLabel === (value.placeName ?? "");
+
           onChange({
             ...value,
             query: picked.placeName || value.query,
             placeName: picked.placeName,
+            locationLabel: shouldAutoFillLabel
+              ? picked.placeName
+              : value.locationLabel,
             address: picked.address,
             lat: picked.lat,
             lng: picked.lng,
           });
         }}
       />
+
+      {/* 사용자 지정 이름 */}
+      <div className="flex flex-col space-y-2">
+        <label htmlFor="locationLabel">이 장소를 뭐라고 부를까요?</label>
+        <input
+          type="text"
+          name="locationLabel"
+          id="locationLabel"
+          value={value.locationLabel}
+          onChange={(e) =>
+            onChange({ ...value, locationLabel: e.target.value })
+          }
+          placeholder="예) 우리가 처음 만난 카페, 약속 장소"
+          className="w-full bg-sub-2 rounded-lg text-sm p-2 outline-none border border-white/0 focus:border-primary-2"
+        />
+      </div>
     </>
   );
 }

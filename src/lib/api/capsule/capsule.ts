@@ -61,7 +61,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
-        ? locationForm.placeName
+        ? locationForm.locationLabel?.trim() || locationForm.placeName
         : "",
     address:
       effectiveUnlockType === "LOCATION" ||
@@ -128,7 +128,7 @@ export function buildPrivatePayload(
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
-        ? locationForm.placeName
+        ? locationForm.locationLabel?.trim() || locationForm.placeName
         : "",
     address:
       effectiveUnlockType === "LOCATION" ||
@@ -203,7 +203,7 @@ export function buildPublicPayload(
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
-        ? locationForm.placeName
+        ? locationForm.locationLabel?.trim() || locationForm.placeName
         : "",
     locationLat:
       effectiveUnlockType === "LOCATION" ||
