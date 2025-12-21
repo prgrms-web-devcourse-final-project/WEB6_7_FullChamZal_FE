@@ -8,6 +8,7 @@ import { Field } from "./Field";
 import PhoneEditModal from "./PhoneEditModal";
 import PasswordEditModal from "./PasswordEditModal";
 import { getMeDetail, updateMe, verifyMemberPassword } from "@/lib/api/members/members";
+import AccountDeleteModal from "./AccountDeleteModal";
 
 type ProfileForm = {
   name: string;
@@ -54,6 +55,8 @@ export default function ProfileModal({
   const [error, setError] = useState<string | null>(null);
 
   const [nextNicknameChangeDate, setNextNicknameChangeDate] = useState<string | null>(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -319,9 +322,15 @@ export default function ProfileModal({
                     돌아가기
                   </Button>
                 ) : (
-                  <button type="button" className="cursor-pointer text-text-3 text-xs underline">
-                    계정 삭제
+                  <button
+                     type="button"
+                     className="cursor-pointer text-text-3 text-xs underline"
+                     onClick={() => setIsDeleteModalOpen(true)}
+                  >                  
+                     계정 삭제
                   </button>
+
+
                 )}
               </>
             )}
@@ -330,7 +339,10 @@ export default function ProfileModal({
       </Modal>
 
       <PhoneEditModal open={isPhoneModalOpen} onClose={() => setIsPhoneModalOpen(false)} />
-      <PasswordEditModal open={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />
+      <PasswordEditModal open={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />              
+      <AccountDeleteModal  open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}
+/>
+
     </>
   );
 }
