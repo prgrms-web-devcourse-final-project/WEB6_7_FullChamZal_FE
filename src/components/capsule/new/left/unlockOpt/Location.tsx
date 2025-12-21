@@ -93,7 +93,7 @@ export default function Location({
 
       {/* 조회 반경 */}
       <div className="flex flex-col space-y-2">
-        <span className="text-sm">조회 반경 (m)</span>
+        <label>조회 반경 (m)</label>
         <div className="flex flex-wrap gap-2">
           {VIEWING_RADIUS_OPTIONS.map((r) => {
             const selected = value.viewingRadius === r;
