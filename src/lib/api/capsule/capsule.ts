@@ -78,7 +78,11 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lng ?? 0
         : 0,
-    viewingRadius: 0,
+    viewingRadius:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.viewingRadius
+        : 0,
     packingColor: args.packingColor ?? "",
     contentColor: args.contentColor ?? "",
     maxViewCount: 0,
@@ -145,7 +149,11 @@ export function buildPrivatePayload(
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lng ?? 0
         : 0,
-    viewingRadius: 0,
+    viewingRadius:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.viewingRadius
+        : 0,
     packingColor,
     contentColor,
     maxViewCount: 0,
@@ -218,7 +226,7 @@ export function buildPublicPayload(
     locationRadiusM:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
-        ? 0
+        ? locationForm.viewingRadius
         : 0,
     maxViewCount: 0,
   };

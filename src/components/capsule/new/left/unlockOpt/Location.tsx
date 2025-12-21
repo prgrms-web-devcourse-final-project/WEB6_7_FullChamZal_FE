@@ -4,6 +4,9 @@ import { MapPin } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import KakaoLocation from "./KakaoLocation";
 
+// 조회 반경
+const VIEWING_RADIUS_OPTIONS = [50, 100, 300, 500, 1000] as const;
+
 export default function Location({
   value,
   onChange,
@@ -87,6 +90,31 @@ export default function Location({
           });
         }}
       />
+
+      {/* 조회 반경 */}
+      <div className="flex flex-col space-y-2">
+        <span className="text-sm">조회 반경 (m)</span>
+        <div className="flex flex-wrap gap-2">
+          {VIEWING_RADIUS_OPTIONS.map((r) => {
+            const selected = value.viewingRadius === r;
+            return (
+              <button
+                key={r}
+                type="button"
+                onClick={() => onChange({ ...value, viewingRadius: r })}
+                className={[
+                  "flex-1 basis-0 min-w-[72px] px-3 py-2 rounded-lg text-sm border-2 transition text-center bg-white",
+                  selected
+                    ? "text-text-2 border-primary"
+                    : "text-text-2 border-outline hover:border-primary/50",
+                ].join(" ")}
+              >
+                {r}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* 사용자 지정 이름 */}
       <div className="flex flex-col space-y-2">

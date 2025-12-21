@@ -83,6 +83,7 @@ export default function WriteForm({
     query: "",
     placeName: "",
     locationLabel: "",
+    viewingRadius: 100,
     address: "",
     lat: undefined,
     lng: undefined,
@@ -279,9 +280,10 @@ export default function WriteForm({
       (!locationForm.placeName ||
         !locationForm.lat ||
         !locationForm.lng ||
-        !locationForm.locationLabel?.trim())
+        !locationForm.locationLabel?.trim() ||
+        !locationForm.viewingRadius)
     ) {
-      window.alert("장소를 선택하고, 장소 이름을 입력해 주세요.");
+      window.alert("장소를 선택하고, 장소 이름과 조회반경을 입력해 주세요.");
       return;
     }
 
