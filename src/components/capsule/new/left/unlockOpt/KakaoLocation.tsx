@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
 
+type KakaoStatus = string;
+
 type PickedLocation = {
   lat: number;
   lng: number;
@@ -26,6 +28,42 @@ type KakaoPlaceItem = {
   road_address_name?: string;
 };
 
+type KakaoCoord2AddressResult = Array<{
+  road_address?: { address_name?: string };
+  address?: { address_name?: string };
+}>;
+
+type KakaoPlacesService = {
+  keywordSearch: (
+    query: string,
+    callback: (data: KakaoPlaceItem[], status: KakaoStatus) => void
+  ) => void;
+};
+
+type KakaoGeocoderService = {
+  coord2Address: (
+    lng: number,
+    lat: number,
+    callback: (result: KakaoCoord2AddressResult, status: KakaoStatus) => void
+  ) => void;
+};
+
+type KakaoNamespace = {
+  maps?: {
+    load?: (callback: () => void) => void;
+    services?: {
+      Places: new () => KakaoPlacesService;
+      Geocoder: new () => KakaoGeocoderService;
+      Status: { OK: KakaoStatus };
+    };
+  };
+};
+
+function getKakao(): KakaoNamespace | null {
+  const kakao = (window as unknown as { kakao?: KakaoNamespace })?.kakao;
+  return kakao ?? null;
+}
+
 function useKakaoReady() {
   const [ready, setReady] = useState(false);
 
@@ -35,7 +73,7 @@ function useKakaoReady() {
     const startedAt = Date.now();
 
     const tryLoad = () => {
-      const kakao = (window as any)?.kakao;
+      const kakao = getKakao();
       if (!kakao?.maps) return false;
 
       // autoload=false 환경 대응
@@ -100,19 +138,20 @@ export default function KakaoLocation({
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const placesRef = useRef<any>(null);
-  const geocoderRef = useRef<any>(null);
+  const placesRef = useRef<KakaoPlacesService | null>(null);
+  const geocoderRef = useRef<KakaoGeocoderService | null>(null);
 
   useEffect(() => {
     if (!ready) return;
-    const kakao = (window as any)?.kakao;
-    if (!kakao?.maps?.services) return;
+    const kakao = getKakao();
+    const services = kakao?.maps?.services;
+    if (!services) return;
 
     if (!placesRef.current) {
-      placesRef.current = new kakao.maps.services.Places();
+      placesRef.current = new services.Places();
     }
     if (!geocoderRef.current) {
-      geocoderRef.current = new kakao.maps.services.Geocoder();
+      geocoderRef.current = new services.Geocoder();
     }
   }, [ready]);
 
@@ -125,15 +164,16 @@ export default function KakaoLocation({
   }, [value?.lat, value?.lng]);
 
   const reverseGeocode = (lat: number, lng: number) => {
-    const kakao = (window as any)?.kakao;
+    const kakao = getKakao();
     const geocoder = geocoderRef.current;
-    if (!kakao?.maps?.services || !geocoder)
+    const services = kakao?.maps?.services;
+    if (!services || !geocoder)
       return Promise.resolve<string | undefined>(undefined);
 
     return new Promise<string | undefined>((resolve) => {
       // coord2Address: (lng, lat) 순서 주의
-      geocoder.coord2Address(lng, lat, (result: any, status: any) => {
-        if (status !== kakao.maps.services.Status.OK) {
+      geocoder.coord2Address(lng, lat, (result, status) => {
+        if (status !== services.Status.OK) {
           resolve(undefined);
           return;
         }
@@ -155,8 +195,9 @@ export default function KakaoLocation({
   // 결과 클릭 시 x/y를 lng/lat로 변환해서 onPick
   useEffect(() => {
     if (!ready) return;
-    const kakao = (window as any)?.kakao;
+    const kakao = getKakao();
     const places = placesRef.current;
+    const services = kakao?.maps?.services;
 
     const q = query?.trim() ?? "";
     if (!q) {
@@ -164,7 +205,7 @@ export default function KakaoLocation({
       setError(null);
       return;
     }
-    if (!kakao?.maps?.services || !places) {
+    if (!services || !places) {
       setError("카카오 지도 서비스를 불러오지 못했습니다.");
       return;
     }
@@ -172,9 +213,9 @@ export default function KakaoLocation({
     setIsSearching(true);
     setError(null);
 
-    places.keywordSearch(q, (data: KakaoPlaceItem[], status: any) => {
+    places.keywordSearch(q, (data, status) => {
       setIsSearching(false);
-      if (status !== kakao.maps.services.Status.OK) {
+      if (status !== services.Status.OK) {
         setResults([]);
         setError("검색 결과가 없어요. 다른 키워드로 시도해 주세요.");
         return;
@@ -187,7 +228,7 @@ export default function KakaoLocation({
 
   return (
     <div className="space-y-2">
-      <div className="h-40 rounded-lg bg-sub-2 overflow-hidden">
+      <div className="h-68 rounded-lg bg-sub-2 overflow-hidden">
         {ready ? (
           <Map
             center={center}
@@ -235,6 +276,7 @@ export default function KakaoLocation({
                 type="button"
                 className="w-full text-left px-3 py-2 hover:bg-sub-2 border-b border-outline last:border-b-0"
                 onClick={() => {
+                  // x/y(문자열)을 lng/lat(숫자)로 변환
                   const lat = Number(item.y);
                   const lng = Number(item.x);
                   handlePick({
