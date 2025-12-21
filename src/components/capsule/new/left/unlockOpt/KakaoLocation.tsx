@@ -2,8 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
+import {
+  type KakaoGeocoderService,
+  type KakaoNamespace,
+  type KakaoPlaceItem,
+  type KakaoPlacesService,
+} from "@/lib/kakao/types";
 
-type KakaoStatus = string;
+function getKakao(): KakaoNamespace | null {
+  const kakao = (window as unknown as { kakao?: KakaoNamespace })?.kakao;
+  return kakao ?? null;
+}
 
 type PickedLocation = {
   lat: number;
@@ -18,51 +27,6 @@ type KakaoLocationProps = {
   value?: Partial<LocationForm>;
   onPick: (picked: PickedLocation) => void;
 };
-
-type KakaoPlaceItem = {
-  id: string;
-  place_name: string;
-  x: string; // lng
-  y: string; // lat
-  address_name?: string;
-  road_address_name?: string;
-};
-
-type KakaoCoord2AddressResult = Array<{
-  road_address?: { address_name?: string };
-  address?: { address_name?: string };
-}>;
-
-type KakaoPlacesService = {
-  keywordSearch: (
-    query: string,
-    callback: (data: KakaoPlaceItem[], status: KakaoStatus) => void
-  ) => void;
-};
-
-type KakaoGeocoderService = {
-  coord2Address: (
-    lng: number,
-    lat: number,
-    callback: (result: KakaoCoord2AddressResult, status: KakaoStatus) => void
-  ) => void;
-};
-
-type KakaoNamespace = {
-  maps?: {
-    load?: (callback: () => void) => void;
-    services?: {
-      Places: new () => KakaoPlacesService;
-      Geocoder: new () => KakaoGeocoderService;
-      Status: { OK: KakaoStatus };
-    };
-  };
-};
-
-function getKakao(): KakaoNamespace | null {
-  const kakao = (window as unknown as { kakao?: KakaoNamespace })?.kakao;
-  return kakao ?? null;
-}
 
 function useKakaoReady() {
   const [ready, setReady] = useState(false);
