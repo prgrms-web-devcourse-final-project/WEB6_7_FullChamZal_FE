@@ -1,8 +1,8 @@
 "use client";
 
 import { MapPin } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
-import KakaoLocation from "./KakaoLocation";
+import { useCallback, useMemo, useRef } from "react";
+import KakaoLocation, { type KakaoLocationHandle } from "./KakaoLocation";
 
 // 조회 반경
 const VIEWING_RADIUS_OPTIONS = [50, 100, 300, 500, 1000] as const;
@@ -14,13 +14,13 @@ export default function Location({
   value: LocationForm;
   onChange: (v: LocationForm) => void;
 }) {
-  const [searchSignal, setSearchSignal] = useState(0);
+  const kakaoLocationRef = useRef<KakaoLocationHandle | null>(null);
 
   const canSearch = useMemo(() => Boolean(value.query?.trim()), [value.query]);
 
   const triggerSearch = useCallback(() => {
     if (!canSearch) return;
-    setSearchSignal((prev) => prev + 1);
+    kakaoLocationRef.current?.search();
   }, [canSearch]);
 
   return (
@@ -70,7 +70,7 @@ export default function Location({
       <KakaoLocation
         query={value.query}
         value={value}
-        searchSignal={searchSignal}
+        ref={kakaoLocationRef}
         onPick={(picked) => {
           // 사용자가 별칭을 입력했다면 별칭을 자동으로 채우지 않음
           const prevLabel = value.locationLabel?.trim() ?? "";

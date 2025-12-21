@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { LocateFixed } from "lucide-react";
 import { Map, MapMarker } from "react-kakao-maps-sdk";
 import {
@@ -24,9 +30,12 @@ type PickedLocation = {
 
 type KakaoLocationProps = {
   query: string;
-  searchSignal: number;
   value?: Partial<LocationForm>;
   onPick: (picked: PickedLocation) => void;
+};
+
+export type KakaoLocationHandle = {
+  search: () => void;
 };
 
 function useKakaoReady() {
@@ -73,248 +82,256 @@ function useKakaoReady() {
   return ready;
 }
 
-export default function KakaoLocation({
-  query,
-  searchSignal,
-  value,
-  onPick,
-}: KakaoLocationProps) {
-  const ready = useKakaoReady();
-  const mapRef = useRef<kakao.maps.Map | null>(null);
+const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
+  ({ query, value, onPick }, ref) => {
+    const ready = useKakaoReady();
+    const mapRef = useRef<kakao.maps.Map | null>(null);
 
-  const initialCenter = useMemo(() => {
-    if (typeof value?.lat === "number" && typeof value?.lng === "number") {
-      return { lat: value.lat, lng: value.lng };
-    }
-    // 기본: 서울 시청 근처
-    return { lat: 37.5665, lng: 126.978 };
-  }, [value?.lat, value?.lng]);
-
-  const [center, setCenter] = useState<{ lat: number; lng: number }>(
-    initialCenter
-  );
-  const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
-    () =>
-      typeof value?.lat === "number" && typeof value?.lng === "number"
-        ? { lat: value.lat, lng: value.lng }
-        : null
-  );
-
-  const [results, setResults] = useState<KakaoPlaceItem[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const placesRef = useRef<KakaoPlacesService | null>(null);
-  const geocoderRef = useRef<KakaoGeocoderService | null>(null);
-
-  useEffect(() => {
-    if (!ready) return;
-    const kakao = getKakao();
-    const services = kakao?.maps?.services;
-    if (!services) return;
-
-    if (!placesRef.current) {
-      placesRef.current = new services.Places();
-    }
-    if (!geocoderRef.current) {
-      geocoderRef.current = new services.Geocoder();
-    }
-  }, [ready]);
-
-  // 외부 value(lat/lng)가 바뀌면 지도도 동기화
-  useEffect(() => {
-    if (typeof value?.lat !== "number" || typeof value?.lng !== "number")
-      return;
-    setCenter({ lat: value.lat, lng: value.lng });
-    setMarker({ lat: value.lat, lng: value.lng });
-  }, [value?.lat, value?.lng]);
-
-  const reverseGeocode = (lat: number, lng: number) => {
-    const kakao = getKakao();
-    const geocoder = geocoderRef.current;
-    const services = kakao?.maps?.services;
-    if (!services || !geocoder)
-      return Promise.resolve<string | undefined>(undefined);
-
-    return new Promise<string | undefined>((resolve) => {
-      // coord2Address: (lng, lat) 순서 주의
-      geocoder.coord2Address(lng, lat, (result, status) => {
-        if (status !== services.Status.OK) {
-          resolve(undefined);
-          return;
-        }
-        const addr =
-          result?.[0]?.road_address?.address_name ??
-          result?.[0]?.address?.address_name;
-        resolve(addr);
-      });
-    });
-  };
-
-  const handlePick = async (picked: PickedLocation) => {
-    setCenter({ lat: picked.lat, lng: picked.lng });
-    setMarker({ lat: picked.lat, lng: picked.lng });
-    if (mapRef.current) {
-      const moveLatLng = new kakao.maps.LatLng(picked.lat, picked.lng);
-      mapRef.current.setCenter(moveLatLng);
-    }
-    onPick(picked);
-  };
-
-  // 내 위치로 지도 중심 이동 (선택값은 건드리지 않음)
-  const moveToMyLocation = () => {
-    if (!("geolocation" in navigator)) {
-      setError("브라우저가 Geolocation을 지원하지 않습니다.");
-      return;
-    }
-
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const next = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        setError(null);
-        setCenter(next);
-        if (mapRef.current) {
-          const moveLatLng = new kakao.maps.LatLng(next.lat, next.lng);
-          mapRef.current.setCenter(moveLatLng);
-        }
-        setIsLocating(false);
-      },
-      () => {
-        setError("현재 위치를 가져오지 못했어요. 위치 권한을 확인해 주세요.");
-        setIsLocating(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 60_000,
+    const [center, setCenter] = useState<{ lat: number; lng: number }>(() => {
+      if (typeof value?.lat === "number" && typeof value?.lng === "number") {
+        return { lat: value.lat, lng: value.lng };
       }
+      // 기본: 서울 시청
+      return { lat: 37.5665, lng: 126.978 };
+    });
+    const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
+      () =>
+        typeof value?.lat === "number" && typeof value?.lng === "number"
+          ? { lat: value.lat, lng: value.lng }
+          : null
     );
-  };
 
-  // 검색 트리거 (Location.tsx에서 버튼/엔터로 searchSignal 증가)
-  // 결과 클릭 시 x/y를 lng/lat로 변환해서 onPick
-  useEffect(() => {
-    if (!ready) return;
-    const kakao = getKakao();
-    const places = placesRef.current;
-    const services = kakao?.maps?.services;
+    const [results, setResults] = useState<KakaoPlaceItem[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isLocating, setIsLocating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const q = query?.trim() ?? "";
-    if (!q) {
-      setResults([]);
-      setError(null);
-      return;
-    }
-    if (!services || !places) {
-      setError("카카오 지도 서비스를 불러오지 못했습니다.");
-      return;
-    }
+    const placesRef = useRef<KakaoPlacesService | null>(null);
+    const geocoderRef = useRef<KakaoGeocoderService | null>(null);
 
-    setIsSearching(true);
-    setError(null);
+    useEffect(() => {
+      if (!ready) return;
+      const kakao = getKakao();
+      const services = kakao?.maps?.services;
+      if (!services) return;
 
-    places.keywordSearch(q, (data, status) => {
-      setIsSearching(false);
-      if (status !== services.Status.OK) {
-        setResults([]);
-        setError("검색 결과가 없어요. 다른 키워드로 시도해 주세요.");
+      if (!placesRef.current) {
+        placesRef.current = new services.Places();
+      }
+      if (!geocoderRef.current) {
+        geocoderRef.current = new services.Geocoder();
+      }
+    }, [ready]);
+
+    const reverseGeocode = (lat: number, lng: number) => {
+      const kakao = getKakao();
+      const geocoder = geocoderRef.current;
+      const services = kakao?.maps?.services;
+      if (!services || !geocoder)
+        return Promise.resolve<string | undefined>(undefined);
+
+      return new Promise<string | undefined>((resolve) => {
+        // coord2Address: (lng, lat) 순서 주의
+        geocoder.coord2Address(lng, lat, (result, status) => {
+          if (status !== services.Status.OK) {
+            resolve(undefined);
+            return;
+          }
+          const addr =
+            result?.[0]?.road_address?.address_name ??
+            result?.[0]?.address?.address_name;
+          resolve(addr);
+        });
+      });
+    };
+
+    const handlePick = async (picked: PickedLocation) => {
+      setCenter({ lat: picked.lat, lng: picked.lng });
+      setMarker({ lat: picked.lat, lng: picked.lng });
+      if (mapRef.current) {
+        const moveLatLng = new kakao.maps.LatLng(picked.lat, picked.lng);
+        mapRef.current.setCenter(moveLatLng);
+      }
+      onPick(picked);
+    };
+
+    // 검색,엔터 버튼으로 kakao places 검색 돌려서 검색결과 리스트 갱신
+    useImperativeHandle(
+      ref,
+      () => ({
+        search: () => {
+          if (!ready) return;
+          const kakao = getKakao();
+          const places = placesRef.current;
+          const services = kakao?.maps?.services;
+
+          const q = query?.trim() ?? "";
+          if (!q) return;
+
+          if (!services || !places) {
+            setError("카카오 지도 서비스를 불러오지 못했습니다.");
+            return;
+          }
+
+          setIsSearching(true);
+          setError(null);
+
+          places.keywordSearch(q, (data, status) => {
+            setIsSearching(false);
+            if (status !== services.Status.OK) {
+              setResults([]);
+              setError("검색 결과가 없어요. 다른 키워드로 시도해 주세요.");
+              return;
+            }
+            setResults(data ?? []);
+            setError(null);
+          });
+        },
+      }),
+      [query, ready]
+    );
+
+    // 내 위치로 지도 중심 이동 (선택값은 건드리지 않음)
+    const moveToMyLocation = () => {
+      if (!("geolocation" in navigator)) {
+        setError("브라우저가 Geolocation을 지원하지 않습니다.");
         return;
       }
-      setResults(data ?? []);
-      setError(null);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchSignal, ready]);
 
-  return (
-    <div className="space-y-2">
-      <div className="relative h-68 rounded-lg bg-sub-2 overflow-hidden">
-        {ready ? (
-          <Map
-            center={center}
-            level={5}
-            style={{ width: "100%", height: "100%" }}
-            onCreate={(map) => {
-              mapRef.current = map;
-            }}
-            // 클릭한 위치 좌표 가져오기
-            onClick={async (_map, mouseEvent) => {
-              const lat = mouseEvent.latLng.getLat();
-              const lng = mouseEvent.latLng.getLng();
+      setIsLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const next = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setError(null);
+          setCenter(next);
+          if (mapRef.current) {
+            const moveLatLng = new kakao.maps.LatLng(next.lat, next.lng);
+            mapRef.current.setCenter(moveLatLng);
+          }
+          setIsLocating(false);
+        },
+        () => {
+          setError("현재 위치를 가져오지 못했어요. 위치 권한을 확인해 주세요.");
+          setIsLocating(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 60_000,
+        }
+      );
+    };
 
-              setCenter({ lat, lng });
-              setMarker({ lat, lng });
+    // 검색은 부모(Location.tsx)에서 ref.search()로 트리거한다.
 
-              const address = await reverseGeocode(lat, lng);
-              const placeName = address ?? "지도에서 선택한 위치";
+    return (
+      <div className="space-y-2">
+        <div className="relative h-68 rounded-lg bg-sub-2 overflow-hidden">
+          {ready ? (
+            <Map
+              center={
+                typeof value?.lat === "number" && typeof value?.lng === "number"
+                  ? { lat: value.lat, lng: value.lng }
+                  : center
+              }
+              level={5}
+              style={{ width: "100%", height: "100%" }}
+              onCreate={(map) => {
+                mapRef.current = map;
+              }}
+              // 클릭한 위치 좌표 가져오기
+              onClick={async (_map, mouseEvent) => {
+                const lat = mouseEvent.latLng.getLat();
+                const lng = mouseEvent.latLng.getLng();
 
-              await handlePick({ lat, lng, placeName, address });
-            }}
+                setCenter({ lat, lng });
+                setMarker({ lat, lng });
+
+                const address = await reverseGeocode(lat, lng);
+                const placeName = address ?? "지도에서 선택한 위치";
+
+                await handlePick({ lat, lng, placeName, address });
+              }}
+            >
+              {(typeof value?.lat === "number" &&
+                typeof value?.lng === "number") ||
+              marker ? (
+                <MapMarker
+                  position={
+                    typeof value?.lat === "number" &&
+                    typeof value?.lng === "number"
+                      ? { lat: value.lat, lng: value.lng }
+                      : (marker as { lat: number; lng: number })
+                  }
+                />
+              ) : null}
+            </Map>
+          ) : (
+            <div className="h-full flex items-center justify-center text-xs text-text-5">
+              지도를 불러오는 중...
+            </div>
+          )}
+
+          {/* 내 위치로 이동 버튼 (우측 하단) */}
+          <button
+            type="button"
+            onClick={moveToMyLocation}
+            disabled={!ready || isLocating}
+            aria-label="내 위치로 이동"
+            className="bg-white absolute bottom-3 right-3 p-3 rounded-xl z-10 shadow-lg text-primary disabled:opacity-50"
           >
-            {marker ? <MapMarker position={marker} /> : null}
-          </Map>
-        ) : (
-          <div className="h-full flex items-center justify-center text-xs text-text-5">
-            지도를 불러오는 중...
-          </div>
-        )}
-
-        {/* 내 위치로 이동 버튼 (우측 하단) */}
-        <button
-          type="button"
-          onClick={moveToMyLocation}
-          disabled={!ready || isLocating}
-          aria-label="내 위치로 이동"
-          className="bg-white absolute bottom-3 right-3 p-3 rounded-xl z-10 shadow-lg text-primary disabled:opacity-50"
-        >
-          <LocateFixed size={22} />
-        </button>
-      </div>
-
-      <div className="text-xs text-text-3">
-        지도에서 클릭하거나, 검색 결과에서 장소를 선택해 주세요.
-      </div>
-
-      {isSearching ? (
-        <div className="text-xs text-text-4">검색 중...</div>
-      ) : null}
-      {error ? <div className="text-xs text-red-500">{error}</div> : null}
-
-      {results.length ? (
-        <div className="max-h-44 overflow-auto rounded-lg border border-outline bg-white">
-          {results.map((item) => {
-            const address = item.road_address_name || item.address_name || "";
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className="w-full text-left px-3 py-2 hover:bg-sub-2 border-b border-outline last:border-b-0"
-                onClick={() => {
-                  // x/y(문자열)을 lng/lat(숫자)로 변환
-                  const lat = Number(item.y);
-                  const lng = Number(item.x);
-                  handlePick({
-                    lat,
-                    lng,
-                    placeName: item.place_name,
-                    address,
-                  });
-                }}
-              >
-                <div className="text-sm text-text-2">{item.place_name}</div>
-                {address ? (
-                  <div className="text-xs text-text-4 mt-0.5">{address}</div>
-                ) : null}
-              </button>
-            );
-          })}
+            <LocateFixed size={22} />
+          </button>
         </div>
-      ) : null}
-    </div>
-  );
-}
+
+        <div className="text-xs text-text-3">
+          지도에서 클릭하거나, 검색 결과에서 장소를 선택해 주세요.
+        </div>
+
+        {isSearching ? (
+          <div className="text-xs text-text-4">검색 중...</div>
+        ) : null}
+        {error ? <div className="text-xs text-red-500">{error}</div> : null}
+
+        {results.length ? (
+          <div className="max-h-44 overflow-auto rounded-lg border border-outline bg-white">
+            {results.map((item) => {
+              const address = item.road_address_name || item.address_name || "";
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="w-full text-left px-3 py-2 hover:bg-sub-2 border-b border-outline last:border-b-0"
+                  onClick={() => {
+                    // x/y(문자열)을 lng/lat(숫자)로 변환
+
+                    const lat = Number(item.y);
+                    const lng = Number(item.x);
+                    handlePick({
+                      lat,
+                      lng,
+                      placeName: item.place_name,
+                      address,
+                    });
+                  }}
+                >
+                  <div className="text-sm text-text-2">{item.place_name}</div>
+                  {address ? (
+                    <div className="text-xs text-text-4 mt-0.5">{address}</div>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+);
+
+KakaoLocation.displayName = "KakaoLocation";
+
+export default KakaoLocation;
