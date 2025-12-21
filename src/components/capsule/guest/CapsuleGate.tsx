@@ -22,9 +22,9 @@ export default function CapsuleGate({ uuId }: { uuId: string }) {
     return <div className="p-8 text-text-3">정보를 불러오지 못했어요.</div>;
 
   const payload: ReadCapsulePasswordData | undefined =
-    (data as any)?.data?.data ?? // 2중 래핑 대응
-    (data as ApiEnvelope<ReadCapsulePasswordData>)?.data ?? // 일반 envelope
-    (data as unknown as ReadCapsulePasswordData); // 이미 언랩된 경우
+    (data as any)?.data?.data ??
+    (data as ApiEnvelope<ReadCapsulePasswordData>)?.data ??
+    (data as unknown as ReadCapsulePasswordData);
 
   if (!payload?.capsuleId) {
     return <div className="p-8 text-text-3">응답 형식이 예상과 달라요.</div>;
@@ -32,7 +32,6 @@ export default function CapsuleGate({ uuId }: { uuId: string }) {
 
   const { capsuleId, existedPassword, isProtected } = payload;
 
-  console.log(capsuleId);
   // 비밀번호 있는 캡슐이면: 비밀번호 입력 → 성공 시 상세로
   if (existedPassword && !password) {
     return (

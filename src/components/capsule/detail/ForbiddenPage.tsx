@@ -1,7 +1,7 @@
 export default function ForbiddenPage() {
   return (
     <>
-      <h1>ForbiddenPage</h1>
+      <h1>권한이 없다</h1>
     </>
   );
 }

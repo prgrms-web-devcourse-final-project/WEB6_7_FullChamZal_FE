@@ -12,8 +12,6 @@ export default async function Page({ params }: PageProps) {
     redirect("/404");
   }
 
-  console.log(uuId);
-
   // 클라이언트에서 비번 여부 확인 + UI 분기
   return <CapsuleGate uuId={uuId} />;
 }
