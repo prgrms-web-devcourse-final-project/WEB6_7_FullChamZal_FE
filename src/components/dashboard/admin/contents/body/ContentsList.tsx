@@ -1,4 +1,5 @@
 import CapsuleList from "./capsules/CapsuleList";
+import ModerationList from "./moderation/ModerationList";
 import PhoneList from "./phone/PhoneList";
 import ReportList from "./reports/ReportList";
 import UserList from "./users/UserList";
@@ -8,7 +9,7 @@ export default function ContentsList({
   tab,
   keyword,
 }: {
-  section: "users" | "capsules" | "reports" | "phone";
+  section: "users" | "capsules" | "reports" | "phone" | "moderation";
   tab: string;
   keyword: string;
 }) {
@@ -26,6 +27,10 @@ export default function ContentsList({
 
   if (section === "phone") {
     return <PhoneList tab={tab} query={keyword} />;
+  }
+
+  if (section === "moderation") {
+    return <ModerationList tab={tab} query={keyword} />; // 수정 필요
   }
 
   return <div>준비중</div>;

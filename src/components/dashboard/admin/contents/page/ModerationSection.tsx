@@ -1,16 +1,16 @@
 "use client";
 
-import { adminReportApi } from "@/lib/api/admin/reports/adminReports";
 import AdminHeader from "../AdminHeader";
 import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
+import { AdminModerationApi } from "@/lib/api/admin/moderation/adminModeration";
 
 const REPORT_TABS = [
   { key: "all", label: "전체" },
-  { key: "PASS", label: "통과" },
-  { key: "ERROR", label: "차단" },
-  { key: "FLAGGED", label: "플래그됨" },
+  { key: "pass", label: "통과" },
+  { key: "error", label: "차단" },
+  { key: "flagged", label: "플래그됨" },
 ] as const;
 
 export default function ModerationSection() {
@@ -19,36 +19,36 @@ export default function ModerationSection() {
   const qAll = useQuery({
     queryKey: ["adminReportCount", "all"],
     queryFn: ({ signal }) =>
-      adminReportApi.list({ tab: "all", ...base, signal }),
+      AdminModerationApi.list({ tab: "all", ...base, signal }),
     staleTime: 30_000,
   });
 
-  const qAccepted = useQuery({
-    queryKey: ["adminReportCount", "accepted"],
+  const qPass = useQuery({
+    queryKey: ["adminReportCount", "pass"],
     queryFn: ({ signal }) =>
-      adminReportApi.list({ tab: "accepted", ...base, signal }),
+      AdminModerationApi.list({ tab: "pass", ...base, signal }),
     staleTime: 30_000,
   });
 
-  const qRejected = useQuery({
-    queryKey: ["adminReportCount", "rejected"],
+  const qError = useQuery({
+    queryKey: ["adminReportCount", "error"],
     queryFn: ({ signal }) =>
-      adminReportApi.list({ tab: "rejected", ...base, signal }),
+      AdminModerationApi.list({ tab: "error", ...base, signal }),
     staleTime: 30_000,
   });
 
-  const qPending = useQuery({
-    queryKey: ["adminReportCount", "pending"],
+  const qFlagged = useQuery({
+    queryKey: ["adminReportCount", "flagged"],
     queryFn: ({ signal }) =>
-      adminReportApi.list({ tab: "pending", ...base, signal }),
+      AdminModerationApi.list({ tab: "flagged", ...base, signal }),
     staleTime: 30_000,
   });
 
   const counts = {
     total: qAll.data?.totalElements ?? 0,
-    accepted: qAccepted.data?.totalElements ?? 0,
-    rejected: qRejected.data?.totalElements ?? 0,
-    pending: qPending.data?.totalElements ?? 0,
+    pass: qPass.data?.totalElements ?? 0,
+    error: qError.data?.totalElements ?? 0,
+    flagged: qFlagged.data?.totalElements ?? 0,
   };
 
   return (
@@ -62,13 +62,13 @@ export default function ModerationSection() {
         <StatsOverview
           tabs={REPORT_TABS}
           totals={counts.total ?? 0}
-          second={counts.accepted ?? 0}
-          third={counts.rejected ?? 0}
-          fourth={counts.pending ?? 0}
+          second={counts.pass ?? 0}
+          third={counts.error ?? 0}
+          fourth={counts.flagged ?? 0}
         />
 
         <AdminBody
-          section="reports"
+          section="moderation"
           tabs={REPORT_TABS}
           defaultTab="all"
           searchPlaceholder="신고자 이름 또는 편지 아이디로 검색..."

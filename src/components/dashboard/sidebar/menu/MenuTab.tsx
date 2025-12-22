@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { FileWarning, Home, Map, Users, Phone } from "lucide-react";
+import { FileWarning, Home, Map, Users, Phone, History } from "lucide-react";
 import { MenuItemCard } from "./MenuItemCard";
 
 const ADMIN_ITEMS: MenuItem[] = [
@@ -32,6 +32,13 @@ const ADMIN_ITEMS: MenuItem[] = [
     title: "전화번호 인증",
     desc: "인증 내역 확인",
     icon: Phone,
+  },
+  {
+    href: "/admin/dashboard/moderation-logs",
+    activePrefix: "/admin/dashboard/moderation-logs",
+    title: "편지 생성 로그",
+    desc: "AI 모더레이션 로그",
+    icon: History,
   },
 ];
 

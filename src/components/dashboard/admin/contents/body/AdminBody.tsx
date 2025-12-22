@@ -14,7 +14,7 @@ export default function AdminBody({
   defaultTab,
   searchPlaceholder = "검색...",
 }: {
-  section: "users" | "capsules" | "reports" | "phone";
+  section: "users" | "capsules" | "reports" | "phone" | "moderation";
   tabs: readonly TabItem[];
   defaultTab: string;
   searchPlaceholder?: string;
