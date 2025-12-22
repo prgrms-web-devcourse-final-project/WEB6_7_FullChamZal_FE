@@ -105,7 +105,7 @@ export default function LetterDetailModal({
     else router.back();
   };
 
-  // ✅ 저장 mutation
+  // 저장 mutation
   const saveMutation = useMutation({
     mutationKey: ["capsuleSave", capsuleId],
     mutationFn: (payload: {
@@ -116,7 +116,7 @@ export default function LetterDetailModal({
     onSuccess: () => setIsSaveSuccessOpen(true),
   });
 
-  // ✅ 로그인/회원가입 후 돌아왔을 때 자동 재시도
+  // 로그인/회원가입 후 돌아왔을 때 자동 재시도
   useEffect(() => {
     if (!open) return;
 
@@ -142,7 +142,7 @@ export default function LetterDetailModal({
     });
   }, [open, saveMutation]);
 
-  // ✅ 저장 버튼 핸들러
+  // 저장 버튼 핸들러
   const handleSave = async () => {
     try {
       const me = await authApiClient.me();
@@ -166,7 +166,7 @@ export default function LetterDetailModal({
     }
   };
 
-  // ✅ 상세 조회 query (open일 때만)
+  // 상세 조회 query (open일 때만)
   const { data, isLoading, isError, error } = useQuery<UICapsule>({
     queryKey: ["capsuleDetailModal", role, capsuleId, password],
     enabled: open && capsuleId > 0,
@@ -222,7 +222,7 @@ export default function LetterDetailModal({
     },
   });
 
-  // ✅ open이 아니면 렌더 자체 안 함 (훅은 이미 호출된 뒤라 안전)
+  // open이 아니면 렌더 자체 안 함 (훅은 이미 호출된 뒤라 안전)
   if (!open) return null;
 
   if (isLoading) {
@@ -318,6 +318,7 @@ export default function LetterDetailModal({
       )}
 
       <div className="flex h-full justify-center md:p-15 p-6">
+        <div>{capsule.unlockUntil}</div>
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
           <div className="shrink-0 border-b px-8 py-4">
