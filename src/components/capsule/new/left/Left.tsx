@@ -5,7 +5,7 @@ type PreviewState = {
   senderName: string;
   receiverName: string;
   content: string;
-  visibility: Visibility | "SELF";
+  visibility: Visibility;
   authMethod: string;
   unlockType: string;
   charCount: number;

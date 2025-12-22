@@ -6,7 +6,7 @@ type CapsuleDashboardItem = {
   sender: string;
   title: string;
   content: string;
-  createAt: string; // 서버가 createAt 로 내려줌
+  createAt: string;
   viewStatus: boolean;
   unlockType: string;
   unlockAt: string | null;

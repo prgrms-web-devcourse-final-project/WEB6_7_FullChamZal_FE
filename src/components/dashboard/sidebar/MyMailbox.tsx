@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
+import { bookmarkApi } from "@/lib/api/dashboard/bookmark";
 
 export default function MyMailbox() {
   const pathname = usePathname();
@@ -28,6 +29,12 @@ export default function MyMailbox() {
   const { data: receiveList } = useQuery({
     queryKey: ["capsuleDashboard", "receive"],
     queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+  });
+
+  /** 북마크 개수 */
+  const { data: bookmarkPage } = useQuery({
+    queryKey: ["bookmarks", "count"],
+    queryFn: ({ signal }) => bookmarkApi.list({ page: 0, size: 1 }, signal),
   });
 
   return (
@@ -97,7 +104,9 @@ export default function MyMailbox() {
                 >
                   소중한 편지
                 </span>
-                <span className="text-2xl">연결 필요</span>
+                <span className="text-2xl">
+                  {bookmarkPage?.totalElements ?? 0}
+                </span>
               </div>
             </div>
           </DivBox>
