@@ -9,6 +9,8 @@ import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
 
 //서버 렌더링 방지
 import dynamic from "next/dynamic";
+import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
+import { useSearchParams } from "next/navigation";
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
@@ -16,11 +18,13 @@ const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
 //필터링 타입
 export type Radius = 1500 | 1000 | 500;
 export type ViewedFilter = "ALL" | "UNREAD" | "READ";
+export type AccessibleFilter = "ALL" | "ACCESSIBLE" | "INACCESSIBLE";
 
 export default function MapContents() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [radius, setRadius] = useState<Radius>(1000);
   const [viewed, setViewed] = useState<ViewedFilter>("ALL");
+  const [accessible, setAccessible] = useState<AccessibleFilter>("ALL");
   const filterRef = useRef<HTMLDivElement | null>(null);
 
   //map center 위치
@@ -37,6 +41,8 @@ export default function MapContents() {
   const [error, setError] = useState<string | null>(null);
   //포커스 된 card
   const [focus, setFocus] = useState<{ id: number; ts: number } | null>(null);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   //위치 정보 가져오기 실패했을 때 상황에 따른 에러 메세지
   const showErrorMsg = (error: GeolocationPositionError) => {
@@ -116,11 +122,19 @@ export default function MapContents() {
   }, []);
 
   //근처 공개 캡슐 조회
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    error: queryError,
+  } = useQuery({
     queryKey: ["publicCapsules", myLocation?.lat, myLocation?.lng, radius],
     queryFn: () => {
       if (!myLocation) {
         throw new Error("현재 위치 정보 없음");
+      }
+      if (isError) {
+        throw queryError;
       }
 
       return fetchPublicCapsules({
@@ -134,7 +148,7 @@ export default function MapContents() {
   });
 
   //조회 상태 필터
-  const filterData = (data: PublicCapsule[] | undefined) => {
+  const filter = (data: PublicCapsule[] | undefined) => {
     if (data) {
       switch (viewed) {
         case "ALL":
@@ -147,10 +161,17 @@ export default function MapContents() {
     } else return [];
   };
 
-  console.log(focus);
+  const filteredData = filter(data);
 
   return (
     <div className="h-full flex flex-col gap-4">
+      {id ? (
+        <LetterDetailModal
+          capsuleId={Number(id)}
+          closeHref="/dashboard/map"
+          role="USER"
+        />
+      ) : null}
       {/* 헤더 */}
       <div className="space-y-2">
         <h3 className="text-3xl font-medium">
@@ -160,7 +181,7 @@ export default function MapContents() {
         <p className="text-text-2">
           주변에 숨겨진{" "}
           <span className="text-primary font-semibold">
-            {myLocation ? filterData(data).length : "-"}개
+            {!myLocation || isLoading ? "-" : filteredData.length}개
           </span>
           의 편지를 찾아보세요
         </p>
@@ -193,9 +214,12 @@ export default function MapContents() {
           {mapLocation ? (
             <PublicCapsuleMap
               location={mapLocation}
-              data={filterData(data)}
-              onClick={(id) => {
+              myLocation={myLocation}
+              data={filteredData}
+              focus={focus?.id}
+              onClick={(id, lat, lng) => {
                 setFocus({ id, ts: Date.now() });
+                setMapLocation({ lat, lng });
               }}
             />
           ) : (
@@ -235,10 +259,13 @@ export default function MapContents() {
                   onRadiusChange={setRadius}
                   viewed={viewed}
                   onViewedChange={setViewed}
+                  accessible={accessible}
+                  onAccessibleChange={setAccessible}
                   onClose={() => setIsFilterOpen(false)}
                   onReset={() => {
                     setRadius(1000);
                     setViewed("ALL");
+                    setAccessible("ALL");
                   }}
                 />
               )}
@@ -247,11 +274,18 @@ export default function MapContents() {
 
           {/* 리스트 영역 */}
           {myLocation ? (
-            <MapList
-              listData={filterData(data)}
-              onClick={(lat, lng) => setMapLocation({ lat, lng })}
-              focus={focus}
-            />
+            isLoading ? (
+              <div className="text-center text-text-3 text-sm">로딩중</div>
+            ) : (
+              <MapList
+                listData={filteredData}
+                onClick={(id, lat, lng) => {
+                  setMapLocation({ lat, lng });
+                  setFocus({ id, ts: Date.now() });
+                }}
+                focus={focus}
+              />
+            )
           ) : (
             <div className="text-center text-text-3 text-sm">
               위치 정보 접근을 허용해주세요.

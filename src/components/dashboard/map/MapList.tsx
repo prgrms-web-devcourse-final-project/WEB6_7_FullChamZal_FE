@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 
 type MapListProps = {
   listData?: PublicCapsule[];
-  onClick: (lat: number, lng: number) => void;
+  onClick: (id: number, lat: number, lng: number) => void;
   focus: { id: number; ts: number } | null;
 };
 
@@ -67,8 +67,10 @@ export default function MapList({ listData, onClick, focus }: MapListProps) {
             <button
               key={d.capsuleId}
               type="button"
-              className="w-full text-left focus:bg-button-hover"
-              onClick={() => onClick(d.capsuleLatitude, d.capsuleLongitude)}
+              className="group w-full text-left rounded-xl hover:bg-button-hover focus:bg-primary-2"
+              onClick={() =>
+                onClick(d.capsuleId, d.capsuleLatitude, d.capsuleLongitude)
+              }
               ref={(val) => {
                 cardFocus.current[d.capsuleId] = val;
               }}
