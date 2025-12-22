@@ -18,7 +18,7 @@ export default function MailboxSkeleton() {
           </div>
 
           {/* 카드 / 미리보기 영역 */}
-          <div className="flex flex-wrap justify-between animate-pulse">
+          <div className="flex flex-wrap justify-between animate-pulse gap-8">
             <div className="w-[280px] h-[180px] rounded-lg bg-gray-200" />
             <div className="w-[280px] h-[180px] rounded-lg bg-gray-200" />
             <div className="w-[280px] h-[180px] rounded-lg bg-gray-200" />

@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -21,6 +21,7 @@ import { authApiClient } from "@/lib/api/auth/auth.client";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
+import { bookmarkApi } from "@/lib/api/dashboard/bookmark";
 
 type UICapsule = {
   title: string;
@@ -36,10 +37,9 @@ type UICapsule = {
   locationName: string | null;
 };
 
-type PostLoginAction = {
-  type: "SAVE_CAPSULE";
-  payload: { capsuleId: number; isSendSelf: 0 | 1 };
-};
+type PostLoginAction =
+  | { type: "SAVE_CAPSULE"; payload: { capsuleId: number; isSendSelf: 0 | 1 } }
+  | { type: "BOOKMARK"; payload: { capsuleId: number } };
 
 const POST_LOGIN_ACTION_KEY = "postLoginAction";
 
@@ -86,6 +86,7 @@ export default function LetterDetailModal({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const isAdmin = role === "ADMIN";
 
@@ -116,6 +117,29 @@ export default function LetterDetailModal({
     onSuccess: () => setIsSaveSuccessOpen(true),
   });
 
+  // 북마크 추가/복구
+  const bookmarkMutation = useMutation({
+    mutationKey: ["bookmarkUpsert", capsuleId],
+    mutationFn: (payload: { capsuleId: number }) => bookmarkApi.upsert(payload),
+    onSuccess: () => {
+      // 북마크 리스트/카운트 갱신
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+      // 필요하면 대시보드 숫자도 갱신(북마크 카운트 쓰는 곳)
+      queryClient.invalidateQueries({ queryKey: ["bookmarks", "count"] });
+    },
+  });
+
+  // 북마크 삭제
+  const removeBookmarkMutation = useMutation({
+    mutationKey: ["bookmarkRemove", capsuleId],
+    mutationFn: (id: number) => bookmarkApi.remove(id),
+    onSuccess: () => {
+      // 북마크 리스트/카운트 갱신
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+      queryClient.invalidateQueries({ queryKey: ["bookmarks", "count"] });
+    },
+  });
+
   // 로그인/회원가입 후 돌아왔을 때 자동 재시도
   useEffect(() => {
     if (!open) return;
@@ -123,7 +147,7 @@ export default function LetterDetailModal({
     const raw = sessionStorage.getItem(POST_LOGIN_ACTION_KEY);
     if (!raw) return;
 
-    sessionStorage.removeItem(POST_LOGIN_ACTION_KEY); // 🔥 일단 제거 (무한루프 방지)
+    sessionStorage.removeItem(POST_LOGIN_ACTION_KEY);
 
     let action: PostLoginAction | null = null;
     try {
@@ -132,15 +156,23 @@ export default function LetterDetailModal({
       return;
     }
 
-    if (action?.type !== "SAVE_CAPSULE") return;
+    if (!action) return;
 
-    const unlockAt = new Date().toISOString();
-    saveMutation.mutate({
-      capsuleId: action.payload.capsuleId,
-      isSendSelf: action.payload.isSendSelf,
-      unlockAt,
-    });
-  }, [open, saveMutation]);
+    if (action.type === "SAVE_CAPSULE") {
+      const unlockAt = new Date().toISOString();
+      saveMutation.mutate({
+        capsuleId: action.payload.capsuleId,
+        isSendSelf: action.payload.isSendSelf,
+        unlockAt,
+      });
+      return;
+    }
+
+    if (action.type === "BOOKMARK") {
+      bookmarkMutation.mutate({ capsuleId: action.payload.capsuleId });
+      return;
+    }
+  }, [open, saveMutation, bookmarkMutation]);
 
   // 저장 버튼 핸들러
   const handleSave = async () => {
@@ -163,6 +195,33 @@ export default function LetterDetailModal({
       }
 
       console.error("❌ save error:", err);
+    }
+  };
+
+  // 북마크 핸들러
+  const handleBookmark = async () => {
+    try {
+      const me = await authApiClient.me();
+      if (!me) throw Object.assign(new Error("NO_ME"), { status: 401 });
+
+      // 북마크 화면에서는 제거, 그 외에는 추가
+      if (isProtected) {
+        removeBookmarkMutation.mutate(capsuleId);
+      } else {
+        bookmarkMutation.mutate({ capsuleId });
+      }
+    } catch (err: any) {
+      if (isAuthMissingError(err)) {
+        const action: PostLoginAction = {
+          type: "BOOKMARK",
+          payload: { capsuleId },
+        };
+        sessionStorage.setItem(POST_LOGIN_ACTION_KEY, JSON.stringify(action));
+        router.push(`/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+        return;
+      }
+
+      console.error("❌ bookmark error:", err);
     }
   };
 
@@ -336,13 +395,15 @@ export default function LetterDetailModal({
                 </div>
               </div>
 
-              <button
-                type="button"
-                className="md:flex-1 flex justify-end cursor-pointer text-primary"
-                onClick={close}
-              >
-                <X size={24} />
-              </button>
+              <div className="md:flex-1 flex justify-end">
+                <button
+                  type="button"
+                  className="cursor-pointer text-primary"
+                  onClick={close}
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -400,10 +461,14 @@ export default function LetterDetailModal({
 
                 <div className="flex-1 flex items-center justify-center">
                   <button
-                    onClick={handleSave}
+                    onClick={!isProtected ? handleSave : handleBookmark}
                     type="button"
                     className="cursor-pointer flex items-center justify-center gap-2"
-                    disabled={saveMutation.isPending}
+                    disabled={
+                      saveMutation.isPending ||
+                      bookmarkMutation.isPending ||
+                      removeBookmarkMutation.isPending
+                    }
                   >
                     {!isProtected ? (
                       <>
@@ -416,7 +481,10 @@ export default function LetterDetailModal({
                       <>
                         <Bookmark size={16} className="text-primary" />
                         <span>
-                          {saveMutation.isPending ? "처리 중..." : "북마크"}
+                          {bookmarkMutation.isPending ||
+                          removeBookmarkMutation.isPending
+                            ? "처리 중..."
+                            : "북마크 해제"}
                         </span>
                       </>
                     )}

@@ -20,4 +20,21 @@ export const bookmarkApi = {
       }
     );
   },
+
+  // 열람한 캡슐을 북마크에 추가하거나 삭제된 북마크를 복구
+  upsert: (body: { capsuleId: number }, signal?: AbortSignal) => {
+    return apiFetch<ApiResponse<null>>("/api/bookmarks", {
+      method: "POST",
+      json: body,
+      signal,
+    });
+  },
+
+  // 북마크 제거
+  remove: (capsuleId: number, signal?: AbortSignal) => {
+    return apiFetch<ApiResponse<null>>(`/api/bookmarks/${capsuleId}`, {
+      method: "DELETE",
+      signal,
+    });
+  },
 };
