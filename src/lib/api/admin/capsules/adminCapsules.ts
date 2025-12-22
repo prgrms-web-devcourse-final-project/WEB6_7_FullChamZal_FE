@@ -1,11 +1,22 @@
 import { apiFetch } from "../../fetchClient";
 
-function mapTabToFilters(tab: string): { visibility?: CapsuleVisibility } {
-  if (tab === "public") return { visibility: "PUBLIC" };
-  if (tab === "private") return { visibility: "PRIVATE" };
-  return {};
+function mapTabToFilters(tab: string): {
+  visibility?: CapsuleVisibility;
+  unlocked?: string;
+} {
+  switch (tab) {
+    case "public":
+      return { visibility: "PUBLIC" };
+    case "private":
+      return { visibility: "PRIVATE" };
+    case "locked":
+      return { unlocked: "false" };
+    case "opened":
+      return { unlocked: "true" };
+    default:
+      return {};
+  }
 }
-
 export const adminCapsulesApi = {
   /* 편지 회원 목록 조회 */
   list: (params: {
@@ -21,6 +32,7 @@ export const adminCapsulesApi = {
       page: String(params.page),
       size: String(params.size),
       ...(filters.visibility ? { visibility: filters.visibility } : {}),
+      ...(filters.unlocked !== undefined ? { unlocked: filters.unlocked } : {}),
       sort: "createdAt,desc",
     });
 
@@ -29,9 +41,7 @@ export const adminCapsulesApi = {
 
     return apiFetch<AdminCapsulesResponse>(
       `/api/v1/admin/capsules?${qs.toString()}`,
-      {
-        signal: params.signal,
-      }
+      { signal: params.signal }
     );
   },
 

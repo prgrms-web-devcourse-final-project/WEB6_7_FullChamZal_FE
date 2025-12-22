@@ -1,38 +1,177 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/purity */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import LetterDetailModal from "./LetterDetailModal";
-import LetterUnlockModal from "./LetterUnlockModal";
+import LetterLockedView from "./LetterLockedView";
+import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+
+type LatLng = { lat: number; lng: number };
+
+function isLatLng(v: any): v is LatLng {
+  return (
+    v != null &&
+    typeof v.lat === "number" &&
+    Number.isFinite(v.lat) &&
+    typeof v.lng === "number" &&
+    Number.isFinite(v.lng)
+  );
+}
+
+function getCurrentPosition(): Promise<LatLng> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocation not supported"));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (p) =>
+        resolve({
+          lat: p.coords.latitude,
+          lng: p.coords.longitude,
+        }),
+      (err) => reject(err),
+      { enableHighAccuracy: true, timeout: 10_000 }
+    );
+  });
+}
+
+type Props = {
+  capsuleId: number;
+  isProtected: number;
+  password?: string | null;
+};
 
 export default function LetterDetailView({
-  capsule,
-  mode,
-}: {
-  capsule: Capsule;
-  mode: "public" | "protected";
-}) {
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(
-    // 비밀번호가 있는 편지
-    mode !== "public"
-  );
+  capsuleId,
+  isProtected,
+  password = null,
+}: Props) {
+  // 내 위치 (current)
+  const [currentLocation, setCurrentLocation] = useState<LatLng | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
-  // (더미) 비밀번호 검증 함수 — 나중에 API로 교체
-  const verifyPassword = async (password: string) => {
-    // 예: capsule.passwordHash가 있다면 서버에서 검증해야 함
-    // 지금은 더미로 "1234"만 통과
-    return password === "1234";
-  };
+  // 최초 1회 내 위치 시도
+  useEffect(() => {
+    let mounted = true;
 
+    getCurrentPosition()
+      .then((pos) => {
+        if (!mounted) return;
+        setCurrentLocation(pos);
+      })
+      .catch((e: any) => {
+        if (!mounted) return;
+        setLocationError(
+          e?.message || "위치 정보를 가져오지 못했어요. (권한/설정 확인)"
+        );
+        setCurrentLocation(null);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // 너무 자주 리패치 방지(좌표 라운딩)
+  const locationKey = useMemo(() => {
+    if (!currentLocation) return "no-location";
+    const lat = Number(currentLocation.lat.toFixed(5));
+    const lng = Number(currentLocation.lng.toFixed(5));
+    return `${lat},${lng}`;
+  }, [currentLocation]);
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["capsuleRead", capsuleId, password, locationKey],
+    queryFn: async ({ signal }) => {
+      const unlockAt = new Date().toISOString();
+
+      const locationLat = currentLocation?.lat ?? 0;
+      const locationLng = currentLocation?.lng ?? 0;
+
+      const res = await guestCapsuleApi.read(
+        {
+          capsuleId,
+          unlockAt,
+          locationLat,
+          locationLng,
+          password,
+        },
+        signal
+      );
+
+      console.log("/capsule/read payload:", {
+        capsuleId,
+        unlockAt,
+        locationLat,
+        locationLng,
+      });
+      console.log("/capsule/read response:", res);
+
+      return res;
+    },
+    retry: false,
+    enabled: capsuleId > 0,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-8">
+        불러오는 중...
+      </div>
+    );
+  }
+
+  // 네트워크/서버 레벨 에러 (응답 자체가 없음)
+  if (isError || !data) {
+    const fallbackUnlockAt = new Date(
+      Date.now() + 10 * 60 * 1000
+    ).toISOString();
+    console.log("❌ /capsule/read error:", error);
+
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-8">
+        <LetterLockedView unlockAt={fallbackUnlockAt} />
+      </div>
+    );
+  }
+
+  const capsule: any = data;
+
+  // 조건 미충족 (서버가 FAIL을 정상 응답으로 내려줌)
+  if (capsule.result === "FAIL") {
+    // 목표 위치(target): 서버가 내려준 캡슐 좌표
+    // - 여기서 "LatLng 확정"을 만들어야 타입 에러가 안 남
+    const maybeTarget = { lat: capsule.locationLat, lng: capsule.locationLng };
+    const targetLocation = isLatLng(maybeTarget) ? maybeTarget : undefined;
+
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-8">
+        <LetterLockedView
+          unlockAt={capsule.unlockAt ?? new Date().toISOString()}
+          unlockType={capsule.unlockType}
+          currentLocation={currentLocation ?? undefined}
+          targetLocation={targetLocation}
+          allowedRadiusMeter={100}
+          locationErrorMessage={locationError ?? undefined}
+        />
+      </div>
+    );
+  }
+
+  // 열람 가능
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-8">
-      {isUnlocked ? (
-        <LetterDetailModal capsuleId={capsule.id} mode={mode} />
-      ) : (
-        <LetterUnlockModal
-          onSuccess={() => setIsUnlocked(true)}
-          onVerify={verifyPassword}
-        />
-      )}
+      <LetterDetailModal
+        capsuleId={capsule.capsuleId}
+        isProtected={isProtected}
+        role="USER"
+        open={true}
+        password={password}
+      />
     </div>
   );
 }

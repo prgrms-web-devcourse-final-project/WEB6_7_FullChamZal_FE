@@ -13,9 +13,7 @@ export default function SixthSection() {
     if (me.isLoading) return;
 
     if (me.isError) {
-      router.push(
-        `/auth/login?callbackUrl=${encodeURIComponent("/dashboard")}`
-      );
+      router.push("/auth/login");
       return;
     }
 
@@ -27,7 +25,7 @@ export default function SixthSection() {
 
     if (me.isError) {
       router.push(
-        `/auth/login?callbackUrl=${encodeURIComponent("/capsules/new")}`
+        `/auth/login?callback=${encodeURIComponent("/capsules/new")}`
       );
       return;
     }

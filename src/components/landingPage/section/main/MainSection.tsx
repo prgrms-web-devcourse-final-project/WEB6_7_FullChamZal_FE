@@ -67,7 +67,7 @@ export default function MainSection() {
 
     if (me.isError) {
       router.push(
-        `/auth/login?callbackUrl=${encodeURIComponent("/capsules/new")}`
+        `/auth/login?callback=${encodeURIComponent("/capsules/new")}`
       );
       return;
     }

@@ -1,67 +1,230 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-/* eslint-disable react-hooks/rules-of-hooks */
 
-import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
-import { capsuleReadApi } from "@/lib/api/capsule/capsuleDetail";
-import { formatDate } from "@/lib/hooks/formatDate";
-import { formatDateTime } from "@/lib/hooks/formatDateTime";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
+  Archive,
+  Bookmark,
   Clock,
   LinkIcon,
   MapPin,
   Reply,
   X,
-  Archive,
-  Bookmark,
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+
+import ActiveModal from "@/components/common/ActiveModal";
+import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
+import { authApiClient } from "@/lib/api/auth/auth.client";
+import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import { formatDate } from "@/lib/hooks/formatDate";
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
+
+type UICapsule = {
+  title: string;
+  content: string;
+  createdAt: string;
+  writerNickname: string;
+  recipient: string | null;
+
+  unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION" | string;
+  unlockAt: string | null;
+  unlockUntil?: string | null;
+
+  locationName: string | null;
+};
+
+type PostLoginAction = {
+  type: "SAVE_CAPSULE";
+  payload: { capsuleId: number; isSendSelf: 0 | 1 };
+};
+
+const POST_LOGIN_ACTION_KEY = "postLoginAction";
+
+function isAuthMissingError(err: any) {
+  const status = err?.status ?? err?.response?.status;
+  return status === 401 || status === 403;
+}
+
+async function getCurrentPos() {
+  return await new Promise<{ lat: number; lng: number }>((resolve, reject) => {
+    if (!navigator.geolocation)
+      reject(new Error("위치 정보를 사용할 수 없습니다."));
+    navigator.geolocation.getCurrentPosition(
+      (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      reject,
+      { enableHighAccuracy: true, timeout: 10_000 }
+    );
+  });
+}
 
 export default function LetterDetailModal({
   capsuleId,
   open = true,
   closeHref,
-  mode,
+  isProtected,
   role = "USER",
   onClose,
-  // USER read 호출에 필요한 값들
-  isSendSelf,
   locationLat = null,
   locationLng = null,
   password = null,
 }: {
+  uuId?: string;
   capsuleId: number;
   open?: boolean;
   closeHref?: string;
-  mode?: string;
+  isProtected?: number;
   role?: MemberRole;
   onClose?: () => void;
-  isSendSelf?: 0 | 1;
+
   locationLat?: number | null;
   locationLng?: number | null;
-  password?: string | number | null;
+  password?: string | null;
 }) {
   const router = useRouter();
-  if (!open) return null;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const isAdmin = role === "ADMIN";
+
+  const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
+
+  const returnUrl = useMemo(() => {
+    const qs = searchParams?.toString();
+    return qs ? `${pathname}?${qs}` : `${pathname}`;
+  }, [pathname, searchParams]);
 
   const close = () => {
+    if (role === "ADMIN") {
+      onClose?.();
+      return;
+    }
     if (closeHref) router.push(closeHref, { scroll: false });
     else router.back();
   };
 
-  const isAdmin = role === "ADMIN";
-
-  // 나중에 ADMIN일 경우에는 아래 api만 USER이면 USER 세부 api만 호출
-  const { data: adminData, isLoading } = useQuery<AdminCapsuleDetail>({
-    queryKey: ["adminCapsuleDetail", capsuleId],
-    queryFn: ({ signal }) => adminCapsulesApi.detail({ capsuleId, signal }),
-    enabled: open && capsuleId > 0 && isAdmin,
+  // ✅ 저장 mutation
+  const saveMutation = useMutation({
+    mutationKey: ["capsuleSave", capsuleId],
+    mutationFn: (payload: {
+      capsuleId: number;
+      isSendSelf: 0 | 1;
+      unlockAt: string;
+    }) => guestCapsuleApi.save(payload),
+    onSuccess: () => setIsSaveSuccessOpen(true),
   });
 
-  // UI에서 쓰는 형태로 통일 (ADMIN/USER 필드명 다름)
-  const capsule = isAdmin ? adminData : /* ...user mapping... */ null;
-  // 로딩 UI
+  // ✅ 로그인/회원가입 후 돌아왔을 때 자동 재시도
+  useEffect(() => {
+    if (!open) return;
+
+    const raw = sessionStorage.getItem(POST_LOGIN_ACTION_KEY);
+    if (!raw) return;
+
+    sessionStorage.removeItem(POST_LOGIN_ACTION_KEY); // 🔥 일단 제거 (무한루프 방지)
+
+    let action: PostLoginAction | null = null;
+    try {
+      action = JSON.parse(raw);
+    } catch {
+      return;
+    }
+
+    if (action?.type !== "SAVE_CAPSULE") return;
+
+    const unlockAt = new Date().toISOString();
+    saveMutation.mutate({
+      capsuleId: action.payload.capsuleId,
+      isSendSelf: action.payload.isSendSelf,
+      unlockAt,
+    });
+  }, [open, saveMutation]);
+
+  // ✅ 저장 버튼 핸들러
+  const handleSave = async () => {
+    try {
+      const me = await authApiClient.me();
+      if (!me) throw Object.assign(new Error("NO_ME"), { status: 401 });
+
+      const unlockAt = new Date().toISOString();
+      saveMutation.mutate({ capsuleId, isSendSelf: 0, unlockAt });
+    } catch (err: any) {
+      if (isAuthMissingError(err)) {
+        const action: PostLoginAction = {
+          type: "SAVE_CAPSULE",
+          payload: { capsuleId, isSendSelf: 0 },
+        };
+        sessionStorage.setItem(POST_LOGIN_ACTION_KEY, JSON.stringify(action));
+
+        router.push(`/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+        return;
+      }
+
+      console.error("❌ save error:", err);
+    }
+  };
+
+  // ✅ 상세 조회 query (open일 때만)
+  const { data, isLoading, isError, error } = useQuery<UICapsule>({
+    queryKey: ["capsuleDetailModal", role, capsuleId, password],
+    enabled: open && capsuleId > 0,
+    retry: false,
+    queryFn: async ({ signal }) => {
+      if (isAdmin) {
+        const a = await adminCapsulesApi.detail({ capsuleId, signal });
+        return {
+          title: a.data.title,
+          content: a.data.content,
+          createdAt: a.data.createdAt,
+          writerNickname: a.data.writerNickname,
+          recipient: a.data.recipientName ?? null,
+
+          unlockType: a.data.unlockType,
+          unlockAt: a.data.unlockAt,
+          unlockUntil: a.data.unlockUntil ?? null,
+
+          locationName: a.data.locationAlias || a.data.address || null,
+        };
+      }
+
+      const unlockAt = new Date().toISOString();
+      const pos =
+        locationLat != null && locationLng != null
+          ? { lat: locationLat, lng: locationLng }
+          : await getCurrentPos();
+
+      const u = await guestCapsuleApi.read(
+        {
+          capsuleId,
+          unlockAt,
+          locationLat: pos.lat ?? 0,
+          locationLng: pos.lng ?? 0,
+          password,
+        },
+        signal
+      );
+
+      return {
+        title: u.title,
+        content: u.content,
+        createdAt: u.createAt,
+        writerNickname: u.senderNickname,
+        recipient: u.recipient ?? null,
+
+        unlockType: u.unlockType,
+        unlockAt: u.unlockAt,
+        unlockUntil: u.unlockUntil,
+
+        locationName: u.locationName ?? null,
+      };
+    },
+  });
+
+  // ✅ open이 아니면 렌더 자체 안 함 (훅은 이미 호출된 뒤라 안전)
+  if (!open) return null;
+
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
@@ -79,18 +242,35 @@ export default function LetterDetailModal({
     );
   }
 
-  if (!capsule) {
+  if (isError) {
+    return (
+      <div className="fixed inset-0 z-9999 bg-black/50">
+        <div className="flex h-full justify-center py-15">
+          <div className="max-w-330 w-full rounded-2xl bg-white p-8">
+            <div className="flex items-center justify-between">
+              <div className="text-lg font-semibold">불러오기 실패</div>
+              <button onClick={close} className="cursor-pointer text-primary">
+                <X size={24} />
+              </button>
+            </div>
+
+            <pre className="mt-4 text-xs whitespace-pre-wrap">
+              {String((error as any)?.message ?? error)}
+            </pre>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center py-15">
           <div className="max-w-330 w-full rounded-2xl bg-white p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">편지를 찾을 수 없어요</div>
-              <button
-                type="button"
-                onClick={role === "ADMIN" ? onClose : close}
-                className="cursor-pointer text-primary"
-              >
+              <button onClick={close} className="cursor-pointer text-primary">
                 <X size={24} />
               </button>
             </div>
@@ -103,6 +283,8 @@ export default function LetterDetailModal({
     );
   }
 
+  const capsule = data;
+
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
 
@@ -112,13 +294,29 @@ export default function LetterDetailModal({
         ? formatDateTime(capsule.unlockAt)
         : "시간 조건 없음"
       : capsule.unlockType === "LOCATION"
-      ? (capsule.locationAlias || capsule.address) ?? "위치 조건 없음"
+      ? capsule.locationName ?? "위치 조건 없음"
       : `${
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
-        } · ${(capsule.locationAlias || capsule.address) ?? "위치 조건 없음"}`;
+        } · ${capsule.locationName ?? "위치 조건 없음"}`;
 
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
+      {/* 저장 성공 모달 */}
+      {isSaveSuccessOpen && (
+        <ActiveModal
+          active="success"
+          title="저장 완료"
+          content="저장이 완료되었습니다."
+          open={isSaveSuccessOpen}
+          onClose={() => setIsSaveSuccessOpen(false)}
+          onConfirm={() => {
+            setIsSaveSuccessOpen(false);
+            router.replace("/dashboard");
+            router.refresh();
+          }}
+        />
+      )}
+
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
@@ -128,7 +326,7 @@ export default function LetterDetailModal({
 
               <div
                 className={`flex-1 flex items-center gap-1 ${
-                  mode ? "justify-end" : "justify-center"
+                  isProtected ? "justify-end" : "justify-center"
                 }`}
               >
                 <span className="hidden md:block text-text-2">해제 조건:</span>
@@ -141,7 +339,7 @@ export default function LetterDetailModal({
               <button
                 type="button"
                 className="md:flex-1 flex justify-end cursor-pointer text-primary"
-                onClick={role === "ADMIN" ? onClose : close}
+                onClick={close}
               >
                 <X size={24} />
               </button>
@@ -154,7 +352,7 @@ export default function LetterDetailModal({
               <div className="w-full h-full flex flex-col justify-between gap-8">
                 <div className="text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span>{capsule.recipientName ?? "(수신자 정보 없음)"}</span>
+                  <span>{capsule.recipient ?? "(수신자 정보 없음)"}</span>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
@@ -167,7 +365,6 @@ export default function LetterDetailModal({
                   <span className="text-text-3">
                     {formatDate(capsule.createdAt)}
                   </span>
-
                   <div className="text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
                     <span>{capsule.writerNickname}</span>
@@ -203,18 +400,24 @@ export default function LetterDetailModal({
 
                 <div className="flex-1 flex items-center justify-center">
                   <button
+                    onClick={handleSave}
                     type="button"
                     className="cursor-pointer flex items-center justify-center gap-2"
+                    disabled={saveMutation.isPending}
                   >
-                    {mode ? (
+                    {!isProtected ? (
                       <>
                         <Archive size={16} className="text-primary" />
-                        <span>저장하기</span>
+                        <span>
+                          {saveMutation.isPending ? "저장 중..." : "저장하기"}
+                        </span>
                       </>
                     ) : (
                       <>
                         <Bookmark size={16} className="text-primary" />
-                        <span>북마크</span>
+                        <span>
+                          {saveMutation.isPending ? "처리 중..." : "북마크"}
+                        </span>
                       </>
                     )}
                   </button>

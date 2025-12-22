@@ -70,7 +70,7 @@ export default function MailboxPage({
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-between">
+            <div className="flex flex-wrap gap-8">
               {!data?.length ? (
                 <p>받은 편지가 없습니다</p>
               ) : (
