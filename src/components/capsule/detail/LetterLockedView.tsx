@@ -129,8 +129,8 @@ export default function LetterLockedView({
   unlockType = "TIME",
   currentLocation,
   targetLocation,
-  viewingRadius = 50, // ✅ 반경(미터) 표시 + 판정에 사용
-  locationName = "없음", // ✅ 장소 별칭 표시
+  viewingRadius = 50, // 반경(미터) 표시 + 판정에 사용
+  locationName = "없음", // 장소 별칭 표시
   locationErrorMessage,
 }: {
   unlockAt: string;
@@ -160,7 +160,7 @@ export default function LetterLockedView({
     ? remainingMsRaw <= 0
     : false;
 
-  // ✅ 시간이 이미 지났으면 0으로 고정
+  // 시간이 이미 지났으면 0으로 고정
   const remainingMs = Number.isFinite(unlockTime)
     ? Math.max(0, remainingMsRaw)
     : 0;
@@ -174,7 +174,7 @@ export default function LetterLockedView({
     return distanceMeter(currentLocation, targetLocation);
   }, [currentLocation, targetLocation]);
 
-  // ✅ 반경 기반으로 위치 조건 충족 여부 판단
+  // 반경 기반으로 위치 조건 충족 여부 판단
   const isLocationUnlocked = useMemo(() => {
     if (unlockType === "TIME") return true; // 위치 조건 없는 타입
     if (distance == null) return false; // 거리 계산 불가면 미충족
@@ -267,7 +267,7 @@ export default function LetterLockedView({
                 <p className="text-sm">지정된 장소에 도착해야 열 수 있어요</p>
               </div>
 
-              {/* ✅ 장소 별칭 + 반경 표시 */}
+              {/* 장소 별칭 + 반경 표시 */}
               <div className="text-xs text-text-3 flex flex-col items-center gap-1">
                 <p>장소 이름: {locationName}</p>
                 <p>기준 반경: {Math.round(viewingRadius)} m</p>
