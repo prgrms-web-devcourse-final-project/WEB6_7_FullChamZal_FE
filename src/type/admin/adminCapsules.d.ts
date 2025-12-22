@@ -1,6 +1,7 @@
 type CapsuleUnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
 type CapsuleVisibility = "PUBLIC" | "PRIVATE";
+type CapsuleUnLocked = boolean;
 
 type CapsuleLocation = {
   locationAlias: string | null;
@@ -24,6 +25,8 @@ type AdminCapsuleBase = {
 
   currentViewCount: number;
   maxViewCount: number;
+
+  unlocked: boolean;
 
   deleted: boolean;
   protectedCapsule: boolean;

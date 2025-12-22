@@ -3,7 +3,7 @@
 import Button from "../common/Button";
 import Input from "../common/Input";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { ApiError } from "@/lib/api/fetchClient";
 import { authApiClient } from "@/lib/api/auth/auth.client";
@@ -18,6 +18,12 @@ export default function RegisterForm({
 }) {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
+  const returnUrl = useMemo(() => {
+    const cb = searchParams.get("returnUrl") || searchParams.get("callback");
+    return cb && cb.startsWith("/") ? cb : null;
+  }, [searchParams]);
   const [redirectTarget, setRedirectTarget] = useState<string | null>(null);
 
   const [name, setName] = useState("");
@@ -207,7 +213,8 @@ export default function RegisterForm({
       await authApiClient.login({ userId: id.trim(), password: pw });
 
       const me = await authApiClient.me();
-      const target = me.role === "ADMIN" ? "/admin" : "/dashboard";
+      const fallbackTarget = me.role === "ADMIN" ? "/admin" : "/dashboard";
+      const target = returnUrl ?? fallbackTarget;
 
       setRedirectTarget(target);
       setModalMessage("회원가입이 완료되었습니다.");

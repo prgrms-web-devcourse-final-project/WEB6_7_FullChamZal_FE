@@ -250,7 +250,7 @@ export default function CapsuleList({
               <Trash2 size={14} />
               삭제됨
             </div>
-          ) : c.unlockAt === null ? (
+          ) : !c.unlocked ? (
             <div className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-3 py-1 text-amber-800">
               <Lock size={14} />
               잠김

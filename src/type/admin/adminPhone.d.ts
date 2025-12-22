@@ -13,4 +13,7 @@ type AdminPhone = {
   expiredAt: string | null;
 };
 
-type AdminPhoneResponse = ApiResponse<AdminPhone>;
+type AdminPhoneResponse = {
+  content: AdminPhone[];
+  totalElements: number;
+};
