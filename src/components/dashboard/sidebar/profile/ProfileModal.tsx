@@ -219,6 +219,7 @@ export default function ProfileModal({
                     value={form.name}
                     isEditing={false}
                     readOnly
+                    disabled
                   />
 
                   <div className="space-y-1">
@@ -242,6 +243,7 @@ export default function ProfileModal({
                     value={form.email}
                     isEditing={false}
                     readOnly
+                    disabled
                   />
 
                   <Field
