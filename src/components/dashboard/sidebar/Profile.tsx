@@ -34,7 +34,7 @@ export default function Profile({
   const displayName =
     mode === "admin" ? "관리자" : me?.name ?? "홍길동";
 
-  // 스웨거상 email 필드가 없어서 userId를 표시용으로 사용(대부분 이메일 아이디일 확률)
+  
   const displayEmail =
     mode === "admin" ? "admin@dear.com" : me?.userId ?? "hong@mail.com";
 
