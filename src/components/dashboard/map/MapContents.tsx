@@ -214,6 +214,7 @@ export default function MapContents() {
           {mapLocation ? (
             <PublicCapsuleMap
               location={mapLocation}
+              myLocation={myLocation}
               data={filteredData}
               focus={focus?.id}
               onClick={(id, lat, lng) => {

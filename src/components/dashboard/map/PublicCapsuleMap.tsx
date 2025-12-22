@@ -24,11 +24,7 @@ const EventMarkerContainer = ({
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <CustomOverlayMap
-      position={position}
-      yAnchor={0}
-      zIndex={isFocus ? 999 : 1}
-    >
+    <CustomOverlayMap position={position} zIndex={isFocus ? 999 : 1}>
       <div
         className={`relative flex flex-col items-center`}
         onMouseEnter={() => setIsVisible(true)}
@@ -64,11 +60,23 @@ const EventMarkerContainer = ({
   );
 };
 
+//줌따라 스케일 조정 함수
+const scaleClassByZoom = (level: number) => {
+  if (level <= 3) return "scale-150";
+  if (level <= 5) return "scale-125";
+  if (level <= 6) return "scale-110";
+  return "scale-100";
+};
+
 type PublicCapsuleMapProps = {
   location: {
     lat: number;
     lng: number;
   };
+  myLocation: {
+    lat: number;
+    lng: number;
+  } | null;
   data: PublicCapsule[];
   focus?: number;
   onClick: (id: number, lat: number, lng: number) => void;
@@ -76,12 +84,13 @@ type PublicCapsuleMapProps = {
 
 export default function PublicCapsuleMap({
   location,
+  myLocation,
   data,
   onClick,
-
   focus,
 }: PublicCapsuleMapProps) {
   const mapRef = useRef<kakao.maps.Map | null>(null);
+  const [level, setLevel] = useState(6);
   const router = useRouter();
   //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경
   useEffect(() => {
@@ -95,14 +104,38 @@ export default function PublicCapsuleMap({
     <>
       <Map
         center={location} //중심 좌표
-        level={6} //줌 레벨
+        level={level} //줌 레벨
         isPanto={true} //부드럽게 이동
         style={{ width: "100%", height: "100%", borderRadius: "12px" }}
         //생성 시 해당 지도 객체를 저장
         onCreate={(map) => {
           mapRef.current = map;
         }}
+        onZoomChanged={(map) => {
+          setLevel(map.getLevel());
+        }}
       >
+        {/* 내 위치 마커 */}
+        {myLocation && (
+          <CustomOverlayMap
+            position={{
+              lat: myLocation?.lat,
+              lng: myLocation?.lng,
+            }}
+          >
+            <div
+              className={`border border-primary-2/90 rounded-full ${scaleClassByZoom(
+                level
+              )}`}
+            >
+              <div className="relative bg-primary-2/12 rounded-full w-12 h-12 ">
+                <div className="absolute bg-primary-2 w-2 h-2 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+              </div>
+            </div>
+          </CustomOverlayMap>
+        )}
+
+        {/* 캡슐 위치 마커 */}
         <MarkerClusterer
           averageCenter={true} // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
           minLevel={2} // 클러스터 할 최소 지도 레벨
