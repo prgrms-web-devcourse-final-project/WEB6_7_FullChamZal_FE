@@ -82,6 +82,8 @@ export default function WriteForm({
   const [locationForm, setLocationForm] = useState<LocationForm>({
     query: "",
     placeName: "",
+    locationLabel: "",
+    viewingRadius: 100,
     address: "",
     lat: undefined,
     lng: undefined,
@@ -275,9 +277,13 @@ export default function WriteForm({
     if (
       (effectiveUnlockType === "LOCATION" ||
         effectiveUnlockType === "TIME_AND_LOCATION") &&
-      (!locationForm.placeName || !locationForm.lat || !locationForm.lng)
+      (!locationForm.placeName ||
+        !locationForm.lat ||
+        !locationForm.lng ||
+        !locationForm.locationLabel?.trim() ||
+        !locationForm.viewingRadius)
     ) {
-      window.alert("장소를 선택해 주세요.");
+      window.alert("장소를 선택하고, 장소 이름과 조회반경을 입력해 주세요.");
       return;
     }
 
