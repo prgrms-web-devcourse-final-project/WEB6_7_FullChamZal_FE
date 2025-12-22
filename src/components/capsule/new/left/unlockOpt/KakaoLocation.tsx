@@ -85,7 +85,8 @@ function useKakaoReady() {
 const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
   ({ query, value, onPick }, ref) => {
     const ready = useKakaoReady();
-    const mapRef = useRef<kakao.maps.Map | null>(null);
+    const [map, setMap] = useState<kakao.maps.Map | null>(null);
+    const circleRef = useRef<kakao.maps.Circle | null>(null);
 
     const [center, setCenter] = useState<{ lat: number; lng: number }>(() => {
       if (typeof value?.lat === "number" && typeof value?.lng === "number") {
@@ -123,6 +124,60 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
       }
     }, [ready]);
 
+    // 반경 원 오버레이 동기화(React 값(value.*) <-> 외부 시스템(kakao map overlay))
+    useEffect(() => {
+      const lat =
+        typeof value?.lat === "number" ? (value.lat as number) : undefined;
+      const lng =
+        typeof value?.lng === "number" ? (value.lng as number) : undefined;
+      const radius =
+        typeof value?.viewingRadius === "number"
+          ? (value.viewingRadius as number)
+          : undefined;
+
+      // 좌표/반경이 없으면 원 제거
+      if (typeof lat !== "number" || typeof lng !== "number" || !radius) {
+        if (circleRef.current) {
+          circleRef.current.setMap(null);
+          circleRef.current = null;
+        }
+        return;
+      }
+
+      if (!ready || !map) return;
+
+      const centerLatLng = new kakao.maps.LatLng(lat, lng);
+
+      if (!circleRef.current) {
+        circleRef.current = new kakao.maps.Circle({
+          center: centerLatLng,
+          radius,
+          strokeWeight: 2,
+          strokeColor: "#FF583B",
+          strokeOpacity: 0.9,
+          strokeStyle: "solid",
+          fillColor: "#FF583B",
+          fillOpacity: 0.12,
+        });
+        circleRef.current.setMap(map);
+        return;
+      }
+
+      circleRef.current.setPosition(centerLatLng);
+      circleRef.current.setRadius(radius);
+      circleRef.current.setMap(map);
+    }, [ready, map, value?.lat, value?.lng, value?.viewingRadius]);
+
+    // 언마운트 시 원 정리
+    useEffect(() => {
+      return () => {
+        if (circleRef.current) {
+          circleRef.current.setMap(null);
+          circleRef.current = null;
+        }
+      };
+    }, []);
+
     const reverseGeocode = (lat: number, lng: number) => {
       const kakao = getKakao();
       const geocoder = geocoderRef.current;
@@ -148,9 +203,9 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
     const handlePick = async (picked: PickedLocation) => {
       setCenter({ lat: picked.lat, lng: picked.lng });
       setMarker({ lat: picked.lat, lng: picked.lng });
-      if (mapRef.current) {
+      if (map) {
         const moveLatLng = new kakao.maps.LatLng(picked.lat, picked.lng);
-        mapRef.current.setCenter(moveLatLng);
+        map.setCenter(moveLatLng);
       }
       onPick(picked);
     };
@@ -207,9 +262,9 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
           };
           setError(null);
           setCenter(next);
-          if (mapRef.current) {
+          if (map) {
             const moveLatLng = new kakao.maps.LatLng(next.lat, next.lng);
-            mapRef.current.setCenter(moveLatLng);
+            map.setCenter(moveLatLng);
           }
           setIsLocating(false);
         },
@@ -240,7 +295,7 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
               level={5}
               style={{ width: "100%", height: "100%" }}
               onCreate={(map) => {
-                mapRef.current = map;
+                setMap(map);
               }}
               // 클릭한 위치 좌표 가져오기
               onClick={async (_map, mouseEvent) => {
