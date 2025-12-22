@@ -16,6 +16,26 @@ import {
   type KakaoPlacesService,
 } from "@/lib/kakao/types";
 
+/**
+ * KakaoLocation
+ *
+ * 캡슐 생성(해제조건: 장소)에서 사용하는 카카오 지도/검색 컴포넌트.
+ *
+ * ## 제공 기능
+ * - **지도 클릭으로 좌표 선택**: 클릭한 위치의 lat/lng를 얻어 `onPick`으로 전달
+ * - **장소 검색(키워드 검색)**: Kakao Places `keywordSearch`로 결과를 조회하고 리스트 UI로 표시
+ * - **내 위치로 이동 버튼**: Geolocation으로 현재 위치를 받아 지도 중심을 이동
+ * - **조회 반경 시각화**: `value.viewingRadius`와 `value.lat/lng`가 있을 때 지도 위에 `kakao.maps.Circle`로 반경 원 표시
+ *
+ * ## 부모-자식 트리거 방식(ref)
+ * 이 컴포넌트는 검색 실행을 `useImperativeHandle`로 노출합니다.
+ * - 부모(`Location.tsx`)에서 `ref.current?.search()`를 호출하면 현재 `query`로 검색을 실행하고 결과 리스트를 갱신합니다.
+ *
+ * @example
+ * const ref = useRef<KakaoLocationHandle>(null);
+ * <KakaoLocation ref={ref} query={query} value={value} onPick={...} />
+ * ref.current?.search();
+ */
 function getKakao(): KakaoNamespace | null {
   const kakao = (window as unknown as { kakao?: KakaoNamespace })?.kakao;
   return kakao ?? null;
