@@ -507,15 +507,20 @@ export default function LetterDetailModal({
           <div className="shrink-0 border-t p-5">
             {role === "ADMIN" ? null : (
               <div className="flex-1 flex items-center justify-center">
-                <div className="flex-1 flex items-center justify-center">
-                  <button
-                    type="button"
-                    className="cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <MessageSquareWarning size={16} className="text-primary" />
-                    <span>신고하기</span>
-                  </button>
-                </div>
+                {isReceiver && (
+                  <div className="flex-1 flex items-center justify-center">
+                    <button
+                      type="button"
+                      className="cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <MessageSquareWarning
+                        size={16}
+                        className="text-primary"
+                      />
+                      <span>신고하기</span>
+                    </button>
+                  </div>
+                )}
 
                 <div className="flex-1 flex items-center justify-center">
                   <button
