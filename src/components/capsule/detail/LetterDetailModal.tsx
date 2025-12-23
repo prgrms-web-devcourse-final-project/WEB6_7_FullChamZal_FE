@@ -546,15 +546,17 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
-                <div className="flex-1 flex items-center justify-center">
-                  <Link
-                    href={"/capsules/new"}
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <Reply size={16} className="text-primary" />
-                    <span>답장하기</span>
-                  </Link>
-                </div>
+                {!isPublic && (
+                  <div className="flex-1 flex items-center justify-center">
+                    <Link
+                      href={"/capsules/new"}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Reply size={16} className="text-primary" />
+                      <span>답장하기</span>
+                    </Link>
+                  </div>
+                )}
 
                 <div className="flex-1 flex items-center justify-center">
                   <button
