@@ -158,7 +158,7 @@ export default function ProfileModal({
   return (
     <>
       <Modal open={open} onClose={handleClose}>
-        <div className="w-full max-w-[500px] rounded-2xl border-2 border-outline bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
+        <div className="w-full max-w-125 rounded-2xl border-2 border-outline bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
           <div className="py-4 px-6 flex justify-between items-center border-b border-outline">
             <h4 className="text-lg">내 프로필</h4>
             <button type="button" onClick={handleClose} className="cursor-pointer">

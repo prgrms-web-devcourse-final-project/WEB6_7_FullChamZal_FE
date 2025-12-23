@@ -26,6 +26,8 @@ export default function AuthHeader({
       {/* 소셜 로그인 버튼 */}
       <button
         type="button"
+        onClick={() => {  window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/google`;
+      }}
         className="cursor-pointer w-full py-2 md:py-3 bg-white/80 rounded-xl flex items-center justify-center gap-2 border border-outline"
       >
         <svg
