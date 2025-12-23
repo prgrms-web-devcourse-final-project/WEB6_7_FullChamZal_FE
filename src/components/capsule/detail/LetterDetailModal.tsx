@@ -294,6 +294,8 @@ export default function LetterDetailModal({
   }
 
   const capsule = data;
+  // 내가 보낸 편지만 수정 가능하기에, 임시로 확인을 하기 위함임
+  // 백엔드 측에 별도 API 요청하여 구현 필요
   const me = meQuery.data;
   const isOwner =
     !isAdmin &&
@@ -375,10 +377,12 @@ export default function LetterDetailModal({
                       <div className="h-px bg-border my-1" />
                       <button
                         type="button"
-                        className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 disabled:opacity-60 rounded-md"
-                        disabled
+                        className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md"
+                        onClick={() => {
+                          router.push(`/capsules/edit?capsuleId=${capsuleId}`);
+                        }}
                       >
-                        수정하기 (준비중)
+                        수정하기
                       </button>
                       <button
                         type="button"

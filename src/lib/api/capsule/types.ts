@@ -82,3 +82,12 @@ export interface CapsuleCreateResponse {
   url?: string;
   capPW?: string;
 }
+
+export interface CapsuleUpdateRequest {
+  title?: string;
+  content?: string;
+}
+
+export interface CapsuleUpdateResponse {
+  message: string;
+}

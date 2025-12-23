@@ -4,6 +4,8 @@ import {
   CreatePrivateCapsuleRequest,
   CreateMyCapsuleRequest,
   CreatePublicCapsuleRequest,
+  CapsuleUpdateRequest,
+  CapsuleUpdateResponse,
   UnlockType,
 } from "./types";
 
@@ -269,4 +271,22 @@ export async function createMyCapsule(
     method: "POST",
     json: payload,
   });
+}
+
+/**
+ * 캡슐 수정 API 호출 (인증 필요)
+ * @param capsuleId 수정할 캡슐 ID
+ * @param payload 수정할 제목/내용
+ */
+export async function updateCapsule(
+  capsuleId: number,
+  payload: CapsuleUpdateRequest
+): Promise<CapsuleUpdateResponse> {
+  return apiFetchRaw<CapsuleUpdateResponse>(
+    `/api/v1/capsule/update?capsuleId=${capsuleId}`,
+    {
+      method: "PUT",
+      json: payload,
+    }
+  );
 }
