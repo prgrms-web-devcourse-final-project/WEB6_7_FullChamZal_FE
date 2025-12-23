@@ -5,22 +5,31 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+
 import {
   Archive,
   Bookmark,
   Clock,
   LinkIcon,
+  MoreHorizontal,
   MapPin,
   Reply,
   X,
 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import ActiveModal from "@/components/common/ActiveModal";
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
+import { useMe } from "@/lib/hooks/useMe";
 
 type UICapsule = {
   title: string;
@@ -88,6 +97,7 @@ export default function LetterDetailModal({
   const searchParams = useSearchParams();
 
   const isAdmin = role === "ADMIN";
+  const meQuery = useMe();
 
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
 
@@ -284,6 +294,12 @@ export default function LetterDetailModal({
   }
 
   const capsule = data;
+  const me = meQuery.data;
+  const isOwner =
+    !isAdmin &&
+    !!me &&
+    (me.nickname === capsule.writerNickname ||
+      me.name === capsule.writerNickname);
 
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
@@ -336,13 +352,54 @@ export default function LetterDetailModal({
                 </div>
               </div>
 
-              <button
-                type="button"
-                className="md:flex-1 flex justify-end cursor-pointer text-primary"
-                onClick={close}
-              >
-                <X size={24} />
-              </button>
+              <div className="md:flex-1 flex justify-end items-center gap-2">
+                {isOwner ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="text-primary"
+                        aria-label="더보기"
+                      >
+                        <MoreHorizontal size={18} />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="end"
+                      className="w-44 z-10000 p-1"
+                      sideOffset={6}
+                    >
+                      <div className="px-3 py-2 text-xs text-text-3">관리</div>
+                      <div className="h-px bg-border my-1" />
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 disabled:opacity-60 rounded-md"
+                        disabled
+                      >
+                        수정하기 (준비중)
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 disabled:opacity-60 rounded-md"
+                        disabled
+                      >
+                        삭제하기 (준비중)
+                      </button>
+                    </PopoverContent>
+                  </Popover>
+                ) : null}
+
+                <button
+                  type="button"
+                  className="cursor-pointer text-primary"
+                  onClick={close}
+                  aria-label="닫기"
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
           </div>
 
