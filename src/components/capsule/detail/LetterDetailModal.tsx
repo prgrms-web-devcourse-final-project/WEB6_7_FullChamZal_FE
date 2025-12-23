@@ -10,6 +10,7 @@ import {
   Archive,
   Bookmark,
   Clock,
+  Heart,
   LinkIcon,
   MessageSquareWarning,
   MoreHorizontal,
@@ -108,9 +109,10 @@ export default function LetterDetailModal({
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  // 발신자/수신자 구분: pathname으로 확인
+  // 발신자/수신자/공개 편지 구분: pathname으로 확인
   const isSender = pathname?.includes("/dashboard/send");
   const isReceiver = pathname?.includes("/dashboard/receive");
+  const isPublic = pathname?.includes("/dashboard/map");
 
   const returnUrl = useMemo(() => {
     const qs = searchParams?.toString();
@@ -531,6 +533,18 @@ export default function LetterDetailModal({
                     <span>링크 복사</span>
                   </button>
                 </div>
+
+                {isPublic && (
+                  <div className="flex-1 flex items-center justify-center">
+                    <button
+                      type="button"
+                      className="cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <Heart size={16} className="text-primary" />
+                      <span>좋아요</span>
+                    </button>
+                  </div>
+                )}
 
                 <div className="flex-1 flex items-center justify-center">
                   <Link
