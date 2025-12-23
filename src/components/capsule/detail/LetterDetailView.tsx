@@ -139,12 +139,10 @@ export default function LetterDetailView({
     );
   }
 
-  const capsule: any = data;
+  const capsule = data;
 
   // 조건 미충족 (서버가 FAIL을 정상 응답으로 내려줌)
   if (capsule.result === "FAIL") {
-    // 목표 위치(target): 서버가 내려준 캡슐 좌표
-    // - 여기서 "LatLng 확정"을 만들어야 타입 에러가 안 남
     const maybeTarget = { lat: capsule.locationLat, lng: capsule.locationLng };
     const targetLocation = isLatLng(maybeTarget) ? maybeTarget : undefined;
 
@@ -155,7 +153,8 @@ export default function LetterDetailView({
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
           targetLocation={targetLocation}
-          allowedRadiusMeter={100}
+          viewingRadius={capsule.locationRadiusM}
+          locationName={capsule.locationName}
           locationErrorMessage={locationError ?? undefined}
         />
       </div>
