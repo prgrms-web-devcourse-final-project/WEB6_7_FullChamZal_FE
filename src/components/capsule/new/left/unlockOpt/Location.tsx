@@ -5,7 +5,7 @@ import { useCallback, useMemo, useRef } from "react";
 import KakaoLocation, { type KakaoLocationHandle } from "./KakaoLocation";
 
 // 조회 반경
-const VIEWING_RADIUS_OPTIONS = [50, 100, 300, 500, 1000] as const;
+// const VIEWING_RADIUS_OPTIONS = [50, 100, 300, 500, 1000] as const;
 
 export default function Location({
   value,
@@ -27,7 +27,7 @@ export default function Location({
     <>
       <div className="flex items-center gap-1">
         <MapPin size={16} />
-        <span className="text-sm">장소 설정</span>
+        <span className="text-sm">열람 가능 장소</span>
       </div>
 
       {/* 검색 입력 */}
@@ -92,7 +92,7 @@ export default function Location({
       />
 
       {/* 조회 반경 */}
-      <div className="flex flex-col space-y-2">
+      {/* <div className="flex flex-col space-y-2">
         <label>조회 반경 (m)</label>
         <div className="flex flex-wrap gap-2">
           {VIEWING_RADIUS_OPTIONS.map((r) => {
@@ -114,7 +114,7 @@ export default function Location({
             );
           })}
         </div>
-      </div>
+      </div> */}
 
       {/* 사용자 지정 이름 */}
       <div className="flex flex-col space-y-2">
