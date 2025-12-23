@@ -33,4 +33,6 @@ interface PublicCapsule {
   distanceToCapsule: number;
   isViewed: boolean;
   isUnlockable: boolean;
+  likeCount: number;
+  isLiked: boolean;
 }
