@@ -30,9 +30,16 @@ export default function Card({ data, keyword }: CardProps) {
         <div className="space-y-1">
           <div className="flex justify-between group-focus:text-white">
             <p>{highlightText(data.title, keyword)}</p>
-            <div className="flex items-center text-sm gap-1">
-              <Heart size={14}></Heart>
-              <p>0</p>
+            <div className="flex items-center text-sm gap-1 group-focus:text-white">
+              <Heart
+                size={14}
+                className={
+                  data.isLiked
+                    ? "fill-current text-primary group-focus-within:text-white"
+                    : ""
+                }
+              />
+              <p>{data.likeCount}</p>
             </div>
           </div>
           <div className="text-xs flex items-center gap-1 text-text-3 group-focus:text-white">
