@@ -91,3 +91,8 @@ export interface CapsuleUpdateRequest {
 export interface CapsuleUpdateResponse {
   message: string;
 }
+
+export interface CapsuleDeleteResponse {
+  capsuleId: number;
+  message: string;
+}

@@ -6,6 +6,7 @@ import {
   CreatePublicCapsuleRequest,
   CapsuleUpdateRequest,
   CapsuleUpdateResponse,
+  CapsuleDeleteResponse,
   UnlockType,
 } from "./types";
 
@@ -287,6 +288,36 @@ export async function updateCapsule(
     {
       method: "PUT",
       json: payload,
+    }
+  );
+}
+
+/**
+ * 캡슐 삭제 API 호출 - 발신자 삭제 (인증 필요)
+ * @param capsuleId 삭제할 캡슐 ID
+ */
+export async function deleteCapsuleAsSender(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleDeleteResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleDeleteResponse>>(
+    `/api/v1/capsule/delete/sender?capsuleId=${capsuleId}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+/**
+ * 캡슐 삭제 API 호출 - 수신자 삭제 (인증 필요)
+ * @param capsuleId 삭제할 캡슐 ID
+ */
+export async function deleteCapsuleAsReceiver(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleDeleteResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleDeleteResponse>>(
+    `/api/v1/capsule/delete/reciver?capsuleId=${capsuleId}`,
+    {
+      method: "DELETE",
     }
   );
 }

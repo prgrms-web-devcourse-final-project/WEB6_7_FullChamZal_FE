@@ -24,9 +24,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import ActiveModal from "@/components/common/ActiveModal";
+import ConfirmModal from "@/components/common/ConfirmModal";
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import {
+  deleteCapsuleAsReceiver,
+  deleteCapsuleAsSender,
+} from "@/lib/api/capsule/capsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { useMe } from "@/lib/hooks/useMe";
@@ -100,6 +105,11 @@ export default function LetterDetailModal({
   const meQuery = useMe();
 
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
+  // 발신자/수신자 구분: pathname으로 확인
+  const isSender = pathname?.includes("/dashboard/send");
+  const isReceiver = pathname?.includes("/dashboard/receive");
 
   const returnUrl = useMemo(() => {
     const qs = searchParams?.toString();
@@ -124,6 +134,37 @@ export default function LetterDetailModal({
       unlockAt: string;
     }) => guestCapsuleApi.save(payload),
     onSuccess: () => setIsSaveSuccessOpen(true),
+  });
+
+  // 삭제 mutation
+  const deleteMutation = useMutation({
+    mutationKey: ["capsuleDelete", capsuleId],
+    mutationFn: () => {
+      if (isSender) {
+        return deleteCapsuleAsSender(capsuleId);
+      } else if (isReceiver) {
+        return deleteCapsuleAsReceiver(capsuleId);
+      }
+      throw new Error("삭제할 수 없습니다.");
+    },
+    onSuccess: () => {
+      alert("캡슐이 삭제되었습니다.");
+      if (closeHref) {
+        router.push(closeHref);
+      } else {
+        router.back();
+      }
+      router.refresh();
+    },
+    onError: (err: unknown) => {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "삭제 중 오류가 발생했습니다.";
+      alert(msg);
+    },
   });
 
   // ✅ 로그인/회원가입 후 돌아왔을 때 자동 재시도
@@ -335,6 +376,25 @@ export default function LetterDetailModal({
         />
       )}
 
+      {/* 삭제 확인 모달 */}
+      {isDeleteConfirmOpen && (
+        <ConfirmModal
+          active="fail"
+          title="캡슐 삭제"
+          content={
+            isSender
+              ? "보낸 편지를 삭제하시겠습니까?"
+              : "받은 편지를 삭제하시겠습니까?"
+          }
+          open={isDeleteConfirmOpen}
+          onClose={() => setIsDeleteConfirmOpen(false)}
+          onConfirm={() => {
+            setIsDeleteConfirmOpen(false);
+            deleteMutation.mutate();
+          }}
+        />
+      )}
+
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
@@ -355,7 +415,7 @@ export default function LetterDetailModal({
               </div>
 
               <div className="md:flex-1 flex justify-end items-center gap-2">
-                {isOwner ? (
+                {isOwner || isSender || isReceiver ? (
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -375,22 +435,29 @@ export default function LetterDetailModal({
                     >
                       <div className="px-3 py-2 text-xs text-text-3">관리</div>
                       <div className="h-px bg-border my-1" />
-                      <button
-                        type="button"
-                        className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md"
-                        onClick={() => {
-                          router.push(`/capsules/edit?capsuleId=${capsuleId}`);
-                        }}
-                      >
-                        수정하기
-                      </button>
-                      <button
-                        type="button"
-                        className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 disabled:opacity-60 rounded-md"
-                        disabled
-                      >
-                        삭제하기 (준비중)
-                      </button>
+                      {isOwner && (
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md"
+                          onClick={() => {
+                            router.push(
+                              `/capsules/edit?capsuleId=${capsuleId}`
+                            );
+                          }}
+                        >
+                          수정하기
+                        </button>
+                      )}
+                      {(isSender || isReceiver) && (
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md disabled:opacity-60"
+                          disabled={deleteMutation.isPending}
+                          onClick={() => setIsDeleteConfirmOpen(true)}
+                        >
+                          {deleteMutation.isPending ? "삭제 중..." : "삭제하기"}
+                        </button>
+                      )}
                     </PopoverContent>
                   </Popover>
                 ) : null}
