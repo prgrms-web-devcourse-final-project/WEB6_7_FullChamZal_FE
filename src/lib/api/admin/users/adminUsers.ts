@@ -34,6 +34,14 @@ export const adminUsersApi = {
     );
   },
 
+  /* 관리자 회원 단건 조회 */
+  get: (params: { memberId: number; signal?: AbortSignal }) => {
+    return apiFetch<AdminMemberDetail>(
+      `/api/v1/admin/members/${params.memberId}`,
+      { signal: params.signal }
+    );
+  },
+
   /* 회원 상태 변경 (ACTIVE ↔ STOP) */
   toggleStatus: (params: { id: number; nextStatus: AdminStatus }) => {
     return apiFetch<void>(`/api/v1/admin/members/${params.id}/status`, {

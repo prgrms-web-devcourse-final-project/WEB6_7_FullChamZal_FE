@@ -22,3 +22,47 @@ type AdminReportResponse = {
   content: AdminReport[];
   totalElements: number;
 };
+
+/* 신고 세부 내용 */
+type AdminReportDetail = {
+  id: number;
+  targetType: ReportTargetType;
+  targetId: number;
+  targetTitle: string;
+  targetWriterNickname: string;
+  status: ReportStatus; // PENDING | REVIEWING | ACCEPTED | REJECTED
+  reasonType: ReportReasonType; // SPAM, ABUSE 등
+  reasonDetail: string;
+  reporterId: number;
+  reporterNickname: string;
+  reporterPhone: string | null;
+  processedBy: number | null;
+  processedAt: string | null;
+  adminMemo: string | null;
+  createdAt: string;
+};
+
+/* 신고 상태 변경 */
+type ReportAction =
+  | "SANCTION" // 제재
+  | "NO_ACTION" // 조치 없음
+  | "WARN" // 경고
+  | "ETC" // 기타
+  | string;
+
+type UpdateReportStatusParams = {
+  reportId: number;
+  status: ReportStatus;
+  action: string;
+  processMemo?: string | null;
+  sanctionUntil?: string | null;
+};
+
+type UpdateReportStatusResponse = {
+  id: number;
+  status: string;
+  action: string;
+  processedBy: number;
+  processedAt: string;
+  processMemo: string | null;
+};

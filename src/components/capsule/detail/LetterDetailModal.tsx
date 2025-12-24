@@ -318,6 +318,7 @@ export default function LetterDetailModal({
       )}
 
       <div className="flex h-full justify-center md:p-15 p-6">
+        <div>{capsule.unlockUntil}</div>
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
           <div className="shrink-0 border-b px-8 py-4">
