@@ -137,11 +137,6 @@ export default function ModerationList({
         cell: (m: AdminModeration) => m.createdAt,
       },
       {
-        key: "capsuleId",
-        header: "캡슐 ID",
-        cell: (m: AdminModeration) => m.capsuleId,
-      },
-      {
         key: "userId",
         header: "회원 ID",
         cell: (m: AdminModeration) => m.actorMemberId,
