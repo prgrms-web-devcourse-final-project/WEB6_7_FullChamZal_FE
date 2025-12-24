@@ -10,8 +10,7 @@ import WriteInput from "@/components/capsule/new/left/WriteInput";
 import WriteDiv from "@/components/capsule/new/left/WriteDiv";
 import Button from "@/components/common/Button";
 import { CAPTURE_ENVELOPE_PALETTE } from "@/constants/capsulePalette";
-import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
-import { updateCapsule } from "@/lib/api/capsule/capsule";
+import { updateCapsule, readSendCapsule } from "@/lib/api/capsule/capsule";
 import { Send } from "lucide-react";
 
 type PreviewState = {
@@ -67,22 +66,12 @@ export default function CapsuleEditPage() {
   };
 
   // 서버 프리필 대비 유효 값 계산
-  const { data: prefillData } = useQuery<CapsuleReadData>({
+  const { data: prefillData } = useQuery({
     queryKey: ["capsuleEditPrefill", capsuleId],
     enabled: capsuleId > 0 && !preview.title && !preview.content,
-    queryFn: async ({ signal }) => {
-      const unlockAt = new Date().toISOString();
-      const res = await guestCapsuleApi.read(
-        {
-          capsuleId: capsuleId,
-          unlockAt,
-          locationLat: 0,
-          locationLng: 0,
-          password: undefined,
-        },
-        signal
-      );
-      return res;
+    queryFn: async () => {
+      const res = await readSendCapsule(capsuleId);
+      return res.data;
     },
   });
 

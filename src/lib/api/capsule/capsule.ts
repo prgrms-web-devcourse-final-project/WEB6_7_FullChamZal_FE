@@ -8,6 +8,7 @@ import {
   CapsuleUpdateResponse,
   CapsuleDeleteResponse,
   CapsuleLikeResponse,
+  CapsuleSendReadResponse,
   UnlockType,
 } from "./types";
 
@@ -366,6 +367,22 @@ export async function unlikeCapsule(
     {
       method: "POST",
       json: { capsuleId },
+    }
+  );
+}
+
+/**
+ * 수신자 캡슐 조회 API 호출 (인증 필요)
+ * 사용자가 보낸 캡슐의 내용을 조건 없이 보여줍니다.
+ * @param capsuleId 캡슐 ID
+ */
+export async function readSendCapsule(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleSendReadResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleSendReadResponse>>(
+    `/api/v1/capsule/readSendCapsule?capsuleId=${capsuleId}`,
+    {
+      method: "GET",
     }
   );
 }
