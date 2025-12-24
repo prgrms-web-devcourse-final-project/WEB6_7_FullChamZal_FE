@@ -85,7 +85,7 @@ function getRightIcon(type: string) {
 
 export default function PendingLetters() {
   const {
-    data: receiveList = [], // ✅ 핵심: 기본값 빈 배열
+    data: receiveList = [],
     isLoading,
     isError,
   } = useQuery<CapsuleDashboardItem[]>({
@@ -102,7 +102,7 @@ export default function PendingLetters() {
   } | null>(null);
 
   useEffect(() => {
-    // ✅ 브라우저 환경 가드 (안전)
+    // 브라우저 환경 가드 (안전)
     if (typeof window === "undefined") return;
     if (!navigator?.geolocation) return;
 
