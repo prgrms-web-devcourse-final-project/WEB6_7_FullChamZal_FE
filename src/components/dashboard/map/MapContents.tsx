@@ -150,13 +150,25 @@ export default function MapContents() {
   //조회 상태 필터
   const filter = (data: PublicCapsule[] | undefined) => {
     if (data) {
+      let result = data;
       switch (viewed) {
         case "ALL":
-          return data;
+          break;
         case "UNREAD":
-          return data.filter((d) => d.isViewed === false);
+          result = result.filter((d) => d.isViewed === false);
+          break;
         case "READ":
-          return data.filter((d) => d.isViewed === true);
+          result = result.filter((d) => d.isViewed === true);
+          break;
+      }
+      switch (accessible) {
+        case "ALL":
+          return result;
+        case "ACCESSIBLE":
+          return result.filter((d) => d.isUnlockable === true);
+
+        case "INACCESSIBLE":
+          return result.filter((d) => d.isUnlockable === false);
       }
     } else return [];
   };

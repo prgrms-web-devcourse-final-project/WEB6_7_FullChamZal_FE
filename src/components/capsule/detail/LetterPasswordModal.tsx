@@ -5,13 +5,10 @@ import { useState } from "react";
 import Button from "@/components/common/Button";
 import Logo from "@/components/common/Logo";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
-import LetterLockedView from "./LetterLockedView";
-import { redirect } from "next/navigation";
 import ForbiddenPage from "./ForbiddenPage";
 
 export default function LetterUnlockModal({
   capsuleId,
-  isProtected,
   onSuccess,
 }: {
   capsuleId: number;
@@ -59,7 +56,7 @@ export default function LetterUnlockModal({
       });
 
       // 여기서 응답 구조 확인
-      console.log("📦 read capsule result:", result);
+      console.log("read capsule result:", result);
 
       onSuccess(password);
     } catch (err: any) {
@@ -73,9 +70,6 @@ export default function LetterUnlockModal({
   };
 
   if (error === "이 캡슐의 수신자가 아닙니다.") return <ForbiddenPage />;
-
-  /* if (error === "시간/위치 검증에 실패하였습니다.")
-    return <LetterLockedView unlockAt={} />; */
 
   return (
     <section className="w-full max-w-120 rounded-3xl border border-outline bg-white shadow-xl p-10">

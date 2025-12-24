@@ -4,7 +4,7 @@
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import LetterUnlockModal from "../detail/LetterUnlockModal";
+import LetterPasswordModal from "../detail/LetterPasswordModal";
 import LetterDetailView from "../detail/LetterDetailView";
 import { ApiEnvelope } from "@/lib/api/fetchClient";
 
@@ -36,7 +36,7 @@ export default function CapsuleGate({ uuId }: { uuId: string }) {
   if (existedPassword && !password) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
-        <LetterUnlockModal
+        <LetterPasswordModal
           capsuleId={capsuleId}
           isProtected={isProtected}
           onSuccess={(pw) => setPassword(pw)}
