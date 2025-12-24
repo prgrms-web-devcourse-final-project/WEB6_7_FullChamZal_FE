@@ -33,6 +33,9 @@ import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import {
   deleteCapsuleAsReceiver,
   deleteCapsuleAsSender,
+  getCapsuleLikeCount,
+  likeCapsule,
+  unlikeCapsule,
 } from "@/lib/api/capsule/capsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
@@ -108,6 +111,8 @@ export default function LetterDetailModal({
 
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
   // 발신자/수신자/공개 편지 구분: pathname으로 확인
   const isSender = pathname?.includes("/dashboard/send");
@@ -166,6 +171,93 @@ export default function LetterDetailModal({
           : typeof err === "string"
           ? err
           : "삭제 중 오류가 발생했습니다.";
+      alert(msg);
+    },
+  });
+
+  // 좋아요 수 조회 query (공개 편지일 때만)
+  const { data: likeData } = useQuery({
+    queryKey: ["capsuleLikeCount", capsuleId],
+    enabled: isPublic && open && capsuleId > 0,
+    queryFn: async () => {
+      const res = await getCapsuleLikeCount(capsuleId);
+      return res.data;
+    },
+  });
+
+  // 좋아요 수 초기화
+  useEffect(() => {
+    if (likeData) {
+      setLikeCount(likeData.likeCount);
+    }
+  }, [likeData]);
+
+  // 좋아요 토글 mutation (낙관적 업데이트)
+  const likeMutation = useMutation({
+    mutationKey: ["capsuleLike", capsuleId],
+    mutationFn: async (shouldLike: boolean) => {
+      // onMutate에서 결정한 방향으로 API 호출
+      if (shouldLike) {
+        return await likeCapsule(capsuleId);
+      } else {
+        return await unlikeCapsule(capsuleId);
+      }
+    },
+    onMutate: async () => {
+      // 낙관적 업데이트: 먼저 UI 업데이트
+      const previousIsLiked = isLiked;
+      const previousLikeCount = likeCount;
+      const nextIsLiked = !previousIsLiked;
+
+      setIsLiked(nextIsLiked);
+      setLikeCount((prev) => (previousIsLiked ? prev - 1 : prev + 1));
+
+      // 롤백을 위한 이전 값과 다음 상태 반환
+      return { previousIsLiked, previousLikeCount, nextIsLiked };
+    },
+    onSuccess: (data, variables, context) => {
+      // 서버 응답으로 최신 값 업데이트
+      if (data.data) {
+        setLikeCount(data.data.likeCount);
+      }
+      // 성공 시 상태 확인
+      if (context) {
+        setIsLiked(context.nextIsLiked);
+      }
+    },
+    onError: (err, variables, context) => {
+      // 에러 코드에 따라 상태 업데이트
+      const errorCode =
+        err && typeof err === "object" && "code" in err
+          ? (err as { code?: string }).code
+          : null;
+
+      // CPS016: 중복 좋아요 → 이미 좋아요를 눌렀다는 의미
+      if (errorCode === "CPS016") {
+        setIsLiked(true);
+        // 좋아요 수는 롤백하지 않음 (이미 증가했을 수 있음)
+        return;
+      }
+
+      // CPS018: 좋아요 해제 불가 → 좋아요를 누르지 않았다는 의미
+      if (errorCode === "CPS018") {
+        setIsLiked(false);
+        // 좋아요 수는 롤백하지 않음
+        return;
+      }
+
+      // 그 외 에러는 롤백
+      if (context) {
+        setIsLiked(context.previousIsLiked);
+        setLikeCount(context.previousLikeCount);
+      }
+
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "좋아요 처리 중 오류가 발생했습니다.";
       alert(msg);
     },
   });
@@ -538,10 +630,21 @@ export default function LetterDetailModal({
                   <div className="flex-1 flex items-center justify-center">
                     <button
                       type="button"
-                      className="cursor-pointer flex items-center justify-center gap-2"
+                      className="cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                      onClick={() => likeMutation.mutate(!isLiked)}
+                      disabled={likeMutation.isPending}
                     >
-                      <Heart size={16} className="text-primary" />
-                      <span>좋아요</span>
+                      <Heart
+                        size={16}
+                        className={
+                          isLiked ? "text-primary fill-red-500" : "text-primary"
+                        }
+                      />
+                      <span>
+                        {likeMutation.isPending
+                          ? "처리 중..."
+                          : `좋아요 ${likeCount}`}
+                      </span>
                     </button>
                   </div>
                 )}

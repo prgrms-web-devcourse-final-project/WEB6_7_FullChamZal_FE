@@ -7,6 +7,7 @@ import {
   CapsuleUpdateRequest,
   CapsuleUpdateResponse,
   CapsuleDeleteResponse,
+  CapsuleLikeResponse,
   UnlockType,
 } from "./types";
 
@@ -318,6 +319,53 @@ export async function deleteCapsuleAsReceiver(
     `/api/v1/capsule/delete/reciver?capsuleId=${capsuleId}`,
     {
       method: "DELETE",
+    }
+  );
+}
+
+/**
+ * 캡슐 좋아요 수 읽기 API 호출
+ * @param capsuleId 캡슐 ID
+ */
+export async function getCapsuleLikeCount(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleLikeResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleLikeResponse>>(
+    `/api/v1/capsule/readLike?capsuleId=${capsuleId}`,
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * 캡슐 좋아요 증가 API 호출 (인증 필요)
+ * @param capsuleId 캡슐 ID
+ */
+export async function likeCapsule(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleLikeResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleLikeResponse>>(
+    "/api/v1/capsule/likeUp",
+    {
+      method: "POST",
+      json: { capsuleId },
+    }
+  );
+}
+
+/**
+ * 캡슐 좋아요 감소 API 호출 (인증 필요)
+ * @param capsuleId 캡슐 ID
+ */
+export async function unlikeCapsule(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleLikeResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleLikeResponse>>(
+    "/api/v1/capsule/likeDown",
+    {
+      method: "POST",
+      json: { capsuleId },
     }
   );
 }

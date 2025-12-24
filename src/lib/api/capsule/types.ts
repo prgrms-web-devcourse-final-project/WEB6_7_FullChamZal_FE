@@ -96,3 +96,12 @@ export interface CapsuleDeleteResponse {
   capsuleId: number;
   message: string;
 }
+
+export interface CapsuleLikeRequest {
+  capsuleId: number;
+}
+
+export interface CapsuleLikeResponse {
+  likeCount: number;
+  message: string;
+}
