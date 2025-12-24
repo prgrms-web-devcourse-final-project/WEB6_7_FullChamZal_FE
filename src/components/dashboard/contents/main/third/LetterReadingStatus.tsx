@@ -9,11 +9,25 @@ import {
   Tooltip,
 } from "recharts";
 import DivBox from "../../../DivBox";
+import { useQuery } from "@tanstack/react-query";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 
 export default function LetterReadingStatus() {
+  /* 받은 편지 */
+  const { data: receiveList } = useQuery({
+    queryKey: ["capsuleDashboard", "receive"],
+    queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+  });
+
+  const viewedCount =
+    receiveList?.filter((item) => item.viewStatus).length ?? 0;
+
+  const unviewedCount =
+    receiveList?.filter((item) => !item.viewStatus).length ?? 0;
+
   const donutData = [
-    { name: "열람", value: 15 },
-    { name: "미열람", value: 10 },
+    { name: "열람", value: viewedCount },
+    { name: "미열람", value: unviewedCount },
   ];
 
   const DONUT_COLORS = ["#FF583B", "#D6DAE1"];
@@ -40,7 +54,7 @@ export default function LetterReadingStatus() {
                   ))}
 
                   <Label
-                    value={`총 24통`}
+                    value={`총 ${viewedCount + unviewedCount}통`}
                     position="center"
                     fill="#111827" // 텍스트 색
                     style={{ fontSize: 28, fontWeight: 500 }}
