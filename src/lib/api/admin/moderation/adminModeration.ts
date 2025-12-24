@@ -1,7 +1,7 @@
 import { apiFetch } from "../../fetchClient";
 
 function mapTabToFilters(tab: string): { decision?: ModerationDecision } {
-  if (tab === "pass") return { decision: "PASS" };
+  if (tab === "skipped") return { decision: "SKIPPED" };
   if (tab === "error") return { decision: "ERROR" };
   if (tab === "flagged") return { decision: "FLAGGED" };
   return {};

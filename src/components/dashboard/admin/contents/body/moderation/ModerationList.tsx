@@ -10,15 +10,15 @@ import {
 } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import DataTable from "../DataTable";
-import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { AlertCircle, MinusCircle, XCircle } from "lucide-react";
 import ModerationDetail from "./ModerationDetail";
 
 function DecisionBadge({ decision }: { decision: ModerationDecision }) {
-  if (decision === "PASS") {
+  if (decision === "SKIPPED") {
     return (
       <div className="inline-flex items-center gap-1 text-green-800">
-        <CheckCircle size={14} />
-        완료
+        <MinusCircle size={14} />
+        건너뜀
       </div>
     );
   }

@@ -8,7 +8,7 @@ import { AdminModerationApi } from "@/lib/api/admin/moderation/adminModeration";
 
 const REPORT_TABS = [
   { key: "all", label: "전체" },
-  { key: "pass", label: "통과" },
+  { key: "skipped", label: "건너뜀" },
   { key: "error", label: "차단" },
   { key: "flagged", label: "플래그됨" },
 ] as const;
@@ -23,10 +23,10 @@ export default function ModerationSection() {
     staleTime: 30_000,
   });
 
-  const qPass = useQuery({
-    queryKey: ["adminReportCount", "pass"],
+  const qSkipped = useQuery({
+    queryKey: ["adminReportCount", "skipped"],
     queryFn: ({ signal }) =>
-      AdminModerationApi.list({ tab: "pass", ...base, signal }),
+      AdminModerationApi.list({ tab: "skipped", ...base, signal }),
     staleTime: 30_000,
   });
 
@@ -46,7 +46,7 @@ export default function ModerationSection() {
 
   const counts = {
     total: qAll.data?.totalElements ?? 0,
-    pass: qPass.data?.totalElements ?? 0,
+    skipped: qSkipped.data?.totalElements ?? 0,
     error: qError.data?.totalElements ?? 0,
     flagged: qFlagged.data?.totalElements ?? 0,
   };
@@ -62,7 +62,7 @@ export default function ModerationSection() {
         <StatsOverview
           tabs={REPORT_TABS}
           totals={counts.total ?? 0}
-          second={counts.pass ?? 0}
+          second={counts.skipped ?? 0}
           third={counts.error ?? 0}
           fourth={counts.flagged ?? 0}
         />

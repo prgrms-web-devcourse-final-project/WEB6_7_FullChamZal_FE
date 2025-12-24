@@ -1,4 +1,4 @@
-type ModerationDecision = "PASS" | "ERROR" | "FLAGGED";
+type ModerationDecision = "SKIPPED" | "ERROR" | "FLAGGED";
 
 type AdminModeration = {
   id: number;
