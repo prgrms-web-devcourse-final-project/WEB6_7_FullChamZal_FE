@@ -35,6 +35,7 @@ type CapsuleReadData = {
   locationName?: string;
   locationLat?: number;
   locationLng?: number;
+  isBookmarked: boolean;
   result: string;
 };
 
@@ -46,8 +47,6 @@ type ApiResponse<T> = {
 
 type CapsuleSaveRequest = {
   capsuleId: number;
-  isSendSelf: 0 | 1;
-  unlockAt: string;
 };
 
 type CapsuleSaveData = {

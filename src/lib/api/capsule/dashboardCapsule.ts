@@ -35,4 +35,19 @@ export const capsuleDashboardApi = {
 
     return apiFetchRaw<BookmarkPageResponse>(url, { signal });
   },
+
+  /* 북마크 등록 */
+  addBookmark: (capsuleId: number, signal?: AbortSignal) =>
+    apiFetch("/api/bookmarks", {
+      method: "POST",
+      body: JSON.stringify({ capsuleId }),
+      signal,
+    }),
+
+  /* 북마크 삭제 */
+  removeBookmark: (capsuleId: number, signal?: AbortSignal) =>
+    apiFetch(`/api/bookmarks/${capsuleId}`, {
+      method: "DELETE",
+      signal,
+    }),
 };
