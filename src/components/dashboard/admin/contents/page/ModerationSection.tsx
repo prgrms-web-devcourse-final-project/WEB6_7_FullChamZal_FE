@@ -56,7 +56,7 @@ export default function ModerationSection() {
       <div className="w-full space-y-8">
         <AdminHeader
           title="편지 생성 로그"
-          content="편지 생성 시 AI 모더레이션 로그를 확인합니다"
+          content="편지 생성 시 AI 검증 로그를 확인합니다"
         />
 
         <StatsOverview

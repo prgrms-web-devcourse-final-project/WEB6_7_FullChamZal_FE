@@ -37,7 +37,7 @@ const ADMIN_ITEMS: MenuItem[] = [
     href: "/admin/dashboard/moderation-logs",
     activePrefix: "/admin/dashboard/moderation-logs",
     title: "편지 생성 로그",
-    desc: "AI 모더레이션 로그",
+    desc: "AI 검증 로그",
     icon: History,
   },
 ];
