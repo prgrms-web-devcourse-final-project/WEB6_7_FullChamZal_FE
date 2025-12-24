@@ -11,6 +11,13 @@ export default function TodayLetters() {
     queryFn: () => authApiClient.me(),
   });
 
+  const today = new Date();
+  const todayText = today.toLocaleDateString("ko-KR", {
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  });
+
   return (
     <>
       <div className="space-y-5">
@@ -20,12 +27,13 @@ export default function TodayLetters() {
             안녕하세요, {me?.name}님<span className="text-primary px-1">_</span>
           </h2>
           <p className="text-text-2 text-lg ">
-            오늘은 12월 5일, 오늘 당신을 기다리는 편지가{" "}
+            오늘은 {todayText}, 오늘 당신을 기다리는 편지가{" "}
             <span className="text-primary font-semibold">4통</span> 있습니다.
           </p>
         </div>
         {/* Card => 총 4개 까지 */}
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:ml-6">
+          {/* 없으면 열릴 편지가 없다는 UI 추가 */}
           api 구현 뒤에 진행할 예정!!
           <DivBox className="w-full">
             <div className="space-y-3">
