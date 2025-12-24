@@ -20,7 +20,7 @@ type ProfileForm = {
   nickname: string;
   email: string;
   phoneNumber: string;
-  oAuthProvider?: string| null
+  oAuthProvider?: string | null;
 };
 
 const getErrorMessage = (e: unknown) => {
@@ -62,7 +62,9 @@ export default function ProfileModal({
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [nextNicknameChangeDate, setNextNicknameChangeDate] = useState<string | null>(null);
+  const [nextNicknameChangeDate, setNextNicknameChangeDate] = useState<
+    string | null
+  >(null);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -91,7 +93,6 @@ export default function ProfileModal({
     setForm(emptyForm);
     setInitialForm(emptyForm);
 
-    
     (async () => {
       try {
         setIsLoadingProfile(true);
@@ -106,7 +107,6 @@ export default function ProfileModal({
           oAuthProvider: meRes.oauthProvider ?? null,
         };
 
-        
         if (meRes.oauthProvider === "GOOGLE") {
           setIsVerified(true);
           setForm(next);
@@ -114,7 +114,6 @@ export default function ProfileModal({
           return;
         }
 
-      
         setForm(emptyForm);
         setInitialForm(emptyForm);
       } catch (e: unknown) {
@@ -210,7 +209,11 @@ export default function ProfileModal({
             <h4 className="text-lg">내 프로필</h4>
 
             {/* ✅ 구글 유저도 닫기는 허용(원하면 막을 수도 있음) */}
-            <button type="button" onClick={handleClose} className="cursor-pointer">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="cursor-pointer"
+            >
               <X />
             </button>
           </div>
@@ -222,19 +225,19 @@ export default function ProfileModal({
               </div>
             ) : null}
 
-           
             {isLoadingProfile ? (
               <div className="text-sm text-text-3">불러오는 중...</div>
             ) : null}
 
-           
             {!isVerified && !isOAuthGoogle ? (
               <div className="space-y-4">
                 <div className="flex items-start gap-3 rounded-xl border border-outline bg-sub p-4">
                   <Lock className="mt-0.5" size={18} />
                   <div className="space-y-1">
                     <p className="text-sm font-medium">본인 확인이 필요해요</p>
-                    <p className="text-xs text-text-3">내 정보 열람을 위해 비밀번호를 입력해주세요.</p>
+                    <p className="text-xs text-text-3">
+                      내 정보 열람을 위해 비밀번호를 입력해주세요.
+                    </p>
                   </div>
                 </div>
 
@@ -253,11 +256,18 @@ export default function ProfileModal({
                   />
                 </div>
 
-                <Button className="w-full py-3" onClick={verifyPassword} disabled={!password.trim() || isVerifying}>
+                <Button
+                  className="w-full py-3"
+                  onClick={verifyPassword}
+                  disabled={!password.trim() || isVerifying}
+                >
                   {isVerifying ? "확인 중..." : "확인하기"}
                 </Button>
 
-                <button type="button" className="w-full text-center text-xs text-text-3 underline">
+                <button
+                  type="button"
+                  className="w-full text-center text-xs text-text-3 underline"
+                >
                   비밀번호를 잊으셨나요?
                 </button>
               </div>
@@ -306,17 +316,22 @@ export default function ProfileModal({
                     actionLabel="수정"
                     onActionClick={() => setIsPhoneModalOpen(true)}
                   />
-                  
+
                   {form.oAuthProvider ? null : (
-                  <Field
-                    icon={<Lock size={16} />}
-                    label="비밀번호"
-                    value={isOAuthGoogle ? "소셜 로그인" : "••••••••"}
-                    isEditing={false}
-                    readOnly
-                    actionLabel={isOAuthGoogle ? undefined : "수정"}
-                    onActionClick={isOAuthGoogle ? undefined : () => setIsPasswordModalOpen(true)}
-                  />
+                    <Field
+                      icon={<Lock size={16} />}
+                      label="비밀번호"
+                      value={isOAuthGoogle ? "소셜 로그인" : "••••••••"}
+                      isEditing={false}
+                      readOnly
+                      actionLabel={isOAuthGoogle ? undefined : "수정"}
+                      onActionClick={
+                        isOAuthGoogle
+                          ? undefined
+                          : () => setIsPasswordModalOpen(true)
+                      }
+                    />
+                  )}
                 </div>
 
                 <div className="flex gap-4 text-center">
@@ -350,7 +365,13 @@ export default function ProfileModal({
                 <Button
                   className="w-full py-3"
                   onClick={onPrimaryClick}
-                  disabled={isLoadingProfile ? true : isEditing ? !isDirty || isSaving : false}
+                  disabled={
+                    isLoadingProfile
+                      ? true
+                      : isEditing
+                      ? !isDirty || isSaving
+                      : false
+                  }
                 >
                   {isLoadingProfile
                     ? "불러오는 중..."
@@ -390,14 +411,20 @@ export default function ProfileModal({
         </div>
       </Modal>
 
-      <PhoneEditModal open={isPhoneModalOpen} onClose={() => setIsPhoneModalOpen(false)} />
+      <PhoneEditModal
+        open={isPhoneModalOpen}
+        onClose={() => setIsPhoneModalOpen(false)}
+      />
       {form.oAuthProvider ? null : (
-      <PasswordEditModal
-         open={isPasswordModalOpen}
-         onClose={() => setIsPasswordModalOpen(false)}
-          />
-          )}
-      <AccountDeleteModal open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
+        <PasswordEditModal
+          open={isPasswordModalOpen}
+          onClose={() => setIsPasswordModalOpen(false)}
+        />
+      )}
+      <AccountDeleteModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </>
   );
 }
