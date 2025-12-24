@@ -138,8 +138,10 @@ export default function PublicCapsuleMap({
               lng: myLocation?.lng,
             }}
           >
-            <div className="relative">
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full" />
+            <div className="relative w-6 h-6">
+              <span className="absolute inset-0 rounded-full bg-primary opacity-30 animate-ping" />
+              <span className="absolute inset-0 rounded-full bg-primary/30" />
+              <span className="absolute left-1/2 top-1/2 w-3 h-3 bg-primary rounded-full -translate-x-1/2 -translate-y-1/2" />
             </div>
           </CustomOverlayMap>
         )}
