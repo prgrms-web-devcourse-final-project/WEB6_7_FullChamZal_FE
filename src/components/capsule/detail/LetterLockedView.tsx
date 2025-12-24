@@ -105,16 +105,21 @@ function getLockMessage(args: {
       title: isTimeUnlocked
         ? "이제 열 수 있습니다!"
         : "아직 시간이 되지 않았습니다.",
-      desc: "정해진 날짜가 되면 편지를 열 수 있어요.",
+      desc: isTimeUnlocked
+        ? "지금 바로 편지를 확인할 수 있어요."
+        : "정해진 날짜가 되면 편지를 열 수 있어요.",
       status: [],
     };
   }
 
+  // LOCATION
   return {
     title: isLocationUnlocked
       ? "이제 열 수 있습니다!"
       : "지정된 장소에 도착해야 합니다",
-    desc: "해당 위치에 도착하면 편지를 열 수 있어요.",
+    desc: isLocationUnlocked
+      ? "지금 바로 편지를 확인할 수 있어요."
+      : "해당 위치에 도착하면 편지를 열 수 있어요.",
     status: [],
   };
 }
@@ -124,20 +129,25 @@ export default function LetterLockedView({
   unlockType = "TIME",
   currentLocation,
   targetLocation,
-  allowedRadiusMeter = 100,
+  viewingRadius = 50, // 반경(미터) 표시 + 판정에 사용
+  locationName = "없음", // 장소 별칭 표시
   locationErrorMessage,
 }: {
   unlockAt: string;
   unlockType?: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
   currentLocation?: LatLng;
   targetLocation?: LatLng;
-  allowedRadiusMeter?: number;
+  viewingRadius?: number;
+  locationName?: string;
   locationErrorMessage?: string;
 }) {
   const router = useRouter();
 
   // ---------------- TIME ----------------
-  const unlockTime = useMemo(() => new Date(unlockAt).getTime(), [unlockAt]);
+  const unlockTime = useMemo(() => {
+    const t = new Date(unlockAt).getTime();
+    return Number.isFinite(t) ? t : NaN;
+  }, [unlockAt]);
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -145,11 +155,18 @@ export default function LetterLockedView({
     return () => window.clearInterval(id);
   }, []);
 
-  const remainingMs = unlockTime - now;
-  const isTimeUnlocked = remainingMs <= 0;
+  const remainingMsRaw = unlockTime - now;
+  const isTimeUnlocked = Number.isFinite(unlockTime)
+    ? remainingMsRaw <= 0
+    : false;
+
+  // 시간이 이미 지났으면 0으로 고정
+  const remainingMs = Number.isFinite(unlockTime)
+    ? Math.max(0, remainingMsRaw)
+    : 0;
 
   const t = formatRemaining(remainingMs);
-  const dDay = calcDDay(unlockTime);
+  const dDay = Number.isFinite(unlockTime) ? calcDDay(unlockTime) : "-";
 
   // ---------------- LOCATION ----------------
   const distance = useMemo(() => {
@@ -157,10 +174,12 @@ export default function LetterLockedView({
     return distanceMeter(currentLocation, targetLocation);
   }, [currentLocation, targetLocation]);
 
-  const isLocationUnlocked =
-    distance != null &&
-    Number.isFinite(distance) &&
-    distance <= allowedRadiusMeter;
+  // 반경 기반으로 위치 조건 충족 여부 판단
+  const isLocationUnlocked = useMemo(() => {
+    if (unlockType === "TIME") return true; // 위치 조건 없는 타입
+    if (distance == null) return false; // 거리 계산 불가면 미충족
+    return distance <= viewingRadius;
+  }, [unlockType, distance, viewingRadius]);
 
   const msg = useMemo(
     () =>
@@ -201,6 +220,12 @@ export default function LetterLockedView({
                 {locationErrorMessage}
               </p>
             ) : null}
+
+            {!Number.isFinite(unlockTime) ? (
+              <p className="mt-2 text-xs text-red-500">
+                unlockAt 값이 올바르지 않습니다.
+              </p>
+            ) : null}
           </div>
 
           {/* ---------- TIME UI ---------- */}
@@ -209,7 +234,10 @@ export default function LetterLockedView({
               <div className="flex items-center gap-2 text-text-2">
                 <Clock size={16} />
                 <p className="text-sm">
-                  오픈 날짜: {new Date(unlockTime).toLocaleDateString()}
+                  오픈 날짜:{" "}
+                  {Number.isFinite(unlockTime)
+                    ? new Date(unlockTime).toLocaleDateString()
+                    : "-"}
                 </p>
               </div>
 
@@ -223,7 +251,10 @@ export default function LetterLockedView({
               </div>
 
               <p className="text-xs text-text-2">
-                오픈 시각: {new Date(unlockTime).toLocaleString()}
+                오픈 시각:{" "}
+                {Number.isFinite(unlockTime)
+                  ? new Date(unlockTime).toLocaleString()
+                  : "-"}
               </p>
             </div>
           ) : null}
@@ -234,6 +265,12 @@ export default function LetterLockedView({
               <div className="flex items-center gap-2 text-text-2">
                 <MapPin size={16} />
                 <p className="text-sm">지정된 장소에 도착해야 열 수 있어요</p>
+              </div>
+
+              {/* 장소 별칭 + 반경 표시 */}
+              <div className="text-xs text-text-3 flex flex-col items-center gap-1">
+                <p>장소 이름: {locationName}</p>
+                <p>기준 반경: {Math.round(viewingRadius)} m</p>
               </div>
 
               {distance == null ? (
@@ -249,7 +286,7 @@ export default function LetterLockedView({
                       : `${Math.round(distance)} m`}
                   </p>
                   <p className="text-xs text-text-3">
-                    허용 반경: {allowedRadiusMeter}m 이내
+                    위치 조건: {isLocationUnlocked ? "충족" : "미충족"}
                   </p>
                 </div>
               )}

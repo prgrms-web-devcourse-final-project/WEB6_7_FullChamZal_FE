@@ -33,6 +33,7 @@ type CapsuleReadData = {
   locationName?: string;
   locationLat?: number;
   locationLng?: number;
+  locationRadiusM?: number;
   result: string;
 };
 
