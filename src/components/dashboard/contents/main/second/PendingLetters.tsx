@@ -136,7 +136,7 @@ export default function PendingLetters() {
 
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4 lg:ml-6">
         {unViewLetters.slice(0, 4).map((l) => {
-          const RightIcon = getRightIcon(l.unlockType);
+          const RightIcon = getRightIcon(l.unlockType ?? "");
           const conditionText = getUnlockConditionText(l);
 
           let subText = "-";

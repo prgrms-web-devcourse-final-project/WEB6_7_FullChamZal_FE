@@ -4,8 +4,6 @@ import DivBox from "../DivBox";
 import { useEffect, useState } from "react";
 import { getMeDetail, type MemberMeDetail } from "@/lib/api/members/members";
 
-
-
 export default function Profile({
   mode,
   onClick,
@@ -41,20 +39,13 @@ export default function Profile({
     };
   }, [meProp]);
 
-  
-
-
   const me = meProp !== undefined ? meProp : meFetched;
-
-
-console.log("✅ Profile me:", me); 
-
 
   const isAdmin = mode === "admin";
 
   const displayName = isAdmin ? "관리자" : me?.name ?? "";
   const displayEmail = isAdmin ? "admin@dear.com" : me?.userId ?? "";
-  const firstChar = isAdmin ? "A" : (me?.name?.[0] ?? "");
+  const firstChar = isAdmin ? "A" : me?.name?.[0] ?? "";
 
   return (
     <button type="button" onClick={onClick} className="w-full text-left">
@@ -77,5 +68,3 @@ console.log("✅ Profile me:", me);
     </button>
   );
 }
-
-

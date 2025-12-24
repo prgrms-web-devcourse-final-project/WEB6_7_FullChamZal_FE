@@ -55,7 +55,6 @@ export default function LoginForm() {
       const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
 
       const target = returnUrl ?? fallbackTarget;
-      console.log(target);
 
       // 이동
       router.replace(target);

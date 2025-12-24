@@ -6,13 +6,9 @@ import ReportStatusBadge, { REPORT_STATUS_UI } from "./ReportStatusBadge";
 
 export default function ReportCard({
   report,
-  onApprove,
-  onReject,
   onOpenDetail,
 }: {
   report: AdminReport;
-  onApprove: (id: number) => void;
-  onReject: (id: number) => void;
   onOpenDetail: (id: number) => void;
 }) {
   const statusUi = REPORT_STATUS_UI[report.status];
@@ -53,12 +49,7 @@ export default function ReportCard({
         </div>
       </div>
 
-      <ReportActions
-        report={report}
-        onApprove={onApprove}
-        onReject={onReject}
-        onOpenDetail={onOpenDetail}
-      />
+      <ReportActions report={report} onOpenDetail={onOpenDetail} />
     </div>
   );
 }

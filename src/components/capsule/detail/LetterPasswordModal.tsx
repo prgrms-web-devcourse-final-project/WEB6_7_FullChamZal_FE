@@ -47,16 +47,13 @@ export default function LetterUnlockModal({
       );
 
       // 실제 read API 호출
-      const result = await guestCapsuleApi.read({
+      await guestCapsuleApi.read({
         capsuleId,
         unlockAt,
         locationLat: pos.lat ?? null,
         locationLng: pos.lng ?? null,
         password,
       });
-
-      // 여기서 응답 구조 확인
-      console.log("read capsule result:", result);
 
       onSuccess(password);
     } catch (err: any) {
