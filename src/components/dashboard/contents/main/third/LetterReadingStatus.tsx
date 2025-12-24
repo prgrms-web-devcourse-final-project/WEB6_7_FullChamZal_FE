@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Cell,
   Label,
@@ -13,21 +14,19 @@ import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 
 export default function LetterReadingStatus() {
-  /* 받은 편지 */
-  const { data: receiveList } = useQuery({
+  const { data, isLoading, isError } = useQuery<unknown>({
     queryKey: ["capsuleDashboard", "receive"],
     queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+    staleTime: 30_000,
+    retry: 1,
   });
 
-  if (!receiveList) return <div>0</div>;
+  const receiveList: CapsuleDashboardItem[] = Array.isArray(data)
+    ? (data as CapsuleDashboardItem[])
+    : [];
 
-  const viewedCount =
-    receiveList?.filter((item: CapsuleDashboardItem) => item.viewStatus)
-      .length ?? 0;
-
-  const unviewedCount =
-    receiveList?.filter((item: CapsuleDashboardItem) => !item.viewStatus)
-      .length ?? 0;
+  const viewedCount = receiveList.filter((item) => item.viewStatus).length;
+  const unviewedCount = receiveList.filter((item) => !item.viewStatus).length;
 
   const donutData = [
     { name: "열람", value: viewedCount },
@@ -36,61 +35,68 @@ export default function LetterReadingStatus() {
 
   const DONUT_COLORS = ["#FF583B", "#D6DAE1"];
 
-  return (
-    <>
-      <DivBox className="lg:flex-1 flex flex-col justify-between cursor-auto hover:bg-outline/0">
-        <div>
-          <p className="text-lg">받은 편지 열람 현황</p>
-          <div className="h-[360px] flex items-center justify-center select-none [&_*:focus]:outline-none">
-            {!receiveList ? (
-              <p className="text-text-4">받은 편지가 없습니다.</p>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={donutData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={80} // 도넛 구멍 크기
-                    outerRadius={120} // 전체 원 크기
-                    paddingAngle={6} // 섹터 사이 간격
-                    stroke="none"
-                  >
-                    {donutData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={DONUT_COLORS[index]} />
-                    ))}
+  const total = viewedCount + unviewedCount;
 
-                    <Label
-                      value={`총 ${viewedCount + unviewedCount}통`}
-                      position="center"
-                      fill="#111827" // 텍스트 색
-                      style={{ fontSize: 28, fontWeight: 500 }}
-                    />
-                  </Pie>
-                  <Tooltip />
-                  <Legend verticalAlign="bottom" align="center" />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </div>
+  return (
+    <DivBox className="lg:flex-1 flex flex-col justify-between cursor-auto hover:bg-outline/0">
+      <div>
+        <p className="text-lg">받은 편지 열람 현황</p>
+
+        <div className="h-[360px] flex items-center justify-center select-none [&_*:focus]:outline-none">
+          {isLoading ? (
+            <p className="text-text-4">불러오는 중…</p>
+          ) : isError ? (
+            <p className="text-text-4">불러오지 못했어요.</p>
+          ) : total === 0 ? (
+            <p className="text-text-4">받은 편지가 없습니다.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={donutData}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={80}
+                  outerRadius={120}
+                  paddingAngle={6}
+                  stroke="none"
+                >
+                  {donutData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={DONUT_COLORS[index]} />
+                  ))}
+
+                  <Label
+                    value={`총 ${total}통`}
+                    position="center"
+                    fill="#111827"
+                    style={{ fontSize: 28, fontWeight: 500 }}
+                  />
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" align="center" />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-2 px-4 bg-sub rounded-lg">
-            <div className="space-x-3">
-              <span className="inline-block w-3 h-3 rounded-full bg-primary-2"></span>
-              <span>{donutData[0].name}</span>
-            </div>
-            <span>{donutData[0].value}통</span>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between py-2 px-4 bg-sub rounded-lg">
+          <div className="space-x-3">
+            <span className="inline-block w-3 h-3 rounded-full bg-primary-2" />
+            <span>{donutData[0].name}</span>
           </div>
-          <div className="flex items-center justify-between py-2 px-4 bg-sub rounded-lg">
-            <div className="space-x-3">
-              <span className="inline-block w-3 h-3 rounded-full bg-text-5"></span>
-              <span>{donutData[1].name}</span>
-            </div>
-            <span>{donutData[1].value}통</span>
-          </div>
+          <span>{donutData[0].value}통</span>
         </div>
-      </DivBox>
-    </>
+
+        <div className="flex items-center justify-between py-2 px-4 bg-sub rounded-lg">
+          <div className="space-x-3">
+            <span className="inline-block w-3 h-3 rounded-full bg-text-5" />
+            <span>{donutData[1].name}</span>
+          </div>
+          <span>{donutData[1].value}통</span>
+        </div>
+      </div>
+    </DivBox>
   );
 }
