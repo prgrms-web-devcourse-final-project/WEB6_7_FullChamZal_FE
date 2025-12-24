@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { CustomOverlayMap, Map, MarkerClusterer } from "react-kakao-maps-sdk";
 
-const onClusterclick = () => {};
-
 //마커 생성
 const EventMarkerContainer = ({
   position,
@@ -34,7 +32,9 @@ const EventMarkerContainer = ({
         {/* title */}
         <div
           className={`absolute bottom-full mb-2 p-3 text-sm rounded-lg shadow bg-white ${
-            isVisible ? "opacity-100 cursor-pointer" : "opacity-0 pointer-none"
+            isVisible || isFocus
+              ? "opacity-100 cursor-pointer"
+              : "opacity-0 pointer-none"
           }`}
           onClick={showCapsule}
         >
@@ -55,6 +55,7 @@ const EventMarkerContainer = ({
 };
 
 type PublicCapsuleMapProps = {
+  radius: Radius;
   location: {
     lat: number;
     lng: number;
@@ -64,11 +65,12 @@ type PublicCapsuleMapProps = {
     lng: number;
   } | null;
   data: PublicCapsule[];
-  focus?: number;
+  focus: { id: number; ts: number } | null;
   onClick: (id: number, lat: number, lng: number) => void;
 };
 
 export default function PublicCapsuleMap({
+  radius,
   location,
   myLocation,
   data,
@@ -78,7 +80,8 @@ export default function PublicCapsuleMap({
   const mapRef = useRef<kakao.maps.Map | null>(null);
   const circleRef = useRef<kakao.maps.Circle | null>(null);
   const router = useRouter();
-  //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경
+
+  //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경, 내 반경 원 그리기
   useEffect(() => {
     //지도가 아직 안그려진 상태면 return
     if (!mapRef.current) return;
@@ -94,7 +97,7 @@ export default function PublicCapsuleMap({
     if (myLocation) {
       const circle = new kakao.maps.Circle({
         center: new kakao.maps.LatLng(myLocation?.lat, myLocation?.lng),
-        radius: 100,
+        radius: Number(radius),
         strokeWeight: 2,
         strokeColor: "#FF583B",
         strokeOpacity: 0.9,
@@ -106,7 +109,14 @@ export default function PublicCapsuleMap({
       circleRef.current = circle;
       return () => circle.setMap(null);
     }
-  }, [location, myLocation]);
+  }, [radius, location, myLocation]);
+
+  useEffect(() => {
+    if (!focus || !mapRef.current) return;
+    if (focus) {
+      mapRef.current.setLevel(1, { animate: true });
+    }
+  }, [data, focus]);
 
   return (
     <>
@@ -150,7 +160,6 @@ export default function PublicCapsuleMap({
               lineHeight: "48px",
             },
           ]}
-          onClusterclick={onClusterclick}
         >
           {data?.map((d) => (
             <EventMarkerContainer
@@ -163,7 +172,7 @@ export default function PublicCapsuleMap({
               onClick={() =>
                 onClick(d.capsuleId, d.capsuleLatitude, d.capsuleLongitude)
               }
-              isFocus={!!(d.capsuleId === focus)}
+              isFocus={!!(d.capsuleId === focus?.id)}
               showCapsule={() => {
                 router.push(`/dashboard/map?id=${d.capsuleId}`);
               }}

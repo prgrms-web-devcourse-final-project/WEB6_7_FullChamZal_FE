@@ -225,10 +225,11 @@ export default function MapContents() {
           {/* 지도 컴포넌트 */}
           {mapLocation ? (
             <PublicCapsuleMap
+              radius={radius}
               location={mapLocation}
               myLocation={myLocation}
               data={filteredData}
-              focus={focus?.id}
+              focus={focus}
               onClick={(id, lat, lng) => {
                 setFocus({ id, ts: Date.now() });
                 setMapLocation({ lat, lng });
