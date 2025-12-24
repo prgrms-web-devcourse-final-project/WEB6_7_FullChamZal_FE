@@ -1,4 +1,5 @@
 "use client";
+
 import { TrendingUp } from "lucide-react";
 import DivBox from "../../../DivBox";
 import {
@@ -11,6 +12,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import { useQuery } from "@tanstack/react-query";
 
 const data = [
   {
@@ -76,6 +79,18 @@ const data = [
 ];
 
 export default function YearlyLetterOverview() {
+  /** 보낸 편지 */
+  const { data: sendList } = useQuery({
+    queryKey: ["capsuleDashboard", "send"],
+    queryFn: ({ signal }) => capsuleDashboardApi.sendDashboard(signal),
+  });
+
+  /** 받은 편지 */
+  const { data: receiveList } = useQuery({
+    queryKey: ["capsuleDashboard", "receive"],
+    queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+  });
+
   return (
     <>
       <DivBox className="lg:flex-2 space-y-9 cursor-auto hover:bg-outline/0">
@@ -92,11 +107,11 @@ export default function YearlyLetterOverview() {
         <div className="flex gap-4">
           <div className="w-full px-4 py-3 bg-sub rounded-[10px] space-y-2">
             <p className="text-sm">보낸 편지</p>
-            <p className="text-12 text-2xl">20</p>
+            <p className="text-12 text-2xl">{sendList?.length ?? 0}</p>
           </div>
           <div className="w-full px-4 py-3 bg-primary-5 rounded-[10px] space-y-2">
-            <p className="text-sm">보낸 편지</p>
-            <p className="text-2xl">20</p>
+            <p className="text-sm">받은 편지</p>
+            <p className="text-2xl">{receiveList?.length ?? 0}</p>
           </div>
         </div>
         <div className="h-80 select-none outline-none [&_*:focus]:outline-none">
