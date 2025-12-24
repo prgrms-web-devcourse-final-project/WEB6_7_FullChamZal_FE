@@ -20,6 +20,7 @@ type ProfileForm = {
   nickname: string;
   email: string;
   phoneNumber: string;
+  oAuthProvider?: string| null
 };
 
 const getErrorMessage = (e: unknown) => {
@@ -102,6 +103,7 @@ export default function ProfileModal({
           nickname: meRes.nickname ?? "",
           email: meRes.userId ?? "",
           phoneNumber: meRes.phoneNumber ?? "",
+          oAuthProvider: meRes.oauthProvider ?? null,
         };
 
         
@@ -304,16 +306,18 @@ export default function ProfileModal({
                     actionLabel="수정"
                     onActionClick={() => setIsPhoneModalOpen(true)}
                   />
-
+                  
+                  {form.oAuthProvider ? null : (
                   <Field
                     icon={<Lock size={16} />}
                     label="비밀번호"
-                    value={isOAuthGoogle ? "소셜 로그인" : "••••••••"}
+                    value="••••••••"
                     isEditing={false}
                     readOnly
-                    actionLabel={isOAuthGoogle ? undefined : "수정"}
-                    onActionClick={isOAuthGoogle ? undefined : () => setIsPasswordModalOpen(true)}
-                  />
+                    actionLabel="수정"
+                    onActionClick={() => setIsPasswordModalOpen(true)}
+                   />
+  )}
                 </div>
 
                 <div className="flex gap-4 text-center">
@@ -388,7 +392,12 @@ export default function ProfileModal({
       </Modal>
 
       <PhoneEditModal open={isPhoneModalOpen} onClose={() => setIsPhoneModalOpen(false)} />
-      <PasswordEditModal open={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />
+      {form.oAuthProvider ? null : (
+      <PasswordEditModal
+         open={isPasswordModalOpen}
+         onClose={() => setIsPasswordModalOpen(false)}
+          />
+          )}
       <AccountDeleteModal open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
     </>
   );
