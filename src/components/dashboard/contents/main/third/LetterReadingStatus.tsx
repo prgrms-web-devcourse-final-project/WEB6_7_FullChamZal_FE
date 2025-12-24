@@ -22,10 +22,12 @@ export default function LetterReadingStatus() {
   if (!receiveList) return <div>0</div>;
 
   const viewedCount =
-    receiveList?.filter((item) => item.viewStatus).length ?? 0;
+    receiveList?.filter((item: CapsuleDashboardItem) => item.viewStatus)
+      .length ?? 0;
 
   const unviewedCount =
-    receiveList?.filter((item) => !item.viewStatus).length ?? 0;
+    receiveList?.filter((item: CapsuleDashboardItem) => !item.viewStatus)
+      .length ?? 0;
 
   const donutData = [
     { name: "열람", value: viewedCount },
