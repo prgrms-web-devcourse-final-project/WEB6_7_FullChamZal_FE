@@ -47,7 +47,7 @@ export default function AdminBody({
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  // "검색 확정" 함수: Enter/Blur에서만 호출
+  // "검색 확정" 함수
   const commitKeyword = () => {
     const params = new URLSearchParams(searchParams.toString());
     const v = keywordInput.trim();

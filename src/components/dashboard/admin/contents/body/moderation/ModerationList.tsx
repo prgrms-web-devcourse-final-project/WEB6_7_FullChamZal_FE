@@ -73,7 +73,7 @@ export default function ModerationList({
   const [size] = useState(10);
   const queryClient = useQueryClient();
 
-  // ✅ 상세 모달 상태
+  // 상세 모달 상태
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
@@ -115,7 +115,7 @@ export default function ModerationList({
     if (page < lastPage) prefetch(page + 1);
   }, [data, lastPage, listQueryKey, page, size, query, queryClient, tab]);
 
-  // ✅ 상세 조회 프리패치(선택사항): hover 시 빠르게 뜸
+  // 상세 조회
   const prefetchDetail = (id: number) => {
     queryClient.prefetchQuery({
       queryKey: ["adminModerationDetail", id],

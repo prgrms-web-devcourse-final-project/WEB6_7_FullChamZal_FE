@@ -30,7 +30,7 @@ export default function ContentsList({
   }
 
   if (section === "moderation") {
-    return <ModerationList tab={tab} query={keyword} />; // 수정 필요
+    return <ModerationList tab={tab} query={keyword} />;
   }
 
   return <div>준비중</div>;

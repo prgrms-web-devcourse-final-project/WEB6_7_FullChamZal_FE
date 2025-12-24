@@ -51,10 +51,6 @@ export default function ReportCard({
             <span>{report.targetId}</span>
           </div>
         </div>
-
-        <p className="text-text-2 text-sm w-full rounded-lg bg-sub border border-outline p-3">
-          욕설이 포함된 편지를 보냈습니다.
-        </p>
       </div>
 
       <ReportActions

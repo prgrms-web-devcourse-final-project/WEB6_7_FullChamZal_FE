@@ -71,7 +71,7 @@ export default function ModerationSection() {
           section="moderation"
           tabs={REPORT_TABS}
           defaultTab="all"
-          searchPlaceholder="신고자 이름 또는 편지 아이디로 검색..."
+          searchPlaceholder="편지 작성자 아이디로 검색..."
         />
       </div>
     </>
