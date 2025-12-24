@@ -4,6 +4,11 @@ import {
   CreatePrivateCapsuleRequest,
   CreateMyCapsuleRequest,
   CreatePublicCapsuleRequest,
+  CapsuleUpdateRequest,
+  CapsuleUpdateResponse,
+  CapsuleDeleteResponse,
+  CapsuleLikeResponse,
+  CapsuleSendReadResponse,
   UnlockType,
 } from "./types";
 
@@ -286,4 +291,115 @@ export async function createMyCapsule(
     method: "POST",
     json: payload,
   });
+}
+
+/**
+ * 캡슐 수정 API 호출 (인증 필요)
+ * @param capsuleId 수정할 캡슐 ID
+ * @param payload 수정할 제목/내용
+ */
+export async function updateCapsule(
+  capsuleId: number,
+  payload: CapsuleUpdateRequest
+): Promise<CapsuleUpdateResponse> {
+  return apiFetchRaw<CapsuleUpdateResponse>(
+    `/api/v1/capsule/update?capsuleId=${capsuleId}`,
+    {
+      method: "PUT",
+      json: payload,
+    }
+  );
+}
+
+/**
+ * 캡슐 삭제 API 호출 - 발신자 삭제 (인증 필요)
+ * @param capsuleId 삭제할 캡슐 ID
+ */
+export async function deleteCapsuleAsSender(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleDeleteResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleDeleteResponse>>(
+    `/api/v1/capsule/delete/sender?capsuleId=${capsuleId}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+/**
+ * 캡슐 삭제 API 호출 - 수신자 삭제 (인증 필요)
+ * @param capsuleId 삭제할 캡슐 ID
+ */
+export async function deleteCapsuleAsReceiver(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleDeleteResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleDeleteResponse>>(
+    `/api/v1/capsule/delete/reciver?capsuleId=${capsuleId}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+/**
+ * 캡슐 좋아요 수 읽기 API 호출
+ * @param capsuleId 캡슐 ID
+ */
+export async function getCapsuleLikeCount(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleLikeResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleLikeResponse>>(
+    `/api/v1/capsule/readLike?capsuleId=${capsuleId}`,
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * 캡슐 좋아요 증가 API 호출 (인증 필요)
+ * @param capsuleId 캡슐 ID
+ */
+export async function likeCapsule(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleLikeResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleLikeResponse>>(
+    "/api/v1/capsule/likeUp",
+    {
+      method: "POST",
+      json: { capsuleId },
+    }
+  );
+}
+
+/**
+ * 캡슐 좋아요 감소 API 호출 (인증 필요)
+ * @param capsuleId 캡슐 ID
+ */
+export async function unlikeCapsule(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleLikeResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleLikeResponse>>(
+    "/api/v1/capsule/likeDown",
+    {
+      method: "POST",
+      json: { capsuleId },
+    }
+  );
+}
+
+/**
+ * 수신자 캡슐 조회 API 호출 (인증 필요)
+ * 사용자가 보낸 캡슐의 내용을 조건 없이 보여줍니다.
+ * @param capsuleId 캡슐 ID
+ */
+export async function readSendCapsule(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleSendReadResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleSendReadResponse>>(
+    `/api/v1/capsule/readSendCapsule?capsuleId=${capsuleId}`,
+    {
+      method: "GET",
+    }
+  );
 }

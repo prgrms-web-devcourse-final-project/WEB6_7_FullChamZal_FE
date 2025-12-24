@@ -5,20 +5,38 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+
 import {
   Archive,
   Bookmark,
   Clock,
+  Heart,
   LinkIcon,
+  MessageSquareWarning,
+  MoreHorizontal,
   MapPin,
   Reply,
   X,
 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import ActiveModal from "@/components/common/ActiveModal";
+import ConfirmModal from "@/components/common/ConfirmModal";
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import {
+  deleteCapsuleAsReceiver,
+  deleteCapsuleAsSender,
+  getCapsuleLikeCount,
+  likeCapsule,
+  unlikeCapsule,
+} from "@/lib/api/capsule/capsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 
@@ -90,6 +108,14 @@ export default function LetterDetailModal({
   const isAdmin = role === "ADMIN";
 
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+
+  // 발신자/수신자/공개 편지 구분: pathname으로 확인
+  const isSender = pathname?.includes("/dashboard/send");
+  const isReceiver = pathname?.includes("/dashboard/receive");
+  const isPublic = pathname?.includes("/dashboard/map");
 
   const returnUrl = useMemo(() => {
     const qs = searchParams?.toString();
@@ -114,6 +140,124 @@ export default function LetterDetailModal({
       unlockAt: string;
     }) => guestCapsuleApi.save(payload),
     onSuccess: () => setIsSaveSuccessOpen(true),
+  });
+
+  // 삭제 mutation
+  const deleteMutation = useMutation({
+    mutationKey: ["capsuleDelete", capsuleId],
+    mutationFn: () => {
+      if (isSender) {
+        return deleteCapsuleAsSender(capsuleId);
+      } else if (isReceiver) {
+        return deleteCapsuleAsReceiver(capsuleId);
+      }
+      throw new Error("삭제할 수 없습니다.");
+    },
+    onSuccess: () => {
+      alert("캡슐이 삭제되었습니다.");
+      if (closeHref) {
+        router.push(closeHref);
+      } else {
+        router.back();
+      }
+      router.refresh();
+    },
+    onError: (err: unknown) => {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "삭제 중 오류가 발생했습니다.";
+      alert(msg);
+    },
+  });
+
+  // 좋아요 수 조회 query (공개 편지일 때만)
+  const { data: likeData } = useQuery({
+    queryKey: ["capsuleLikeCount", capsuleId],
+    enabled: isPublic && open && capsuleId > 0,
+    queryFn: async () => {
+      const res = await getCapsuleLikeCount(capsuleId);
+      return res.data;
+    },
+  });
+
+  // 좋아요 수 초기화
+  useEffect(() => {
+    if (likeData) {
+      setLikeCount(likeData.likeCount);
+    }
+  }, [likeData]);
+
+  // 좋아요 토글 mutation (낙관적 업데이트)
+  const likeMutation = useMutation({
+    mutationKey: ["capsuleLike", capsuleId],
+    mutationFn: async (shouldLike: boolean) => {
+      // onMutate에서 결정한 방향으로 API 호출
+      if (shouldLike) {
+        return await likeCapsule(capsuleId);
+      } else {
+        return await unlikeCapsule(capsuleId);
+      }
+    },
+    onMutate: async () => {
+      // 낙관적 업데이트: 먼저 UI 업데이트
+      const previousIsLiked = isLiked;
+      const previousLikeCount = likeCount;
+      const nextIsLiked = !previousIsLiked;
+
+      setIsLiked(nextIsLiked);
+      setLikeCount((prev) => (previousIsLiked ? prev - 1 : prev + 1));
+
+      // 롤백을 위한 이전 값과 다음 상태 반환
+      return { previousIsLiked, previousLikeCount, nextIsLiked };
+    },
+    onSuccess: (data, variables, context) => {
+      // 서버 응답으로 최신 값 업데이트
+      if (data.data) {
+        setLikeCount(data.data.likeCount);
+      }
+      // 성공 시 상태 확인
+      if (context) {
+        setIsLiked(context.nextIsLiked);
+      }
+    },
+    onError: (err, variables, context) => {
+      // 에러 코드에 따라 상태 업데이트
+      const errorCode =
+        err && typeof err === "object" && "code" in err
+          ? (err as { code?: string }).code
+          : null;
+
+      // CPS016: 중복 좋아요 → 이미 좋아요를 눌렀다는 의미
+      if (errorCode === "CPS016") {
+        setIsLiked(true);
+        // 좋아요 수는 롤백하지 않음 (이미 증가했을 수 있음)
+        return;
+      }
+
+      // CPS018: 좋아요 해제 불가 -> 좋아요를 누르지 않았다는 의미
+      if (errorCode === "CPS018") {
+        setIsLiked(false);
+        // 좋아요 수는 롤백하지 않음
+        return;
+      }
+
+      // 그 외 에러는 롤백
+      if (context) {
+        setIsLiked(context.previousIsLiked);
+        setLikeCount(context.previousLikeCount);
+      }
+
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "좋아요 처리 중 오류가 발생했습니다.";
+      alert(msg);
+    },
   });
 
   // 로그인/회원가입 후 돌아왔을 때 자동 재시도
@@ -162,7 +306,7 @@ export default function LetterDetailModal({
         return;
       }
 
-      console.error("❌ save error:", err);
+      console.error("save error:", err);
     }
   };
 
@@ -284,7 +428,6 @@ export default function LetterDetailModal({
   }
 
   const capsule = data;
-
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
 
@@ -317,6 +460,25 @@ export default function LetterDetailModal({
         />
       )}
 
+      {/* 삭제 확인 모달 */}
+      {isDeleteConfirmOpen && (
+        <ConfirmModal
+          active="fail"
+          title="캡슐 삭제"
+          content={
+            isSender
+              ? "보낸 편지를 삭제하시겠습니까?"
+              : "받은 편지를 삭제하시겠습니까?"
+          }
+          open={isDeleteConfirmOpen}
+          onClose={() => setIsDeleteConfirmOpen(false)}
+          onConfirm={() => {
+            setIsDeleteConfirmOpen(false);
+            deleteMutation.mutate();
+          }}
+        />
+      )}
+
       <div className="flex h-full justify-center md:p-15 p-6">
         <div>{capsule.unlockUntil}</div>
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
@@ -337,13 +499,63 @@ export default function LetterDetailModal({
                 </div>
               </div>
 
-              <button
-                type="button"
-                className="md:flex-1 flex justify-end cursor-pointer text-primary"
-                onClick={close}
-              >
-                <X size={24} />
-              </button>
+              <div className="md:flex-1 flex justify-end items-center gap-2">
+                {isSender || isReceiver ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="text-primary"
+                        aria-label="더보기"
+                      >
+                        <MoreHorizontal size={18} />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="end"
+                      className="w-44 z-10000 p-1"
+                      sideOffset={6}
+                    >
+                      <div className="px-3 py-2 text-xs text-text-3">관리</div>
+                      <div className="h-px bg-border my-1" />
+                      {isSender && (
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md"
+                          onClick={() => {
+                            router.push(
+                              `/capsules/edit?capsuleId=${capsuleId}`
+                            );
+                          }}
+                        >
+                          수정하기
+                        </button>
+                      )}
+                      {(isSender || isReceiver) && (
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md disabled:opacity-60"
+                          disabled={deleteMutation.isPending}
+                          onClick={() => setIsDeleteConfirmOpen(true)}
+                        >
+                          {deleteMutation.isPending ? "삭제 중..." : "삭제하기"}
+                        </button>
+                      )}
+                    </PopoverContent>
+                  </Popover>
+                ) : null}
+
+                <button
+                  type="button"
+                  className="cursor-pointer text-primary"
+                  onClick={close}
+                  aria-label="닫기"
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -379,6 +591,21 @@ export default function LetterDetailModal({
           <div className="shrink-0 border-t p-5">
             {role === "ADMIN" ? null : (
               <div className="flex-1 flex items-center justify-center">
+                {isReceiver && (
+                  <div className="flex-1 flex items-center justify-center">
+                    <button
+                      type="button"
+                      className="cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <MessageSquareWarning
+                        size={16}
+                        className="text-primary"
+                      />
+                      <span>신고하기</span>
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex-1 flex items-center justify-center">
                   <button
                     type="button"
@@ -389,15 +616,40 @@ export default function LetterDetailModal({
                   </button>
                 </div>
 
-                <div className="flex-1 flex items-center justify-center">
-                  <Link
-                    href={"/capsules/new"}
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <Reply size={16} className="text-primary" />
-                    <span>답장하기</span>
-                  </Link>
-                </div>
+                {isPublic && (
+                  <div className="flex-1 flex items-center justify-center">
+                    <button
+                      type="button"
+                      className="cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                      onClick={() => likeMutation.mutate(!isLiked)}
+                      disabled={likeMutation.isPending}
+                    >
+                      <Heart
+                        size={16}
+                        className={
+                          isLiked ? "text-primary fill-red-500" : "text-primary"
+                        }
+                      />
+                      <span>
+                        {likeMutation.isPending
+                          ? "처리 중..."
+                          : `좋아요 ${likeCount}`}
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                {!isPublic && (
+                  <div className="flex-1 flex items-center justify-center">
+                    <Link
+                      href={"/capsules/new"}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Reply size={16} className="text-primary" />
+                      <span>답장하기</span>
+                    </Link>
+                  </div>
+                )}
 
                 <div className="flex-1 flex items-center justify-center">
                   <button
