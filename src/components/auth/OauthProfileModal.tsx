@@ -94,7 +94,7 @@ export default function OAuthProfileModal({
         purpose: "SIGNUP",
         resend: true,
       });
-      setCooldown(res.cooldownSeconds ?? 30);
+      setCooldown(Math.max(res.cooldownSeconds ?? 0, 180));
     } catch (e: any) {
       setError(e?.message ?? "인증번호 발송에 실패했어요.");
     } finally {

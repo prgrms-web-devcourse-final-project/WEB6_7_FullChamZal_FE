@@ -4,6 +4,8 @@ import DivBox from "../DivBox";
 import { useEffect, useState } from "react";
 import { getMeDetail, type MemberMeDetail } from "@/lib/api/members/members";
 
+
+
 export default function Profile({
   mode,
   onClick,
@@ -39,8 +41,14 @@ export default function Profile({
     };
   }, [meProp]);
 
+  
+
 
   const me = meProp !== undefined ? meProp : meFetched;
+
+
+console.log("✅ Profile me:", me); 
+
 
   const isAdmin = mode === "admin";
 
@@ -69,3 +77,5 @@ export default function Profile({
     </button>
   );
 }
+
+

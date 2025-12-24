@@ -11,10 +11,19 @@ export type MemberMe = {
   createdAt: string;
 };
 
-export type MemberMeDetail = MemberMe & {
-  oauthProvider?: string; 
+export type MemberMeDetail = {
+  memberId: number;
+  userId: string;
+  name: string;
+  nickname: string | null;
+  phoneNumber: string | null;
+  status: "ACTIVE" | string;
+  role: "USER" | string;
+  oauthProvider?: "GOOGLE" | "NONE" | string | null;
+  createdAt?: string;
   updatedAt?: string;
 };
+
 
 export type UpdateMeRequest = Partial<{
   nickname: string;

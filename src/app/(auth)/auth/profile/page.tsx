@@ -42,8 +42,8 @@ export default function AuthProfilePage() {
         if (!needNickname && !needPhone) {
           router.replace("/dashboard");
         } else {
-          if (needNickname === false) setNickname(me.nickname);
-          if (needPhone === false) setPhone(me.phoneNumber);
+          if (needNickname === false) setNickname(me.nickname ?? "");
+          if (needPhone === false) setPhone(me.phoneNumber ?? "");
         }
       } catch {
         // 비로그인이라면 auth 쪽 정책대로 처리
@@ -99,7 +99,7 @@ try {
     purpose: "SIGNUP",
     resend: true,
   });
-  setCooldown(res.cooldownSeconds ?? 30);
+  setCooldown(res.cooldownSeconds ?? 180);
 } catch (e: unknown) {
   const message = e instanceof Error ? e.message : "인증번호 발송에 실패했어요.";
   setError(message);
