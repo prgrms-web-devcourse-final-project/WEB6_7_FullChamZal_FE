@@ -34,7 +34,7 @@ export default function TodayLetters() {
         {/* Card => 총 4개 까지 */}
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:ml-6">
           {/* 없으면 열릴 편지가 없다는 UI 추가 */}
-          api 구현 뒤에 진행할 예정!!
+          <span>api 구현 뒤에 진행할 예정!!</span>
           <DivBox className="w-full">
             <div className="space-y-3">
               <div className="flex justify-between">

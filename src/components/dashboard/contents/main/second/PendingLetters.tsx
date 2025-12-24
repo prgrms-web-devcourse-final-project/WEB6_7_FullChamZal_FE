@@ -114,7 +114,8 @@ export default function PendingLetters() {
 
   /* 미열람 편지 */
   const unViewLetters = useMemo(
-    () => (receiveList ?? []).filter((l) => !l.viewStatus),
+    () =>
+      (receiveList ?? []).filter((l: CapsuleDashboardItem) => !l.viewStatus),
     [receiveList]
   );
 
