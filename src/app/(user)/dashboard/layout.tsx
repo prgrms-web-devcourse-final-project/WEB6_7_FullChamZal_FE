@@ -8,7 +8,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let me;
+  let me: MemberMe;
   try {
     me = await authApiServer.me();
   } catch {
