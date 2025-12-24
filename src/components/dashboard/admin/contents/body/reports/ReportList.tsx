@@ -37,8 +37,6 @@ export default function ReportList({
           <ReportCard
             key={item.id}
             report={item}
-            onApprove={(id) => console.log("approve", id)}
-            onReject={(id) => console.log("reject", id)}
             onOpenDetail={(id: number) => {
               setSelectedReportId(id);
               setOpenDetail(true);

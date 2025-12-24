@@ -40,12 +40,14 @@ function getCurrentPosition(): Promise<LatLng> {
 }
 
 type Props = {
+  isPublic?: boolean;
   capsuleId: number;
-  isProtected: number;
+  isProtected?: number;
   password?: string | null;
 };
 
 export default function LetterDetailView({
+  isPublic = false,
   capsuleId,
   isProtected,
   password = null,
@@ -84,7 +86,7 @@ export default function LetterDetailView({
     return `${lat},${lng}`;
   }, [currentLocation]);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["capsuleRead", capsuleId, password, locationKey],
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
@@ -102,14 +104,6 @@ export default function LetterDetailView({
         },
         signal
       );
-
-      console.log("/capsule/read payload:", {
-        capsuleId,
-        unlockAt,
-        locationLat,
-        locationLng,
-      });
-      console.log("/capsule/read response:", res);
 
       return res;
     },
@@ -130,32 +124,31 @@ export default function LetterDetailView({
     const fallbackUnlockAt = new Date(
       Date.now() + 10 * 60 * 1000
     ).toISOString();
-    console.log("❌ /capsule/read error:", error);
 
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
-        <LetterLockedView unlockAt={fallbackUnlockAt} />
+        <LetterLockedView isPublic={isPublic} unlockAt={fallbackUnlockAt} />
       </div>
     );
   }
 
-  const capsule: any = data;
+  const capsule = data;
 
   // 조건 미충족 (서버가 FAIL을 정상 응답으로 내려줌)
   if (capsule.result === "FAIL") {
-    // 목표 위치(target): 서버가 내려준 캡슐 좌표
-    // - 여기서 "LatLng 확정"을 만들어야 타입 에러가 안 남
     const maybeTarget = { lat: capsule.locationLat, lng: capsule.locationLng };
     const targetLocation = isLatLng(maybeTarget) ? maybeTarget : undefined;
 
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
         <LetterLockedView
+          isPublic={isPublic}
           unlockAt={capsule.unlockAt ?? new Date().toISOString()}
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
           targetLocation={targetLocation}
-          allowedRadiusMeter={100}
+          viewingRadius={capsule.locationRadiusM}
+          locationName={capsule.locationName}
           locationErrorMessage={locationError ?? undefined}
         />
       </div>

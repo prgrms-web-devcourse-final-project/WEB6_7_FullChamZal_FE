@@ -82,3 +82,46 @@ export interface CapsuleCreateResponse {
   url?: string;
   capPW?: string;
 }
+
+export interface CapsuleUpdateRequest {
+  title?: string;
+  content?: string;
+}
+
+export interface CapsuleUpdateResponse {
+  message: string;
+}
+
+export interface CapsuleDeleteResponse {
+  capsuleId: number;
+  message: string;
+}
+
+export interface CapsuleLikeRequest {
+  capsuleId: number;
+}
+
+export interface CapsuleLikeResponse {
+  likeCount: number;
+  message: string;
+}
+
+export interface CapsuleSendReadResponse {
+  capsuleId: number;
+  capsuleColor: string;
+  capsulePackingColor: string;
+  recipient: string;
+  senderNickname: string;
+  title: string;
+  content: string;
+  createAt: string;
+  viewStatus: boolean;
+  unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
+  unlockAt: string;
+  unlockUntil: string | null;
+  locationName: string;
+  locationLat: number;
+  locationLng: number;
+  locationRadiusM: number;
+  result: string;
+}

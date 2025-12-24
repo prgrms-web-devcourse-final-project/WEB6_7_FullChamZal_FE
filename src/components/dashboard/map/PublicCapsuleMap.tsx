@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { CustomOverlayMap, Map, MarkerClusterer } from "react-kakao-maps-sdk";
 
-const onClusterclick = () => {};
-
 //마커 생성
 const EventMarkerContainer = ({
   position,
@@ -33,20 +31,16 @@ const EventMarkerContainer = ({
       >
         {/* title */}
         <div
-          className={`
-            absolute bottom-full mb-2
-            p-3 text-sm rounded-lg shadow
-            bg-white 
-            ${
-              isVisible
-                ? "opacity-100 cursor-pointer"
-                : "opacity-0 pointer-none"
-            }
-          `}
+          className={`absolute bottom-full mb-2 p-3 text-sm rounded-lg shadow bg-white ${
+            isVisible || isFocus
+              ? "opacity-100 cursor-pointer"
+              : "opacity-0 pointer-none"
+          }`}
           onClick={showCapsule}
         >
           {content}
         </div>
+
         <div
           className={`flex items-center justify-center w-11 h-11 rounded-full ${
             isFocus ? "bg-primary scale-[1.2]" : "bg-primary-2"
@@ -60,15 +54,8 @@ const EventMarkerContainer = ({
   );
 };
 
-//줌따라 스케일 조정 함수
-const scaleClassByZoom = (level: number) => {
-  if (level <= 3) return "scale-150";
-  if (level <= 5) return "scale-125";
-  if (level <= 6) return "scale-110";
-  return "scale-100";
-};
-
 type PublicCapsuleMapProps = {
+  radius: Radius;
   location: {
     lat: number;
     lng: number;
@@ -78,11 +65,12 @@ type PublicCapsuleMapProps = {
     lng: number;
   } | null;
   data: PublicCapsule[];
-  focus?: number;
+  focus: { id: number; ts: number } | null;
   onClick: (id: number, lat: number, lng: number) => void;
 };
 
 export default function PublicCapsuleMap({
+  radius,
   location,
   myLocation,
   data,
@@ -90,29 +78,56 @@ export default function PublicCapsuleMap({
   focus,
 }: PublicCapsuleMapProps) {
   const mapRef = useRef<kakao.maps.Map | null>(null);
-  const [level, setLevel] = useState(6);
+  const circleRef = useRef<kakao.maps.Circle | null>(null);
   const router = useRouter();
-  //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경
+
+  //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경, 내 반경 원 그리기
   useEffect(() => {
     //지도가 아직 안그려진 상태면 return
     if (!mapRef.current) return;
     const moveLatLng = new kakao.maps.LatLng(location.lat, location.lng);
     mapRef.current.setCenter(moveLatLng);
-  }, [location]);
+
+    if (circleRef.current) {
+      circleRef.current.setMap(null);
+      circleRef.current = null;
+    }
+
+    //내 위치 100m 반경 표시
+    if (myLocation) {
+      const circle = new kakao.maps.Circle({
+        center: new kakao.maps.LatLng(myLocation?.lat, myLocation?.lng),
+        radius: Number(radius),
+        strokeWeight: 2,
+        strokeColor: "#FF583B",
+        strokeOpacity: 0.9,
+        strokeStyle: "solid",
+        fillColor: "#FF583B",
+        fillOpacity: 0.12,
+      });
+      circle.setMap(mapRef.current);
+      circleRef.current = circle;
+      return () => circle.setMap(null);
+    }
+  }, [radius, location, myLocation]);
+
+  useEffect(() => {
+    if (!focus || !mapRef.current) return;
+    if (focus) {
+      mapRef.current.setLevel(1, { animate: true });
+    }
+  }, [data, focus]);
 
   return (
     <>
       <Map
         center={location} //중심 좌표
-        level={level} //줌 레벨
+        level={6} //줌 레벨
         isPanto={true} //부드럽게 이동
         style={{ width: "100%", height: "100%", borderRadius: "12px" }}
         //생성 시 해당 지도 객체를 저장
         onCreate={(map) => {
           mapRef.current = map;
-        }}
-        onZoomChanged={(map) => {
-          setLevel(map.getLevel());
         }}
       >
         {/* 내 위치 마커 */}
@@ -123,14 +138,10 @@ export default function PublicCapsuleMap({
               lng: myLocation?.lng,
             }}
           >
-            <div
-              className={`border border-primary-2/90 rounded-full ${scaleClassByZoom(
-                level
-              )}`}
-            >
-              <div className="relative bg-primary-2/12 rounded-full w-12 h-12 ">
-                <div className="absolute bg-primary-2 w-2 h-2 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-              </div>
+            <div className="relative w-6 h-6">
+              <span className="absolute inset-0 rounded-full bg-primary opacity-30 animate-ping" />
+              <span className="absolute inset-0 rounded-full bg-primary/30" />
+              <span className="absolute left-1/2 top-1/2 w-3 h-3 bg-primary rounded-full -translate-x-1/2 -translate-y-1/2" />
             </div>
           </CustomOverlayMap>
         )}
@@ -150,28 +161,7 @@ export default function PublicCapsuleMap({
               borderRadius: "50%",
               lineHeight: "48px",
             },
-            // {
-            //   // 10~99개
-            //   width: "48px",
-            //   height: "48px",
-            //   background: "#FF583B",
-            //   textAlign: "center",
-            //   color: "#fff",
-            //   borderRadius: "50%",
-            //   lineHeight: "48px",
-            // },
-            // {
-            //   // 100개 이상
-            //   width: "48px",
-            //   height: "48px",
-            //   background: "#FF583B",
-            //   textAlign: "center",
-            //   color: "#fff",
-            //   borderRadius: "50%",
-            //   lineHeight: "48px",
-            // },
           ]}
-          onClusterclick={onClusterclick}
         >
           {data?.map((d) => (
             <EventMarkerContainer
@@ -184,7 +174,7 @@ export default function PublicCapsuleMap({
               onClick={() =>
                 onClick(d.capsuleId, d.capsuleLatitude, d.capsuleLongitude)
               }
-              isFocus={!!(d.capsuleId === focus)}
+              isFocus={!!(d.capsuleId === focus?.id)}
               showCapsule={() => {
                 router.push(`/dashboard/map?id=${d.capsuleId}`);
               }}

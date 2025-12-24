@@ -9,8 +9,8 @@ import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
 
 //서버 렌더링 방지
 import dynamic from "next/dynamic";
-import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import { useSearchParams } from "next/navigation";
+import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
@@ -63,33 +63,6 @@ export default function MapContents() {
         break;
     }
   };
-
-  //현재 내 위치를 가져오는 함수
-  // const getMyLocation = () => {
-  //   if ("geolocation" in navigator) {
-  //     //현 브라우저가 Geolocation API를 지원하는지 확인
-  //     navigator.geolocation.getCurrentPosition(
-  //       //사용자의 현재 위치를 요청
-  //       (position) => {
-  //         setMapLocation({
-  //           lat: position.coords.latitude, //위도값 저장
-  //           lng: position.coords.longitude, //경도값 저장
-  //         });
-  //       },
-  //       (err) => {
-  //         showErrorMsg(err); //상황에 따른 에러메세지 호출
-  //       },
-  //       {
-  //         //옵션 객체
-  //         enableHighAccuracy: true, // 정확도 우선모드
-  //         timeout: 60000, // 1분 이내에 응답 없으면 에러 발생
-  //         maximumAge: Infinity, //항상 캐시 값 저장된 위치 정보 반환
-  //       }
-  //     );
-  //   } else {
-  //     setError("브라우저가 Geolocation을 지원하지 않습니다.");
-  //   }
-  // };
 
   //현재 사용자 위치로 map center 이동
   const MoveMyLocation = () => {
@@ -150,13 +123,25 @@ export default function MapContents() {
   //조회 상태 필터
   const filter = (data: PublicCapsule[] | undefined) => {
     if (data) {
+      let result = data;
       switch (viewed) {
         case "ALL":
-          return data;
+          break;
         case "UNREAD":
-          return data.filter((d) => d.isViewed === false);
+          result = result.filter((d) => d.isViewed === false);
+          break;
         case "READ":
-          return data.filter((d) => d.isViewed === true);
+          result = result.filter((d) => d.isViewed === true);
+          break;
+      }
+      switch (accessible) {
+        case "ALL":
+          return result;
+        case "ACCESSIBLE":
+          return result.filter((d) => d.isUnlockable === true);
+
+        case "INACCESSIBLE":
+          return result.filter((d) => d.isUnlockable === false);
       }
     } else return [];
   };
@@ -165,13 +150,8 @@ export default function MapContents() {
 
   return (
     <div className="h-full flex flex-col gap-4">
-      {id ? (
-        <LetterDetailModal
-          capsuleId={Number(id)}
-          closeHref="/dashboard/map"
-          role="USER"
-        />
-      ) : null}
+      {id ? <LetterDetailView isPublic={true} capsuleId={Number(id)} /> : null}
+
       {/* 헤더 */}
       <div className="space-y-2">
         <h3 className="text-3xl font-medium">
@@ -213,10 +193,11 @@ export default function MapContents() {
           {/* 지도 컴포넌트 */}
           {mapLocation ? (
             <PublicCapsuleMap
+              radius={radius}
               location={mapLocation}
               myLocation={myLocation}
               data={filteredData}
-              focus={focus?.id}
+              focus={focus}
               onClick={(id, lat, lng) => {
                 setFocus({ id, ts: Date.now() });
                 setMapLocation({ lat, lng });
