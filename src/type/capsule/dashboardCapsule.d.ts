@@ -1,3 +1,4 @@
+/* 보낸, 받은 편지 조회 */
 type CapsuleDashboardItem = {
   capsuleId: number;
   capsuleColor?: string;
@@ -15,15 +16,16 @@ type CapsuleDashboardItem = {
   locationLng?: number | null;
 };
 
+/* 북마크 */
 type BookmarkItem = {
   bookmarkId: number;
   capsuleId: number;
-  visibility: "PUBLIC" | "PRIVATE"; // 필요하면 확장
+  visibility: "PUBLIC" | "PRIVATE";
   sender: string;
   title: string;
   contentPreview: string;
   isViewed: boolean;
-  bookmarkedAt: string; // ISO string
+  bookmarkedAt: string;
 };
 
 type BookmarkPageResponse = {
@@ -34,3 +36,5 @@ type BookmarkPageResponse = {
   totalElements: number;
   last: boolean;
 };
+
+/* 보낸 사람 조회 */
