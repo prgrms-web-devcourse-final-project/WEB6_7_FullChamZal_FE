@@ -128,30 +128,30 @@ export default function MapContents() {
         case "ALL":
           break;
         case "UNREAD":
-          result = result.filter((d) => d.isViewed === false);
+          result = result.filter((d: PublicCapsule) => d.isViewed === false);
           break;
         case "READ":
-          result = result.filter((d) => d.isViewed === true);
+          result = result.filter((d: PublicCapsule) => d.isViewed === true);
           break;
       }
       switch (accessible) {
         case "ALL":
           return result;
         case "ACCESSIBLE":
-          return result.filter((d) => d.isUnlockable === true);
+          return result.filter((d: PublicCapsule) => d.isUnlockable === true);
 
         case "INACCESSIBLE":
-          return result.filter((d) => d.isUnlockable === false);
+          return result.filter((d: PublicCapsule) => d.isUnlockable === false);
       }
     } else return [];
   };
 
   const filteredData = filter(data);
 
-  return (
+  return id ? (
+    <LetterDetailView isPublic={true} capsuleId={Number(id)} />
+  ) : (
     <div className="h-full flex flex-col gap-4">
-      {id ? <LetterDetailView isPublic={true} capsuleId={Number(id)} /> : null}
-
       {/* 헤더 */}
       <div className="space-y-2">
         <h3 className="text-3xl font-medium">
