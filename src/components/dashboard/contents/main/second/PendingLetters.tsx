@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { Clock, MapPin, Sparkle } from "lucide-react";
@@ -84,16 +85,16 @@ function getRightIcon(type: string) {
 }
 
 export default function PendingLetters() {
-  const {
-    data: receiveList = [],
-    isLoading,
-    isError,
-  } = useQuery<CapsuleDashboardItem[]>({
+  const { data, isLoading, isError } = useQuery<unknown>({
     queryKey: ["capsuleDashboard", "receive"],
     queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
     staleTime: 30_000,
     retry: 1,
   });
+
+  const receiveList: CapsuleDashboardItem[] = Array.isArray(data)
+    ? (data as CapsuleDashboardItem[])
+    : [];
 
   /* 현재 위치 */
   const [myLocation, setMyLocation] = useState<{

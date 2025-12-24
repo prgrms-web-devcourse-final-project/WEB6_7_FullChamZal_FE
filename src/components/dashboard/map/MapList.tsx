@@ -15,7 +15,8 @@ export default function MapList({ listData, onClick, focus }: MapListProps) {
   const [keyword, setKeyword] = useState("");
   const cardFocus = useRef<Record<number, HTMLButtonElement | null>>({});
   const searchResultList = listData?.filter(
-    (d) => d.title.includes(keyword) || d.capsuleLocationName.includes(keyword)
+    (d: PublicCapsule) =>
+      d.title.includes(keyword) || d.capsuleLocationName.includes(keyword)
   );
 
   useEffect(() => {
