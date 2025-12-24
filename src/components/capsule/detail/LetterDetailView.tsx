@@ -147,7 +147,6 @@ export default function LetterDetailView({
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
           targetLocation={targetLocation}
-          viewingRadius={capsule.locationRadiusM}
           locationName={capsule.locationName}
           locationErrorMessage={locationError ?? undefined}
         />

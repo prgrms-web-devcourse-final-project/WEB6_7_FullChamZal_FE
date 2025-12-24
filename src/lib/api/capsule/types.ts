@@ -62,7 +62,6 @@ export interface CreatePublicCapsuleRequest {
   address?: string;
   locationLat: number;
   locationLng: number;
-  locationRadiusM: number;
   maxViewCount: number;
 }
 
@@ -122,6 +121,5 @@ export interface CapsuleSendReadResponse {
   locationName: string;
   locationLat: number;
   locationLng: number;
-  locationRadiusM: number;
   result: string;
 }
