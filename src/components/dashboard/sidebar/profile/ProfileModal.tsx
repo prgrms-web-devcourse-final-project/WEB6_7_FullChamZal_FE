@@ -7,7 +7,12 @@ import { Lock, Mail, Phone, User, UserCircle, X } from "lucide-react";
 import { Field } from "./Field";
 import PhoneEditModal from "./PhoneEditModal";
 import PasswordEditModal from "./PasswordEditModal";
-import { getMeDetail, updateMe, verifyMemberPassword } from "@/lib/api/members/members";
+import {
+  getMeDetail,
+  updateMe,
+  verifyMemberPassword,
+  type MemberMeDetail,
+} from "@/lib/api/members/members";
 import AccountDeleteModal from "./AccountDeleteModal";
 
 type ProfileForm = {
@@ -41,6 +46,8 @@ export default function ProfileModal({
     []
   );
 
+  const [me, setMe] = useState<MemberMeDetail | null>(null);
+
   const [isVerified, setIsVerified] = useState(false);
   const [password, setPassword] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -61,8 +68,13 @@ export default function ProfileModal({
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
+  const isOAuthGoogle = me?.oauthProvider === "GOOGLE";
+
   useEffect(() => {
     if (!open) return;
+
+    // 초기화
+    setMe(null);
 
     setIsVerified(false);
     setPassword("");
@@ -77,6 +89,38 @@ export default function ProfileModal({
 
     setForm(emptyForm);
     setInitialForm(emptyForm);
+
+    
+    (async () => {
+      try {
+        setIsLoadingProfile(true);
+        const meRes = await getMeDetail();
+        setMe(meRes);
+
+        const next: ProfileForm = {
+          name: meRes.name ?? "",
+          nickname: meRes.nickname ?? "",
+          email: meRes.userId ?? "",
+          phoneNumber: meRes.phoneNumber ?? "",
+        };
+
+        
+        if (meRes.oauthProvider === "GOOGLE") {
+          setIsVerified(true);
+          setForm(next);
+          setInitialForm(next);
+          return;
+        }
+
+      
+        setForm(emptyForm);
+        setInitialForm(emptyForm);
+      } catch (e: unknown) {
+        setError(getErrorMessage(e));
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    })();
   }, [open, emptyForm]);
 
   const updateField =
@@ -99,13 +143,14 @@ export default function ProfileModal({
       setPassword("");
 
       setIsLoadingProfile(true);
-      const me = await getMeDetail();
+      const meRes = await getMeDetail();
+      setMe(meRes);
 
       const next: ProfileForm = {
-        name: me.name ?? "",
-        nickname: me.nickname ?? "",
-        email: me.userId ?? "",
-        phoneNumber: me.phoneNumber ?? "",
+        name: meRes.name ?? "",
+        nickname: meRes.nickname ?? "",
+        email: meRes.userId ?? "",
+        phoneNumber: meRes.phoneNumber ?? "",
       };
 
       setForm(next);
@@ -158,9 +203,11 @@ export default function ProfileModal({
   return (
     <>
       <Modal open={open} onClose={handleClose}>
-        <div className="w-full max-w-[500px] rounded-2xl border-2 border-outline bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
+        <div className="w-full max-w-125 rounded-2xl border-2 border-outline bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
           <div className="py-4 px-6 flex justify-between items-center border-b border-outline">
             <h4 className="text-lg">내 프로필</h4>
+
+            {/* ✅ 구글 유저도 닫기는 허용(원하면 막을 수도 있음) */}
             <button type="button" onClick={handleClose} className="cursor-pointer">
               <X />
             </button>
@@ -173,7 +220,13 @@ export default function ProfileModal({
               </div>
             ) : null}
 
-            {!isVerified ? (
+           
+            {isLoadingProfile ? (
+              <div className="text-sm text-text-3">불러오는 중...</div>
+            ) : null}
+
+           
+            {!isVerified && !isOAuthGoogle ? (
               <div className="space-y-4">
                 <div className="flex items-start gap-3 rounded-xl border border-outline bg-sub p-4">
                   <Lock className="mt-0.5" size={18} />
@@ -198,11 +251,7 @@ export default function ProfileModal({
                   />
                 </div>
 
-                <Button
-                  className="w-full py-3"
-                  onClick={verifyPassword}
-                  disabled={!password.trim() || isVerifying}
-                >
+                <Button className="w-full py-3" onClick={verifyPassword} disabled={!password.trim() || isVerifying}>
                   {isVerifying ? "확인 중..." : "확인하기"}
                 </Button>
 
@@ -259,11 +308,11 @@ export default function ProfileModal({
                   <Field
                     icon={<Lock size={16} />}
                     label="비밀번호"
-                    value="••••••••"
+                    value={isOAuthGoogle ? "소셜 로그인" : "••••••••"}
                     isEditing={false}
                     readOnly
-                    actionLabel="수정"
-                    onActionClick={() => setIsPasswordModalOpen(true)}
+                    actionLabel={isOAuthGoogle ? undefined : "수정"}
+                    onActionClick={isOAuthGoogle ? undefined : () => setIsPasswordModalOpen(true)}
                   />
                 </div>
 
@@ -286,7 +335,7 @@ export default function ProfileModal({
           </div>
 
           <div className="py-6 px-6 flex flex-col gap-3 border-t border-outline">
-            {!isVerified ? (
+            {!isVerified && !isOAuthGoogle ? (
               <Button
                 className="w-full py-3 border border-outline bg-white text-text hover:text-white"
                 onClick={handleClose}
@@ -325,14 +374,12 @@ export default function ProfileModal({
                   </Button>
                 ) : (
                   <button
-                     type="button"
-                     className="cursor-pointer text-text-3 text-xs underline"
-                     onClick={() => setIsDeleteModalOpen(true)}
-                  >                  
-                     계정 삭제
+                    type="button"
+                    className="cursor-pointer text-text-3 text-xs underline"
+                    onClick={() => setIsDeleteModalOpen(true)}
+                  >
+                    계정 삭제
                   </button>
-
-
                 )}
               </>
             )}
@@ -341,10 +388,8 @@ export default function ProfileModal({
       </Modal>
 
       <PhoneEditModal open={isPhoneModalOpen} onClose={() => setIsPhoneModalOpen(false)} />
-      <PasswordEditModal open={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />              
-      <AccountDeleteModal  open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}
-/>
-
+      <PasswordEditModal open={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />
+      <AccountDeleteModal open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} />
     </>
   );
 }

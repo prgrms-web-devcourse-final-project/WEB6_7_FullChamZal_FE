@@ -9,8 +9,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProfileModal from "./profile/ProfileModal";
 import { authApiClient } from "@/lib/api/auth/auth.client";
+import type { MemberMeDetail } from "@/lib/api/members/members";
 
-export default function Sidebar() {
+export default function Sidebar({ me }: { me?: MemberMeDetail | null }) {
   const router = useRouter();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -30,10 +31,13 @@ export default function Sidebar() {
               Dear. ___
             </span>
           </div>
+
           {/* 프로필 */}
-          <Profile mode="user" onClick={() => setIsProfileOpen(true)} />
+          <Profile mode="user" onClick={() => setIsProfileOpen(true)} me={me} />
+
           {/* 메뉴(홈, 지도) */}
           <MenuTab mode="user" />
+
           {/* 나의 우체통 */}
           <MyMailbox />
         </div>
