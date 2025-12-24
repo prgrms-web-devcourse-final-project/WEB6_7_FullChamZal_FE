@@ -38,7 +38,7 @@ function calcDistanceKm(
   lng2: number
 ) {
   const toRad = (v: number) => (v * Math.PI) / 180;
-  const R = 6371; // km
+  const R = 6371;
 
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
@@ -52,6 +52,7 @@ function calcDistanceKm(
 
 // 거리 표시 포맷
 function formatDistance(km: number) {
+  if (!Number.isFinite(km)) return "-";
   if (km < 1) return `${Math.round(km * 1000)}m`;
   return `${km.toFixed(1)}km`;
 }
@@ -83,10 +84,15 @@ function getRightIcon(type: string) {
 }
 
 export default function PendingLetters() {
-  /* 받은 편지 */
-  const { data: receiveList } = useQuery<CapsuleDashboardItem[]>({
+  const {
+    data: receiveList = [], // ✅ 핵심: 기본값 빈 배열
+    isLoading,
+    isError,
+  } = useQuery<CapsuleDashboardItem[]>({
     queryKey: ["capsuleDashboard", "receive"],
     queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+    staleTime: 30_000,
+    retry: 1,
   });
 
   /* 현재 위치 */
@@ -96,7 +102,9 @@ export default function PendingLetters() {
   } | null>(null);
 
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    // ✅ 브라우저 환경 가드 (안전)
+    if (typeof window === "undefined") return;
+    if (!navigator?.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -106,16 +114,15 @@ export default function PendingLetters() {
         });
       },
       () => {
-        // 권한 거부 / 실패 → 거리 미표시
         setMyLocation(null);
-      }
+      },
+      { enableHighAccuracy: false, timeout: 8000 }
     );
   }, []);
 
   /* 미열람 편지 */
   const unViewLetters = useMemo(
-    () =>
-      (receiveList ?? []).filter((l: CapsuleDashboardItem) => !l.viewStatus),
+    () => receiveList.filter((l) => !l.viewStatus),
     [receiveList]
   );
 
@@ -125,18 +132,29 @@ export default function PendingLetters() {
         <Sparkle className="text-primary" />
         <div>
           <p className="text-lg">미열람 편지</p>
-          <p className="text-sm text-text-3">
-            아직 열리지 않은 편지가{" "}
-            <span className="text-primary font-semibold">
-              {unViewLetters.length}통
-            </span>{" "}
-            있습니다.
-          </p>
+
+          {isLoading ? (
+            <p className="text-sm text-text-3">불러오는 중…</p>
+          ) : isError ? (
+            <p className="text-sm text-text-3">편지를 불러오지 못했어요.</p>
+          ) : (
+            <p className="text-sm text-text-3">
+              아직 열리지 않은 편지가{" "}
+              <span className="text-primary font-semibold">
+                {unViewLetters.length}통
+              </span>{" "}
+              있습니다.
+            </p>
+          )}
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4 lg:ml-6">
-        {!unViewLetters.length ? (
+        {isLoading ? (
+          <div className="h-20 flex flex-col justify-center">
+            <p className="text-text-4">불러오는 중…</p>
+          </div>
+        ) : !unViewLetters.length ? (
           <div className="h-20 flex flex-col justify-center">
             <p className="text-text-4">미열람 편지가 없습니다.</p>
           </div>
@@ -148,7 +166,7 @@ export default function PendingLetters() {
             let subText = "-";
             let SubIcon = Clock;
 
-            // TIME → D-Day
+            // TIME / TIME_AND_LOCATION → D-Day
             if (
               (l.unlockType === "TIME" ||
                 l.unlockType === "TIME_AND_LOCATION") &&
