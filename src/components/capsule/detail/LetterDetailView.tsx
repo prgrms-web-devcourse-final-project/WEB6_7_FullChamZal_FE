@@ -40,12 +40,14 @@ function getCurrentPosition(): Promise<LatLng> {
 }
 
 type Props = {
+  isPublic: boolean;
   capsuleId: number;
-  isProtected: number;
+  isProtected?: number;
   password?: string | null;
 };
 
 export default function LetterDetailView({
+  isPublic,
   capsuleId,
   isProtected,
   password = null,
@@ -134,7 +136,7 @@ export default function LetterDetailView({
 
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
-        <LetterLockedView unlockAt={fallbackUnlockAt} />
+        <LetterLockedView isPublic={isPublic} unlockAt={fallbackUnlockAt} />
       </div>
     );
   }
@@ -149,6 +151,7 @@ export default function LetterDetailView({
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
         <LetterLockedView
+          isPublic={isPublic}
           unlockAt={capsule.unlockAt ?? new Date().toISOString()}
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
