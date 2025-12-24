@@ -17,6 +17,7 @@ type BuildCommonArgs = {
   visibility: Visibility;
   effectiveUnlockType: UnlockType;
   dayForm: DayForm;
+  expireDayForm?: DayForm;
   locationForm: LocationForm;
   capsulePassword?: string | null;
   capsuleColor?: string;
@@ -107,6 +108,7 @@ export function buildPrivatePayload(
     visibility,
     effectiveUnlockType,
     dayForm,
+    expireDayForm,
     locationForm,
     packingColor = "",
     contentColor = "",
@@ -115,6 +117,13 @@ export function buildPrivatePayload(
     effectiveUnlockType === "TIME" ||
     effectiveUnlockType === "TIME_AND_LOCATION"
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
+      : undefined;
+
+  const unlockUntil =
+    expireDayForm &&
+    (effectiveUnlockType === "TIME" ||
+      effectiveUnlockType === "TIME_AND_LOCATION")
+      ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
       : undefined;
 
   return {
@@ -128,7 +137,7 @@ export function buildPrivatePayload(
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
-    unlockUntil: undefined,
+    unlockUntil,
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
@@ -176,6 +185,7 @@ export function buildPublicPayload(
     visibility,
     effectiveUnlockType,
     dayForm,
+    expireDayForm,
     locationForm,
     capsuleColor = "",
     capsulePackingColor = "",
@@ -187,6 +197,13 @@ export function buildPublicPayload(
     effectiveUnlockType === "TIME" ||
     effectiveUnlockType === "TIME_AND_LOCATION"
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
+      : undefined;
+
+  const unlockUntil =
+    expireDayForm &&
+    (effectiveUnlockType === "TIME" ||
+      effectiveUnlockType === "TIME_AND_LOCATION")
+      ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
       : undefined;
 
   return {
@@ -202,7 +219,7 @@ export function buildPublicPayload(
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
-    unlockUntil: undefined,
+    unlockUntil,
     address:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
