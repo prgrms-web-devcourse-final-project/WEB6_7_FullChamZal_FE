@@ -4,6 +4,8 @@ import DivBox from "../DivBox";
 import { useEffect, useState } from "react";
 import { getMeDetail, type MemberMeDetail } from "@/lib/api/members/members";
 
+
+
 export default function Profile({
   mode,
   onClick,
@@ -68,3 +70,5 @@ export default function Profile({
     </button>
   );
 }
+
+
