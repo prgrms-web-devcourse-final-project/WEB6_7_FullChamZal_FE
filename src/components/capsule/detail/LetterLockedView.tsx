@@ -125,6 +125,7 @@ function getLockMessage(args: {
 }
 
 export default function LetterLockedView({
+  isPublic,
   unlockAt,
   unlockType = "TIME",
   currentLocation,
@@ -133,6 +134,7 @@ export default function LetterLockedView({
   locationName = "없음", // 장소 별칭 표시
   locationErrorMessage,
 }: {
+  isPublic: boolean;
   unlockAt: string;
   unlockType?: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
   currentLocation?: LatLng;
@@ -293,22 +295,34 @@ export default function LetterLockedView({
             </div>
           ) : null}
 
-          <div className="flex gap-3 mt-4">
-            <button
-              className="cursor-pointer px-4 py-2 rounded-xl bg-sub"
-              onClick={() => router.push("/")}
-              type="button"
-            >
-              홈으로 이동
-            </button>
-            <button
-              className="cursor-pointer px-4 py-2 rounded-xl bg-primary-3 text-white hover:bg-primary-2"
-              onClick={() => router.push("/auth/login")}
-              type="button"
-            >
-              로그인하고 저장하기
-            </button>
-          </div>
+          {isPublic ? (
+            <div className="flex gap-3 mt-4">
+              <button
+                className="cursor-pointer px-4 py-2 rounded-xl bg-sub"
+                onClick={() => router.back()}
+                type="button"
+              >
+                뒤로가기
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-3 mt-4">
+              <button
+                className="cursor-pointer px-4 py-2 rounded-xl bg-sub"
+                onClick={() => router.push("/")}
+                type="button"
+              >
+                홈으로 이동
+              </button>
+              <button
+                className="cursor-pointer px-4 py-2 rounded-xl bg-primary-3 text-white hover:bg-primary-2"
+                onClick={() => router.push("/auth/login")}
+                type="button"
+              >
+                로그인하고 저장하기
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

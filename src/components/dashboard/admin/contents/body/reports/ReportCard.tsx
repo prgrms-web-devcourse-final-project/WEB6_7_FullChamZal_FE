@@ -6,13 +6,9 @@ import ReportStatusBadge, { REPORT_STATUS_UI } from "./ReportStatusBadge";
 
 export default function ReportCard({
   report,
-  onApprove,
-  onReject,
   onOpenDetail,
 }: {
   report: AdminReport;
-  onApprove: (id: number) => void;
-  onReject: (id: number) => void;
   onOpenDetail: (id: number) => void;
 }) {
   const statusUi = REPORT_STATUS_UI[report.status];
@@ -51,18 +47,9 @@ export default function ReportCard({
             <span>{report.targetId}</span>
           </div>
         </div>
-
-        <p className="text-text-2 text-sm w-full rounded-lg bg-sub border border-outline p-3">
-          욕설이 포함된 편지를 보냈습니다.
-        </p>
       </div>
 
-      <ReportActions
-        report={report}
-        onApprove={onApprove}
-        onReject={onReject}
-        onOpenDetail={onOpenDetail}
-      />
+      <ReportActions report={report} onOpenDetail={onOpenDetail} />
     </div>
   );
 }

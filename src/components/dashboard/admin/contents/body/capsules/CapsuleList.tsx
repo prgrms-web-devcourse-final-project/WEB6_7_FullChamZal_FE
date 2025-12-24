@@ -120,7 +120,6 @@ export default function CapsuleList({
       queryClient.invalidateQueries({
         queryKey: ["adminCapsules"],
       });
-      console.log("삭제 성공!");
     },
 
     onError: (error) => {

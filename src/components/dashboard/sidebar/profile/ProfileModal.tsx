@@ -311,13 +311,12 @@ export default function ProfileModal({
                   <Field
                     icon={<Lock size={16} />}
                     label="비밀번호"
-                    value="••••••••"
+                    value={isOAuthGoogle ? "소셜 로그인" : "••••••••"}
                     isEditing={false}
                     readOnly
-                    actionLabel="수정"
-                    onActionClick={() => setIsPasswordModalOpen(true)}
-                   />
-  )}
+                    actionLabel={isOAuthGoogle ? undefined : "수정"}
+                    onActionClick={isOAuthGoogle ? undefined : () => setIsPasswordModalOpen(true)}
+                  />
                 </div>
 
                 <div className="flex gap-4 text-center">

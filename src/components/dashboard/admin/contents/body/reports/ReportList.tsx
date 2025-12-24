@@ -14,13 +14,15 @@ export default function ReportList({
   query: string;
 }) {
   const [openDetail, setOpenDetail] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
+
   const [page, setPage] = useState(0);
   const [size] = useState(10);
 
   const listQueryKey = (p: number) =>
     ["adminReports", tab, query, p, size] as const;
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: listQueryKey(page),
     queryFn: ({ signal }) =>
       adminReportApi.list({ tab, query, page, size, signal }),
@@ -35,16 +37,21 @@ export default function ReportList({
           <ReportCard
             key={item.id}
             report={item}
-            onApprove={(id) => console.log("approve", id)}
-            onReject={(id) => console.log("reject", id)}
-            onOpenDetail={() => setOpenDetail(true)}
+            onOpenDetail={(id: number) => {
+              setSelectedReportId(id);
+              setOpenDetail(true);
+            }}
           />
         ))}
       </div>
 
       <ReportDetailModal
         open={openDetail}
-        onClose={() => setOpenDetail(false)}
+        reportId={selectedReportId}
+        onClose={() => {
+          setOpenDetail(false);
+          setSelectedReportId(null);
+        }}
       />
     </>
   );

@@ -30,6 +30,16 @@ export default function MyMailbox() {
     queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
   });
 
+  /* 북마크 */
+  const { data: bookmarkList } = useQuery({
+    queryKey: ["bookmarks", { page: 0, size: 10 }],
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.bookmarks(
+        { page: 0, size: 10, sort: ["bookmarkedAt,desc"] },
+        signal
+      ),
+  });
+
   return (
     <div className="space-y-3">
       <p className="font-medium">나의 우체통</p>
@@ -97,7 +107,9 @@ export default function MyMailbox() {
                 >
                   소중한 편지
                 </span>
-                <span className="text-2xl">연결 필요</span>
+                <span className="text-2xl">
+                  {bookmarkList?.totalElements ?? 0}
+                </span>
               </div>
             </div>
           </DivBox>

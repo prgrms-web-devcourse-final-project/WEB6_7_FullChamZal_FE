@@ -40,12 +40,14 @@ function getCurrentPosition(): Promise<LatLng> {
 }
 
 type Props = {
+  isPublic?: boolean;
   capsuleId: number;
-  isProtected: number;
+  isProtected?: number;
   password?: string | null;
 };
 
 export default function LetterDetailView({
+  isPublic = false,
   capsuleId,
   isProtected,
   password = null,
@@ -84,7 +86,7 @@ export default function LetterDetailView({
     return `${lat},${lng}`;
   }, [currentLocation]);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["capsuleRead", capsuleId, password, locationKey],
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
@@ -102,14 +104,6 @@ export default function LetterDetailView({
         },
         signal
       );
-
-      console.log("/capsule/read payload:", {
-        capsuleId,
-        unlockAt,
-        locationLat,
-        locationLng,
-      });
-      console.log("/capsule/read response:", res);
 
       return res;
     },
@@ -130,11 +124,10 @@ export default function LetterDetailView({
     const fallbackUnlockAt = new Date(
       Date.now() + 10 * 60 * 1000
     ).toISOString();
-    console.log("❌ /capsule/read error:", error);
 
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
-        <LetterLockedView unlockAt={fallbackUnlockAt} />
+        <LetterLockedView isPublic={isPublic} unlockAt={fallbackUnlockAt} />
       </div>
     );
   }
@@ -149,11 +142,11 @@ export default function LetterDetailView({
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
         <LetterLockedView
+          isPublic={isPublic}
           unlockAt={capsule.unlockAt ?? new Date().toISOString()}
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
           targetLocation={targetLocation}
-          viewingRadius={capsule.locationRadiusM}
           locationName={capsule.locationName}
           locationErrorMessage={locationError ?? undefined}
         />

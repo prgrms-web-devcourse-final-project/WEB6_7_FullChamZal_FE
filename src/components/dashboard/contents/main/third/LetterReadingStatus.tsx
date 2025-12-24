@@ -9,11 +9,29 @@ import {
   Tooltip,
 } from "recharts";
 import DivBox from "../../../DivBox";
+import { useQuery } from "@tanstack/react-query";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 
 export default function LetterReadingStatus() {
+  /* 받은 편지 */
+  const { data: receiveList } = useQuery({
+    queryKey: ["capsuleDashboard", "receive"],
+    queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+  });
+
+  if (!receiveList) return <div>0</div>;
+
+  const viewedCount =
+    receiveList?.filter((item: CapsuleDashboardItem) => item.viewStatus)
+      .length ?? 0;
+
+  const unviewedCount =
+    receiveList?.filter((item: CapsuleDashboardItem) => !item.viewStatus)
+      .length ?? 0;
+
   const donutData = [
-    { name: "열람", value: 15 },
-    { name: "미열람", value: 10 },
+    { name: "열람", value: viewedCount },
+    { name: "미열람", value: unviewedCount },
   ];
 
   const DONUT_COLORS = ["#FF583B", "#D6DAE1"];
@@ -24,32 +42,36 @@ export default function LetterReadingStatus() {
         <div>
           <p className="text-lg">받은 편지 열람 현황</p>
           <div className="h-[360px] flex items-center justify-center select-none [&_*:focus]:outline-none">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={donutData}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={80} // 도넛 구멍 크기
-                  outerRadius={120} // 전체 원 크기
-                  paddingAngle={6} // 섹터 사이 간격
-                  stroke="none"
-                >
-                  {donutData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={DONUT_COLORS[index]} />
-                  ))}
+            {!receiveList ? (
+              <p className="text-text-4">받은 편지가 없습니다.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={donutData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={80} // 도넛 구멍 크기
+                    outerRadius={120} // 전체 원 크기
+                    paddingAngle={6} // 섹터 사이 간격
+                    stroke="none"
+                  >
+                    {donutData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={DONUT_COLORS[index]} />
+                    ))}
 
-                  <Label
-                    value={`총 24통`}
-                    position="center"
-                    fill="#111827" // 텍스트 색
-                    style={{ fontSize: 28, fontWeight: 500 }}
-                  />
-                </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" align="center" />
-              </PieChart>
-            </ResponsiveContainer>
+                    <Label
+                      value={`총 ${viewedCount + unviewedCount}통`}
+                      position="center"
+                      fill="#111827" // 텍스트 색
+                      style={{ fontSize: 28, fontWeight: 500 }}
+                    />
+                  </Pie>
+                  <Tooltip />
+                  <Legend verticalAlign="bottom" align="center" />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
         <div className="space-y-4">
