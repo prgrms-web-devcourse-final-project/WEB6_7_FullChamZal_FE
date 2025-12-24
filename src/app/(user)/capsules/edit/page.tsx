@@ -58,6 +58,8 @@ export default function CapsuleEditPage() {
   const MAX_CONTENT_LENGTH = 3000;
   const [isComposing, setIsComposing] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const findColorHex = (name?: string | null) => {
     if (!name) return undefined;
@@ -128,7 +130,8 @@ export default function CapsuleEditPage() {
           : typeof err === "string"
           ? err
           : "수정 중 오류가 발생했습니다.";
-      alert(msg);
+      setErrorMessage(msg);
+      setIsErrorModalOpen(true);
     },
   });
 
@@ -262,6 +265,15 @@ export default function CapsuleEditPage() {
           setIsSuccessModalOpen(false);
           router.back();
         }}
+      />
+
+      <ActiveModal
+        active="fail"
+        title="수정 실패"
+        content={errorMessage || "수정 중 오류가 발생했습니다."}
+        open={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        onConfirm={() => setIsErrorModalOpen(false)}
       />
     </div>
   );
