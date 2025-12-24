@@ -9,6 +9,7 @@ import Right from "@/components/capsule/new/right/Right";
 import WriteInput from "@/components/capsule/new/left/WriteInput";
 import WriteDiv from "@/components/capsule/new/left/WriteDiv";
 import Button from "@/components/common/Button";
+import ActiveModal from "@/components/common/ActiveModal";
 import { CAPTURE_ENVELOPE_PALETTE } from "@/constants/capsulePalette";
 import { updateCapsule, readSendCapsule } from "@/lib/api/capsule/capsule";
 import { Send } from "lucide-react";
@@ -56,6 +57,7 @@ export default function CapsuleEditPage() {
 
   const MAX_CONTENT_LENGTH = 3000;
   const [isComposing, setIsComposing] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const findColorHex = (name?: string | null) => {
     if (!name) return undefined;
@@ -117,8 +119,7 @@ export default function CapsuleEditPage() {
       updateCapsule(capsuleId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries();
-      alert("캡슐이 수정되었습니다.");
-      router.back();
+      setIsSuccessModalOpen(true);
     },
     onError: (err: unknown) => {
       const msg =
@@ -250,7 +251,18 @@ export default function CapsuleEditPage() {
           <Right preview={mergedPreview} />
         </div>
       </div>
+
+      <ActiveModal
+        active="success"
+        title="수정이 완료되었습니다."
+        content="캡슐이 성공적으로 수정되었습니다."
+        open={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        onConfirm={() => {
+          setIsSuccessModalOpen(false);
+          router.back();
+        }}
+      />
     </div>
   );
 }
-

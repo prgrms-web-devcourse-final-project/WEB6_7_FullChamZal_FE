@@ -39,7 +39,6 @@ import {
 } from "@/lib/api/capsule/capsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
-import { useMe } from "@/lib/hooks/useMe";
 
 type UICapsule = {
   title: string;
@@ -107,7 +106,6 @@ export default function LetterDetailModal({
   const searchParams = useSearchParams();
 
   const isAdmin = role === "ADMIN";
-  const meQuery = useMe();
 
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -133,7 +131,7 @@ export default function LetterDetailModal({
     else router.back();
   };
 
-  // ✅ 저장 mutation
+  //  저장 mutation
   const saveMutation = useMutation({
     mutationKey: ["capsuleSave", capsuleId],
     mutationFn: (payload: {
@@ -239,7 +237,7 @@ export default function LetterDetailModal({
         return;
       }
 
-      // CPS018: 좋아요 해제 불가 → 좋아요를 누르지 않았다는 의미
+      // CPS018: 좋아요 해제 불가 -> 좋아요를 누르지 않았다는 의미
       if (errorCode === "CPS018") {
         setIsLiked(false);
         // 좋아요 수는 롤백하지 않음
@@ -262,7 +260,7 @@ export default function LetterDetailModal({
     },
   });
 
-  // ✅ 로그인/회원가입 후 돌아왔을 때 자동 재시도
+  //  로그인/회원가입 후 돌아왔을 때 자동 재시도
   useEffect(() => {
     if (!open) return;
 
@@ -288,7 +286,7 @@ export default function LetterDetailModal({
     });
   }, [open, saveMutation]);
 
-  // ✅ 저장 버튼 핸들러
+  // 저장 버튼 핸들러
   const handleSave = async () => {
     try {
       const me = await authApiClient.me();
@@ -308,11 +306,11 @@ export default function LetterDetailModal({
         return;
       }
 
-      console.error("❌ save error:", err);
+      console.error("save error:", err);
     }
   };
 
-  // ✅ 상세 조회 query (open일 때만)
+  //  상세 조회 query (open일 때만)
   const { data, isLoading, isError, error } = useQuery<UICapsule>({
     queryKey: ["capsuleDetailModal", role, capsuleId, password],
     enabled: open && capsuleId > 0,
@@ -368,7 +366,7 @@ export default function LetterDetailModal({
     },
   });
 
-  // ✅ open이 아니면 렌더 자체 안 함 (훅은 이미 호출된 뒤라 안전)
+  //  open이 아니면 렌더 자체 안 함 (훅은 이미 호출된 뒤라 안전)
   if (!open) return null;
 
   if (isLoading) {
@@ -430,15 +428,6 @@ export default function LetterDetailModal({
   }
 
   const capsule = data;
-  // 내가 보낸 편지만 수정 가능하기에, 임시로 확인을 하기 위함임
-  // 백엔드 측에 별도 API 요청하여 구현 필요
-  const me = meQuery.data;
-  const isOwner =
-    !isAdmin &&
-    !!me &&
-    (me.nickname === capsule.writerNickname ||
-      me.name === capsule.writerNickname);
-
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
 
@@ -510,7 +499,7 @@ export default function LetterDetailModal({
               </div>
 
               <div className="md:flex-1 flex justify-end items-center gap-2">
-                {isOwner || isSender || isReceiver ? (
+                {isSender || isReceiver ? (
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -530,7 +519,7 @@ export default function LetterDetailModal({
                     >
                       <div className="px-3 py-2 text-xs text-text-3">관리</div>
                       <div className="h-px bg-border my-1" />
-                      {isOwner && (
+                      {isSender && (
                         <button
                           type="button"
                           className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md"
