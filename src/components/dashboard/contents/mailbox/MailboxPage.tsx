@@ -21,7 +21,6 @@ export default function MailboxPage({
 
   const isBookmark = type === "bookmark";
 
-  // bookmark면 BookmarkPageResponse, 아니면 CapsuleDashboardItem[]
   const { data, isLoading, error } = useQuery<
     CapsuleDashboardItem[] | BookmarkPageResponse
   >({
@@ -40,7 +39,6 @@ export default function MailboxPage({
     },
   });
 
-  // 렌더에 쓸 "리스트"와 "총개수"를 통일된 형태로 뽑아내기
   const { list, totalCount } = useMemo(() => {
     if (!data) return { list: [] as CapsuleDashboardItem[], totalCount: 0 };
 

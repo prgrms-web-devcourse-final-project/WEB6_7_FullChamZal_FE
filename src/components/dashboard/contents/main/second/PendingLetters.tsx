@@ -135,63 +135,70 @@ export default function PendingLetters() {
       </div>
 
       <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4 lg:ml-6">
-        {unViewLetters.slice(0, 4).map((l) => {
-          const RightIcon = getRightIcon(l.unlockType ?? "");
-          const conditionText = getUnlockConditionText(l);
+        {!unViewLetters.length ? (
+          <div className="h-20 flex flex-col justify-center">
+            <p className="text-text-4">미열람 편지가 없습니다.</p>
+          </div>
+        ) : (
+          unViewLetters.slice(0, 4).map((l) => {
+            const RightIcon = getRightIcon(l.unlockType ?? "");
+            const conditionText = getUnlockConditionText(l);
 
-          let subText = "-";
-          let SubIcon = Clock;
+            let subText = "-";
+            let SubIcon = Clock;
 
-          // TIME → D-Day
-          if (
-            (l.unlockType === "TIME" || l.unlockType === "TIME_AND_LOCATION") &&
-            l.unlockAt
-          ) {
-            subText = formatDDay(l.unlockAt);
-            SubIcon = Clock;
-          }
+            // TIME → D-Day
+            if (
+              (l.unlockType === "TIME" ||
+                l.unlockType === "TIME_AND_LOCATION") &&
+              l.unlockAt
+            ) {
+              subText = formatDDay(l.unlockAt);
+              SubIcon = Clock;
+            }
 
-          // LOCATION → 거리
-          if (
-            l.unlockType === "LOCATION" &&
-            myLocation &&
-            l.locationLat != null &&
-            l.locationLng != null
-          ) {
-            const km = calcDistanceKm(
-              myLocation.lat,
-              myLocation.lng,
-              l.locationLat,
-              l.locationLng
-            );
-            subText = formatDistance(km);
-            SubIcon = MapPin;
-          }
+            // LOCATION → 거리
+            if (
+              l.unlockType === "LOCATION" &&
+              myLocation &&
+              l.locationLat != null &&
+              l.locationLng != null
+            ) {
+              const km = calcDistanceKm(
+                myLocation.lat,
+                myLocation.lng,
+                l.locationLat,
+                l.locationLng
+              );
+              subText = formatDistance(km);
+              SubIcon = MapPin;
+            }
 
-          return (
-            <DivBox key={l.capsuleId}>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-text-3 text-xs">보낸 사람</span>
-                    <span>{l.sender}</span>
+            return (
+              <DivBox key={l.capsuleId}>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-text-3 text-xs">보낸 사람</span>
+                      <span>{l.sender}</span>
+                    </div>
+                    <RightIcon size={18} />
                   </div>
-                  <RightIcon size={18} />
-                </div>
 
-                <div className="flex flex-col gap-1">
-                  <span className="text-text-3 text-xs">해제 조건</span>
-                  <span className="line-clamp-2">{conditionText}</span>
-                </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-text-3 text-xs">해제 조건</span>
+                    <span className="line-clamp-2">{conditionText}</span>
+                  </div>
 
-                <div className="flex items-center gap-2 text-text-3">
-                  <SubIcon size={16} />
-                  <span className="text-sm">{subText}</span>
+                  <div className="flex items-center gap-2 text-text-3">
+                    <SubIcon size={16} />
+                    <span className="text-sm">{subText}</span>
+                  </div>
                 </div>
-              </div>
-            </DivBox>
-          );
-        })}
+              </DivBox>
+            );
+          })
+        )}
       </div>
     </div>
   );
