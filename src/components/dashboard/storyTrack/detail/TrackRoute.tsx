@@ -1,7 +1,9 @@
 export default function TrackRoute() {
   return (
     <>
-      <div className="p-6">🗺️ 경로 지도 / 장소 리스트</div>
+      <div className="p-8">
+        <p className="text-xl">경로 상세</p>
+      </div>
     </>
   );
 }
