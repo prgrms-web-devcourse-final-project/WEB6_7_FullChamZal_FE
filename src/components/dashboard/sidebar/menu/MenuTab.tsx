@@ -1,7 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { FileWarning, Home, Map, Users, Phone, History } from "lucide-react";
+import {
+  FileWarning,
+  Home,
+  Map,
+  Users,
+  Phone,
+  History,
+  Route,
+} from "lucide-react";
 import { MenuItemCard } from "./MenuItemCard";
 
 const ADMIN_ITEMS: MenuItem[] = [
@@ -56,6 +64,13 @@ const USER_ITEMS: MenuItem[] = [
     title: "지도",
     desc: "공개 편지 찾기",
     icon: Map,
+  },
+  {
+    href: "/dashboard/storyTrack/joined",
+    activePrefix: "/dashboard/storyTrack",
+    title: "스토리트랙",
+    desc: "경로 기반 여정",
+    icon: Route,
   },
 ];
 
