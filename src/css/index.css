@@ -247,9 +247,12 @@ pre {
 
   --color-sub: #f8f8f8;
   --color-sub-2: #f3f3f5;
+
+  --color-accent: #f9f9f9;
+  --color-accent-foreground: #070d19;
 }
 
-/* Radix UI 드롭다운/팝오버 transform transition 비활성화 */
+/* Radix UI 드롭다운/팝오버 transition 비활성화 */
 [data-slot="dropdown-menu-content"],
 [data-slot="dropdown-menu-sub-content"],
 [data-slot="popover-content"],
