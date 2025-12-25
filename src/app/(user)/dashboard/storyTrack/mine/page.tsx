@@ -1,4 +1,4 @@
-import MineTrackPage from "@/components/dashboard/storyTrack/list/mine/MineTrackPage";
+import MineTrackPage from "@/components/dashboard/storyTrack/mine/MineTrackPage";
 import { Suspense } from "react";
 
 export default function MinePage() {

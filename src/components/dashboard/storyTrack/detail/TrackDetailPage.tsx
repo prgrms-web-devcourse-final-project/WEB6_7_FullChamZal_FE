@@ -28,6 +28,7 @@ export default function TrackDetailPage() {
         <div className="flex-1 overflow-auto">
           {tab === "overview" && <TrackOverview />}
           {tab === "route" && <TrackRoute />}
+          {/* 작성자라면 이 탭도 보이지 않도록 처리 */}
           {tab === "progress" && <TrackProgress />}
         </div>
       </div>

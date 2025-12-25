@@ -1,4 +1,4 @@
-import JoinedTrackPage from "@/components/dashboard/storyTrack/list/joined/JoinedTrackPage";
+import JoinedTrackPage from "@/components/dashboard/storyTrack/joined/JoinedTrackPage";
 import { Suspense } from "react";
 
 export default function JoinedPage() {
