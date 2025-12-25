@@ -1,7 +1,11 @@
+"use client";
+
 import Button from "@/components/common/Button";
 import { ListOrdered, MapPin, Play, TrendingUp, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function JoinedCard() {
+  const router = useRouter();
   return (
     <>
       <div className="border border-outline rounded-xl">
@@ -66,7 +70,10 @@ export default function JoinedCard() {
           </div>
 
           {/* 버튼 */}
-          <Button className="md:font-normal gap-1 w-full py-3">
+          <Button
+            onClick={() => router.push("/dashboard/storyTrack/1")}
+            className="md:font-normal gap-1 w-full py-3"
+          >
             <Play size={20} />
             계속하기
           </Button>

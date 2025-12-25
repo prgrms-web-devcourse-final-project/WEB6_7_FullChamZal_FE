@@ -1,24 +1,16 @@
 "use client";
 
-import { ArrowLeft, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import TrackCard from "./TrackCard";
+import BackButton from "@/components/common/BackButton";
 
 export default function AllTrackPage() {
-  const router = useRouter();
   return (
     <>
       <div className="p-8 space-y-6">
         {/* Top */}
         <div className="space-y-3 flex-none">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="cursor-pointer flex items-center gap-1 text-text-3 hover:text-text"
-          >
-            <ArrowLeft size={20} />
-            돌아가기
-          </button>
+          <BackButton />
 
           <div className="space-y-2">
             <h3 className="text-3xl font-medium">
