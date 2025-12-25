@@ -66,7 +66,7 @@ const USER_ITEMS: MenuItem[] = [
     icon: Map,
   },
   {
-    href: "/dashboard/storyTrack",
+    href: "/dashboard/storyTrack/joined",
     activePrefix: "/dashboard/storyTrack",
     title: "스토리트랙",
     desc: "경로 기반 여정",
