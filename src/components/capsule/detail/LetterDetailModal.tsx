@@ -518,7 +518,10 @@ export default function LetterDetailModal({
                         <MoreHorizontal size={18} />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44 z-10000">
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-44 z-10000 bg-white shadow-lg"
+                    >
                       <DropdownMenuLabel>관리</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
@@ -530,7 +533,7 @@ export default function LetterDetailModal({
                               );
                             }}
                           >
-                            <PencilLine />
+                            <PencilLine className="text-primary" />
                             수정하기
                           </DropdownMenuItem>
                         )}
@@ -540,12 +543,8 @@ export default function LetterDetailModal({
                             disabled={deleteMutation.isPending}
                             onClick={() => setIsDeleteConfirmOpen(true)}
                           >
-                            <Trash2 />
-                            <span>
-                              {deleteMutation.isPending
-                                ? "삭제 중..."
-                                : "삭제하기"}
-                            </span>
+                            <Trash2 className="text-primary" />
+                            삭제하기
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuGroup>
