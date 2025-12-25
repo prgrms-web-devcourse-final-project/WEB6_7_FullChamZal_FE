@@ -216,7 +216,7 @@ export default function CreateStoryTrack() {
             {step === 3 && (
               <Button
                 type="button"
-                onClick={() => router.push("/dashboard/storyTrack/joined")}
+                onClick={() => router.push("/dashboard/storyTrack/mine")}
                 className="md:font-normal py-2 px-8"
               >
                 완료
