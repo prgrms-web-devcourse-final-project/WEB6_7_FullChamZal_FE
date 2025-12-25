@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 
-import PublicLetterPicker from "../PublicLetterPicker";
+import PublicLetterPicker from "./PublicLetterPicker";
 import SelectedRouteList from "./SelectedRouteList";
 
 type Props = {

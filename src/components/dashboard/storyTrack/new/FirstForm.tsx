@@ -94,10 +94,7 @@ export default function FirstForm({ value, onChange }: Props) {
                     onChange={() => onChange({ order: "ordered" })}
                     className="hidden peer"
                   />
-                  <div
-                    className="flex items-center justify-center py-2.5 border-2 border-outline text-text-3 rounded-lg
-                               peer-checked:border-primary-2 peer-checked:bg-button-hover peer-checked:text-primary-2"
-                  >
+                  <div className="flex items-center justify-center py-2.5 border-2 border-outline text-text-3 rounded-lg peer-checked:border-primary-2 peer-checked:bg-button-hover peer-checked:text-primary-2">
                     순서대로
                   </div>
                 </label>
@@ -111,10 +108,7 @@ export default function FirstForm({ value, onChange }: Props) {
                     onChange={() => onChange({ order: "free" })}
                     className="hidden peer"
                   />
-                  <div
-                    className="flex items-center justify-center py-2.5 border-2 border-outline text-text-3 rounded-lg
-                               peer-checked:border-primary-2 peer-checked:bg-button-hover peer-checked:text-primary-2"
-                  >
+                  <div className="flex items-center justify-center py-2.5 border-2 border-outline text-text-3 rounded-lg peer-checked:border-primary-2 peer-checked:bg-button-hover peer-checked:text-primary-2">
                     순서 없음
                   </div>
                 </label>

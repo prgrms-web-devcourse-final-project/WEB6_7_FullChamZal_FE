@@ -50,7 +50,6 @@ export default function CreateStoryTrack() {
       form.title.trim().length > 0 &&
       form.description.trim().length > 0 &&
       form.imageFile !== null
-      // order는 기본값 있어서 굳이 검사 안 해도 됨
     );
   }, [form.title, form.description, form.imageFile]);
 
@@ -168,7 +167,7 @@ export default function CreateStoryTrack() {
         </div>
       </div>
 
-      {/* Bottom Action Bar */}
+      {/* Bottom */}
       <div className="flex-none border-t border-outline bg-white/95 backdrop-blur">
         <div className="px-8 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
           <div className="flex justify-between items-center">

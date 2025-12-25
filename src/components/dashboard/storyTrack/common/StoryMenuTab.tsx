@@ -22,7 +22,7 @@ export default function StoryMenuTab() {
     <>
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         {/* 왼쪽 */}
-        <div className="space-x-2">
+        <div className="space-x-6">
           <Button
             onClick={() => router.push("/dashboard/storyTrack/joined")}
             className={`${baseBtn} ${isJoined ? activeBtn : inactiveBtn}`}
@@ -40,7 +40,7 @@ export default function StoryMenuTab() {
           </Button>
         </div>
         {/* 오른쪽 */}
-        <div className="space-x-2">
+        <div className="space-x-6">
           <Button
             onClick={() => router.push("/dashboard/storyTrack/all")}
             className="bg-white border border-outline text-text md:font-normal px-5 py-3 gap-1 text-sm hover:bg-button-hover"

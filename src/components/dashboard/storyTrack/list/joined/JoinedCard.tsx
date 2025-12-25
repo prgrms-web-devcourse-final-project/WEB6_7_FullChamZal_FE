@@ -1,5 +1,5 @@
 import Button from "@/components/common/Button";
-import { Clock, MapPin, Play, TrendingUp, Users } from "lucide-react";
+import { MapPin, Play, TrendingUp, Users } from "lucide-react";
 
 export default function JoinedCard() {
   return (
@@ -44,10 +44,6 @@ export default function JoinedCard() {
             <div className="flex gap-1 items-center">
               <MapPin size={16} />
               5개 장소
-            </div>
-            <div className="flex gap-1 items-center">
-              <Clock size={16} />
-              3시간
             </div>
             <div className="flex gap-1 items-center">
               <Users size={16} />
