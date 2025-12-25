@@ -129,7 +129,7 @@ export default function CreateStoryTrack() {
                 order={form.order}
                 value={{ routeItems: step2.routeItems }}
                 onChange={(patch) => {
-                  // patch.routeItems: Letter[] (UI용)
+                  // (UI용)
                   const nextRouteItems = patch.routeItems ?? step2.routeItems;
 
                   // UI state 업데이트

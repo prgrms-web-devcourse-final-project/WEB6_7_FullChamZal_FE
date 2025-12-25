@@ -57,6 +57,13 @@ export default function SuccessForm({
             </div>
           </div>
         </div>
+
+        {/* 버튼 - 세부 페이지 확인하러 가는 버튼 */}
+        <div className="flex items-center justify-center">
+          <button className="cursor-pointer py-3 px-5 border border-outline rounded-xl hover:bg-button-hover">
+            확인 하러 가기
+          </button>
+        </div>
       </div>
     </div>
   );
