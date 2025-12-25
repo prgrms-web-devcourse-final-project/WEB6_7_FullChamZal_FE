@@ -1,7 +1,11 @@
+"use client";
+
 import Button from "@/components/common/Button";
-import { MapPin, Play, TrendingUp, Users } from "lucide-react";
+import { ListOrdered, MapPin, Play, TrendingUp, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function JoinedCard() {
+  const router = useRouter();
   return (
     <>
       <div className="border border-outline rounded-xl">
@@ -20,10 +24,18 @@ export default function JoinedCard() {
           {/* 제목과 소개 */}
           <div className="space-y-1">
             <p>서울 한강 이야기</p>
-            <p className="text-sm text-text-2 line-clamp-2 break-keep">
+            <p className="text-sm text-text-3 line-clamp-2 break-keep">
               한강을 따라 펼쳐지는 추억의 여정. 여의도부터 뚝섬까지, 각 장소마다
               숨겨진 이야기를 발견하세요.
             </p>
+          </div>
+
+          {/* 작성자 프로필 */}
+          <div className="flex items-center gap-1.5">
+            <div className="flex-none w-6 h-6 rounded-full bg-black text-white text-xs flex items-center justify-center">
+              {/* 그 사람의 프로필 */}홍
+            </div>
+            <p className="text-xs text-text-2">홍길동</p>
           </div>
 
           {/* 진행 상황 */}
@@ -42,6 +54,12 @@ export default function JoinedCard() {
           {/* 아이콘 요약 */}
           <div className="text-text-3 text-xs flex items-center gap-3">
             <div className="flex gap-1 items-center">
+              <ListOrdered size={16} />
+              순서대로
+              {/* <Shuffle size={18} />
+            <span>순서 무관</span> */}
+            </div>
+            <div className="flex gap-1 items-center">
               <MapPin size={16} />
               5개 장소
             </div>
@@ -52,7 +70,10 @@ export default function JoinedCard() {
           </div>
 
           {/* 버튼 */}
-          <Button className="md:font-normal gap-1 w-full py-3">
+          <Button
+            onClick={() => router.push("/dashboard/storyTrack/1")}
+            className="md:font-normal gap-1 w-full py-3"
+          >
             <Play size={20} />
             계속하기
           </Button>

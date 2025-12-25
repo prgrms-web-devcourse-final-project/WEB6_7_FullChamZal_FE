@@ -1,4 +1,4 @@
-import { Clock, ListOrdered, MapPin, Shuffle, Users } from "lucide-react";
+import { ListOrdered, MapPin, Users } from "lucide-react";
 
 export default function MineCard() {
   return (
@@ -21,7 +21,7 @@ export default function MineCard() {
           {/* 제목과 소개 */}
           <div className="space-y-1">
             <p>성수동 카페투어</p>
-            <p className="text-sm text-text-2 line-clamp-2 break-keep">
+            <p className="text-sm text-text-3 line-clamp-2 break-keep">
               힙한 성수동의 숨은 카페들을 찾아가는 여정. 각 카페마다 특별한
               이야기가 담겨있습니다.
             </p>
@@ -32,10 +32,6 @@ export default function MineCard() {
             <div className="flex gap-1 items-center">
               <MapPin size={16} />
               5개 장소
-            </div>
-            <div className="flex gap-1 items-center">
-              <Clock size={16} />
-              3시간
             </div>
             <div className="flex gap-1 items-center">
               <Users size={16} />

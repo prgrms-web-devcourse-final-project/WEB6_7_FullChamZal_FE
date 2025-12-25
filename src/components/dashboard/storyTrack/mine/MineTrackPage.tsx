@@ -1,8 +1,8 @@
-import StoryHeader from "../../common/StoryHeader";
-import StoryMenuTab from "../../common/StoryMenuTab";
-import JoinedCard from "./JoinedCard";
+import StoryHeader from "../common/StoryHeader";
+import StoryMenuTab from "../common/StoryMenuTab";
+import MineCard from "./MineCard";
 
-export default function JoinedTrackPage() {
+export default function MineTrackPage() {
   return (
     <>
       <div className="p-8 space-y-6">
@@ -15,7 +15,7 @@ export default function JoinedTrackPage() {
         {/* List */}
         <div className="grid grid-cols-3 gap-6">
           {/* Card 1 */}
-          <JoinedCard />
+          <MineCard />
         </div>
       </div>
     </>

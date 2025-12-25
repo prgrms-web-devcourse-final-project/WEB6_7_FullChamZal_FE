@@ -2,12 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Button from "@/components/common/Button";
-import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-
 import SecondForm from "./secondForm/SecondForm";
 import SuccessForm from "./SuccessForm";
 import FirstForm from "./FirstForm";
+import BackButton from "@/components/common/BackButton";
 
 type Step = 1 | 2 | 3;
 
@@ -58,15 +57,6 @@ export default function CreateStoryTrack() {
     return form.routeLetterIds.length > 1;
   }, [form.routeLetterIds.length]);
 
-  const handleBack = () => {
-    if (step === 1) {
-      router.back();
-      return;
-    }
-    if (step === 2) setStep(1);
-    if (step === 3) router.push("/dashboard/storyTrack/joined");
-  };
-
   const handleCancel = () => {
     router.push("/dashboard/storyTrack/joined");
   };
@@ -99,14 +89,7 @@ export default function CreateStoryTrack() {
       <div className="flex-1 overflow-hidden p-8 flex flex-col gap-8 min-h-0">
         {/* Top */}
         <div className="space-y-3 flex-none">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="cursor-pointer flex items-center gap-1 text-text-3 hover:text-text"
-          >
-            <ArrowLeft size={20} />
-            돌아가기
-          </button>
+          <BackButton />
 
           <div className="space-y-2">
             <h3 className="text-3xl font-medium">
@@ -146,7 +129,7 @@ export default function CreateStoryTrack() {
                 order={form.order}
                 value={{ routeItems: step2.routeItems }}
                 onChange={(patch) => {
-                  // patch.routeItems: Letter[] (UI용)
+                  // (UI용)
                   const nextRouteItems = patch.routeItems ?? step2.routeItems;
 
                   // UI state 업데이트
@@ -216,7 +199,7 @@ export default function CreateStoryTrack() {
             {step === 3 && (
               <Button
                 type="button"
-                onClick={() => router.push("/dashboard/storyTrack/joined")}
+                onClick={() => router.push("/dashboard/storyTrack/mine")}
                 className="md:font-normal py-2 px-8"
               >
                 완료

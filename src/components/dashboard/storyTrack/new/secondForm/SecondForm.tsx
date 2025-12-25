@@ -20,7 +20,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
   const routeItems = value.routeItems;
 
   const addLetter = (letter: Letter) => {
-    if (routeItems.some((x) => x.id === letter.id)) return; // 중복 방지
+    if (routeItems.some((x) => x.id === letter.id)) return;
     onChange({ routeItems: [...routeItems, letter] });
   };
 
@@ -35,12 +35,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
   return (
     <div className="h-full min-h-0">
       <div className="flex gap-8 h-full min-h-0">
-        {/* Left - 지도 */}
-        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 flex items-center justify-center text-text-4 overflow-hidden">
-          지도 영역
-        </div>
-
-        {/* Right - 경로 설정 */}
+        {/* Left - 경로 설정 */}
         <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 flex flex-col">
           <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-6">
             <div className="space-y-2">
@@ -87,7 +82,6 @@ export default function SecondForm({ order, value, onChange }: Props) {
               </div>
             )}
 
-            {/* ✅ 선택된 경로 리스트 (분리 컴포넌트) */}
             <SelectedRouteList
               order={order}
               items={routeItems}
@@ -95,6 +89,11 @@ export default function SecondForm({ order, value, onChange }: Props) {
               onRemove={removeLetter}
             />
           </div>
+        </div>
+
+        {/* Right - 지도 */}
+        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 flex items-center justify-center text-text-4 overflow-hidden">
+          지도 영역
         </div>
       </div>
     </div>
