@@ -19,26 +19,29 @@ export default function MyMailbox() {
     "bg-primary-2 border-primary-2/0 text-white shadow-md hover:bg-primary-2";
 
   /** 보낸 편지 */
-  const { data: sendList } = useQuery({
-    queryKey: ["capsuleDashboard", "send"],
-    queryFn: ({ signal }) => capsuleDashboardApi.sendDashboard(signal),
+  const { data: sendData } = useQuery({
+    queryKey: ["capsuleDashboard", "send", "count"],
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.sendDashboard({ page: 0, size: 1 }, signal),
   });
 
   /** 받은 편지 */
-  const { data: receiveList } = useQuery({
-    queryKey: ["capsuleDashboard", "receive"],
-    queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+  const { data: receiveData } = useQuery({
+    queryKey: ["capsuleDashboard", "receive", "count"],
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.receiveDashboard({ page: 0, size: 1 }, signal),
   });
 
   /* 북마크 */
-  const { data: bookmarkList } = useQuery({
-    queryKey: ["bookmarks", { page: 0, size: 10 }],
+  const { data: bookmarkData } = useQuery({
+    queryKey: ["bookmarks", "count"],
     queryFn: ({ signal }) =>
-      capsuleDashboardApi.bookmarks(
-        { page: 0, size: 10, sort: ["bookmarkedAt,desc"] },
-        signal
-      ),
+      capsuleDashboardApi.bookmarks({ page: 0, size: 1 }, signal),
   });
+
+  const sendCount = sendData?.data.totalElements ?? 0;
+  const receiveCount = receiveData?.data.totalElements ?? 0;
+  const bookmarkCount = bookmarkData?.totalElements ?? 0;
 
   return (
     <div className="space-y-3">
@@ -65,7 +68,7 @@ export default function MyMailbox() {
                 >
                   보낸 편지
                 </span>
-                <span className="text-2xl">{sendList?.length ?? 0}</span>
+                <span className="text-2xl">{sendCount}</span>
               </div>
             </div>
           </DivBox>
@@ -86,7 +89,7 @@ export default function MyMailbox() {
                 >
                   받은 편지
                 </span>
-                <span className="text-2xl">{receiveList?.length ?? 0}</span>
+                <span className="text-2xl">{receiveCount}</span>
               </div>
             </div>
           </DivBox>
@@ -107,9 +110,7 @@ export default function MyMailbox() {
                 >
                   소중한 편지
                 </span>
-                <span className="text-2xl">
-                  {bookmarkList?.totalElements ?? 0}
-                </span>
+                <span className="text-2xl">{bookmarkCount}</span>
               </div>
             </div>
           </DivBox>

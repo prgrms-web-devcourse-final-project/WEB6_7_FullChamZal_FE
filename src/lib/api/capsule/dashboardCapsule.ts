@@ -2,10 +2,23 @@ import { apiFetch, apiFetchRaw } from "../fetchClient";
 
 export const capsuleDashboardApi = {
   /* 보낸 편지 */
-  sendDashboard: (signal?: AbortSignal) =>
-    apiFetch<CapsuleDashboardItem[]>("/api/v1/capsule/send/dashboard", {
-      signal,
-    }),
+  sendDashboard: (
+    params?: { page?: number; size?: number; sort?: string[] },
+    signal?: AbortSignal
+  ) => {
+    const page = params?.page ?? 0;
+    const size = params?.size ?? 10;
+
+    const sp = new URLSearchParams();
+    sp.set("page", String(page));
+    sp.set("size", String(size));
+    params?.sort?.forEach((s) => sp.append("sort", s));
+
+    return apiFetchRaw<PageResponse<CapsuleDashboardItem>>(
+      `/api/v1/capsule/send/dashboard?${sp.toString()}`,
+      { signal }
+    );
+  },
 
   /* 보낸 편지 읽기 */
   readSendCapsule: (capsuleId: number, signal?: AbortSignal) =>
@@ -15,10 +28,23 @@ export const capsuleDashboardApi = {
     ),
 
   /* 받은 편지 */
-  receiveDashboard: (signal?: AbortSignal) =>
-    apiFetch<CapsuleDashboardItem[]>("/api/v1/capsule/receive/dashboard", {
-      signal,
-    }),
+  receiveDashboard: (
+    params?: { page?: number; size?: number; sort?: string[] },
+    signal?: AbortSignal
+  ) => {
+    const page = params?.page ?? 0;
+    const size = params?.size ?? 10;
+
+    const sp = new URLSearchParams();
+    sp.set("page", String(page));
+    sp.set("size", String(size));
+    params?.sort?.forEach((s) => sp.append("sort", s));
+
+    return apiFetchRaw<PageResponse<CapsuleDashboardItem>>(
+      `/api/v1/capsule/receive/dashboard?${sp.toString()}`,
+      { signal }
+    );
+  },
 
   /* 북마크 편지 */
   bookmarks: (

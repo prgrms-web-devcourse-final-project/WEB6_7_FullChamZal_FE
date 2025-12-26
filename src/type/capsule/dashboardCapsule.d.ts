@@ -1,3 +1,36 @@
+type SortMeta = {
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
+};
+
+type PageableMeta = {
+  pageNumber: number;
+  pageSize: number;
+  sort: SortMeta;
+  offset: number;
+  paged: boolean;
+  unpaged: boolean;
+};
+
+type PageResponse<T> = {
+  code: string;
+  message: string;
+  data: {
+    content: T[];
+    pageable: PageableMeta;
+    last: boolean;
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+    sort: SortMeta;
+    first: boolean;
+    numberOfElements: number;
+    empty: boolean;
+  };
+};
+
 /* 보낸, 받은 편지 조회 */
 type CapsuleDashboardItem = {
   capsuleId: number;
@@ -57,5 +90,3 @@ type BookmarkPageResponse = {
   totalElements: number;
   last: boolean;
 };
-
-/* 보낸 사람 조회 */
