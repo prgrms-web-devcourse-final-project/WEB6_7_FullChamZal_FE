@@ -71,7 +71,7 @@ export default function MailboxPage({
 
   const size = isBookmark ? 24 : 10;
 
-  // 1) send/receive infinite
+  // 1) send/receive
   const sendReceiveInf = useInfiniteQuery({
     enabled: !isBookmark,
     queryKey: ["capsuleDashboard", type, "infinite", size],
@@ -86,7 +86,6 @@ export default function MailboxPage({
       return capsuleDashboardApi.receiveDashboard({ page, size }, signal);
     },
     getNextPageParam: (lastPage) => {
-      // PageResponse<CapsuleDashboardItem>
       const d = lastPage.data;
       if (d.last) return undefined;
       // number는 현재 페이지 index
@@ -94,7 +93,7 @@ export default function MailboxPage({
     },
   });
 
-  // 2) bookmark infinite
+  // 2) bookmark
   const bookmarkInf = useInfiniteQuery({
     enabled: isBookmark,
     queryKey: ["bookmarks", "infinite", size],
