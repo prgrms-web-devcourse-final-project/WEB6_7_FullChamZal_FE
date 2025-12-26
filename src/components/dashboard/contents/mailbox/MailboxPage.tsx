@@ -1,12 +1,44 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DivBox from "../../DivBox";
 import EnvelopeCard from "./EnvelopeCard";
 import { Bookmark, Inbox, Send } from "lucide-react";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import MailboxSkeleton from "@/components/skeleton/MailboxSkeleton";
+
+type LatLng = { lat: number; lng: number };
+
+function useCurrentPositionOnce(enabled: boolean) {
+  const [pos, setPos] = useState<LatLng | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    if (!navigator.geolocation) {
+      setPos(null);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        setPos({ lat: p.coords.latitude, lng: p.coords.longitude });
+      },
+      () => {
+        setPos(null);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10_000,
+        maximumAge: 30_000, // 30초 캐시 허용
+      }
+    );
+  }, [enabled]);
+
+  return pos;
+}
 
 export default function MailboxPage({
   type,
@@ -20,6 +52,9 @@ export default function MailboxPage({
   }[type];
 
   const isBookmark = type === "bookmark";
+
+  // receive/bookmark에서만 위치가 필요하니까 그때만 1회 획득
+  const currentPos = useCurrentPositionOnce(type !== "send");
 
   const { data, isLoading, error } = useQuery<
     CapsuleDashboardItem[] | BookmarkPageResponse
@@ -95,6 +130,8 @@ export default function MailboxPage({
                   key={capsule.capsuleId}
                   capsule={capsule}
                   type={type}
+                  // 위치 1회 획득값을 카드에 전달
+                  currentPos={currentPos}
                 />
               ))
             )}

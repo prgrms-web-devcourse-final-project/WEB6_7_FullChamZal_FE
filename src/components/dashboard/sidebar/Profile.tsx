@@ -4,8 +4,6 @@ import DivBox from "../DivBox";
 import { useEffect, useState } from "react";
 import { getMeDetail, type MemberMeDetail } from "@/lib/api/members/members";
 
-
-
 export default function Profile({
   mode,
   onClick,
@@ -15,7 +13,7 @@ export default function Profile({
   onClick?: () => void;
   me?: MemberMeDetail | null;
 }) {
-  // ✅ props를 state로 복사하지 말기!
+  // props를 state로 복사하지 말기!
   // props가 없을 때만 fetch해서 state로 채움
   const [meFetched, setMeFetched] = useState<MemberMeDetail | null>(null);
 
@@ -70,5 +68,3 @@ export default function Profile({
     </button>
   );
 }
-
-

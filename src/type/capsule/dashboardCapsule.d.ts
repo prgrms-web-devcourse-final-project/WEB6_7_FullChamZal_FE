@@ -16,6 +16,27 @@ type CapsuleDashboardItem = {
   locationLng?: number | null;
 };
 
+type CapsuleDashboardSendItem = {
+  capsuleId: number;
+  capsuleColor: string;
+  capsulePackingColor: string;
+  recipient: string;
+  senderNickname: string;
+  title: string;
+  content: string;
+  createAt: string;
+  viewStatus: boolean;
+  unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
+  unlockAt: string | null;
+  unlockUntil: string | null;
+  locationName: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
+  locationRadiusM: number;
+  isBookmarked: boolean;
+  result: string;
+};
+
 /* 북마크 */
 type BookmarkItem = {
   bookmarkId: number;

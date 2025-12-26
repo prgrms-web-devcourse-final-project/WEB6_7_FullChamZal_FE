@@ -39,8 +39,11 @@ import {
 } from "@/lib/api/capsule/capsule";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
 
 type UICapsule = {
+  capsuleColor?: string;
   title: string;
   content: string;
   createdAt: string;
@@ -52,6 +55,9 @@ type UICapsule = {
   unlockUntil?: string | null;
 
   locationName: string | null;
+
+  // send에서 상대방 열람 여부로 수정 제한하려면 필요
+  viewStatus?: boolean;
 };
 
 type PostLoginAction = {
@@ -82,7 +88,7 @@ export default function LetterDetailModal({
   capsuleId,
   open = true,
   closeHref,
-  isProtected,
+  isProtected = 1,
   role = "USER",
   onClose,
   locationLat = null,
@@ -194,15 +200,10 @@ export default function LetterDetailModal({
   const likeMutation = useMutation({
     mutationKey: ["capsuleLike", capsuleId],
     mutationFn: async (shouldLike: boolean) => {
-      // onMutate에서 결정한 방향으로 API 호출
-      if (shouldLike) {
-        return await likeCapsule(capsuleId);
-      } else {
-        return await unlikeCapsule(capsuleId);
-      }
+      if (shouldLike) return await likeCapsule(capsuleId);
+      return await unlikeCapsule(capsuleId);
     },
     onMutate: async () => {
-      // 낙관적 업데이트: 먼저 UI 업데이트
       const previousIsLiked = isLiked;
       const previousLikeCount = likeCount;
       const nextIsLiked = !previousIsLiked;
@@ -210,41 +211,26 @@ export default function LetterDetailModal({
       setIsLiked(nextIsLiked);
       setLikeCount((prev) => (previousIsLiked ? prev - 1 : prev + 1));
 
-      // 롤백을 위한 이전 값과 다음 상태 반환
       return { previousIsLiked, previousLikeCount, nextIsLiked };
     },
     onSuccess: (data, variables, context) => {
-      // 서버 응답으로 최신 값 업데이트
-      if (data.data) {
-        setLikeCount(data.data.likeCount);
-      }
-      // 성공 시 상태 확인
-      if (context) {
-        setIsLiked(context.nextIsLiked);
-      }
+      if (data.data) setLikeCount(data.data.likeCount);
+      if (context) setIsLiked(context.nextIsLiked);
     },
     onError: (err, variables, context) => {
-      // 에러 코드에 따라 상태 업데이트
       const errorCode =
         err && typeof err === "object" && "code" in err
           ? (err as { code?: string }).code
           : null;
 
-      // CPS016: 중복 좋아요 → 이미 좋아요를 눌렀다는 의미
       if (errorCode === "CPS016") {
         setIsLiked(true);
-        // 좋아요 수는 롤백하지 않음 (이미 증가했을 수 있음)
         return;
       }
-
-      // CPS018: 좋아요 해제 불가 -> 좋아요를 누르지 않았다는 의미
       if (errorCode === "CPS018") {
         setIsLiked(false);
-        // 좋아요 수는 롤백하지 않음
         return;
       }
-
-      // 그 외 에러는 롤백
       if (context) {
         setIsLiked(context.previousIsLiked);
         setLikeCount(context.previousLikeCount);
@@ -267,7 +253,7 @@ export default function LetterDetailModal({
     const raw = sessionStorage.getItem(POST_LOGIN_ACTION_KEY);
     if (!raw) return;
 
-    sessionStorage.removeItem(POST_LOGIN_ACTION_KEY); // 🔥 일단 제거 (무한루프 방지)
+    sessionStorage.removeItem(POST_LOGIN_ACTION_KEY);
 
     let action: PostLoginAction | null = null;
     try {
@@ -301,7 +287,6 @@ export default function LetterDetailModal({
           payload: { capsuleId, isSendSelf: 0 },
         };
         sessionStorage.setItem(POST_LOGIN_ACTION_KEY, JSON.stringify(action));
-
         router.push(`/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`);
         return;
       }
@@ -312,10 +297,11 @@ export default function LetterDetailModal({
 
   // 상세 조회 query (open일 때만)
   const { data, isLoading, isError, error } = useQuery<UICapsule>({
-    queryKey: ["capsuleDetailModal", role, capsuleId, password],
+    queryKey: ["capsuleDetailModal", role, capsuleId, password, isSender],
     enabled: open && capsuleId > 0,
     retry: false,
     queryFn: async ({ signal }) => {
+      // 1) 관리자 상세
       if (isAdmin) {
         const a = await adminCapsulesApi.detail({ capsuleId, signal });
         return {
@@ -330,16 +316,43 @@ export default function LetterDetailModal({
           unlockUntil: a.data.unlockUntil ?? null,
 
           locationName: a.data.locationAlias || a.data.address || null,
+
+          // 관리자 응답에 viewStatus가 있으면 매핑 (없으면 undefined)
+          viewStatus: (a.data as any).viewStatus,
         };
       }
 
+      // 2) 보낸 편지 상세: 잠금 조건 없이 조회 + viewStatus도 받아와서 수정 제한에 사용
+      if (isSender) {
+        const s: CapsuleDashboardSendItem =
+          await capsuleDashboardApi.readSendCapsule(capsuleId, signal);
+        return {
+          capsuleColor: s.capsuleColor ?? null,
+          title: s.title,
+          content: s.content,
+          createdAt: s.createAt,
+          writerNickname: s.senderNickname,
+          recipient: s.recipient ?? null,
+
+          unlockType: s.unlockType,
+          unlockAt: s.unlockAt,
+          unlockUntil: s.unlockUntil,
+
+          locationName: s.locationName ?? null,
+
+          // 상대가 열람했는지 여부
+          viewStatus: !!s.viewStatus,
+        };
+      }
+
+      // 3) 받은/공개 편지 상세: 기존 unlock 조건 + 위치 필요
       const unlockAt = new Date().toISOString();
       const pos =
         locationLat != null && locationLng != null
           ? { lat: locationLat, lng: locationLng }
           : await getCurrentPos();
 
-      const u = await guestCapsuleApi.read(
+      const u: CapsuleReadData = await guestCapsuleApi.read(
         {
           capsuleId,
           unlockAt,
@@ -351,6 +364,7 @@ export default function LetterDetailModal({
       );
 
       return {
+        capsuleColor: u.capsuleColor ?? null,
         title: u.title,
         content: u.content,
         createdAt: u.createAt,
@@ -362,11 +376,13 @@ export default function LetterDetailModal({
         unlockUntil: u.unlockUntil,
 
         locationName: u.locationName ?? null,
+
+        viewStatus: !!u.viewStatus,
       };
     },
   });
 
-  // open이 아니면 렌더 자체 안 함 (훅은 이미 호출된 뒤라 안전)
+  // open이 아니면 렌더 자체 안 함
   if (!open) return null;
 
   if (isLoading) {
@@ -442,6 +458,12 @@ export default function LetterDetailModal({
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
         } · ${capsule.locationName ?? "위치 조건 없음"}`;
 
+  // send에서 "상대가 이미 읽음"이면 수정 불가
+  const isReadByOther = isSender && !!capsule.viewStatus;
+  const canEdit = isSender && !isReadByOther;
+
+  const detailHex = CAPTURE_COLOR_MAP[capsule.capsuleColor ?? "BEIGE"];
+
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
       {/* 저장 성공 모달 */}
@@ -482,7 +504,7 @@ export default function LetterDetailModal({
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
-          <div className="shrink-0 border-b px-8 py-4">
+          <div className="shrink-0 border-b px-8 py-4 border-outline">
             <div className="flex justify-between items-center gap-4">
               <div className="md:flex-1 truncate">{capsule.title}</div>
 
@@ -519,11 +541,20 @@ export default function LetterDetailModal({
                     >
                       <div className="px-3 py-2 text-xs text-text-3">관리</div>
                       <div className="h-px bg-border my-1" />
+
+                      {/* 수정하기: send면서 상대가 읽기 전일 때만 활성화 */}
                       {isSender && (
                         <button
                           type="button"
-                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md"
+                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md disabled:opacity-60 disabled:cursor-not-allowed"
+                          disabled={!canEdit}
                           onClick={() => {
+                            if (!canEdit) {
+                              alert(
+                                "상대가 이미 열람한 편지는 수정할 수 없습니다."
+                              );
+                              return;
+                            }
                             router.push(
                               `/capsules/edit?capsuleId=${capsuleId}`
                             );
@@ -532,6 +563,14 @@ export default function LetterDetailModal({
                           수정하기
                         </button>
                       )}
+
+                      {/* 안내 문구 */}
+                      {isSender && !canEdit && (
+                        <div className="px-3 pb-2 text-xs text-text-3">
+                          상대가 열람한 편지는 수정할 수 없어요.
+                        </div>
+                      )}
+
                       {(isSender || isReceiver) && (
                         <button
                           type="button"
@@ -560,7 +599,10 @@ export default function LetterDetailModal({
 
           {/* Body */}
           <div className="flex-1 overflow-hidden">
-            <div className="w-full h-full py-15 px-15">
+            <div
+              className="w-full h-full py-15 px-15"
+              style={{ backgroundColor: detailHex }}
+            >
               <div className="w-full h-full flex flex-col justify-between gap-8">
                 <div className="text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
@@ -587,7 +629,7 @@ export default function LetterDetailModal({
           </div>
 
           {/* Footer */}
-          <div className="shrink-0 border-t p-5">
+          <div className="shrink-0 border-t border-outline p-5">
             {role === "ADMIN" ? null : (
               <div className="flex-1 flex items-center justify-center">
                 {isReceiver && (

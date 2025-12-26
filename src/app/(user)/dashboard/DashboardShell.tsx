@@ -17,16 +17,13 @@ export default function DashboardShell({
   // 한번 닫으면 이 세션에서는 안 뜨게(원하면 localStorage로 확장 가능)
   const [dismissed, setDismissed] = useState(false);
 
-  // ✅ state로 setOpen 하지 말고 "계산된 open" 사용
+  // state로 setOpen 하지 말고 "계산된 open" 사용
   const open = needs && !dismissed;
 
   return (
     <>
       {children}
-      <OAuthProfileModal
-        open={open}
-        onClose={() => setDismissed(true)}
-      />
+      <OAuthProfileModal open={open} onClose={() => setDismissed(true)} />
     </>
   );
 }

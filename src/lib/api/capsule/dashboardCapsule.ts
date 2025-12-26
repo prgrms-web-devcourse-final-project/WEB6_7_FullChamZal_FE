@@ -8,6 +8,11 @@ export const capsuleDashboardApi = {
     }),
 
   /* 보낸 편지 읽기 */
+  readSendCapsule: (capsuleId: number, signal?: AbortSignal) =>
+    apiFetch<CapsuleDashboardSendItem>(
+      `/api/v1/capsule/readSendCapsule?capsuleId=${capsuleId}`,
+      { signal }
+    ),
 
   /* 받은 편지 */
   receiveDashboard: (signal?: AbortSignal) =>
