@@ -113,7 +113,7 @@ interface CapsuleSendReadResponse {
   senderNickname: string;
   title: string;
   content: string;
-  createAt: string;
+  createdAt: string;
   viewStatus: boolean;
   unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
   unlockAt: string;

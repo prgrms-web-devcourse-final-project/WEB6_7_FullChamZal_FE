@@ -422,7 +422,7 @@ export default function LetterDetailModal({
           capsuleColor: s.capsuleColor ?? null,
           title: s.title,
           content: s.content,
-          createdAt: s.createAt,
+          createdAt: s.createdAt,
           writerNickname: s.senderNickname,
           recipient: s.recipient ?? null,
 
@@ -459,7 +459,7 @@ export default function LetterDetailModal({
         capsuleColor: u.capsuleColor ?? null,
         title: u.title,
         content: u.content,
-        createdAt: u.createAt,
+        createdAt: u.createdAt,
         writerNickname: u.senderNickname,
         recipient: u.recipient ?? null,
 
