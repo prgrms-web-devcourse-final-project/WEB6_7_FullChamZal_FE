@@ -1,76 +1,62 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import TrackCard from "./TrackCard";
 import BackButton from "@/components/common/BackButton";
-
-type Track = {
-  id: number;
-  title: string;
-  description: string;
-  createdAt: string; // ISO
-  likeCount: number;
-  isEnded: boolean;
-  // tags?: string[];
-};
+import { useQuery } from "@tanstack/react-query";
+import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 
 type StatusFilter = "all" | "active" | "ended";
 type SortOption = "newest" | "popular";
 
 export default function AllTrackPage() {
-  const tracks: Track[] = [
+  /* const tracks: StoryTrackItem[] = [
     {
-      id: 1,
-      title: "한강 산책 트랙",
-      description: "여의도부터 뚝섬까지",
-      createdAt: "2025-12-01T10:00:00Z",
-      likeCount: 12,
-      isEnded: false,
+      storytrackId: 1,
+      createrName: "홍길동",
+      title: "테스트 스토리트랙",
+      desctiption: "SEQUENTIAL 테스트",
+      trackType: "SEQUENTIAL",
+      isPublic: 1,
+      price: 0,
+      totalSteps: 3,
+      totalParticipant: 12,
+      createdAt: "2025-12-21",
     },
     {
-      id: 2,
-      title: "밤 산책 트랙",
-      description: "야경 명소 모음",
-      createdAt: "2025-10-15T10:00:00Z",
-      likeCount: 40,
-      isEnded: true,
+      storytrackId: 2,
+      createrName: "테스터123",
+      title: "테스트123213 스토리트랙",
+      desctiption: "자유 테스트",
+      trackType: "FREE",
+      isPublic: 1,
+      price: 0,
+      totalSteps: 2,
+      totalParticipant: 5,
+      createdAt: "2025-12-19",
     },
-  ];
+  ]; */
+
+  const page = 0;
+  const size = 10;
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortOption>("newest");
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-
-    const list = tracks.filter((t) => {
-      // 1) 검색
-      const hit =
-        q.length === 0 ||
-        t.title.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q);
-
-      if (!hit) return false;
-
-      // 2) 상태 필터
-      if (status === "active") return !t.isEnded;
-      if (status === "ended") return t.isEnded;
-
-      return true; // all
-    });
-
-    // 3) 정렬
-    list.sort((a, b) => {
-      if (sort === "popular") return b.likeCount - a.likeCount;
-      // newest
-      return +new Date(b.createdAt) - +new Date(a.createdAt);
-    });
-
-    return list;
-  }, [tracks, search, status, sort]);
+  const {
+    data: tracks,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["allStoryTrack", page, size],
+    queryFn: async ({ signal }) => {
+      return await storyTrackApi.allList({ page, size }, signal);
+    },
+  });
 
   return (
     <div className="p-8 space-y-6">
@@ -103,6 +89,29 @@ export default function AllTrackPage() {
           className="w-full p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
         />
       </div>
+
+      {/* 로딩/에러 */}
+      {isLoading && (
+        <div className="rounded-xl border border-outline bg-white/80 p-6 text-text-2">
+          불러오는 중...
+        </div>
+      )}
+
+      {isError && (
+        <div className="rounded-xl border border-outline bg-white/80 p-6">
+          <p className="text-primary font-medium">불러오기에 실패했어요.</p>
+          <pre className="mt-3 text-xs whitespace-pre-wrap text-text-3">
+            {String(error?.message ?? error)}
+          </pre>
+          <button
+            className="mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
+            onClick={() => refetch()}
+            type="button"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
 
       {/* 필터 바 */}
       <div className="flex flex-wrap items-center gap-2">
@@ -174,17 +183,20 @@ export default function AllTrackPage() {
       </div>
 
       {/* List */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((t) => (
-          <TrackCard key={t.id} /* track={t} */ />
-        ))}
+      {/* 로딩/에러 아닐 때만 리스트 영역 보여주면 UX도 좋아짐 */}
+      {!isLoading && !isError && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tracks!.data.content.map((t) => (
+            <TrackCard key={t.storytrackId} track={t} />
+          ))}
 
-        {filtered.length === 0 && (
-          <div className="col-span-full text-center text-text-3 py-12">
-            조건에 맞는 트랙이 없어요.
-          </div>
-        )}
-      </div>
+          {tracks!.data.content.length === 0 && (
+            <div className="col-span-full text-center text-text-3 py-12">
+              조건에 맞는 트랙이 없어요.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
