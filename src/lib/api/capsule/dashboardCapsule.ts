@@ -45,6 +45,7 @@ export const capsuleDashboardApi = {
   addBookmark: (capsuleId: number, signal?: AbortSignal) =>
     apiFetch("/api/bookmarks", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ capsuleId }),
       signal,
     }),

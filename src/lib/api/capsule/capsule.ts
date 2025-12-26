@@ -1,16 +1,4 @@
 import { apiFetchRaw } from "../fetchClient";
-import {
-  CapsuleCreateResponse,
-  CreatePrivateCapsuleRequest,
-  CreateMyCapsuleRequest,
-  CreatePublicCapsuleRequest,
-  CapsuleUpdateRequest,
-  CapsuleUpdateResponse,
-  CapsuleDeleteResponse,
-  CapsuleLikeResponse,
-  CapsuleSendReadResponse,
-  UnlockType,
-} from "./types";
 
 type BuildCommonArgs = {
   memberId: number;
@@ -63,7 +51,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
-    unlockUntil: undefined,
+    unlockUntil: new Date("9999-12-31T23:59:59Z").toISOString(),
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
@@ -118,6 +106,7 @@ export function buildPrivatePayload(
     packingColor = "",
     contentColor = "",
   } = args;
+
   const unlockAt =
     effectiveUnlockType === "TIME" ||
     effectiveUnlockType === "TIME_AND_LOCATION"
@@ -129,7 +118,7 @@ export function buildPrivatePayload(
     (effectiveUnlockType === "TIME" ||
       effectiveUnlockType === "TIME_AND_LOCATION")
       ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
-      : undefined;
+      : new Date("9999-12-31T23:59:59Z").toISOString();
 
   return {
     memberId,
@@ -209,7 +198,7 @@ export function buildPublicPayload(
     (effectiveUnlockType === "TIME" ||
       effectiveUnlockType === "TIME_AND_LOCATION")
       ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
-      : undefined;
+      : new Date("9999-12-31T23:59:59Z").toISOString();
 
   return {
     memberId,

@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -50,7 +50,7 @@ type UICapsule = {
   writerNickname: string;
   recipient: string | null;
 
-  unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION" | string;
+  unlockType: UnlockType;
   unlockAt: string | null;
   unlockUntil?: string | null;
 
@@ -58,12 +58,20 @@ type UICapsule = {
 
   // send에서 상대방 열람 여부로 수정 제한하려면 필요
   viewStatus?: boolean;
+
+  // 어드민은 필요x
+  isBookmarked?: boolean;
 };
 
-type PostLoginAction = {
-  type: "SAVE_CAPSULE";
-  payload: { capsuleId: number; isSendSelf: 0 | 1 };
-};
+type PostLoginAction =
+  | {
+      type: "SAVE_CAPSULE";
+      payload: { capsuleId: number; isSendSelf: 0 | 1 };
+    }
+  | {
+      type: "TOGGLE_BOOKMARK";
+      payload: { capsuleId: number; nextBookmarked: boolean };
+    };
 
 const POST_LOGIN_ACTION_KEY = "postLoginAction";
 
@@ -110,13 +118,29 @@ export default function LetterDetailModal({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const isAdmin = role === "ADMIN";
 
+  /* 저장 */
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
+
+  /* 북마크 */
+  const [bookmarkToast, setBookmarkToast] = useState<{
+    open: boolean;
+    mode: "ADD" | "REMOVE";
+  }>({ open: false, mode: "ADD" });
+
+  /* 삭제 */
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isDeleteSuccessOpen, setIsDeleteSuccessOpen] = useState(false);
+
+  // 좋아요
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+
+  // 북마크
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   // 발신자/수신자/공개 편지 구분: pathname으로 확인
   const isSender = pathname?.includes("/dashboard/send");
@@ -137,7 +161,7 @@ export default function LetterDetailModal({
     else router.back();
   };
 
-  // 저장 mutation
+  // 저장 mutation (공개 편지 저장하기)
   const saveMutation = useMutation({
     mutationKey: ["capsuleSave", capsuleId],
     mutationFn: (payload: {
@@ -146,6 +170,42 @@ export default function LetterDetailModal({
       unlockAt: string;
     }) => guestCapsuleApi.save(payload),
     onSuccess: () => setIsSaveSuccessOpen(true),
+  });
+
+  // 북마크 토글 mutation
+  const bookmarkMutation = useMutation({
+    mutationKey: ["capsuleBookmarkToggle", capsuleId],
+    mutationFn: async (nextBookmarked: boolean) => {
+      // nextBookmarked === true -> add
+      if (nextBookmarked) return capsuleDashboardApi.addBookmark(capsuleId);
+      return capsuleDashboardApi.removeBookmark(capsuleId);
+    },
+    onMutate: async (nextBookmarked: boolean) => {
+      const prev = isBookmarked;
+      setIsBookmarked(nextBookmarked);
+      return { prev };
+    },
+    onError: (err, _vars, ctx) => {
+      if (ctx?.prev != null) setIsBookmarked(ctx.prev);
+
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "북마크 처리 중 오류가 발생했습니다.";
+      alert(msg);
+    },
+    onSuccess: (_data, nextBookmarked) => {
+      // 목록/상세 캐시 갱신
+      queryClient.invalidateQueries({ queryKey: ["capsuleDetailModal"] });
+      queryClient.invalidateQueries({ queryKey: ["capsuleDashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+      setBookmarkToast({
+        open: true,
+        mode: nextBookmarked ? "ADD" : "REMOVE",
+      });
+    },
   });
 
   // 삭제 mutation
@@ -160,13 +220,7 @@ export default function LetterDetailModal({
       throw new Error("삭제할 수 없습니다.");
     },
     onSuccess: () => {
-      alert("캡슐이 삭제되었습니다.");
-      if (closeHref) {
-        router.push(closeHref);
-      } else {
-        router.back();
-      }
-      router.refresh();
+      setIsDeleteSuccessOpen(true);
     },
     onError: (err: unknown) => {
       const msg =
@@ -213,11 +267,11 @@ export default function LetterDetailModal({
 
       return { previousIsLiked, previousLikeCount, nextIsLiked };
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, _variables, context) => {
       if (data.data) setLikeCount(data.data.likeCount);
       if (context) setIsLiked(context.nextIsLiked);
     },
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       const errorCode =
         err && typeof err === "object" && "code" in err
           ? (err as { code?: string }).code
@@ -262,17 +316,25 @@ export default function LetterDetailModal({
       return;
     }
 
-    if (action?.type !== "SAVE_CAPSULE") return;
+    if (!action) return;
 
-    const unlockAt = new Date().toISOString();
-    saveMutation.mutate({
-      capsuleId: action.payload.capsuleId,
-      isSendSelf: action.payload.isSendSelf,
-      unlockAt,
-    });
-  }, [open, saveMutation]);
+    if (action.type === "SAVE_CAPSULE") {
+      const unlockAt = new Date().toISOString();
+      saveMutation.mutate({
+        capsuleId: action.payload.capsuleId,
+        isSendSelf: action.payload.isSendSelf,
+        unlockAt,
+      });
+      return;
+    }
 
-  // 저장 버튼 핸들러
+    if (action.type === "TOGGLE_BOOKMARK") {
+      bookmarkMutation.mutate(action.payload.nextBookmarked);
+      return;
+    }
+  }, [open, saveMutation, bookmarkMutation]);
+
+  // 저장 버튼 핸들러 (공개 편지 저장하기)
   const handleSave = async () => {
     try {
       const me = await authApiClient.me();
@@ -292,6 +354,36 @@ export default function LetterDetailModal({
       }
 
       console.error("save error:", err);
+    }
+  };
+
+  // 북마크 버튼 핸들러
+  const handleToggleBookmark = async () => {
+    const next = !isBookmarked;
+
+    try {
+      const me = await authApiClient.me();
+      if (!me) throw Object.assign(new Error("NO_ME"), { status: 401 });
+
+      bookmarkMutation.mutate(next);
+    } catch (err: any) {
+      if (isAuthMissingError(err)) {
+        const action: PostLoginAction = {
+          type: "TOGGLE_BOOKMARK",
+          payload: { capsuleId, nextBookmarked: next },
+        };
+        sessionStorage.setItem(POST_LOGIN_ACTION_KEY, JSON.stringify(action));
+        router.push(`/auth/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+        return;
+      }
+
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "북마크 처리 중 오류가 발생했습니다.";
+      alert(msg);
     }
   };
 
@@ -317,12 +409,12 @@ export default function LetterDetailModal({
 
           locationName: a.data.locationAlias || a.data.address || null,
 
-          // 관리자 응답에 viewStatus가 있으면 매핑 (없으면 undefined)
           viewStatus: (a.data as any).viewStatus,
+          isBookmarked: false,
         };
       }
 
-      // 2) 보낸 편지 상세: 잠금 조건 없이 조회 + viewStatus도 받아와서 수정 제한에 사용
+      // 2) 보낸 편지 상세
       if (isSender) {
         const s: CapsuleDashboardSendItem =
           await capsuleDashboardApi.readSendCapsule(capsuleId, signal);
@@ -340,12 +432,12 @@ export default function LetterDetailModal({
 
           locationName: s.locationName ?? null,
 
-          // 상대가 열람했는지 여부
           viewStatus: !!s.viewStatus,
+          isBookmarked: !!s.isBookmarked,
         };
       }
 
-      // 3) 받은/공개 편지 상세: 기존 unlock 조건 + 위치 필요
+      // 3) 받은/공개 편지 상세
       const unlockAt = new Date().toISOString();
       const pos =
         locationLat != null && locationLng != null
@@ -378,9 +470,15 @@ export default function LetterDetailModal({
         locationName: u.locationName ?? null,
 
         viewStatus: !!u.viewStatus,
+        isBookmarked: !!u.isBookmarked,
       };
     },
   });
+
+  useEffect(() => {
+    if (!open) return;
+    setIsBookmarked(!!data?.isBookmarked);
+  }, [open, data?.isBookmarked]);
 
   // open이 아니면 렌더 자체 안 함
   if (!open) return null;
@@ -444,6 +542,7 @@ export default function LetterDetailModal({
   }
 
   const capsule = data;
+
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
 
@@ -471,6 +570,13 @@ export default function LetterDetailModal({
 
   const detailHex = CAPTURE_COLOR_MAP[detailKey] ?? DEFAULT_HEX;
 
+  // Footer에서 북마크 버튼을 보여줄지:
+  // - 관리자면 없음
+  // - 보호편지(= 북마크 모드)일 때는 북마크 토글
+  const isBookmarkMode = !isAdmin && !!isProtected;
+
+  const bookmarkButtonDisabled = bookmarkMutation.isPending;
+
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
       {/* 저장 성공 모달 */}
@@ -489,6 +595,21 @@ export default function LetterDetailModal({
         />
       )}
 
+      {/* 북마크 성공 모달 */}
+      {bookmarkToast.open && (
+        <ActiveModal
+          active="success"
+          title={bookmarkToast.mode === "ADD" ? "북마크 완료" : "북마크 해제"}
+          content={
+            bookmarkToast.mode === "ADD"
+              ? "북마크가 완료되었습니다."
+              : "북마크가 해제되었습니다."
+          }
+          open={bookmarkToast.open}
+          onClose={() => setBookmarkToast((prev) => ({ ...prev, open: false }))}
+        />
+      )}
+
       {/* 삭제 확인 모달 */}
       {isDeleteConfirmOpen && (
         <ConfirmModal
@@ -504,6 +625,23 @@ export default function LetterDetailModal({
           onConfirm={() => {
             setIsDeleteConfirmOpen(false);
             deleteMutation.mutate();
+          }}
+        />
+      )}
+
+      {/* 삭제 성공 모달 */}
+      {isDeleteSuccessOpen && (
+        <ActiveModal
+          active="success"
+          title="삭제 완료"
+          content="캡슐이 삭제되었습니다."
+          open={isDeleteSuccessOpen}
+          onClose={() => setIsDeleteSuccessOpen(false)}
+          onConfirm={() => {
+            setIsDeleteSuccessOpen(false);
+            if (closeHref) router.push(closeHref);
+            else router.back();
+            router.refresh();
           }}
         />
       )}
@@ -699,29 +837,44 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
+                {/* ✅ 저장하기(공개) vs 북마크(보호) 분기 */}
                 <div className="flex-1 flex items-center justify-center">
-                  <button
-                    onClick={handleSave}
-                    type="button"
-                    className="cursor-pointer flex items-center justify-center gap-2"
-                    disabled={saveMutation.isPending}
-                  >
-                    {!isProtected ? (
-                      <>
-                        <Archive size={16} className="text-primary" />
-                        <span>
-                          {saveMutation.isPending ? "저장 중..." : "저장하기"}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <Bookmark size={16} className="text-primary" />
-                        <span>
-                          {saveMutation.isPending ? "처리 중..." : "북마크"}
-                        </span>
-                      </>
-                    )}
-                  </button>
+                  {isBookmarkMode ? (
+                    <button
+                      onClick={handleToggleBookmark}
+                      type="button"
+                      className="cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                      disabled={bookmarkButtonDisabled}
+                    >
+                      <Bookmark
+                        size={16}
+                        className={
+                          isBookmarked
+                            ? "text-primary fill-primary"
+                            : "text-primary"
+                        }
+                      />
+                      <span>
+                        {bookmarkButtonDisabled
+                          ? "처리 중..."
+                          : isBookmarked
+                          ? "북마크 해제"
+                          : "북마크"}
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSave}
+                      type="button"
+                      className="cursor-pointer flex items-center justify-center gap-2"
+                      disabled={saveMutation.isPending}
+                    >
+                      <Archive size={16} className="text-primary" />
+                      <span>
+                        {saveMutation.isPending ? "저장 중..." : "저장하기"}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
             )}

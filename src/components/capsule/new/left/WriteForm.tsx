@@ -35,10 +35,6 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
-import type {
-  UnlockType,
-  CapsuleCreateResponse,
-} from "@/lib/api/capsule/types";
 
 type PreviewState = {
   title: string;
