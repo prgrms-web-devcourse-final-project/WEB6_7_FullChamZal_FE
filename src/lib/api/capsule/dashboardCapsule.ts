@@ -1,6 +1,25 @@
 import { apiFetch, apiFetchRaw } from "../fetchClient";
 
 export const capsuleDashboardApi = {
+  /* 오늘 해제될 편지 조회 */
+  dailyUnlocked: (signal?: AbortSignal) => {
+    return apiFetchRaw<DailyUnlockedCapsuleResponse>(
+      "/api/v1/capsule/dailyUnlockedCapsule",
+      { signal }
+    );
+  },
+
+  /* 올 해 송수신 한 캡슐들의 수 */
+  yearLetters: (year: number, signal?: AbortSignal) => {
+    const sp = new URLSearchParams();
+    sp.set("year", String(year));
+
+    return apiFetchRaw<YearlyCapsuleResponse>(
+      `/api/v1/capsule/showYearlyCapsule?${sp.toString()}`,
+      { signal }
+    );
+  },
+
   /* 보낸 편지 */
   sendDashboard: (
     params?: { page?: number; size?: number; sort?: string[] },

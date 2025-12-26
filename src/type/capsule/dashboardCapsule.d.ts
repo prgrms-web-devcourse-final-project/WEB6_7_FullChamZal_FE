@@ -1,3 +1,36 @@
+/* 오늘 해제될 편지 아이템 */
+type DailyUnlockedCapsuleItem = {
+  capsuleId: number;
+  sender: string;
+  receiver: string;
+  unlockType: string;
+};
+
+/* 오늘 해제될 편지 api 응답 형태 */
+type DailyUnlockedCapsuleResponse = {
+  code: string;
+  message: string;
+  data: {
+    data: DailyUnlockedCapsuleItem[];
+  };
+};
+/* --------------------------------------------------------- */
+/* 월별 송수신 집계 아이템 */
+type YearlyCapsuleItem = {
+  name: string;
+  receive: number;
+  send: number;
+};
+
+/* 월별 송수신 집계 api 응답 */
+type YearlyCapsuleResponse = {
+  code: string;
+  message: string;
+  data: {
+    data: YearlyCapsuleItem[];
+  };
+};
+/* --------------------------------------------------------- */
 type SortMeta = {
   empty: boolean;
   sorted: boolean;
