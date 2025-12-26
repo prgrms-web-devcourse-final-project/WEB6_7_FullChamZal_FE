@@ -17,6 +17,13 @@ export default function DayTime({
   expireDayValue: DayForm;
   onExpireDayChange: (v: DayForm) => void;
 }) {
+  const handleExpireToggle = () => {
+    if (!isExpire) {
+      onExpireDayChange({ date: "", time: "" });
+    }
+    onIsExpireChange();
+  };
+
   return (
     <>
       <div className="flex flex-col gap-5">
@@ -60,23 +67,24 @@ export default function DayTime({
         ) : (
           <div className="flex flex-col gap-2">
             <div
-              className="flex items-center justify-between "
-              onClick={onIsExpireChange}
+              className="flex items-center justify-between"
+              onClick={handleExpireToggle}
             >
               <div className="flex items-center gap-1">
                 <Clock size={16} />
                 <span className="text-sm">열람 만료 시간</span>
               </div>
-              {isExpire ? <Minus size={16} /> : <PlusIcon size={16}></PlusIcon>}
+              {isExpire ? <Minus size={16} /> : <PlusIcon size={16} />}
             </div>
+
             {isExpire ? (
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col space-y-2">
-                  <label htmlFor="unlock-date">날짜</label>
+                  <label htmlFor="expire-date">날짜</label>
                   <input
                     type="date"
-                    name="unlockDate"
-                    id="unlock-date"
+                    name="expireDate"
+                    id="expire-date"
                     value={expireDayValue.date}
                     onChange={(e) =>
                       onExpireDayChange({
@@ -89,11 +97,11 @@ export default function DayTime({
                 </div>
 
                 <div className="flex flex-col space-y-2">
-                  <label htmlFor="unlock-time">시간</label>
+                  <label htmlFor="expire-time">시간</label>
                   <input
                     type="time"
-                    name="unlockTime"
-                    id="unlock-time"
+                    name="expireTime"
+                    id="expire-time"
                     value={expireDayValue.time}
                     onChange={(e) =>
                       onExpireDayChange({

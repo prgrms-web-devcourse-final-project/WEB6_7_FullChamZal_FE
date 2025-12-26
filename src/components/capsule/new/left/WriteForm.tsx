@@ -277,10 +277,15 @@ export default function WriteForm({
       return;
     }
 
-    if (isExpire && (!expireDayForm.date || !expireDayForm.time)) {
-      window.alert("만료 날짜와 시간을 모두 입력해 주세요.");
+    if (
+      isExpire &&
+      ((expireDayForm.date && !expireDayForm.time) ||
+        (!expireDayForm.date && expireDayForm.time))
+    ) {
+      window.alert("만료 날짜/시간은 둘 다 입력하거나, 둘 다 비워두세요.");
       return;
     }
+
     if (
       (effectiveUnlockType === "LOCATION" ||
         effectiveUnlockType === "TIME_AND_LOCATION") &&

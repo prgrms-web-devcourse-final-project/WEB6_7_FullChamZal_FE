@@ -1,5 +1,12 @@
 import { apiFetchRaw } from "../fetchClient";
 
+const FAR_FUTURE_UNLOCK_UNTIL_ISO = "9999-12-31T23:59:59Z";
+
+function toIsoIfFilled(dayForm?: DayForm): string | undefined {
+  if (!dayForm?.date || !dayForm?.time) return undefined;
+  return new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString();
+}
+
 type BuildCommonArgs = {
   memberId: number;
   senderName: string;
@@ -51,7 +58,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     visibility,
     unlockType: effectiveUnlockType,
     unlockAt,
-    unlockUntil: new Date("9999-12-31T23:59:59Z").toISOString(),
+    unlockUntil: undefined,
     locationName:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
@@ -113,12 +120,14 @@ export function buildPrivatePayload(
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
       : undefined;
 
+  const expireIso = toIsoIfFilled(expireDayForm);
+
   const unlockUntil =
-    expireDayForm &&
     (effectiveUnlockType === "TIME" ||
-      effectiveUnlockType === "TIME_AND_LOCATION")
-      ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
-      : new Date("9999-12-31T23:59:59Z").toISOString();
+      effectiveUnlockType === "TIME_AND_LOCATION") &&
+    expireIso
+      ? expireIso
+      : FAR_FUTURE_UNLOCK_UNTIL_ISO;
 
   return {
     memberId,
@@ -193,12 +202,14 @@ export function buildPublicPayload(
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
       : undefined;
 
+  const expireIso = toIsoIfFilled(expireDayForm);
+
   const unlockUntil =
-    expireDayForm &&
     (effectiveUnlockType === "TIME" ||
-      effectiveUnlockType === "TIME_AND_LOCATION")
-      ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
-      : new Date("9999-12-31T23:59:59Z").toISOString();
+      effectiveUnlockType === "TIME_AND_LOCATION") &&
+    expireIso
+      ? expireIso
+      : FAR_FUTURE_UNLOCK_UNTIL_ISO;
 
   return {
     memberId,
