@@ -15,16 +15,22 @@ import {
   MessageSquareWarning,
   MoreHorizontal,
   MapPin,
+  PencilLine,
   Reply,
+  Trash2,
   X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import ActiveModal from "@/components/common/ActiveModal";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
@@ -667,8 +673,8 @@ export default function LetterDetailModal({
 
               <div className="md:flex-1 flex justify-end items-center gap-2">
                 {isSender || isReceiver ? (
-                  <Popover>
-                    <PopoverTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button
                         type="button"
                         variant="ghost"
@@ -678,56 +684,39 @@ export default function LetterDetailModal({
                       >
                         <MoreHorizontal size={18} />
                       </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
                       align="end"
-                      className="w-44 z-10000 p-1"
-                      sideOffset={6}
+                      className="w-44 z-10000 bg-white shadow-lg"
                     >
-                      <div className="px-3 py-2 text-xs text-text-3">관리</div>
-                      <div className="h-px bg-border my-1" />
-
-                      {/* 수정하기: send면서 상대가 읽기 전일 때만 활성화 */}
-                      {isSender && (
-                        <button
-                          type="button"
-                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md disabled:opacity-60 disabled:cursor-not-allowed"
-                          disabled={!canEdit}
-                          onClick={() => {
-                            if (!canEdit) {
-                              alert(
-                                "상대가 이미 열람한 편지는 수정할 수 없습니다."
+                      <DropdownMenuLabel>관리</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        {isSender && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              router.push(
+                                `/capsules/edit?capsuleId=${capsuleId}`
                               );
-                              return;
-                            }
-                            router.push(
-                              `/capsules/edit?capsuleId=${capsuleId}`
-                            );
-                          }}
-                        >
-                          수정하기
-                        </button>
-                      )}
-
-                      {/* 안내 문구 */}
-                      {isSender && !canEdit && (
-                        <div className="px-3 pb-2 text-xs text-text-3">
-                          상대가 열람한 편지는 수정할 수 없어요.
-                        </div>
-                      )}
-
-                      {(isSender || isReceiver) && (
-                        <button
-                          type="button"
-                          className="w-full text-left px-3 py-2 hover:bg-accent text-text-2 rounded-md disabled:opacity-60"
-                          disabled={deleteMutation.isPending}
-                          onClick={() => setIsDeleteConfirmOpen(true)}
-                        >
-                          {deleteMutation.isPending ? "삭제 중..." : "삭제하기"}
-                        </button>
-                      )}
-                    </PopoverContent>
-                  </Popover>
+                            }}
+                          >
+                            <PencilLine className="text-primary" />
+                            수정하기
+                          </DropdownMenuItem>
+                        )}
+                        {(isSender || isReceiver) && (
+                          <DropdownMenuItem
+                            variant="destructive"
+                            disabled={deleteMutation.isPending}
+                            onClick={() => setIsDeleteConfirmOpen(true)}
+                          >
+                            <Trash2 className="text-primary" />
+                            삭제하기
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : null}
 
                 <button
