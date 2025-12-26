@@ -1,7 +1,5 @@
 import { apiFetchRaw } from "../fetchClient";
 
-const FAR_FUTURE_UNLOCK_UNTIL_ISO = "9999-12-31T23:59:59Z";
-
 function toIsoIfFilled(dayForm?: DayForm): string | undefined {
   if (!dayForm?.date || !dayForm?.time) return undefined;
   return new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString();
@@ -127,7 +125,7 @@ export function buildPrivatePayload(
       effectiveUnlockType === "TIME_AND_LOCATION") &&
     expireIso
       ? expireIso
-      : FAR_FUTURE_UNLOCK_UNTIL_ISO;
+      : null;
 
   return {
     memberId,
@@ -209,7 +207,7 @@ export function buildPublicPayload(
       effectiveUnlockType === "TIME_AND_LOCATION") &&
     expireIso
       ? expireIso
-      : FAR_FUTURE_UNLOCK_UNTIL_ISO;
+      : null;
 
   return {
     memberId,
