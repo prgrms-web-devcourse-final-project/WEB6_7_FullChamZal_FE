@@ -462,7 +462,14 @@ export default function LetterDetailModal({
   const isReadByOther = isSender && !!capsule.viewStatus;
   const canEdit = isSender && !isReadByOther;
 
-  const detailHex = CAPTURE_COLOR_MAP[capsule.capsuleColor ?? "BEIGE"];
+  const DEFAULT_HEX = CAPTURE_COLOR_MAP.BEIGE ?? "#FFDED8";
+
+  const detailKey = (capsule.capsuleColor ?? "BEIGE")
+    .toString()
+    .trim()
+    .toUpperCase() as keyof typeof CAPTURE_COLOR_MAP;
+
+  const detailHex = CAPTURE_COLOR_MAP[detailKey] ?? DEFAULT_HEX;
 
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
