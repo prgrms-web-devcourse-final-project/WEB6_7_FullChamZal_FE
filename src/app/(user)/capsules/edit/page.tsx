@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import WriteHeader from "@/components/capsule/new/WriteHeader";
+import EditHeader from "@/components/capsule/edit/EditHeader";
 import Right from "@/components/capsule/new/right/Right";
 import WriteInput from "@/components/capsule/new/left/WriteInput";
 import WriteDiv from "@/components/capsule/new/left/WriteDiv";
@@ -150,7 +150,7 @@ export default function CapsuleEditPage() {
 
   return (
     <div className="h-screen flex flex-col">
-      <WriteHeader />
+      <EditHeader />
 
       <div className="flex flex-1 flex-col lg:flex-row overflow-hidden bg-sub">
         <div className="w-full lg:w-1/2 overflow-y-auto">
