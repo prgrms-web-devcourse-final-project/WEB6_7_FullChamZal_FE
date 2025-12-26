@@ -11,7 +11,7 @@ interface CreatePrivateCapsuleRequest {
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;
-  unlockUntil?: string;
+  unlockUntil?: string | null;
   locationName: string;
   address?: string;
   locationLat: number;
@@ -33,7 +33,7 @@ interface CreateMyCapsuleRequest {
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;
-  unlockUntil?: string;
+  unlockUntil?: string | null;
   locationName: string;
   address?: string;
   locationLat: number;
@@ -57,7 +57,7 @@ interface CreatePublicCapsuleRequest {
   visibility: Visibility;
   unlockType: UnlockType;
   unlockAt?: string;
-  unlockUntil?: string;
+  unlockUntil?: string | null;
   locationName: string;
   address?: string;
   locationLat: number;
