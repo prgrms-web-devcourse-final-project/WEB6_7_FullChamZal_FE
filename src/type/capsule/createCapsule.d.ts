@@ -1,6 +1,6 @@
-export type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
+type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
-export interface CreatePrivateCapsuleRequest {
+interface CreatePrivateCapsuleRequest {
   memberId: number;
   nickname: string;
   receiverNickname: string;
@@ -24,7 +24,7 @@ export interface CreatePrivateCapsuleRequest {
   capsulePackingColor?: string;
 }
 
-export interface CreateMyCapsuleRequest {
+interface CreateMyCapsuleRequest {
   memberId: number;
   nickname: string;
   receiverNickname: string;
@@ -44,7 +44,7 @@ export interface CreateMyCapsuleRequest {
   maxViewCount: number;
 }
 
-export interface CreatePublicCapsuleRequest {
+interface CreatePublicCapsuleRequest {
   memberId: number;
   nickname: string;
   title: string;
@@ -65,7 +65,7 @@ export interface CreatePublicCapsuleRequest {
   maxViewCount: number;
 }
 
-export interface CapsuleCreateResponse {
+interface CapsuleCreateResponse {
   memberId: number;
   capsuleId: number;
   nickname?: string;
@@ -82,30 +82,30 @@ export interface CapsuleCreateResponse {
   capPW?: string;
 }
 
-export interface CapsuleUpdateRequest {
+interface CapsuleUpdateRequest {
   title?: string;
   content?: string;
 }
 
-export interface CapsuleUpdateResponse {
+interface CapsuleUpdateResponse {
   message: string;
 }
 
-export interface CapsuleDeleteResponse {
+interface CapsuleDeleteResponse {
   capsuleId: number;
   message: string;
 }
 
-export interface CapsuleLikeRequest {
+interface CapsuleLikeRequest {
   capsuleId: number;
 }
 
-export interface CapsuleLikeResponse {
+interface CapsuleLikeResponse {
   likeCount: number;
   message: string;
 }
 
-export interface CapsuleSendReadResponse {
+interface CapsuleSendReadResponse {
   capsuleId: number;
   capsuleColor: string;
   capsulePackingColor: string;
@@ -113,7 +113,7 @@ export interface CapsuleSendReadResponse {
   senderNickname: string;
   title: string;
   content: string;
-  createAt: string;
+  createdAt: string;
   viewStatus: boolean;
   unlockType: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
   unlockAt: string;

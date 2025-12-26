@@ -27,7 +27,7 @@ type CapsuleReadData = {
   senderNickname: string;
   title: string;
   content: string;
-  createAt: string;
+  createdAt: string;
   viewStatus: boolean;
   unlockType: UnlockType;
   unlockAt: string;

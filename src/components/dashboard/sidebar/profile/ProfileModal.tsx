@@ -208,7 +208,7 @@ export default function ProfileModal({
           <div className="py-4 px-6 flex justify-between items-center border-b border-outline">
             <h4 className="text-lg">내 프로필</h4>
 
-            {/* ✅ 구글 유저도 닫기는 허용(원하면 막을 수도 있음) */}
+            {/* 구글 유저도 닫기는 허용(원하면 막을 수도 있음) */}
             <button
               type="button"
               onClick={handleClose}

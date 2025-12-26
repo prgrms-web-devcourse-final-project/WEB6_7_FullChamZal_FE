@@ -11,13 +11,13 @@ interface Capsule {
   from: string;
   to: string;
   title: string;
-  content: string; // ✅ 본문
-  createdAt: string; // ✅ 작성일(ISO)
+  content: string; // 본문
+  createdAt: string; // 작성일(ISO)
   unlockCondition: UnlockCondition;
   isUnlocked: boolean;
   isRead: boolean;
-  isBookmarked: boolean; // ✅ 저장하기 상태
-  sharePath: string; // ✅ 공개 링크 (/capsules/[id] 같은)
+  isBookmarked: boolean; // 저장하기 상태
+  sharePath: string; // 공개 링크
 }
 
 interface PublicCapsule {

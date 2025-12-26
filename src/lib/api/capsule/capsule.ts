@@ -1,16 +1,11 @@
 import { apiFetchRaw } from "../fetchClient";
-import {
-  CapsuleCreateResponse,
-  CreatePrivateCapsuleRequest,
-  CreateMyCapsuleRequest,
-  CreatePublicCapsuleRequest,
-  CapsuleUpdateRequest,
-  CapsuleUpdateResponse,
-  CapsuleDeleteResponse,
-  CapsuleLikeResponse,
-  CapsuleSendReadResponse,
-  UnlockType,
-} from "./types";
+
+const FAR_FUTURE_UNLOCK_UNTIL_ISO = "9999-12-31T23:59:59Z";
+
+function toIsoIfFilled(dayForm?: DayForm): string | undefined {
+  if (!dayForm?.date || !dayForm?.time) return undefined;
+  return new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString();
+}
 
 type BuildCommonArgs = {
   memberId: number;
@@ -118,18 +113,21 @@ export function buildPrivatePayload(
     packingColor = "",
     contentColor = "",
   } = args;
+
   const unlockAt =
     effectiveUnlockType === "TIME" ||
     effectiveUnlockType === "TIME_AND_LOCATION"
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
       : undefined;
 
+  const expireIso = toIsoIfFilled(expireDayForm);
+
   const unlockUntil =
-    expireDayForm &&
     (effectiveUnlockType === "TIME" ||
-      effectiveUnlockType === "TIME_AND_LOCATION")
-      ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
-      : undefined;
+      effectiveUnlockType === "TIME_AND_LOCATION") &&
+    expireIso
+      ? expireIso
+      : FAR_FUTURE_UNLOCK_UNTIL_ISO;
 
   return {
     memberId,
@@ -204,12 +202,14 @@ export function buildPublicPayload(
       ? new Date(`${dayForm.date}T${dayForm.time}:00`).toISOString()
       : undefined;
 
+  const expireIso = toIsoIfFilled(expireDayForm);
+
   const unlockUntil =
-    expireDayForm &&
     (effectiveUnlockType === "TIME" ||
-      effectiveUnlockType === "TIME_AND_LOCATION")
-      ? new Date(`${expireDayForm.date}T${expireDayForm.time}:00`).toISOString()
-      : undefined;
+      effectiveUnlockType === "TIME_AND_LOCATION") &&
+    expireIso
+      ? expireIso
+      : FAR_FUTURE_UNLOCK_UNTIL_ISO;
 
   return {
     memberId,

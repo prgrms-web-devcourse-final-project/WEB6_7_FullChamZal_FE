@@ -27,7 +27,7 @@ export default function Modal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            onMouseDown={(e) => e.stopPropagation()} // ✅ 모달 내부 클릭은 닫히지 않게
+            onMouseDown={(e) => e.stopPropagation()}
           >
             {children}
           </motion.div>
