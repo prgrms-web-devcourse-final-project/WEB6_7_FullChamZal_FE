@@ -17,4 +17,22 @@ export const storyTrackApi = {
       { signal }
     );
   },
+
+  /**
+   * 스토리트랙 생성 API 호출
+   * @param payload 스토리트랙 생성 요청 데이터
+   */
+  createStorytrack: (
+    payload: CreateStorytrackRequest,
+    signal?: AbortSignal
+  ) => {
+    return apiFetchRaw<ApiResponse<CreateStorytrackResponse>>(
+      "/api/v1/storytrack/creat",
+      {
+        method: "POST",
+        json: payload,
+        signal,
+      }
+    );
+  },
 };
