@@ -62,6 +62,7 @@ interface CreatePublicCapsuleRequest {
   address?: string;
   locationLat: number;
   locationLng: number;
+  locationRadiusM: number; // 공개 캡슐은 locationRadiusM 사용
   maxViewCount: number;
 }
 
