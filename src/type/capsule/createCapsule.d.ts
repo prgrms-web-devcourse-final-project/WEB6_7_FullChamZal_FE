@@ -62,7 +62,7 @@ interface CreatePublicCapsuleRequest {
   address?: string;
   locationLat: number;
   locationLng: number;
-  viewingRadius: number; // 공개/비공개 모두 viewingRadius로 통일
+  locationRadiusM: number;
   maxViewCount: number;
 }
 

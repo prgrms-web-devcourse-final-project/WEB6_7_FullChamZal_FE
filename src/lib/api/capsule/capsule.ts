@@ -243,7 +243,7 @@ export function buildPublicPayload(
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lng ?? 0
         : 0,
-    viewingRadius:
+    locationRadiusM:
       effectiveUnlockType === "LOCATION" ||
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.viewingRadius
