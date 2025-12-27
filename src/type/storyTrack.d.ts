@@ -38,3 +38,25 @@ type StoryTrackListPage = {
 };
 
 type StoryTrackListResponse = ApiResponse<StoryTrackListPage>;
+
+/* 스토리트랙 생성 요청 */
+type CreateStorytrackRequest = {
+  title: string;
+  description: string;
+  trackType: "SEQUENTIAL" | "FREE";
+  isPublic: number; // 0: 비공개, 1: 공개
+  price: number;
+  capsuleList: number[]; // capsuleId 배열
+};
+
+/* 스토리트랙 생성 응답 */
+type CreateStorytrackResponse = {
+  storytrackId: number;
+  title: string;
+  description: string;
+  trackType: "SEQUENTIAL" | "FREE";
+  isPublic: number;
+  price: number;
+  totalSteps: number;
+  capsuleList: number[]; // capsuleId 배열
+};
