@@ -344,6 +344,7 @@ export default function LetterDetailModal({
   const handleSave = async () => {
     try {
       const me = await authApiClient.me();
+      console.log("me:", me);
       if (!me) throw Object.assign(new Error("NO_ME"), { status: 401 });
 
       const unlockAt = new Date().toISOString();
@@ -562,10 +563,6 @@ export default function LetterDetailModal({
       : `${
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
         } · ${capsule.locationName ?? "위치 조건 없음"}`;
-
-  // send에서 "상대가 이미 읽음"이면 수정 불가
-  const isReadByOther = isSender && !!capsule.viewStatus;
-  const canEdit = isSender && !isReadByOther;
 
   const DEFAULT_HEX = CAPTURE_COLOR_MAP.BEIGE ?? "#FFDED8";
 

@@ -2,10 +2,14 @@
 
 import DivBox from "@/components/dashboard/DivBox";
 import { authApiClient } from "@/lib/api/auth/auth.client";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function TodayLetters() {
+  const router = useRouter();
+
   const { data: me } = useQuery({
     queryKey: ["me"],
     queryFn: () => authApiClient.me(),
@@ -18,6 +22,14 @@ export default function TodayLetters() {
     weekday: "long",
   });
 
+  const { data } = useQuery({
+    queryKey: ["dailyUnlocked"],
+    queryFn: ({ signal }) => capsuleDashboardApi.dailyUnlocked(signal),
+  });
+
+  // 배열은 data?.data.data
+  const list = data?.data.data ?? [];
+
   return (
     <>
       <div className="space-y-5">
@@ -28,41 +40,55 @@ export default function TodayLetters() {
           </h2>
           <p className="text-text-2 text-lg ">
             오늘은 {todayText}, 오늘 당신을 기다리는 편지가{" "}
-            <span className="text-primary font-semibold">4통</span> 있습니다.
+            <span className="text-primary font-semibold">{list.length}통</span>{" "}
+            있습니다.
           </p>
         </div>
         {/* Card => 총 4개 까지 */}
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:ml-6">
-          {/* 없으면 열릴 편지가 없다는 UI 추가 */}
-          <span>api 구현 뒤에 진행할 예정!!</span>
-          <DivBox className="w-full">
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                {/* 보낸 사람 */}
-                <div className="flex flex-col gap-1">
-                  <span className="text-text-3 text-xs">보낸 사람</span>
-                  <span>김민수</span>
-                </div>
+          {list.length === 0 ? (
+            <p>없음</p>
+          ) : (
+            list.map((l) => (
+              <button
+                key={l.capsuleId}
+                onClick={() =>
+                  router.push(`/dashboard/receive?id=${l.capsuleId}`)
+                }
+              >
+                <DivBox className="w-full">
+                  <div className="flex flex-col gap-3">
+                    <div className="w-full flex justify-between">
+                      {/* 보낸 사람 */}
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="text-text-3 text-xs">보낸 사람</span>
+                        <span>{l.sender}</span>
+                      </div>
 
-                {/* 해제 조건에 따라 아이콘 변경 */}
-                <div>
-                  <span className="px-3 py-2 rounded-md bg-sub text-sm">
-                    오늘 오후 2시
-                  </span>
-                </div>
-              </div>
-              {/* 해제 조건 */}
-              <div className="flex flex-col gap-1">
-                <span className="text-text-3 text-xs">해제 조건</span>
-                <span>2024년 12월 5일 오전 9시</span>
-              </div>
-              {/* D-Day or 거리 */}
-              <div className="flex items-center gap-1 text-text-3">
-                <span className="text-sm ">편지 읽기</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
-          </DivBox>
+                      {/* 해제 조건에 따라 아이콘 변경 */}
+                      <div>
+                        <span className="px-3 py-2 rounded-md bg-sub text-sm">
+                          {l.unlockType}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 해제 조건 */}
+                    <div className="flex flex-col items-start gap-1">
+                      <span className="text-text-3 text-xs">해제 시간</span>
+                      <span>{l.unlockType}</span>
+                    </div>
+
+                    {/* D-Day or 거리 */}
+                    <div className="flex items-center gap-1 text-text-3">
+                      <span className="text-sm ">편지 읽기</span>
+                      <ArrowRight size={16} />
+                    </div>
+                  </div>
+                </DivBox>
+              </button>
+            ))
+          )}
         </div>
       </div>
     </>
