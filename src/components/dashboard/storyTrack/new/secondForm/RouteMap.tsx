@@ -149,33 +149,15 @@ export default function RouteMap({ routeItems, order }: Props) {
             zIndex={validRouteItems.length - index} // 나중에 추가된 것이 위에
           >
             <div className="relative flex flex-col items-center">
-              {/* 순서 표시 (ordered일 때만) */}
-              {order === "ordered" && (
-                <div className="absolute -top-8 flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shadow-lg">
-                  {index + 1}
-                </div>
-              )}
-
               {/* 마커 */}
-              <div className="relative">
-                {/* 연결선 표시 (ordered이고 다음 항목이 있을 때) */}
-                {order === "ordered" && index < validRouteItems.length - 1 && (
-                  <div
-                    className="absolute top-1/2 left-1/2 w-px bg-primary opacity-30"
-                    style={{
-                      height: "100px",
-                      transform: "translate(-50%, 0)",
-                      transformOrigin: "top center",
-                    }}
-                  >
-                    {/* 선의 각도 계산은 복잡하므로 간단하게 표시 */}
-                  </div>
-                )}
-
-                {/* 마커 원 */}
-                <div className="w-10 h-10 rounded-full bg-primary-2 border-2 border-white shadow-lg flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-primary-2 border-2 border-white shadow-lg flex items-center justify-center">
+                {order === "ordered" ? (
+                  <span className="text-white text-xs font-semibold">
+                    {index + 1}
+                  </span>
+                ) : (
                   <div className="w-3 h-3 rounded-full bg-primary" />
-                </div>
+                )}
               </div>
 
               {/* 제목 툴팁 (호버 시) */}
