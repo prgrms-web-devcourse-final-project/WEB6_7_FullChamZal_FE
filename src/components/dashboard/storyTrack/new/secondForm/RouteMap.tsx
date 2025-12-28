@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Map, CustomOverlayMap } from "react-kakao-maps-sdk";
-import { LocateFixed } from "lucide-react";
 import { type KakaoNamespace } from "@/lib/kakao/types";
 
 type Letter = {
@@ -131,37 +130,6 @@ export default function RouteMap({ routeItems, order }: Props) {
     mapRef.current.setBounds(bounds as kakao.maps.LatLngBounds, 50); // 50px 여백
   }, [validRouteItems]);
 
-  // 내 위치로 이동
-  const moveToMyLocation = () => {
-    if (!navigator.geolocation) return;
-    if (!mapRef.current) return;
-
-    // kakao.maps는 전역 객체로 사용
-    const kakaoWindow = window as unknown as {
-      kakao?: {
-        maps?: {
-          LatLng?: new (lat: number, lng: number) => unknown;
-        };
-      };
-    };
-    const kakao = kakaoWindow.kakao;
-    if (!kakao?.maps?.LatLng) return;
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        if (!kakao?.maps?.LatLng) return;
-        const LatLng = kakao.maps.LatLng;
-        const moveLatLng = new LatLng(latitude, longitude);
-        mapRef.current?.setCenter(moveLatLng as kakao.maps.LatLng);
-        mapRef.current?.setLevel(3);
-      },
-      () => {
-        alert("위치 정보를 가져올 수 없습니다.");
-      }
-    );
-  };
-
   if (!ready) {
     return (
       <div className="w-full h-full flex items-center justify-center text-text-4 text-sm">
@@ -207,16 +175,6 @@ export default function RouteMap({ routeItems, order }: Props) {
           </CustomOverlayMap>
         ))}
       </Map>
-
-      {/* 내 위치로 이동 버튼 */}
-      <button
-        type="button"
-        onClick={moveToMyLocation}
-        className="absolute bottom-4 right-4 p-3 rounded-xl bg-white shadow-lg text-primary hover:bg-button-hover transition"
-        aria-label="내 위치로 이동"
-      >
-        <LocateFixed size={20} />
-      </button>
     </div>
   );
 }
