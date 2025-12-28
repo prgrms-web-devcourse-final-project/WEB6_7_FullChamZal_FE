@@ -21,10 +21,12 @@ export default function PublicLetterPicker({
   onSelect: (letter: Letter) => void;
 }) {
   // 공개 캡슐 목록 조회
+  // 캡슐 100개 최대, 100개 이상이 필요하면 무한스크롤 구현 필요
   const { data, isLoading, isError } = useQuery({
     queryKey: ["storytrackCapsuleList"],
-    queryFn: ({ signal }) => storyTrackApi.getCapsuleList({ page: 0, size: 100 }, signal),
-    staleTime: 1000 * 30, // 30초간 캐시 유지
+    queryFn: ({ signal }) =>
+      storyTrackApi.getCapsuleList({ page: 0, size: 100 }, signal),
+    staleTime: 1000 * 30, // 30초간 캐시 유지: 이 시간 동안은 API 재호출 없이 캐시된 데이터 사용
   });
 
   // 로딩 중
