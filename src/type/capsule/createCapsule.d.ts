@@ -62,6 +62,7 @@ interface CreatePublicCapsuleRequest {
   address?: string;
   locationLat: number;
   locationLng: number;
+  viewingRadius: number;
   maxViewCount: number;
 }
 
