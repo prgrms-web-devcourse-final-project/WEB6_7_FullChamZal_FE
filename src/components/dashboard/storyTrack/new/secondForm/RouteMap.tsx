@@ -84,7 +84,7 @@ export default function RouteMap({ routeItems, order }: Props) {
     [routeItems]
   );
 
-  // 지도 중심 좌표 계산 (모든 마커의 중심)
+  // 지도 중심 좌표 계산 (초기 렌더링용)
   const mapCenter = useMemo(() => {
     if (validRouteItems.length === 0) {
       return { lat: 37.5665, lng: 126.978 }; // 서울시청 기본값
@@ -100,21 +100,60 @@ export default function RouteMap({ routeItems, order }: Props) {
     return { lat: avgLat, lng: avgLng };
   }, [validRouteItems]);
 
+  // 모든 마커가 보이도록 bounds 설정
+  useEffect(() => {
+    if (!mapRef.current || validRouteItems.length === 0) return;
+
+    // kakao.maps는 전역 객체로 사용
+    const kakaoWindow = window as unknown as {
+      kakao?: {
+        maps?: {
+          LatLng?: new (lat: number, lng: number) => unknown;
+          LatLngBounds?: new () => {
+            extend: (latlng: unknown) => void;
+          };
+        };
+      };
+    };
+    const kakao = kakaoWindow.kakao;
+    if (!kakao?.maps?.LatLngBounds || !kakao.maps.LatLng) return;
+
+    // 모든 마커의 좌표로 bounds 생성
+    const LatLngBounds = kakao.maps.LatLngBounds;
+    const LatLng = kakao.maps.LatLng;
+    const bounds = new LatLngBounds();
+    validRouteItems.forEach((item) => {
+      const latLng = new LatLng(item.lat, item.lng);
+      bounds.extend(latLng);
+    });
+
+    // bounds에 패딩 추가
+    mapRef.current.setBounds(bounds as kakao.maps.LatLngBounds, 50); // 50px 여백
+  }, [validRouteItems]);
+
   // 내 위치로 이동
   const moveToMyLocation = () => {
     if (!navigator.geolocation) return;
     if (!mapRef.current) return;
 
-    // kakao.maps는 전역 객체로 사용 (다른 컴포넌트들과 동일한 방식)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const kakao = (window as any)?.kakao;
+    // kakao.maps는 전역 객체로 사용
+    const kakaoWindow = window as unknown as {
+      kakao?: {
+        maps?: {
+          LatLng?: new (lat: number, lng: number) => unknown;
+        };
+      };
+    };
+    const kakao = kakaoWindow.kakao;
     if (!kakao?.maps?.LatLng) return;
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        const moveLatLng = new kakao.maps.LatLng(latitude, longitude);
-        mapRef.current?.setCenter(moveLatLng);
+        if (!kakao?.maps?.LatLng) return;
+        const LatLng = kakao.maps.LatLng;
+        const moveLatLng = new LatLng(latitude, longitude);
+        mapRef.current?.setCenter(moveLatLng as kakao.maps.LatLng);
         mapRef.current?.setLevel(3);
       },
       () => {
