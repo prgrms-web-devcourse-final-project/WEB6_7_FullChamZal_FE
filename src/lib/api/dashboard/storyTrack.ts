@@ -57,4 +57,47 @@ export const storyTrackApi = {
       { signal }
     );
   },
+
+  /**
+   * 참여한 스토리트랙 목록 조회
+   * @param params 페이지네이션 파라미터
+   */
+  joinedList: (
+    params?: { page?: number; size?: number },
+    signal?: AbortSignal
+  ) => {
+    const page = params?.page ?? 0;
+    const size = params?.size ?? 10;
+
+    const sp = new URLSearchParams();
+    sp.set("page", String(page));
+    sp.set("size", String(size));
+
+    return apiFetchRaw<StoryTrackJoinedListResponse>(
+  `/api/v1/storytrack/participant/joinedList?${sp.toString()}`,
+  { signal }
+);
+  },
+
+  /**
+   * 내가 만든 스토리트랙 목록 조회
+   * @param params 페이지네이션 파라미터
+   */
+  mineList: (
+    params?: { page?: number; size?: number },
+    signal?: AbortSignal
+  ) => {
+    const page = params?.page ?? 0;
+    const size = params?.size ?? 10;
+
+    const sp = new URLSearchParams();
+    sp.set("page", String(page));
+    sp.set("size", String(size));
+
+    return apiFetchRaw<StoryTrackMineListResponse>(
+  `/api/v1/storytrack/creater/storytrackList?${sp.toString()}`,
+  { signal }
+);
+
+  },
 };
