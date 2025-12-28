@@ -62,8 +62,9 @@ interface CreatePublicCapsuleRequest {
   address?: string;
   locationLat: number;
   locationLng: number;
-  locationRadiusM: number;
+  viewingRadius: number;
   maxViewCount: number;
+  attachmentIds?: number[]; // 첨부 파일 ID 목록
 }
 
 interface CapsuleCreateResponse {
