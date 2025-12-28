@@ -12,6 +12,8 @@ function toLetter(item: CapsuleDashboardItem): Letter {
     title: item.title,
     placeName: item.locationName ?? undefined,
     createdAt: item.createAt,
+    lat: item.locationLat ?? undefined,
+    lng: item.locationLng ?? undefined,
   };
 }
 
