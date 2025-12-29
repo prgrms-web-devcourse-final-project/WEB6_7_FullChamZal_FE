@@ -243,7 +243,13 @@ export function buildPublicPayload(
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.lng ?? 0
         : 0,
+    locationRadiusM:
+      effectiveUnlockType === "LOCATION" ||
+      effectiveUnlockType === "TIME_AND_LOCATION"
+        ? locationForm.viewingRadius
+        : 0,
     maxViewCount: 0,
+    attachmentIds: [], // 첨부 파일은 추후 구현
   };
 }
 
