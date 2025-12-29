@@ -3,6 +3,8 @@ type Letter = {
   title: string;
   placeName?: string;
   createdAt?: string;
+  lat?: number; // 위치 정보 (지도 마커용)
+  lng?: number; // 위치 정보 (지도 마커용)
 };
 
 type OrderType = "ordered" | "free";

@@ -5,6 +5,7 @@ import { Plus, X } from "lucide-react";
 
 import PublicLetterPicker from "./PublicLetterPicker";
 import SelectedRouteList from "./SelectedRouteList";
+import RouteMap from "./RouteMap";
 
 type Props = {
   order: OrderType;
@@ -92,8 +93,8 @@ export default function SecondForm({ order, value, onChange }: Props) {
         </div>
 
         {/* Right - 지도 */}
-        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 flex items-center justify-center text-text-4 overflow-hidden">
-          지도 영역
+        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 overflow-hidden">
+          <RouteMap routeItems={routeItems} order={order} />
         </div>
       </div>
     </div>
