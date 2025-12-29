@@ -125,3 +125,9 @@ interface CapsuleSendReadResponse {
   locationLng: number;
   result: string;
 }
+
+interface CapsuleBackupResponse {
+  status: string;
+  description: string;
+  authUrl: string;
+}
