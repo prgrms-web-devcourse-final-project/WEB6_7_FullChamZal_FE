@@ -51,7 +51,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
             <div className="flex gap-1 items-center">
               <Users size={16} />
               {/* 나중에 참여자 수 추가하면 */}
-              {track.totalParticipant ?? 0}명
+              {track.totalMemberCount ?? 0}명
             </div>
           </div>
 

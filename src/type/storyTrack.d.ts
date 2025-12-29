@@ -26,8 +26,9 @@ type StoryTrackItem = {
   isPublic: number;
   price: number;
   totalSteps: number;
-  totalParticipant: number;
   createdAt: string;
+  totalMemberCount: number;
+  memberType: string;
 };
 
 type StoryTrackListPage = {
@@ -62,3 +63,123 @@ type CreateStorytrackResponse = {
   totalSteps: number;
   capsuleList: number[]; // capsuleId 배열
 };
+
+type ApiEnvelope<T> = {
+  code: string;
+  message: string;
+  data: T;
+};
+
+type PageEnvelope<T> = {
+  content: T[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+};
+
+/** 공개 전체 스토리트랙   */
+type PublicStoryTrackItem = {
+  storytrackId: number;
+  title: string;
+  description: string;
+  trackType: string;
+  isPublic: number;
+  price: number;
+  totalSteps: number;
+  createdAt: string;
+  totalMemberCount: number;
+};
+
+/**  참여한 스토리트랙  */
+type JoinedStoryTrackItem = {
+  memberId: number;
+  storytrackId: number;
+  title: string;
+  description: string;
+  trackType: string;
+  isPublic: number;
+  price: number;
+  totalSteps: number;
+  completedSteps: number;
+  lastCompletedStep: number;
+  startedAt: string;
+  completedAt: string;
+  createdAt: string;
+  totalMemberCount: number;
+};
+
+/**  내가 만든 스토리트랙  */
+type MineStoryTrackItem = {
+  storytrackId: number;
+  title: string;
+  description: string;
+  trackType: string;
+  isPublic: number;
+  price: number;
+  totalSteps: number;
+  createdAt: string;
+  totalMemberCount: number;
+};
+
+/* 참여한 스토리트랙 리스트 item (participant/joinedList) */
+type StoryTrackJoinedItem = {
+  memberId: number;
+  storytrackId: number;
+  title: string;
+  description: string;
+  trackType: string;
+  isPublic: number;
+  price: number;
+  totalSteps: number;
+  completedSteps: number;
+  lastCompletedStep: number;
+  startedAt: string;
+  completedAt: string;
+  createdAt: string;
+  totalMemberCount: number;
+};
+
+type StoryTrackJoinedListPage = {
+  content: StoryTrackJoinedItem[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+};
+
+type StoryTrackJoinedListResponse = ApiResponse<StoryTrackJoinedListPage>;
+
+/* 내가 만든 스토리트랙 리스트 item (creater/storytrackList) */
+type StoryTrackMineItem = {
+  storytrackId: number;
+  title: string;
+  description: string;
+  trackType: string;
+  isPublic: number;
+  price: number;
+  totalSteps: number;
+  createdAt: string;
+  totalMemberCount: number;
+};
+
+type StoryTrackMineListPage = {
+  content: StoryTrackMineItem[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+};
+
+// 응답 타입
+type PublicStoryTrackListResponse = ApiEnvelope<
+  PageEnvelope<PublicStoryTrackItem>
+>;
+type JoinedStoryTrackListResponse = ApiEnvelope<
+  PageEnvelope<JoinedStoryTrackItem>
+>;
+type MineStoryTrackListResponse = ApiEnvelope<PageEnvelope<MineStoryTrackItem>>;
+type StoryTrackMineListResponse = ApiResponse<StoryTrackMineListPage>;

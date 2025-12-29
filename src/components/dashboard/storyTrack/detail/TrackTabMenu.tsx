@@ -1,4 +1,4 @@
-type TabType = "overview" | "route" | "progress";
+type TabType = "route" | "map";
 
 interface Props {
   activeTab: TabType;
@@ -7,9 +7,8 @@ interface Props {
 
 export default function TrackTabMenu({ activeTab, onChange }: Props) {
   const tabs = [
-    { key: "overview", label: "개요" },
     { key: "route", label: "경로" },
-    { key: "progress", label: "진행 상황" },
+    { key: "map", label: "지도" },
   ] as const;
 
   return (

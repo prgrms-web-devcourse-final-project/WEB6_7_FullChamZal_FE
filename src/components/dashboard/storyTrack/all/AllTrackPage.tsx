@@ -11,34 +11,7 @@ type StatusFilter = "all" | "active" | "ended";
 type SortOption = "newest" | "popular";
 
 export default function AllTrackPage() {
-  /* const tracks: StoryTrackItem[] = [
-    {
-      storytrackId: 1,
-      createrName: "홍길동",
-      title: "테스트 스토리트랙",
-      desctiption: "SEQUENTIAL 테스트",
-      trackType: "SEQUENTIAL",
-      isPublic: 1,
-      price: 0,
-      totalSteps: 3,
-      totalParticipant: 12,
-      createdAt: "2025-12-21",
-    },
-    {
-      storytrackId: 2,
-      createrName: "테스터123",
-      title: "테스트123213 스토리트랙",
-      desctiption: "자유 테스트",
-      trackType: "FREE",
-      isPublic: 1,
-      price: 0,
-      totalSteps: 2,
-      totalParticipant: 5,
-      createdAt: "2025-12-19",
-    },
-  ]; */
-
-  const page = 0;
+  const [page, setPage] = useState(0);
   const size = 10;
 
   const [search, setSearch] = useState("");
@@ -58,12 +31,13 @@ export default function AllTrackPage() {
     },
   });
 
+  const pageInfo = tracks?.data;
+  const content = pageInfo?.content ?? [];
+
   return (
     <div className="p-8 space-y-6">
-      {/* Top */}
       <div className="space-y-3 flex-none">
         <BackButton />
-
         <div className="space-y-2">
           <h3 className="text-3xl font-medium">
             공개 스토리트랙 둘러보기
@@ -75,7 +49,6 @@ export default function AllTrackPage() {
         </div>
       </div>
 
-      {/* 검색 */}
       <div className="relative w-full">
         <Search
           size={20}
@@ -90,7 +63,6 @@ export default function AllTrackPage() {
         />
       </div>
 
-      {/* 로딩/에러 */}
       {isLoading && (
         <div className="rounded-xl border border-outline bg-white/80 p-6 text-text-2">
           불러오는 중...
@@ -101,7 +73,7 @@ export default function AllTrackPage() {
         <div className="rounded-xl border border-outline bg-white/80 p-6">
           <p className="text-primary font-medium">불러오기에 실패했어요.</p>
           <pre className="mt-3 text-xs whitespace-pre-wrap text-text-3">
-            {String(error?.message ?? error)}
+            {error instanceof Error ? error.message : String(error)}
           </pre>
           <button
             className="mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
@@ -113,9 +85,7 @@ export default function AllTrackPage() {
         </div>
       )}
 
-      {/* 필터 바 */}
       <div className="flex flex-wrap items-center gap-2">
-        {/* 상태 */}
         <div className="flex gap-2">
           <button
             onClick={() => setStatus("all")}
@@ -151,7 +121,6 @@ export default function AllTrackPage() {
 
         <div className="flex-1" />
 
-        {/* 정렬 */}
         <div className="relative">
           <select
             value={sort}
@@ -162,14 +131,12 @@ export default function AllTrackPage() {
             <option value="popular">인기순</option>
           </select>
 
-          {/* chevron */}
           <ChevronDown
             size={18}
             className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-4"
           />
         </div>
 
-        {/* 초기화 */}
         <button
           onClick={() => {
             setSearch("");
@@ -182,20 +149,44 @@ export default function AllTrackPage() {
         </button>
       </div>
 
-      {/* List */}
-      {/* 로딩/에러 아닐 때만 리스트 영역 보여주면 UX도 좋아짐 */}
       {!isLoading && !isError && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tracks!.data.content.map((t) => (
-            <TrackCard key={t.storytrackId} track={t} />
-          ))}
+        <>
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {content.map((t) => (
+              <TrackCard key={t.storytrackId} track={t} />
+            ))}
 
-          {tracks!.data.content.length === 0 && (
-            <div className="col-span-full text-center text-text-3 py-12">
-              조건에 맞는 트랙이 없어요.
-            </div>
-          )}
-        </div>
+            {content.length === 0 && (
+              <div className="col-span-full text-center text-text-3 py-12">
+                조건에 맞는 트랙이 없어요.
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-center gap-3 pt-4">
+            <button
+              className="px-3 py-2 rounded-xl border border-outline text-text-2 disabled:opacity-40"
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              type="button"
+            >
+              이전
+            </button>
+
+            <span className="text-text-2">
+              {page + 1} / {pageInfo?.totalPages ?? 1}
+            </span>
+
+            <button
+              className="px-3 py-2 rounded-xl border border-outline text-text-2 disabled:opacity-40"
+              disabled={pageInfo?.last ?? true}
+              onClick={() => setPage((p) => p + 1)}
+              type="button"
+            >
+              다음
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
