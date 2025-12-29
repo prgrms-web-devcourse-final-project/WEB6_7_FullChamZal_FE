@@ -29,9 +29,20 @@ export type KakaoGeocoderService = {
   ) => void;
 };
 
+export type KakaoLatLng = {
+  getLat: () => number;
+  getLng: () => number;
+};
+
+export type KakaoLatLngBounds = {
+  extend: (latlng: KakaoLatLng) => void;
+};
+
 export type KakaoNamespace = {
   maps?: {
     load?: (callback: () => void) => void;
+    LatLng?: new (lat: number, lng: number) => KakaoLatLng;
+    LatLngBounds?: new () => KakaoLatLngBounds;
     services?: {
       Places: new () => KakaoPlacesService;
       Geocoder: new () => KakaoGeocoderService;

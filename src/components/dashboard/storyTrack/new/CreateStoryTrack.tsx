@@ -7,6 +7,7 @@ import SecondForm from "./secondForm/SecondForm";
 import SuccessForm from "./SuccessForm";
 import FirstForm from "./FirstForm";
 import BackButton from "@/components/common/BackButton";
+import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 
 type Step = 1 | 2 | 3;
 
@@ -73,11 +74,32 @@ export default function CreateStoryTrack() {
     try {
       setIsSubmitting(true);
 
-      // 성공하면 Step3
-      setStep(3);
+      // FormState → CreateStorytrackRequest 변환
+      const payload: CreateStorytrackRequest = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        trackType: form.order === "ordered" ? "SEQUENTIAL" : "FREE",
+        isPublic: 1, // 기본값: 공개
+        price: 0, // 기본값: 무료
+        capsuleList: form.routeLetterIds.map((id) => Number(id)), // string[] → number[]
+      };
+
+      // API 호출
+      const response = await storyTrackApi.createStorytrack(payload);
+
+      // 성공 시 Step 3으로 이동
+      if (response.code === "200") {
+        setStep(3);
+      } else {
+        throw new Error(response.message || "스토리트랙 생성에 실패했습니다.");
+      }
     } catch (e) {
-      console.error(e);
-      alert("생성 실패");
+      console.error("스토리트랙 생성 실패:", e);
+      const errorMessage =
+        e instanceof Error
+          ? e.message
+          : "스토리트랙 생성에 실패했습니다. 다시 시도해주세요.";
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
