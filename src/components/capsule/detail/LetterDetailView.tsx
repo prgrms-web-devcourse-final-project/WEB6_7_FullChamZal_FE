@@ -44,6 +44,7 @@ type Props = {
   capsuleId: number;
   isProtected?: number;
   password?: string | null;
+  initialLocation?: LatLng | null; // MapContents에서 전달받은 위치 정보
 };
 
 export default function LetterDetailView({
@@ -51,13 +52,22 @@ export default function LetterDetailView({
   capsuleId,
   isProtected,
   password = null,
+  initialLocation = null,
 }: Props) {
   // 내 위치 (current)
-  const [currentLocation, setCurrentLocation] = useState<LatLng | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<LatLng | null>(
+    initialLocation
+  );
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  // 최초 1회 내 위치 시도
+  // initialLocation이 없을 때만 위치 정보 가져오기
   useEffect(() => {
+    // initialLocation이 이미 있으면 스킵
+    if (initialLocation) {
+      setCurrentLocation(initialLocation);
+      return;
+    }
+
     let mounted = true;
 
     getCurrentPosition()
@@ -76,7 +86,7 @@ export default function LetterDetailView({
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [initialLocation]);
 
   // 너무 자주 리패치 방지(좌표 라운딩)
   const locationKey = useMemo(() => {
@@ -108,7 +118,9 @@ export default function LetterDetailView({
       return res;
     },
     retry: false,
-    enabled: capsuleId > 0,
+    // 공개 캡슐의 경우 위치 정보가 준비될 때까지 대기
+    // initialLocation이 있으면 즉시 실행, 없으면 currentLocation이 설정될 때까지 대기
+    enabled: capsuleId > 0 && (initialLocation !== null || currentLocation !== null),
   });
 
   if (isLoading) {
