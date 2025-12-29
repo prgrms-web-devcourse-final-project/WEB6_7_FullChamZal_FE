@@ -1,22 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import TrackCard from "./TrackCard";
 import BackButton from "@/components/common/BackButton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
+import Pagination from "@/components/common/Pagination";
 
 type StatusFilter = "all" | "active" | "ended";
 type SortOption = "newest" | "popular";
 
 export default function AllTrackPage() {
   const [page, setPage] = useState(0);
-  const size = 10;
+  const [size] = useState(15);
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortOption>("newest");
+
+  const queryClient = useQueryClient();
+
+  // queryKey를 한 곳에서만 만들기 (prefetch에서도 그대로 재사용)
+  const listQueryKey = useMemo(
+    () => (p: number) =>
+      ["allStoryTrack", p, size, search, status, sort] as const,
+    [size, search, status, sort]
+  );
 
   const {
     data: tracks,
@@ -25,14 +35,37 @@ export default function AllTrackPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["allStoryTrack", page, size],
+    queryKey: listQueryKey(page),
     queryFn: async ({ signal }) => {
+      // TODO: 서버가 search/status/sort를 지원하면 params에 함께 넣기
       return await storyTrackApi.allList({ page, size }, signal);
     },
+    staleTime: 30_000,
   });
 
   const pageInfo = tracks?.data;
   const content = pageInfo?.content ?? [];
+
+  const totalElements = pageInfo?.totalElements ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+  const lastPage = totalPages - 1;
+
+  // 인접 페이지 프리패치 (이전/다음)
+  useEffect(() => {
+    // totalElements가 없거나 로딩 중이면 스킵
+    if (!pageInfo) return;
+
+    const prefetch = (p: number) =>
+      queryClient.prefetchQuery({
+        queryKey: listQueryKey(p),
+        queryFn: ({ signal }) =>
+          storyTrackApi.allList({ page: p, size }, signal),
+        staleTime: 30_000,
+      });
+
+    if (page > 0) prefetch(page - 1);
+    if (page < lastPage) prefetch(page + 1);
+  }, [pageInfo, page, lastPage, size, queryClient, listQueryKey]);
 
   return (
     <div className="p-8 space-y-6">
@@ -56,7 +89,10 @@ export default function AllTrackPage() {
         />
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0); // 검색 바뀌면 첫 페이지로
+          }}
           type="text"
           placeholder="스토리트랙 검색..."
           className="w-full p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
@@ -88,7 +124,10 @@ export default function AllTrackPage() {
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex gap-2">
           <button
-            onClick={() => setStatus("all")}
+            onClick={() => {
+              setStatus("all");
+              setPage(0);
+            }}
             className={`px-3 py-2 rounded-xl border ${
               status === "all"
                 ? "border-primary text-primary"
@@ -98,17 +137,23 @@ export default function AllTrackPage() {
             전체
           </button>
           <button
-            onClick={() => setStatus("active")}
+            onClick={() => {
+              setStatus("active");
+              setPage(0);
+            }}
             className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "active"
                 ? "border-primary text-primary"
                 : "border-outline text-text-2"
             }`}
           >
-            참여중
+            미참여
           </button>
           <button
-            onClick={() => setStatus("ended")}
+            onClick={() => {
+              setStatus("ended");
+              setPage(0);
+            }}
             className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "ended"
                 ? "border-primary text-primary"
@@ -124,8 +169,11 @@ export default function AllTrackPage() {
         <div className="relative">
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as SortOption)}
-            className="appearance-none h-11 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary "
+            onChange={(e) => {
+              setSort(e.target.value as SortOption);
+              setPage(0);
+            }}
+            className="appearance-none h-11 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
           >
             <option value="newest">최신순</option>
             <option value="popular">인기순</option>
@@ -142,6 +190,7 @@ export default function AllTrackPage() {
             setSearch("");
             setStatus("all");
             setSort("newest");
+            setPage(0);
           }}
           className="px-3 py-2 rounded-xl border border-outline text-text-2"
         >
@@ -151,7 +200,7 @@ export default function AllTrackPage() {
 
       {!isLoading && !isError && (
         <>
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {content.map((t) => (
               <TrackCard key={t.storytrackId} track={t} />
             ))}
@@ -163,29 +212,12 @@ export default function AllTrackPage() {
             )}
           </div>
 
-          <div className="flex items-center justify-center gap-3 pt-4">
-            <button
-              className="px-3 py-2 rounded-xl border border-outline text-text-2 disabled:opacity-40"
-              disabled={page === 0}
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              type="button"
-            >
-              이전
-            </button>
-
-            <span className="text-text-2">
-              {page + 1} / {pageInfo?.totalPages ?? 1}
-            </span>
-
-            <button
-              className="px-3 py-2 rounded-xl border border-outline text-text-2 disabled:opacity-40"
-              disabled={pageInfo?.last ?? true}
-              onClick={() => setPage((p) => p + 1)}
-              type="button"
-            >
-              다음
-            </button>
-          </div>
+          <Pagination
+            page={page}
+            size={size}
+            totalElements={totalElements}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>

@@ -51,15 +51,15 @@ export default function Profile({
     <button type="button" onClick={onClick} className="w-full text-left">
       <DivBox className="border-2">
         <div className="flex items-center gap-3">
-          <div className="bg-text w-14 h-14 rounded-full">
+          <div className="flex-none bg-text w-14 h-14 rounded-full">
             <div className="text-white text-xl h-full flex items-center justify-center">
               {firstChar || " "}
             </div>
           </div>
 
-          <div>
+          <div className="flex-1">
             <p>{displayName || "\u00A0"}</p>
-            <p className="text-text-3 text-sm line-clamp-2">
+            <p className="text-text-3 text-sm line-clamp-1">
               {displayEmail || "\u00A0"}
             </p>
           </div>
