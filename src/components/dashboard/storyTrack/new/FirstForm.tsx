@@ -123,7 +123,7 @@ export default function FirstForm({ value, onChange }: Props) {
               alt="대표 이미지 미리보기"
               width={800}
               height={800}
-              className="max-w-full object-contain rounded-lg"
+              className="max-w-full max-h-full object-contain rounded-lg"
             />
           ) : (
             <div className="text-center space-y-2">

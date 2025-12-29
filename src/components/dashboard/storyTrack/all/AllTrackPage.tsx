@@ -18,7 +18,13 @@ export default function AllTrackPage() {
   const [status, setStatus] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortOption>("newest");
 
-  const { data: tracks, isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: tracks,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["allStoryTrack", page, size],
     queryFn: async ({ signal }) => {
       return await storyTrackApi.allList({ page, size }, signal);
@@ -68,7 +74,6 @@ export default function AllTrackPage() {
           <p className="text-primary font-medium">불러오기에 실패했어요.</p>
           <pre className="mt-3 text-xs whitespace-pre-wrap text-text-3">
             {error instanceof Error ? error.message : String(error)}
-
           </pre>
           <button
             className="mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
@@ -146,11 +151,10 @@ export default function AllTrackPage() {
 
       {!isLoading && !isError && (
         <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
             {content.map((t) => (
-             <TrackCard key={t.storytrackId} track={t} />
-           ))}
-
+              <TrackCard key={t.storytrackId} track={t} />
+            ))}
 
             {content.length === 0 && (
               <div className="col-span-full text-center text-text-3 py-12">

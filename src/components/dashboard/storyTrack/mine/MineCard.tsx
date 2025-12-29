@@ -9,7 +9,7 @@ export default function MineCard() {
           {/* 이미지로 변경 */}
           <div className="w-full h-40 bg-amber-300 rounded-t-xl"></div>
           {/* 순서o or 순서x */}
-          <div className="absolute top-3 left-3 flex items-center gap-1 px-3 py-2 rounded-lg text-white bg-green-600 text-sm">
+          <div className="absolute top-3 right-3 flex items-center gap-1 px-3 py-2 rounded-lg text-white bg-admin text-sm">
             <ListOrdered size={18} />
             <span>순서대로</span>
             {/* <Shuffle size={18} />

@@ -26,8 +26,9 @@ type StoryTrackItem = {
   isPublic: number;
   price: number;
   totalSteps: number;
-  totalParticipant: number;
   createdAt: string;
+  totalMemberCount: number;
+  memberType: string;
 };
 
 type StoryTrackListPage = {
@@ -63,13 +64,11 @@ type CreateStorytrackResponse = {
   capsuleList: number[]; // capsuleId 배열
 };
 
-
 type ApiEnvelope<T> = {
   code: string;
   message: string;
   data: T;
 };
-
 
 type PageEnvelope<T> = {
   content: T[];
@@ -175,10 +174,12 @@ type StoryTrackMineListPage = {
   last: boolean;
 };
 
-
-
 // 응답 타입
-type PublicStoryTrackListResponse = ApiEnvelope<PageEnvelope<PublicStoryTrackItem>>;
-type JoinedStoryTrackListResponse = ApiEnvelope<PageEnvelope<JoinedStoryTrackItem>>;
+type PublicStoryTrackListResponse = ApiEnvelope<
+  PageEnvelope<PublicStoryTrackItem>
+>;
+type JoinedStoryTrackListResponse = ApiEnvelope<
+  PageEnvelope<JoinedStoryTrackItem>
+>;
 type MineStoryTrackListResponse = ApiEnvelope<PageEnvelope<MineStoryTrackItem>>;
 type StoryTrackMineListResponse = ApiResponse<StoryTrackMineListPage>;
