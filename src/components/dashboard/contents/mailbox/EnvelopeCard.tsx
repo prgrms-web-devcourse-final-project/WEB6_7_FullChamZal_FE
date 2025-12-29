@@ -253,7 +253,7 @@ export default function EnvelopeCard({
             </div>
 
             <div className="absolute top-1/2 left-1/2 -translate-1/2 w-30">
-              <p className="text-center text-sm line-clamp-3">
+              <p className="text-center text-sm line-clamp-3 break-keep">
                 {capsule.title}
               </p>
             </div>
