@@ -21,7 +21,6 @@ export default function AllTrackPage() {
 
   const queryClient = useQueryClient();
 
-  // queryKey를 한 곳에서만 만들기 (prefetch에서도 그대로 재사용)
   const listQueryKey = useMemo(
     () => (p: number) =>
       ["allStoryTrack", p, size, search, status, sort] as const,
@@ -37,7 +36,6 @@ export default function AllTrackPage() {
   } = useQuery({
     queryKey: listQueryKey(page),
     queryFn: async ({ signal }) => {
-      // TODO: 서버가 search/status/sort를 지원하면 params에 함께 넣기
       return await storyTrackApi.allList({ page, size }, signal);
     },
     staleTime: 30_000,
@@ -52,7 +50,6 @@ export default function AllTrackPage() {
 
   // 인접 페이지 프리패치 (이전/다음)
   useEffect(() => {
-    // totalElements가 없거나 로딩 중이면 스킵
     if (!pageInfo) return;
 
     const prefetch = (p: number) =>
