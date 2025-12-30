@@ -2,15 +2,7 @@
 "use client";
 
 import { useMemo, useState, useCallback, useEffect } from "react";
-import {
-  Lock,
-  Unlock,
-  Clock,
-  MapPin,
-  Trash2,
-  Eye,
-  CircleAlert,
-} from "lucide-react";
+import { Lock, Unlock, Clock, MapPin, Trash2, Eye } from "lucide-react";
 import DataTable from "../DataTable";
 import {
   keepPreviousData,
@@ -22,8 +14,8 @@ import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import Pagination from "@/components/common/Pagination";
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import { formatDate } from "@/lib/hooks/formatDate";
-import Modal from "@/components/common/Modal";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 export default function CapsuleList({
   tab,
@@ -315,7 +307,7 @@ export default function CapsuleList({
         onPageChange={setPage}
       />
 
-      {/* 모달 렌더링: open일 때만 마운트(원하면 항상 마운트로 바꿔도 됨) */}
+      {/* 모달 렌더링: open일 때만*/}
       {selectedCapsuleId !== null && (
         <LetterDetailModal
           capsuleId={selectedCapsuleId}
@@ -326,55 +318,18 @@ export default function CapsuleList({
       )}
 
       {isDeletedModalOpen && (
-        <Modal open={isDeletedModalOpen} onClose={closeDeleteModal}>
-          <div className="h-full flex items-center justify-center">
-            <div className="w-full max-w-110 bg-white p-8 rounded-2xl flex flex-col items-center justify-center gap-6">
-              <h3 className="text-xl">
-                정말로 편지를{" "}
-                <span
-                  className={`${
-                    !isRestoring ? "text-blue-800" : "text-primary"
-                  }`}
-                >
-                  {!isRestoring ? "복구" : "삭제"}
-                </span>
-                하시겠습니까?
-              </h3>
-
-              <div className="text-text-3 flex items-center gap-0.5">
-                <CircleAlert size={20} />
-                <p className="text-center">
-                  {!isRestoring
-                    ? "복구 후 다시 목록에 표시됩니다."
-                    : "삭제 후에는 되돌릴 수 없습니다."}
-                </p>
-              </div>
-
-              <div className="w-full flex gap-4">
-                <button
-                  type="button"
-                  onClick={closeDeleteModal}
-                  className="cursor-pointer flex-1 border border-outline py-2 rounded-lg"
-                >
-                  닫기
-                </button>
-
-                <button
-                  type="button"
-                  onClick={confirmDelete}
-                  disabled={toggleDeleteMutation.isPending}
-                  className={`cursor-pointer flex-1  text-white py-2 rounded-lg disabled:opacity-60 ${
-                    !isRestoring
-                      ? "bg-blue-500 hover:bg-blue-600"
-                      : "bg-primary-3 hover:bg-primary-2"
-                  }`}
-                >
-                  {!isRestoring ? "복구" : "삭제"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </Modal>
+        <ConfirmModal
+          active={!isRestoring ? "success" : "fail"}
+          title={!isRestoring ? "편지 복구" : "편지 삭제"}
+          content={
+            !isRestoring
+              ? "복구 후 다시 목록에 표시됩니다. 복구하시겠습니까?"
+              : "삭제 후에는 되돌릴 수 없습니다. 삭제하시겠습니까?"
+          }
+          open={isDeletedModalOpen}
+          onClose={closeDeleteModal}
+          onConfirm={confirmDelete}
+        />
       )}
     </>
   );

@@ -406,21 +406,29 @@ export default function LetterDetailModal({
     queryFn: async ({ signal }) => {
       // 1) 관리자 상세
       if (isAdmin) {
-        const a = await adminCapsulesApi.detail({ capsuleId, signal });
+        const res = await adminCapsulesApi.detail({ capsuleId, signal });
+
+        const payload =
+          (res as any)?.data?.data ?? (res as any)?.data ?? (res as any);
+
+        if (!payload) {
+          throw new Error("관리자 상세 데이터를 불러오지 못했습니다.");
+        }
+
         return {
-          title: a.data.title,
-          content: a.data.content,
-          createdAt: a.data.createdAt,
-          writerNickname: a.data.writerNickname,
-          recipient: a.data.recipientName ?? null,
+          title: payload.title,
+          content: payload.content,
+          createdAt: payload.createdAt,
+          writerNickname: payload.writerNickname,
+          recipient: payload.recipientName ?? null,
 
-          unlockType: a.data.unlockType,
-          unlockAt: a.data.unlockAt,
-          unlockUntil: a.data.unlockUntil ?? null,
+          unlockType: payload.unlockType,
+          unlockAt: payload.unlockAt,
+          unlockUntil: payload.unlockUntil ?? null,
 
-          locationName: a.data.locationAlias || a.data.address || null,
+          locationName: payload.locationAlias || payload.address || null,
 
-          viewStatus: (a.data as any).viewStatus,
+          viewStatus: payload.viewStatus,
           isBookmarked: false,
         };
       }
@@ -497,7 +505,7 @@ export default function LetterDetailModal({
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
-        <div className="flex h-full justify-center py-15">
+        <div className="flex h-full justify-center p-15">
           <div className="max-w-330 w-full rounded-2xl bg-white p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">불러오는 중...</div>
@@ -514,7 +522,7 @@ export default function LetterDetailModal({
   if (isError) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
-        <div className="flex h-full justify-center py-15">
+        <div className="flex h-full justify-center p-15">
           <div className="max-w-330 w-full rounded-2xl bg-white p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">불러오기 실패</div>
@@ -535,7 +543,7 @@ export default function LetterDetailModal({
   if (!data) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
-        <div className="flex h-full justify-center py-15">
+        <div className="flex h-full justify-center p-15">
           <div className="max-w-330 w-full rounded-2xl bg-white p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">편지를 찾을 수 없어요</div>
@@ -744,7 +752,7 @@ export default function LetterDetailModal({
           {/* Body */}
           <div className="flex-1 overflow-hidden">
             <div
-              className="w-full h-full py-15 px-15"
+              className="w-full h-full p-15"
               style={{ backgroundColor: detailHex }}
             >
               <div className="w-full h-full flex flex-col justify-between gap-8">
@@ -837,7 +845,7 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
-                {/* ✅ 저장하기(공개) vs 북마크(보호) 분기 */}
+                {/* 저장하기(공개) vs 북마크(보호) 분기 */}
                 <div className="flex-1 flex items-center justify-center">
                   {isBookmarkMode ? (
                     <button
