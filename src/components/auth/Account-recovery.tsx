@@ -4,42 +4,19 @@ import { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import Button from "@/components/common/Button";
-import { accountRecoveryApi } from "@/lib/api/auth/accountRecovery";
+import {
+  accountRecoveryApi,
+  ConfirmPhoneVerificationRequest,
+  FindPasswordRequest,
+  FindUserIdRequest,
+  SendPhoneVerificationRequest,
+} from "@/lib/api/auth/accountRecovery";
 
 type Mode = "FIND_ID" | "FIND_PW";
-
-function maskUserId(userId: string) {
-  if (userId.length <= 2) return "*".repeat(userId.length);
-  const head = userId.slice(0, 2);
-  const tail = userId.slice(-1);
-  return `${head}${"*".repeat(Math.max(1, userId.length - 3))}${tail}`;
-}
-
-function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null;
-}
-function pickString(obj: Record<string, unknown>, key: string): string | null {
-  const v = obj[key];
-  return typeof v === "string" ? v : null;
-}
-function extractUserIdFromResponse(res: unknown): string | null {
-  if (!isRecord(res)) return null;
-  const data = res["data"];
-  if (!isRecord(data)) return null;
-
-  const direct = pickString(data, "userId") ?? pickString(data, "loginId");
-  if (direct) return direct;
-
-  const nested = data["data"];
-  if (!isRecord(nested)) return null;
-
-  return pickString(nested, "userId") ?? pickString(nested, "loginId");
-}
 
 export default function AccountRecoveryPage() {
   const searchParams = useSearchParams();
 
-  
   const mode = useMemo<Mode>(() => {
     const m = searchParams.get("mode");
     return m === "FIND_PW" ? "FIND_PW" : "FIND_ID";
@@ -51,76 +28,88 @@ export default function AccountRecoveryPage() {
   const [verificationCode, setVerificationCode] = useState("");
   const [verified, setVerified] = useState(false);
 
-  
+  // 아이디 찾기 결과
   const [foundUserId, setFoundUserId] = useState<string | null>(null);
 
-  
+  // 비밀번호 재설정: 사용자가 입력한 아이디
   const [inputUserId, setInputUserId] = useState("");
 
-  
+  // 비밀번호 재설정: 서버에서 전화번호로 조회된 아이디
   const [serverUserId, setServerUserId] = useState<string | null>(null);
+  const [serverIdLoading, setServerIdLoading] = useState(false);
 
   const [newPassword, setNewPassword] = useState("");
   const [newPassword2, setNewPassword2] = useState("");
 
+
   const sendCodeMutation = useMutation({
-    mutationFn: async (payload: {
-      phoneNumber: string;
-      purpose: "FIND_ID" | "FIND_PW";
-      resend: boolean;
-    }) => accountRecoveryApi.sendVerificationCode(payload),
+    mutationFn: (payload: SendPhoneVerificationRequest) =>
+      accountRecoveryApi.sendVerificationCode(payload),
   });
 
   const confirmCodeMutation = useMutation({
-  mutationFn: (payload: {
-    phoneNumber: string;
-    verificationCode: string;
-    purpose: "FIND_ID" | "FIND_PW";
-  }) => accountRecoveryApi.confirmVerificationCode(payload),
-  onSuccess: (res) => {
+    mutationFn: (payload: ConfirmPhoneVerificationRequest) =>
+      accountRecoveryApi.confirmVerificationCode(payload),
+    onSuccess: (res) => {
   
-    if (res.data.verified) setVerified(true);
-  },
-});
-
-const findIdMutation = useMutation({
-  mutationFn: (payload: { phoneNum: string }) => accountRecoveryApi.findUserId(payload),
-  onSuccess: (res) => {
-   
-    const userId = res.data.userId; 
-    setFoundUserId(userId || null);
-  },
-});
-
-
-  const resetPwMutation = useMutation({
-    mutationFn: async (payload: { phoneNum: string; password: string }) =>
-      accountRecoveryApi.findPassword(payload),
+      if (res.data.verified) setVerified(true);
+    },
   });
 
+  const findIdMutation = useMutation({
+    mutationFn: (payload: FindUserIdRequest) => accountRecoveryApi.findUserId(payload),
+    onSuccess: (res) => {
   
+      setFoundUserId(res.data.userId ?? null);
+    },
+  });
+
+  const resetPwMutation = useMutation({
+    mutationFn: (payload: FindPasswordRequest) => accountRecoveryApi.findPassword(payload),
+  });
+
+
   useEffect(() => {
     if (mode !== "FIND_PW") return;
     if (!verified) return;
     if (!phoneNumber.trim()) return;
 
-    
-    findIdMutation.mutate(
-      { phoneNum: phoneNumber },
-      {
-        onSuccess: (res) => {
-          const uid = extractUserIdFromResponse(res);
-          setServerUserId(uid);
-        },
-      }
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, verified]);
+    let cancelled = false;
 
+    (async () => {
+      try {
+        setServerIdLoading(true);
+        const res = await accountRecoveryApi.findUserId({ phoneNum: phoneNumber });
+
+        if (cancelled) return;
+        setServerUserId(res.data.userId ?? null);
+      } finally {
+        if (!cancelled) setServerIdLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, verified, phoneNumber]);
+
+
+  useEffect(() => {
+    setVerified(false);
+    setVerificationCode("");
+    setFoundUserId(null);
+    setServerUserId(null);
+    setInputUserId("");
+    setNewPassword("");
+    setNewPassword2("");
+    setServerIdLoading(false);
+  }, [mode]);
+
+  
   const canSend =
     phoneNumber.trim().length >= 10 &&
     !sendCodeMutation.isPending &&
-    (mode === "FIND_ID" || inputUserId.trim().length > 0); 
+    (mode === "FIND_ID" || inputUserId.trim().length > 0); // PW 모드면 아이디 입력해야 발송
 
   const canConfirm =
     phoneNumber.trim().length >= 10 &&
@@ -129,7 +118,6 @@ const findIdMutation = useMutation({
 
   const canFindId = verified && !findIdMutation.isPending;
 
-  
   const idMatched =
     mode === "FIND_PW" &&
     !!serverUserId &&
@@ -143,16 +131,6 @@ const findIdMutation = useMutation({
     newPassword === newPassword2 &&
     !resetPwMutation.isPending;
 
-  const displayedFoundId = useMemo(() => {
-    if (!foundUserId) return null;
-    return foundUserId.includes("*") ? foundUserId : maskUserId(foundUserId);
-  }, [foundUserId]);
-
-  const displayedServerId = useMemo(() => {
-    if (!serverUserId) return null;
-    return serverUserId.includes("*") ? serverUserId : maskUserId(serverUserId);
-  }, [serverUserId]);
-
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-xl border border-outline rounded-2xl bg-white/80 p-8 space-y-6">
@@ -163,7 +141,7 @@ const findIdMutation = useMutation({
           </p>
         </div>
 
-       
+        {/* 비밀번호 재설정일 때만 아이디 입력 */}
         {mode === "FIND_PW" && (
           <div className="space-y-2">
             <label className="text-sm text-text-2">아이디</label>
@@ -260,10 +238,11 @@ const findIdMutation = useMutation({
               내 아이디 조회
             </Button>
 
-            {displayedFoundId && (
+            {foundUserId && (
               <div className="rounded-xl border border-outline bg-white p-4">
                 <p className="text-sm text-text-2">조회된 아이디</p>
-                <p className="text-lg font-semibold">{displayedFoundId}</p>
+                {/* ✅ 마스킹 제거: 그대로 보여줌 */}
+                <p className="text-lg font-semibold">{foundUserId}</p>
               </div>
             )}
           </div>
@@ -272,14 +251,18 @@ const findIdMutation = useMutation({
         {/* 4) 비밀번호 재설정 */}
         {mode === "FIND_PW" && (
           <div className="space-y-3 border-t border-outline pt-6">
-           
+            {!verified && (
+              <div className="text-sm text-text-3">먼저 전화번호 인증을 완료해주세요.</div>
+            )}
+
             {verified && (
               <div className="rounded-xl border border-outline bg-white p-4 space-y-2">
                 <p className="text-sm text-text-2">이 전화번호로 조회된 아이디</p>
-                <p className="text-lg font-semibold">{displayedServerId ?? "-"}</p>
 
-                {!serverUserId && (
-                  <p className="text-xs text-text-3">아이디 확인 중...</p>
+                {serverIdLoading ? (
+                  <p className="text-sm text-text-3">아이디 확인 중...</p>
+                ) : (
+                  <p className="text-lg font-semibold">{serverUserId ?? "-"}</p>
                 )}
 
                 {serverUserId && !idMatched && (
@@ -290,7 +273,6 @@ const findIdMutation = useMutation({
               </div>
             )}
 
-          
             {verified && idMatched && (
               <>
                 <div className="space-y-2">
@@ -337,11 +319,6 @@ const findIdMutation = useMutation({
                   </div>
                 )}
               </>
-            )}
-
-           
-            {!verified && (
-              <div className="text-sm text-text-3">먼저 전화번호 인증을 완료해주세요.</div>
             )}
           </div>
         )}
