@@ -284,10 +284,14 @@ export default function LetterDetailModal({
     },
   });
 
-  // 좋아요 수 초기화
+  // 좋아요 수 및 상태 초기화
   useEffect(() => {
     if (likeData) {
-      setLikeCount(likeData.likeCount);
+      setLikeCount(likeData.capsuleLikeCount);
+      // isLiked가 있으면 초기 상태 설정 (readLike API 응답에 포함됨)
+      if (typeof likeData.isLiked === "boolean") {
+        setIsLiked(likeData.isLiked);
+      }
     }
   }, [likeData]);
 
@@ -309,7 +313,7 @@ export default function LetterDetailModal({
       return { previousIsLiked, previousLikeCount, nextIsLiked };
     },
     onSuccess: (data, _variables, context) => {
-      if (data.data) setLikeCount(data.data.likeCount);
+      if (data.data) setLikeCount(data.data.capsuleLikeCount);
       if (context) setIsLiked(context.nextIsLiked);
     },
     onError: (err, _variables, context) => {
@@ -721,7 +725,7 @@ export default function LetterDetailModal({
           }}
         />
       )}
-      
+
       {/* 신고 모달 */}
       {isReportOpen && (
         <ReportModal
