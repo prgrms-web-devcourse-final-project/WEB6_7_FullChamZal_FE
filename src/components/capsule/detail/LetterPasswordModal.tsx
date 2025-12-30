@@ -4,7 +4,6 @@
 import { useState } from "react";
 import Button from "@/components/common/Button";
 import Logo from "@/components/common/Logo";
-import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import ForbiddenPage from "./ForbiddenPage";
 
 export default function LetterUnlockModal({
@@ -17,53 +16,20 @@ export default function LetterUnlockModal({
 }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsLoading(true);
-
-    try {
-      const unlockAt = new Date().toISOString();
-
-      const pos = await new Promise<{ lat: number; lng: number }>(
-        (resolve, reject) => {
-          if (!navigator.geolocation) {
-            reject(new Error("위치 정보를 사용할 수 없습니다."));
-            return;
-          }
-
-          navigator.geolocation.getCurrentPosition(
-            (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
-            (err) => reject(err),
-            {
-              enableHighAccuracy: false, // 핵심
-              timeout: 20_000, // 10초 → 20초
-              maximumAge: 60_000, // 최근 위치 캐시 허용(1분)
-            }
-          );
-        }
-      );
-
-      // 실제 read API 호출
-      await guestCapsuleApi.read({
-        capsuleId,
-        unlockAt,
-        locationLat: pos.lat ?? null,
-        locationLng: pos.lng ?? null,
-        password,
-      });
-
-      onSuccess(password);
-    } catch (err: any) {
-      console.error("❌ read capsule error:", err);
-      setError(
-        err?.message || "비밀번호가 올바르지 않거나 조건이 충족되지 않았어요."
-      );
-    } finally {
-      setIsLoading(false);
+    
+    // 비밀번호만 검증하고, 실제 read API는 LetterDetailView에서 호출하도록 변경
+    // 중복 요청 방지를 위해 비밀번호만 onSuccess로 전달
+    if (password.trim().length === 0) {
+      setError("비밀번호를 입력해주세요.");
+      return;
     }
+
+    // 비밀번호만 전달 (read API는 LetterDetailView에서 호출)
+    onSuccess(password);
   };
 
   if (error === "이 캡슐의 수신자가 아닙니다.") return <ForbiddenPage />;
@@ -92,9 +58,9 @@ export default function LetterUnlockModal({
           <Button
             type="submit"
             className="w-full py-2 text-sm font-normal"
-            disabled={isLoading || password.length === 0}
+            disabled={password.length === 0}
           >
-            {isLoading ? "확인 중..." : "편지 열람"}
+            편지 열람
           </Button>
         </form>
       </div>
