@@ -4,9 +4,9 @@ import { Check, CheckCircle } from "lucide-react";
 export default function TrackRoute() {
   return (
     <div className="h-full flex flex-col gap-4">
-      <p className="text-xl">경로 상세</p>
+      <p className="text-base lg:text-xl">경로 상세</p>
 
-      <div className="flex-1 flex gap-4 min-h-0">
+      <div className="flex gap-4 lg:min-h-0">
         <div className="w-full h-full overflow-y-auto space-y-4 pr-2">
           {/* 순서대로 => 번호 / 순서x => 로고 */}
           {/* 순서 버전 */}
