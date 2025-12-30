@@ -11,7 +11,7 @@ export default function TrackRoute() {
           {/* 순서대로 => 번호 / 순서x => 로고 */}
           {/* 순서 버전 */}
           <button className="cursor-pointer w-full rounded-xl border border-outline p-6 flex items-start gap-4 hover:bg-button-hover">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
+            <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
               1
             </div>
             <div className="flex flex-col items-start">
@@ -24,7 +24,7 @@ export default function TrackRoute() {
 
           {/* 순서x 버전 */}
           <button className="cursor-pointer w-full rounded-xl border border-outline p-6 flex items-start gap-4 hover:bg-button-hover">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
+            <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
               <Logo className="text-white w-6 h-6" />
             </div>
             <div className="flex flex-col items-start">
@@ -37,7 +37,7 @@ export default function TrackRoute() {
 
           {/* 편지 확인 버전 */}
           <button className="cursor-pointer w-full rounded-xl border border-green-400 p-6 flex items-start gap-4 bg-green-50">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-green-600 text-white">
+            <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-green-600 text-white">
               <CheckCircle />
             </div>
             <div className="space-y-2">
@@ -59,10 +59,10 @@ export default function TrackRoute() {
             disabled
             className="cursor-pointer w-full rounded-xl border border-outline p-6 flex items-start gap-4 bg-button-hover disabled:cursor-not-allowed"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
+            <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
               3
             </div>
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-start text-left">
               <p className="text-lg">여의도 한강공원</p>
               <p className="text-sm text-text-2">
                 서울특별시 영등포구 여의동로 330
