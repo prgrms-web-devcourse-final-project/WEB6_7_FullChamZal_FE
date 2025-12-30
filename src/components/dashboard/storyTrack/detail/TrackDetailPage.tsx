@@ -12,7 +12,7 @@ import TrackMap from "./TrackMap";
 type TabType = "route" | "map";
 
 export default function TrackDetailPage() {
-  const [tab, setTab] = useState<TabType>("route");
+  const [tab, setTab] = useState<TabType>("map");
 
   return (
     // 모바일: 전체 스크롤

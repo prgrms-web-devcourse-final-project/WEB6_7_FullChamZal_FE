@@ -14,6 +14,8 @@ import {
   type MemberMeDetail,
 } from "@/lib/api/members/members";
 import AccountDeleteModal from "./AccountDeleteModal";
+import { useQuery } from "@tanstack/react-query";
+import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 
 type ProfileForm = {
   name: string;
@@ -201,6 +203,31 @@ export default function ProfileModal({
     onClose();
   };
 
+  /** 보낸 편지 */
+  const { data: sendData } = useQuery({
+    queryKey: ["capsuleDashboard", "send", "count"],
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.sendDashboard({ page: 0, size: 1 }, signal),
+  });
+
+  /** 받은 편지 */
+  const { data: receiveData } = useQuery({
+    queryKey: ["capsuleDashboard", "receive", "count"],
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.receiveDashboard({ page: 0, size: 1 }, signal),
+  });
+
+  /* 북마크 */
+  const { data: bookmarkData } = useQuery({
+    queryKey: ["bookmarks", "count"],
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.bookmarks({ page: 0, size: 1 }, signal),
+  });
+
+  const sendCount = sendData?.data.totalElements ?? 0;
+  const receiveCount = receiveData?.data.totalElements ?? 0;
+  const bookmarkCount = bookmarkData?.totalElements ?? 0;
+
   return (
     <>
       <Modal open={open} onClose={handleClose}>
@@ -250,7 +277,7 @@ export default function ProfileModal({
                     onKeyDown={(e) => {
                       if (e.key === "Enter") verifyPassword();
                     }}
-                    className="w-110 rounded-xl border border-outline px-4 py-3 outline-none focus:ring-2 focus:ring-primary-3"
+                    className="w-full rounded-xl border border-outline px-4 py-3 outline-none focus:ring-2 focus:ring-primary-3"
                     placeholder="비밀번호를 입력해주세요"
                     autoFocus
                   />
@@ -336,16 +363,18 @@ export default function ProfileModal({
 
                 <div className="flex gap-4 text-center">
                   <div className="flex-1 flex flex-col items-center gap-1 border border-outline bg-sub rounded-xl p-4">
-                    <span className="text-2xl">24</span>
+                    <span className="text-2xl">{sendCount}</span>
                     <span className="text-text-3 text-xs">보낸 편지</span>
                   </div>
                   <div className="flex-1 flex flex-col items-center gap-1 border border-outline bg-sub rounded-xl p-4">
-                    <span className="text-2xl">24</span>
+                    <span className="text-2xl">{receiveCount}</span>
                     <span className="text-text-3 text-xs">받은 편지</span>
                   </div>
                   <div className="flex-1 flex flex-col items-center gap-1 border border-outline bg-sub rounded-xl p-4">
-                    <span className="text-2xl">24</span>
-                    <span className="text-text-3 text-xs">소중한 편지</span>
+                    <span className="text-2xl">{bookmarkCount}</span>
+                    <span className="text-text-3 text-xs break-keep">
+                      소중한 편지
+                    </span>
                   </div>
                 </div>
               </>

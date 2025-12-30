@@ -14,7 +14,7 @@ export default function TrackRoute() {
             <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
               1
             </div>
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-start text-left">
               <p className="text-lg">잠실 한강공원</p>
               <p className="text-sm text-text-2">
                 서울특별시 송파구 올림픽로 139
@@ -27,7 +27,7 @@ export default function TrackRoute() {
             <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
               <Logo className="text-white w-6 h-6" />
             </div>
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-start text-left">
               <p className="text-lg">잠실 한강공원</p>
               <p className="text-sm text-text-2">
                 서울특별시 송파구 올림픽로 139
@@ -41,7 +41,7 @@ export default function TrackRoute() {
               <CheckCircle />
             </div>
             <div className="space-y-2">
-              <div className="flex flex-col items-start">
+              <div className="flex flex-col items-start text-left">
                 <p className="text-lg">뚝섬 한강공원</p>
                 <p className="text-sm text-text-2">
                   서울특별시 광진구 강변북로 139
