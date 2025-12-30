@@ -3,8 +3,9 @@
 import DivBox from "@/components/dashboard/DivBox";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function TodayLetters() {
@@ -27,7 +28,6 @@ export default function TodayLetters() {
     queryFn: ({ signal }) => capsuleDashboardApi.dailyUnlocked(signal),
   });
 
-  // 배열은 data?.data.data
   const list = data?.data.data ?? [];
 
   return (
@@ -58,7 +58,7 @@ export default function TodayLetters() {
               >
                 <DivBox className="w-full">
                   <div className="flex flex-col gap-3">
-                    <div className="w-full flex justify-between">
+                    <div className="w-full flex items-start justify-between">
                       {/* 보낸 사람 */}
                       <div className="flex flex-col items-start gap-1">
                         <span className="text-text-3 text-xs">보낸 사람</span>
@@ -66,20 +66,24 @@ export default function TodayLetters() {
                       </div>
 
                       {/* 해제 조건에 따라 아이콘 변경 */}
-                      <div>
-                        <span className="px-3 py-2 rounded-md bg-sub text-sm">
-                          {l.unlockType}
-                        </span>
-                      </div>
+                      <span className="p-2 rounded-md bg-sub text-sm">
+                        {l.locationName === "" ? (
+                          <Clock size={18} />
+                        ) : (
+                          <div className="flex gap-1">
+                            <Clock size={18} />
+                            <MapPin size={18} />
+                          </div>
+                        )}
+                      </span>
                     </div>
 
                     {/* 해제 조건 */}
                     <div className="flex flex-col items-start gap-1">
                       <span className="text-text-3 text-xs">해제 시간</span>
-                      <span>{l.unlockType}</span>
+                      <span>{formatDateTime(l.unlockAt)}</span>
                     </div>
 
-                    {/* D-Day or 거리 */}
                     <div className="flex items-center gap-1 text-text-3">
                       <span className="text-sm ">편지 읽기</span>
                       <ArrowRight size={16} />

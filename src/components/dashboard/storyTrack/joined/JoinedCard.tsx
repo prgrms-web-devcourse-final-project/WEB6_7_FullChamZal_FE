@@ -1,7 +1,15 @@
 "use client";
 
 import Button from "@/components/common/Button";
-import { ListOrdered, MapPin, Play, Shuffle, TrendingUp, Users } from "lucide-react";
+import {
+  ListOrdered,
+  MapPin,
+  Play,
+  Shuffle,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
@@ -14,16 +22,19 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
 
   return (
     <>
-      <div className="border border-outline rounded-xl">
+      <div className="relative border border-outline rounded-xl">
         {/* Top */}
-        <div className="relative">
-          {/* 이미지로 변경 */}
-          <div className="w-full h-40 bg-amber-300 rounded-t-xl"></div>
-          {/* 달성도 */}
-          <div className="absolute top-3 right-3 flex items-center gap-1 px-3 py-2 rounded-lg text-white bg-primary-3 text-sm">
-            <TrendingUp size={18} />
-            <span>{percent}% 완료</span>
-          </div>
+        <Image
+          src="https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"
+          alt={track.title}
+          width={800}
+          height={200}
+          className="w-full h-40 object-cover rounded-t-xl"
+        />
+        {/* 달성도 */}
+        <div className="absolute top-3 right-3 flex items-center gap-1 px-3 py-2 rounded-lg text-white bg-primary-3 text-sm">
+          <TrendingUp size={18} />
+          <span>{percent}% 완료</span>
         </div>
         {/* Bottom */}
         <div className="p-6 space-y-4">
@@ -41,7 +52,7 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
               {/* 그 사람의 프로필 */}
               {track.title?.[0] ?? "?"}
             </div>
-            <p className="text-xs text-text-2">참여</p>
+            <p className="text-xs text-text-2">이름 들어갈 자리</p>
           </div>
 
           {/* 진행 상황 */}
@@ -88,13 +99,15 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
           </div>
 
           {/* 버튼 */}
-          <Button
-            onClick={() => router.push(`/dashboard/storyTrack/${track.storytrackId}`)}
+          {/* <Button
+            onClick={() =>
+              router.push(`/dashboard/storyTrack/${track.storytrackId}`)
+            }
             className="md:font-normal gap-1 w-full py-3"
           >
             <Play size={20} />
             계속하기
-          </Button>
+          </Button> */}
         </div>
       </div>
     </>

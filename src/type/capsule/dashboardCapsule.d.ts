@@ -2,8 +2,8 @@
 type DailyUnlockedCapsuleItem = {
   capsuleId: number;
   sender: string;
-  receiver: string;
-  unlockType: string;
+  unlockAt: string;
+  locationName: string;
 };
 
 /* 오늘 해제될 편지 api 응답 형태 */

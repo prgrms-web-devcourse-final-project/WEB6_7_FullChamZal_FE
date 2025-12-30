@@ -1,6 +1,7 @@
 import { apiFetchRaw } from "../fetchClient";
 
 export const storyTrackApi = {
+  /* 전체 스토리 트랙 리스트 */
   allList: (
     params?: { page?: number; size?: number },
     signal?: AbortSignal
@@ -15,6 +16,38 @@ export const storyTrackApi = {
     return apiFetchRaw<StoryTrackListResponse>(
       `/api/v1/storytrack/List?${sp.toString()}`,
       { signal }
+    );
+  },
+
+  /* 스토리 트랙 참여 */
+  participantStorytrack: (
+    payload: { storytrackId: number },
+    signal?: AbortSignal
+  ) => {
+    return apiFetchRaw<ApiResponse<{ message: string }>>(
+      "/api/v1/storytrack/creat/participant",
+      {
+        method: "POST",
+        json: payload,
+        signal,
+      }
+    );
+  },
+
+  /* 스토리 트랙 참여 삭제 */
+  deleteParticipantStorytrack: (
+    params: { storytrackId: number },
+    signal?: AbortSignal
+  ) => {
+    const sp = new URLSearchParams();
+    sp.set("storytrackId", String(params.storytrackId));
+
+    return apiFetchRaw<ApiResponse<{ message: string }>>(
+      `/api/v1/storytrack/delete/participant?${sp.toString()}`,
+      {
+        method: "DELETE",
+        signal,
+      }
     );
   },
 
@@ -74,9 +107,9 @@ export const storyTrackApi = {
     sp.set("size", String(size));
 
     return apiFetchRaw<StoryTrackJoinedListResponse>(
-  `/api/v1/storytrack/participant/joinedList?${sp.toString()}`,
-  { signal }
-);
+      `/api/v1/storytrack/participant/joinedList?${sp.toString()}`,
+      { signal }
+    );
   },
 
   /**
@@ -95,9 +128,8 @@ export const storyTrackApi = {
     sp.set("size", String(size));
 
     return apiFetchRaw<StoryTrackMineListResponse>(
-  `/api/v1/storytrack/creater/storytrackList?${sp.toString()}`,
-  { signal }
-);
-
+      `/api/v1/storytrack/creater/storytrackList?${sp.toString()}`,
+      { signal }
+    );
   },
 };

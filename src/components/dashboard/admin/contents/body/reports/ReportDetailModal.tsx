@@ -189,6 +189,7 @@ export default function ReportDetailModal({
           queryKey: ["adminReportDetail", reportId],
         }),
         queryClient.invalidateQueries({ queryKey: ["adminReports"] }),
+        queryClient.invalidateQueries({ queryKey: ["adminReportCount"] }),
       ]);
       onClose();
     },
@@ -467,7 +468,7 @@ export default function ReportDetailModal({
                 <div className="space-y-1">
                   <div className="text-xs text-text-3">처리 메모</div>
                   <textarea
-                    className="w-full min-h-[90px] rounded-lg border border-outline p-3 text-sm outline-none focus:ring-2 focus:ring-admin/30"
+                    className="w-full min-h-22.5 rounded-lg border border-outline p-3 text-sm outline-none focus:ring-2 focus:ring-admin/30"
                     value={processMemo}
                     onChange={(e) => setProcessMemo(e.target.value)}
                     placeholder="처리 사유/근거를 남겨주세요. (선택)"

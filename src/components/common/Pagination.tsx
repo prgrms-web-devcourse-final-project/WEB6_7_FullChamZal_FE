@@ -20,7 +20,9 @@ export default function Pagination({
   const isLast = page >= totalPages - 1;
 
   return (
-    <div className={`flex items-center justify-end gap-2 text-sm ${className}`}>
+    <div
+      className={`flex items-center justify-center gap-2 text-sm ${className}`}
+    >
       <span className="text-text-4">
         총 {totalElements}개 · {page + 1}/{totalPages}
       </span>

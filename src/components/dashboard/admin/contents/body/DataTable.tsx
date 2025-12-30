@@ -31,7 +31,7 @@ export default function DataTable<T>({
 
   return (
     <div className="rounded-2xl border border-outline overflow-x-auto overflow-y-hidden">
-      <table className="min-w-[1550px]">
+      <table className="min-w-387.5">
         <thead>
           <tr className="border-b border-outline text-left [&>th]:py-4 [&>th]:px-6">
             {columns.map((col) => (

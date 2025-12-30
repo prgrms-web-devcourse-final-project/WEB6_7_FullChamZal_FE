@@ -16,6 +16,8 @@ type FirstFormValue = {
   imageFile: File | null;
 };
 
+type MemberType = "CREATOR" | "NOT_JOIN" | "PARTICIPANT" | "COMPLETED";
+
 /* 전체 스토리 트랙 리스트 */
 type StoryTrackItem = {
   storytrackId: number;
@@ -28,7 +30,7 @@ type StoryTrackItem = {
   totalSteps: number;
   createdAt: string;
   totalMemberCount: number;
-  memberType: string;
+  memberType: MemberType;
 };
 
 type StoryTrackListPage = {

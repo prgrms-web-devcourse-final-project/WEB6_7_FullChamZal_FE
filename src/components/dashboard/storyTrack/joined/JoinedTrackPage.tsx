@@ -1,19 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import StoryHeader from "../common/StoryHeader";
 import StoryMenuTab from "../common/StoryMenuTab";
 import JoinedCard from "./JoinedCard";
 
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
+import Pagination from "@/components/common/Pagination";
 
 export default function JoinedTrackPage() {
   const [page, setPage] = useState(0);
-  const size = 10;
+  const [size] = useState(15);
 
-  const { data: tracks, isLoading, isError, error, refetch } = useQuery({
+  const queryClient = useQueryClient();
+
+  const {
+    data: tracks,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["joinedStoryTrack", page, size],
     queryFn: async ({ signal }) => {
       return await storyTrackApi.joinedList({ page, size }, signal);
@@ -21,7 +30,29 @@ export default function JoinedTrackPage() {
   });
 
   const pageInfo = tracks?.data;
-  const content: StoryTrackJoinedItem[] = (pageInfo?.content ?? []) as StoryTrackJoinedItem[];
+  const content: StoryTrackJoinedItem[] = (pageInfo?.content ??
+    []) as StoryTrackJoinedItem[];
+
+  const totalElements = pageInfo?.totalElements ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+  const lastPage = totalPages - 1;
+
+  // 인접 페이지 프리패치 (이전/다음)
+  useEffect(() => {
+    // totalElements가 없거나 로딩 중이면 스킵
+    if (!pageInfo) return;
+
+    const prefetch = (p: number) =>
+      queryClient.prefetchQuery({
+        queryKey: ["joinedStoryTrack", page, size],
+        queryFn: ({ signal }) =>
+          storyTrackApi.allList({ page: p, size }, signal),
+        staleTime: 30_000,
+      });
+
+    if (page > 0) prefetch(page - 1);
+    if (page < lastPage) prefetch(page + 1);
+  }, [pageInfo, page, lastPage, size, queryClient]);
 
   return (
     <>
@@ -59,45 +90,25 @@ export default function JoinedTrackPage() {
         {/* List */}
         {!isLoading && !isError && (
           <>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {content.map((t) => (
-                <JoinedCard
-                  key={t.storytrackId}
-                  track={t}
-                />
+                <JoinedCard key={t.storytrackId} track={t} />
               ))}
 
               {content.length === 0 && (
-                <div className="col-span-3 text-center text-text-3 py-12">
+                <div className="col-span-1 md:col-span-3 lg:col-span-4 text-center text-text-3 py-12">
                   참여한 트랙이 없어요.
                 </div>
               )}
             </div>
 
             {/* 페이지네이션 */}
-            <div className="flex items-center justify-center gap-3 pt-4">
-              <button
-                className="px-3 py-2 rounded-xl border border-outline text-text-2 disabled:opacity-40"
-                disabled={page === 0}
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                type="button"
-              >
-                이전
-              </button>
-
-              <span className="text-text-2">
-                {page + 1} / {pageInfo?.totalPages ?? 1}
-              </span>
-
-              <button
-                className="px-3 py-2 rounded-xl border border-outline text-text-2 disabled:opacity-40"
-                disabled={pageInfo?.last ?? true}
-                onClick={() => setPage((p) => p + 1)}
-                type="button"
-              >
-                다음
-              </button>
-            </div>
+            <Pagination
+              page={page}
+              size={size}
+              totalElements={totalElements}
+              onPageChange={setPage}
+            />
           </>
         )}
       </div>

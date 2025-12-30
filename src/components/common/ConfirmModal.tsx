@@ -18,8 +18,8 @@ export default function ConfirmModal({
   onConfirm: () => void;
 }) {
   return (
-    <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-[420px] flex flex-col items-center gap-4 rounded-2xl border-2 border-outline bg-white p-6">
+    <Modal open={open} onClose={onClose} zIndexClassName="z-[20000]">
+      <div className="w-full max-w-105 flex flex-col items-center gap-4 rounded-2xl border-2 border-outline bg-white p-6">
         <div className="w-16 h-16 rounded-full bg-sub flex items-center justify-center">
           {active === "fail" ? (
             <X size={32} strokeWidth={1} />
@@ -51,4 +51,3 @@ export default function ConfirmModal({
     </Modal>
   );
 }
-

@@ -13,6 +13,7 @@ import {
 import DataTable from "../DataTable";
 import Pagination from "@/components/common/Pagination";
 import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 export default function UserList({
   tab,
@@ -23,6 +24,14 @@ export default function UserList({
 }) {
   const [page, setPage] = useState(0);
   const [size] = useState(6);
+
+  /* 확인 모달 */
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{
+    id: number;
+    nextStatus: AdminStatus;
+    nickname?: string;
+  } | null>(null);
 
   // 탭/검색 변경 시 페이지 리셋
   useEffect(() => {
@@ -148,9 +157,13 @@ export default function UserList({
             <div className="inline-flex items-center gap-1 rounded-lg bg-[#DCFCE7] px-3 py-1 text-green-800">
               <CheckCircle size={14} /> 활성
             </div>
-          ) : (
+          ) : u.status === "STOP" ? (
             <div className="inline-flex items-center gap-1 rounded-lg bg-red-100 px-3 py-1 text-red-800">
               <Ban size={14} /> 정지
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1 rounded-lg bg-admin px-3 py-1 text-white">
+              <Ban size={14} /> 탈퇴
             </div>
           ),
       },
@@ -161,11 +174,18 @@ export default function UserList({
           const nextStatus: AdminStatus =
             u.status === "ACTIVE" ? "STOP" : "ACTIVE";
 
-          return (
+          return u.status === "EXIT" ? null : (
             <button
               type="button"
               disabled={toggleMutation.isPending}
-              onClick={() => toggleMutation.mutate({ id: u.id, nextStatus })}
+              onClick={() => {
+                setPendingAction({
+                  id: u.id,
+                  nextStatus,
+                  nickname: u.nickname,
+                });
+                setConfirmOpen(true);
+              }}
               className={`cursor-pointer px-3 py-1 rounded-lg text-white disabled:opacity-50 ${
                 u.status === "ACTIVE"
                   ? "bg-primary hover:bg-red-300"
@@ -182,22 +202,52 @@ export default function UserList({
   );
 
   return (
-    <div className="space-y-3">
-      <DataTable
-        columns={columns}
-        rows={users}
-        getRowKey={(u: AdminUser) => u.id}
-        emptyMessage={"표시할 사용자가 없습니다."}
-        isLoading={isLoading}
-        skeletonRowCount={size}
+    <>
+      <ConfirmModal
+        active={pendingAction?.nextStatus === "STOP" ? "fail" : "success"}
+        title={
+          pendingAction?.nextStatus === "STOP" ? "사용자 정지" : "정지 해제"
+        }
+        content={
+          pendingAction?.nextStatus === "STOP"
+            ? `${pendingAction?.nickname ?? "해당 사용자"}를 정지하시겠습니까?`
+            : `${
+                pendingAction?.nickname ?? "해당 사용자"
+              }의 정지를 해제하시겠습니까?`
+        }
+        open={confirmOpen}
+        onClose={() => {
+          setConfirmOpen(false);
+          setPendingAction(null);
+        }}
+        onConfirm={() => {
+          if (!pendingAction) return;
+          toggleMutation.mutate({
+            id: pendingAction.id,
+            nextStatus: pendingAction.nextStatus,
+          });
+          setConfirmOpen(false);
+          setPendingAction(null);
+        }}
       />
 
-      <Pagination
-        page={page}
-        size={size}
-        totalElements={totalElements}
-        onPageChange={setPage}
-      />
-    </div>
+      <div className="space-y-3">
+        <DataTable
+          columns={columns}
+          rows={users}
+          getRowKey={(u: AdminUser) => u.id}
+          emptyMessage={"표시할 사용자가 없습니다."}
+          isLoading={isLoading}
+          skeletonRowCount={size}
+        />
+
+        <Pagination
+          page={page}
+          size={size}
+          totalElements={totalElements}
+          onPageChange={setPage}
+        />
+      </div>
+    </>
   );
 }

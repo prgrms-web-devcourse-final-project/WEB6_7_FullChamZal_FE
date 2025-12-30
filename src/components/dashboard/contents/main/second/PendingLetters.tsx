@@ -85,16 +85,17 @@ function getRightIcon(type: string) {
 }
 
 export default function PendingLetters() {
-  const { data, isLoading, isError } = useQuery<unknown>({
+  const { data, isLoading, isError } = useQuery<
+    PageResponse<CapsuleDashboardItem>
+  >({
     queryKey: ["capsuleDashboard", "receive"],
-    queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.receiveDashboard(undefined, signal),
     staleTime: 30_000,
     retry: 1,
   });
 
-  const receiveList: CapsuleDashboardItem[] = Array.isArray(data)
-    ? (data as CapsuleDashboardItem[])
-    : [];
+  const receiveList = data?.data.content ?? [];
 
   /* 현재 위치 */
   const [myLocation, setMyLocation] = useState<{
@@ -167,17 +168,20 @@ export default function PendingLetters() {
             let subText = "-";
             let SubIcon = Clock;
 
-            // TIME / TIME_AND_LOCATION → D-Day
-            if (
+            // unlockType별 기본값 먼저
+            if (l.unlockType === "LOCATION") {
+              SubIcon = MapPin;
+              subText = "거리 정보 없음"; // 원하면 "-"로 둬도 됨
+            } else if (
               (l.unlockType === "TIME" ||
                 l.unlockType === "TIME_AND_LOCATION") &&
               l.unlockAt
             ) {
-              subText = formatDDay(l.unlockAt);
               SubIcon = Clock;
+              subText = formatDDay(l.unlockAt);
             }
 
-            // LOCATION → 거리
+            // LOCATION + 위치정보 있으면 거리로 업데이트
             if (
               l.unlockType === "LOCATION" &&
               myLocation &&
@@ -191,7 +195,6 @@ export default function PendingLetters() {
                 l.locationLng
               );
               subText = formatDistance(km);
-              SubIcon = MapPin;
             }
 
             return (

@@ -31,6 +31,13 @@ export default function CapsuleSection() {
     staleTime: 30_000,
   });
 
+  const qPrivate = useQuery({
+    queryKey: ["adminCapsulesCount", "private"],
+    queryFn: ({ signal }) =>
+      adminCapsulesApi.list({ tab: "private", ...base, signal }),
+    staleTime: 30_000,
+  });
+
   const qLocked = useQuery({
     queryKey: ["adminCapsulesCount", "locked"],
     queryFn: ({ signal }) =>
@@ -38,18 +45,11 @@ export default function CapsuleSection() {
     staleTime: 30_000,
   });
 
-  const qOpened = useQuery({
-    queryKey: ["adminCapsulesCount", "opened"],
-    queryFn: ({ signal }) =>
-      adminCapsulesApi.list({ tab: "opened", ...base, signal }),
-    staleTime: 30_000,
-  });
-
   const counts = {
     total: qAll.data?.totalElements ?? 0,
     public: qPublic.data?.totalElements ?? 0,
-    private: qLocked.data?.totalElements ?? 0,
-    lock: qOpened.data?.totalElements ?? 0,
+    private: qPrivate.data?.totalElements ?? 0,
+    lock: qLocked.data?.totalElements ?? 0,
   };
 
   return (
