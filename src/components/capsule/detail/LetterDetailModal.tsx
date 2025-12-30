@@ -37,6 +37,7 @@ import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import {
+  backupCapsule,
   deleteCapsuleAsReceiver,
   deleteCapsuleAsSender,
   getCapsuleLikeCount,
@@ -145,6 +146,9 @@ export default function LetterDetailModal({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isDeleteSuccessOpen, setIsDeleteSuccessOpen] = useState(false);
 
+  // 백업
+  const [isBackupSuccessOpen, setIsBackupSuccessOpen] = useState(false);
+
   // 좋아요
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -239,6 +243,29 @@ export default function LetterDetailModal({
           : typeof err === "string"
           ? err
           : "삭제 중 오류가 발생했습니다.";
+      alert(msg);
+    },
+  });
+
+  //백업 mutation
+  const backupMutation = useMutation({
+    mutationKey: ["capsuleBackup", capsuleId],
+    mutationFn: backupCapsule,
+    onSuccess: (res) => {
+      const url = res.data.authUrl;
+      if (res.data.status === "NEED_CONNECT") {
+        window.open(url, "_blank");
+        return;
+      }
+      setIsBackupSuccessOpen(true);
+    },
+    onError: (err) => {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+          ? err
+          : "백업 중 오류가 발생했습니다.";
       alert(msg);
     },
   });
@@ -610,6 +637,15 @@ export default function LetterDetailModal({
         />
       )}
 
+      {backupMutation.isPending && (
+        <div className="fixed inset-0 z-1000 bg-black/40 flex items-center justify-center">
+          <div className="bg-white rounded-xl px-6 py-4 flex items-center gap-3">
+            <span className="animate-spin rounded-full h-5 w-5 border-2 border-primary-2 border-t-transparent" />
+            <span className="text-sm font-medium">백업 중...</span>
+          </div>
+        </div>
+      )}
+
       {/* 북마크 성공 모달 */}
       {bookmarkToast.open && (
         <ActiveModal
@@ -661,6 +697,23 @@ export default function LetterDetailModal({
         />
       )}
 
+      {/* 백업 성공 모달 */}
+      {isBackupSuccessOpen && (
+        <ActiveModal
+          active="success"
+          title="백업 완료"
+          content="구글 드라이브에 캡슐 내용이 저장되었습니다."
+          open={isBackupSuccessOpen}
+          onClose={() => setIsBackupSuccessOpen(false)}
+          onConfirm={() => {
+            setIsBackupSuccessOpen(false);
+            if (closeHref) router.push(closeHref);
+            else router.back();
+            router.refresh();
+          }}
+        />
+      )}
+      
       {/* 신고 모달 */}
       {isReportOpen && (
         <ReportModal
@@ -710,6 +763,16 @@ export default function LetterDetailModal({
                       <DropdownMenuLabel>관리</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
+                        {isReceiver && (
+                          <DropdownMenuItem
+                            onClick={() => backupMutation.mutate(capsuleId)}
+                          >
+                            <PencilLine className="text-primary" />
+                            {backupMutation.isPending
+                              ? "백업 중..."
+                              : "백업하기"}
+                          </DropdownMenuItem>
+                        )}
                         {isSender && (
                           <DropdownMenuItem
                             onClick={() => {

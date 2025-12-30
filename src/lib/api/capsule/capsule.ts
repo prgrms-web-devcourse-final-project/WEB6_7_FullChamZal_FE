@@ -402,3 +402,19 @@ export async function readSendCapsule(
     }
   );
 }
+
+/**
+ * 구글 드라이브 백업 API 호출
+ * 사용자가 수신한 캡슐을 구글 드라이브에 CSV 파일로 백업합니다.
+ * @param capsuleId 캡슐 ID
+ */
+export async function backupCapsule(
+  capsuleId: number
+): Promise<ApiResponse<CapsuleBackupResponse>> {
+  return apiFetchRaw<ApiResponse<CapsuleBackupResponse>>(
+    `/api/v1/backup/google-drive/${capsuleId}`,
+    {
+      method: "POST",
+    }
+  );
+}
