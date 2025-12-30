@@ -28,7 +28,7 @@ export default function UnlockConditionTabs({
             type="button"
             disabled={tab.disabled}
             onClick={() => onChange(tab.id)}
-            className={`cursor-pointer w-full flex flex-col items-center rounded-xl p-4 gap-1.5 border-2 transition
+            className={`cursor-pointer w-full flex flex-col items-center rounded-xl py-3 px-2 md:p-4 gap-1.5 border-2 transition
               ${
                 tab.disabled
                   ? "opacity-40 cursor-not-allowed border-outline"
@@ -51,7 +51,9 @@ export default function UnlockConditionTabs({
             </div>
 
             <p className="text-sm">{tab.title}</p>
-            <p className="text-xs text-text-3 text-center">{tab.description}</p>
+            <p className="hidden md:block text-xs text-text-3 text-center">
+              {tab.description}
+            </p>
           </button>
         );
       })}

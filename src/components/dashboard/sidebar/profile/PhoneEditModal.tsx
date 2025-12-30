@@ -17,7 +17,6 @@ const getErrorMessage = (e: unknown) => {
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
 const isValidKrMobile = (v: string) => /^010\d{8}$/.test(digitsOnly(v));
 
-
 export default function PhoneEditModal({
   open,
   onClose,
@@ -166,7 +165,7 @@ export default function PhoneEditModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-[420px] rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
         <div className="flex items-center justify-between">
           <h4 className="text-lg">전화번호 수정</h4>
           <button onClick={onClose} className="cursor-pointer" type="button">
@@ -197,8 +196,16 @@ export default function PhoneEditModal({
           />
 
           {step === "INPUT" ? (
-            <Button className="w-full py-3" onClick={onSend} disabled={!canSend}>
-              {isSending ? "전송 중..." : cooldown > 0 ? `${cooldown}s` : "인증번호 전송"}
+            <Button
+              className="w-full py-3"
+              onClick={onSend}
+              disabled={!canSend}
+            >
+              {isSending
+                ? "전송 중..."
+                : cooldown > 0
+                ? `${cooldown}s`
+                : "인증번호 전송"}
             </Button>
           ) : (
             <>
@@ -229,7 +236,11 @@ export default function PhoneEditModal({
                   onClick={onConfirmAndSave}
                   disabled={!canConfirm}
                 >
-                  {isSaving ? "저장 중..." : isConfirming ? "확인 중..." : "확인 후 저장"}
+                  {isSaving
+                    ? "저장 중..."
+                    : isConfirming
+                    ? "확인 중..."
+                    : "확인 후 저장"}
                 </Button>
               </div>
 
@@ -239,7 +250,11 @@ export default function PhoneEditModal({
                 onClick={onSend}
                 disabled={!canSend}
               >
-                {isSending ? "전송 중..." : cooldown > 0 ? `${cooldown}s` : "인증번호 재전송"}
+                {isSending
+                  ? "전송 중..."
+                  : cooldown > 0
+                  ? `${cooldown}s`
+                  : "인증번호 재전송"}
               </Button>
             </>
           )}

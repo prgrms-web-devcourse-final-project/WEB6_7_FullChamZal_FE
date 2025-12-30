@@ -23,7 +23,7 @@ export default function Left({
 }) {
   return (
     <>
-      <section className="p-8">
+      <section className="p-4 lg:p-8">
         <WriteForm preview={preview} onPreviewChange={onPreviewChange} />
       </section>
     </>

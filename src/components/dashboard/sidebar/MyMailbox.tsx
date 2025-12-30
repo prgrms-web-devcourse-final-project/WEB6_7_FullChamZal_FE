@@ -14,7 +14,7 @@ export default function MyMailbox({ onNavigate }: { onNavigate?: () => void }) {
   const isReceive = pathname.startsWith("/dashboard/receive");
   const isBookmark = pathname.startsWith("/dashboard/bookmark");
 
-  const baseBoxClass = "px-5 py-3 rounded-[10px]";
+  const baseBoxClass = "py-2 px-5 lg:py-3 rounded-[10px]";
   const activeBoxClass =
     "bg-primary-2 border-primary-2/0 text-white shadow-md hover:bg-primary-2";
 
@@ -64,11 +64,13 @@ export default function MyMailbox({ onNavigate }: { onNavigate?: () => void }) {
               <Send className={isSend ? "text-white" : "text-primary"} />
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-sm ${isSend ? "text-white" : "text-text-3"}`}
+                  className={`text-xs lg:text-sm ${
+                    isSend ? "text-white" : "text-text-3"
+                  }`}
                 >
                   보낸 편지
                 </span>
-                <span className="text-2xl">{sendCount}</span>
+                <span className="text-lg lg:text-2xl">{sendCount}</span>
               </div>
             </div>
           </DivBox>
@@ -83,13 +85,13 @@ export default function MyMailbox({ onNavigate }: { onNavigate?: () => void }) {
               <Inbox className={isReceive ? "text-white" : "text-primary"} />
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-sm ${
+                  className={`text-xs lg:text-sm ${
                     isReceive ? "text-white" : "text-text-3"
                   }`}
                 >
                   받은 편지
                 </span>
-                <span className="text-2xl">{receiveCount}</span>
+                <span className="text-lg lg:text-2xl">{receiveCount}</span>
               </div>
             </div>
           </DivBox>
@@ -104,13 +106,13 @@ export default function MyMailbox({ onNavigate }: { onNavigate?: () => void }) {
               <Heart className={isBookmark ? "text-white" : "text-primary"} />
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-sm ${
+                  className={`text-xs lg:text-sm ${
                     isBookmark ? "text-white" : "text-text-3"
                   }`}
                 >
                   소중한 편지
                 </span>
-                <span className="text-2xl">{bookmarkCount}</span>
+                <span className="text-lg lg:text-2xl">{bookmarkCount}</span>
               </div>
             </div>
           </DivBox>

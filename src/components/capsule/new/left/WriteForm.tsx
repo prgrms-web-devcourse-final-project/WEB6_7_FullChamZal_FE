@@ -391,7 +391,7 @@ export default function WriteForm({
 
   return (
     <>
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
         <WriteDiv title="공개 범위">
           <VisibilityOpt value={visibility} onChange={setVisibility} />
 
@@ -440,9 +440,6 @@ export default function WriteForm({
                     )}
                   </button>
                 ))}
-                <div className="aspect-square rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
-                  업로드
-                </div>
               </div>
             ) : (
               <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
@@ -468,9 +465,6 @@ export default function WriteForm({
                     )}
                   </button>
                 ))}
-                <div className="aspect-square rounded-2xl border-2 border-dashed border-outline flex items-center justify-center text-text-3">
-                  업로드
-                </div>
               </div>
             )}
           </div>
@@ -545,7 +539,7 @@ export default function WriteForm({
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={handleCompositionEnd}
               maxLength={MAX_CONTENT_LENGTH}
-              className="w-full h-60 bg-sub-2 p-3 rounded-lg resize-none outline-none border border-white focus:border focus:border-primary-2"
+              className="placeholder:text-sm md:placeholder:text-base w-full h-40 md:h-60 bg-sub-2 p-3 rounded-lg resize-none outline-none border border-white focus:border focus:border-primary-2"
               placeholder="마음을 담아 편지를 써보세요..."
             />
 
@@ -686,9 +680,11 @@ export default function WriteForm({
           </WriteDiv>
         )}
 
-        <Button type="submit" className="w-full py-4 space-x-2">
-          <Send />
-          <span>{isSubmitting ? "보내는 중..." : "편지 보내기"}</span>
+        <Button type="submit" className="w-full py-2 md:py-4 space-x-2">
+          <Send className="w-4 md:w-6" />
+          <span className="text-sm md:text-base">
+            {isSubmitting ? "보내는 중..." : "편지 보내기"}
+          </span>
         </Button>
       </form>
 

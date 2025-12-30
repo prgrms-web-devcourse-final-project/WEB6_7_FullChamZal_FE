@@ -21,7 +21,7 @@ export default function Modal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onMouseDown={onClose} // backdrop 클릭 닫기
+          onMouseDown={onClose}
         >
           <motion.div
             className="relative w-full h-dvh overflow-y-auto overscroll-contain touch-pan-y flex items-start justify-center px-6 lg:px-8 py-6 lg:items-center"
