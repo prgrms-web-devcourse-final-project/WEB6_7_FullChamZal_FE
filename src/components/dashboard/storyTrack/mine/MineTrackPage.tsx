@@ -54,7 +54,7 @@ export default function MineTrackPage() {
 
   return (
     <>
-      <div className="p-8 space-y-6">
+      <div className="p-4 space-y-4 lg:p-8 lg:space-y-6">
         {/* 헤더 */}
         <StoryHeader />
 

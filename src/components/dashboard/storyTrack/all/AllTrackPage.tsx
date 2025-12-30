@@ -68,15 +68,15 @@ export default function AllTrackPage() {
   }, [pageInfo, page, lastPage, size, queryClient, listQueryKey]);
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 space-y-4 lg:p-8 lg:space-y-6">
       <div className="space-y-3 flex-none">
         <BackButton />
         <div className="space-y-2">
-          <h3 className="text-3xl font-medium">
+          <h3 className="text-xl lg:text-3xl font-medium">
             공개 스토리트랙 둘러보기
             <span className="text-primary px-1">_</span>
           </h3>
-          <p className="text-text-2">
+          <p className="text-sm lg:text-base text-text-2">
             다양한 스토리트랙을 탐색하고 참여해보세요
           </p>
         </div>

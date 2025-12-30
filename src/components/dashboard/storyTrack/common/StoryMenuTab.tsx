@@ -10,51 +10,68 @@ export default function StoryMenuTab() {
 
   const isJoined = pathname.includes("/joined");
   const isMine = pathname.includes("/mine");
+  const isAll = pathname.includes("/all");
+  const isNew = pathname.includes("/new");
 
-  const baseBtn = "border-2 md:font-normal px-5 py-3 gap-1 text-sm";
+  const baseBtn =
+    "border-2 md:font-normal px-4 py-3 md:px-5 gap-1 text-sm flex items-center justify-center";
 
   const activeBtn = "bg-white border-primary-2 text-primary-2 hover:bg-white";
-
   const inactiveBtn = "bg-white border-outline text-text hover:bg-button-hover";
 
-  return (
-    <>
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        {/* 왼쪽 */}
-        <div className="space-x-6">
-          <Button
-            onClick={() => router.push("/dashboard/storyTrack/joined")}
-            className={`${baseBtn} ${isJoined ? activeBtn : inactiveBtn}`}
-          >
-            <Users size={18} />
-            참여 중인 트랙
-          </Button>
+  // 모바일: 선택된 탭만 텍스트 노출, 나머지는 아이콘만
+  const labelClass = (active: boolean) =>
+    active ? "inline md:inline" : "hidden md:inline";
 
-          <Button
-            onClick={() => router.push("/dashboard/storyTrack/mine")}
-            className={`${baseBtn} ${isMine ? activeBtn : inactiveBtn}`}
-          >
-            <Map size={18} />
-            내가 만든 트랙
-          </Button>
-        </div>
-        {/* 오른쪽 */}
-        <div className="space-x-6">
-          <Button
-            onClick={() => router.push("/dashboard/storyTrack/all")}
-            className="bg-white border-2 border-outline text-text md:font-normal px-5 py-3 gap-1 text-sm hover:bg-button-hover"
-          >
-            <Compass size={18} />
-            전체 트랙 보기
-          </Button>
-          <Button
-            onClick={() => router.push("/dashboard/storyTrack/new")}
-            className="bg-primary-2 border-2 border-primary-2 hover:bg-primary-3 hover:border-primary-3 md:font-normal px-5 py-3 gap-1 text-sm"
-          >
-            <Plus size={18} />새 트랙 만들기
-          </Button>
-        </div>
+  return (
+    <div className="flex flex-row justify-between md:items-center gap-4">
+      {/* 왼쪽 */}
+      <div className="flex gap-2 md:gap-6">
+        <Button
+          onClick={() => router.push("/dashboard/storyTrack/joined")}
+          className={`${baseBtn} ${isJoined ? activeBtn : inactiveBtn}`}
+          aria-label="참여 중인 트랙"
+          title="참여 중인 트랙"
+        >
+          <Users size={18} />
+          <span className={labelClass(isJoined)}>참여 중인 트랙</span>
+        </Button>
+
+        <Button
+          onClick={() => router.push("/dashboard/storyTrack/mine")}
+          className={`${baseBtn} ${isMine ? activeBtn : inactiveBtn}`}
+          aria-label="내가 만든 트랙"
+          title="내가 만든 트랙"
+        >
+          <Map size={18} />
+          <span className={labelClass(isMine)}>내가 만든 트랙</span>
+        </Button>
       </div>
-    </>
+
+      {/* 오른쪽 */}
+      <div className="flex gap-2 md:gap-6">
+        <Button
+          onClick={() => router.push("/dashboard/storyTrack/all")}
+          className={`${baseBtn} ${isAll ? activeBtn : inactiveBtn}`}
+          aria-label="전체 트랙 보기"
+          title="전체 트랙 보기"
+        >
+          <Compass size={18} />
+          <span className={labelClass(isAll)}>전체 트랙 보기</span>
+        </Button>
+
+        <Button
+          onClick={() => router.push("/dashboard/storyTrack/new")}
+          className={`bg-primary-2 border-2 border-primary-2 hover:bg-primary-3 hover:border-primary-3 md:font-normal px-4 py-3 md:px-5 gap-1 text-sm flex items-center justify-center ${
+            isNew ? "" : ""
+          }`}
+          aria-label="새 트랙 만들기"
+          title="새 트랙 만들기"
+        >
+          <Plus size={18} />
+          <span className={labelClass(isNew)}>새 트랙 만들기</span>
+        </Button>
+      </div>
+    </div>
   );
 }
