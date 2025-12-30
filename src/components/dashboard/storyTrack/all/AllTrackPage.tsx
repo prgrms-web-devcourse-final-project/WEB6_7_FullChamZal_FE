@@ -92,7 +92,7 @@ export default function AllTrackPage() {
           }}
           type="text"
           placeholder="스토리트랙 검색..."
-          className="w-full p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
+          className="w-full p-2.5 pl-10 md:p-4 md:pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
         />
       </div>
 
@@ -118,7 +118,8 @@ export default function AllTrackPage() {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      {/* 필터 */}
+      <div className="flex flex-wrap items-center gap-2 text-xs md:text-base">
         <div className="flex gap-2">
           <button
             onClick={() => {
@@ -170,7 +171,7 @@ export default function AllTrackPage() {
               setSort(e.target.value as SortOption);
               setPage(0);
             }}
-            className="cursor-pointer appearance-none h-11 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
+            className="cursor-pointer appearance-none py-2 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
           >
             <option value="newest">최신순</option>
             <option value="popular">인기순</option>

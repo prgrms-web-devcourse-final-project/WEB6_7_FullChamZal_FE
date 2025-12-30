@@ -10,7 +10,7 @@ export default function QuickWrite() {
   return (
     <>
       <DivBox className="cursor-auto hover:bg-sub/0">
-        <div className="space-y-8">
+        <div className="space-y-6 lg:space-y-8">
           <div className="flex items-center gap-3">
             <PencilLine className="text-primary" />
             <div>

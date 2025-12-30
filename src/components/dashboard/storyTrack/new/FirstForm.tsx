@@ -27,9 +27,9 @@ export default function FirstForm({ value, onChange }: Props) {
     <div className="h-full min-h-0">
       <div className="flex gap-8 h-full min-h-0">
         {/* Left - 입력 폼 */}
-        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 flex flex-col">
+        <div className="flex-1 w-full h-full min-h-0 border border-outline rounded-xl p-4 lg:p-8 flex flex-col">
           {/* 스크롤 영역 */}
-          <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-6">
+          <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-4 lg:space-y-6">
             {/* 제목 */}
             <div className="flex flex-col gap-2">
               <label htmlFor="title" className="text-sm">
@@ -112,11 +112,30 @@ export default function FirstForm({ value, onChange }: Props) {
                 className="cursor-pointer border border-outline rounded-lg py-2 px-4 outline-none file:mr-4 file:rounded-md file:border-0 file:bg-button-hover file:px-3 file:py-1.5 file:text-sm file:text-text hover:file:bg-outline/40"
               />
             </div>
+
+            <div className="block md:hidden">
+              {previewUrl ? (
+                <Image
+                  src={previewUrl}
+                  alt="대표 이미지 미리보기"
+                  width={800}
+                  height={800}
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+              ) : (
+                <div className="text-center space-y-2">
+                  <div className="text-base text-text-3">이미지 미리보기</div>
+                  <div className="text-sm text-text-4">
+                    대표 이미지를 선택하면 여기에 표시됩니다
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Right - 이미지 미리보기 */}
-        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 flex items-center justify-center text-text-4 overflow-hidden">
+        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 hidden md:flex items-center justify-center text-text-4 overflow-hidden">
           {previewUrl ? (
             <Image
               src={previewUrl}
