@@ -18,8 +18,6 @@ export default function ReportActions({
         <Eye size={16} />
         <span>상세보기</span>
       </button>
-
-      <span className="text-xs text-text-2 flex items-center">처리 완료</span>
     </div>
   );
 }

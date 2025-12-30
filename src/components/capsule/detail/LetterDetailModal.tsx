@@ -47,6 +47,7 @@ import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
+import ReportModal from "../report/ReportModal";
 
 type UICapsule = {
   capsuleColor?: string;
@@ -127,6 +128,9 @@ export default function LetterDetailModal({
   const queryClient = useQueryClient();
 
   const isAdmin = role === "ADMIN";
+
+  /* 신고 */
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
   /* 저장 */
   const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
@@ -649,6 +653,15 @@ export default function LetterDetailModal({
         />
       )}
 
+      {/* 신고 모달 */}
+      {isReportOpen && (
+        <ReportModal
+          capsuleId={capsuleId}
+          open={isReportOpen}
+          onClose={() => setIsReportOpen(false)}
+        />
+      )}
+
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
@@ -768,6 +781,7 @@ export default function LetterDetailModal({
                     <button
                       type="button"
                       className="cursor-pointer flex items-center justify-center gap-2"
+                      onClick={() => setIsReportOpen(true)}
                     >
                       <MessageSquareWarning
                         size={16}

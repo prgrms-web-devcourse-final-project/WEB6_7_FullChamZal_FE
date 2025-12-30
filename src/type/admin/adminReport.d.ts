@@ -1,6 +1,6 @@
 type ReportTargetType = "CAPSULE" | "LETTER" | "COMMENT";
 
-type ReportReasonType = "SPAM" | "ABUSE" | "HATE" | "SEXUAL" | "ETC";
+type ReportReasonType = "SPAM" | "OBSCENITY" | "HATE" | "FRAUD" | "ETC";
 
 type ReportStatus = "PENDING" | "REVIEWING" | "ACCEPTED" | "REJECTED";
 

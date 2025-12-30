@@ -17,28 +17,28 @@ export default function ModerationSection() {
   const base = { query: "", page: 0, size: 1 as const };
 
   const qAll = useQuery({
-    queryKey: ["adminReportCount", "all"],
+    queryKey: ["adminModerationCount", "all"],
     queryFn: ({ signal }) =>
       AdminModerationApi.list({ tab: "all", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qSkipped = useQuery({
-    queryKey: ["adminReportCount", "skipped"],
+    queryKey: ["adminModerationCount", "skipped"],
     queryFn: ({ signal }) =>
       AdminModerationApi.list({ tab: "skipped", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qError = useQuery({
-    queryKey: ["adminReportCount", "error"],
+    queryKey: ["adminModerationCount", "error"],
     queryFn: ({ signal }) =>
       AdminModerationApi.list({ tab: "error", ...base, signal }),
     staleTime: 30_000,
   });
 
   const qFlagged = useQuery({
-    queryKey: ["adminReportCount", "flagged"],
+    queryKey: ["adminModerationCount", "flagged"],
     queryFn: ({ signal }) =>
       AdminModerationApi.list({ tab: "flagged", ...base, signal }),
     staleTime: 30_000,
