@@ -21,6 +21,9 @@ export type ViewedFilter = "ALL" | "UNREAD" | "READ";
 export type AccessibleFilter = "ALL" | "ACCESSIBLE" | "INACCESSIBLE";
 
 export default function MapContents() {
+  /* 모바일 리스트 */
+  const [isListOpen, setIsListOpen] = useState(false);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [radius, setRadius] = useState<Radius>(1000);
   const [viewed, setViewed] = useState<ViewedFilter>("ALL");
@@ -155,14 +158,14 @@ export default function MapContents() {
       initialLocation={myLocation}
     />
   ) : (
-    <div className="h-full flex flex-col gap-4">
+    <div className="h-full flex flex-col gap-2 lg:gap-4">
       {/* 헤더 */}
-      <div className="space-y-2">
-        <h3 className="text-3xl font-medium">
+      <div className="space-y-1 lg:space-y-2">
+        <h3 className="text-xl lg:text-3xl font-medium">
           공개 편지 지도
           <span className="text-primary px-1">_</span>
         </h3>
-        <p className="text-text-2">
+        <p className="text-sm lg:text-base text-text-2">
           주변에 숨겨진{" "}
           <span className="text-primary font-semibold">
             {!myLocation || isLoading ? "-" : filteredData.length}개
@@ -172,7 +175,7 @@ export default function MapContents() {
       </div>
 
       {/* 지도 + 리스트 영역 */}
-      <div className="flex-1 flex gap-4 min-h-0">
+      <div className="flex-1 flex lg:flex-row flex-col gap-4 min-h-0">
         {/* 지도 */}
         <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden ">
           {/* 위치 정보 접근 불가능 시 안내*/}
@@ -219,10 +222,21 @@ export default function MapContents() {
           >
             <LocateFixed size={24} />
           </button>
+
+          {/* 모바일: 리스트 열기 버튼 */}
+          <button
+            type="button"
+            className="lg:hidden absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-xl z-10 shadow-lg text-sm bg-primary-2 text-white"
+            onClick={() => setIsListOpen(true)}
+          >
+            주변 편지 보기 (
+            {!myLocation || isLoading ? "-" : filteredData.length}
+            개)
+          </button>
         </div>
 
-        {/* 리스트 */}
-        <div className="w-[360px] rounded-xl bg-white/80 border border-outline flex flex-col gap-3 min-h-0 py-6">
+        {/* 리스트 (데스크탑만) */}
+        <div className="w-90 rounded-xl bg-white/80 border border-outline hidden lg:flex flex-col gap-3 min-h-0 py-6">
           <div className="flex justify-between flex-none px-6 items-center">
             <span className="text-lg">주변 편지</span>
 
@@ -276,6 +290,96 @@ export default function MapContents() {
               위치 정보 접근을 허용해주세요.
             </div>
           )}
+        </div>
+
+        {/* 모바일 리스트 */}
+        <div className="lg:hidden">
+          {/* overlay */}
+          <div
+            className={`fixed inset-0 z-9998 bg-black/40 transition-opacity ${
+              isListOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+            onClick={() => setIsListOpen(false)}
+          />
+
+          {/* sheet */}
+          <div
+            className={`fixed left-0 right-0 bottom-0 z-9999 bg-white rounded-t-2xl border-t border-outline
+              transition-transform duration-200 ease-out
+              ${isListOpen ? "translate-y-0" : "translate-y-full"}`}
+            aria-hidden={!isListOpen}
+          >
+            <div className="px-5 py-2 flex items-center justify-between border-b border-outline">
+              <span>주변 편지</span>
+
+              <div className="flex items-center gap-2">
+                {/* 필터 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsListOpen(true);
+                    setIsFilterOpen((v) => !v);
+                  }}
+                  className="p-2 rounded-lg hover:bg-sub transition"
+                  aria-haspopup="menu"
+                  aria-expanded={isFilterOpen}
+                >
+                  <FilterIcon size={16} className="text-primary" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsListOpen(false)}
+                  className="p-2 rounded-lg hover:bg-sub transition"
+                  aria-label="닫기"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* 필터 영역 (모바일에서는 시트 내부에 표시) */}
+            <div className="relative px-5 pt-3" ref={filterRef}>
+              {isFilterOpen && (
+                <FilterArea
+                  radius={radius}
+                  onRadiusChange={setRadius}
+                  viewed={viewed}
+                  onViewedChange={setViewed}
+                  accessible={accessible}
+                  onAccessibleChange={setAccessible}
+                  onClose={() => setIsFilterOpen(false)}
+                  onReset={() => {
+                    setRadius(1000);
+                    setViewed("ALL");
+                    setAccessible("ALL");
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+              {myLocation ? (
+                isLoading ? (
+                  <div className="text-center text-text-3 text-sm">로딩중</div>
+                ) : (
+                  <MapList
+                    listData={filteredData}
+                    onClick={(id, lat, lng) => {
+                      setMapLocation({ lat, lng });
+                      setFocus({ id, ts: Date.now() });
+                      setIsListOpen(false);
+                    }}
+                    focus={focus}
+                  />
+                )
+              ) : (
+                <div className="text-center text-text-3 text-sm">
+                  위치 정보 접근을 허용해주세요.
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
