@@ -6,16 +6,18 @@ export default function Modal({
   open,
   onClose,
   children,
+  zIndexClassName = "z-9999",
 }: {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  zIndexClassName?: string;
 }) {
   return (
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-9999 bg-black/40"
+          className={`fixed w-full h-full inset-0 ${zIndexClassName} bg-black/40`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

@@ -1,6 +1,7 @@
 import { apiFetchRaw } from "../fetchClient";
 
 export const storyTrackApi = {
+  /* 전체 스토리 트랙 리스트 */
   allList: (
     params?: { page?: number; size?: number },
     signal?: AbortSignal
@@ -15,6 +16,38 @@ export const storyTrackApi = {
     return apiFetchRaw<StoryTrackListResponse>(
       `/api/v1/storytrack/List?${sp.toString()}`,
       { signal }
+    );
+  },
+
+  /* 스토리 트랙 참여 */
+  participantStorytrack: (
+    payload: { storytrackId: number },
+    signal?: AbortSignal
+  ) => {
+    return apiFetchRaw<ApiResponse<{ message: string }>>(
+      "/api/v1/storytrack/creat/participant",
+      {
+        method: "POST",
+        json: payload,
+        signal,
+      }
+    );
+  },
+
+  /* 스토리 트랙 참여 삭제 */
+  deleteParticipantStorytrack: (
+    params: { storytrackId: number },
+    signal?: AbortSignal
+  ) => {
+    const sp = new URLSearchParams();
+    sp.set("storytrackId", String(params.storytrackId));
+
+    return apiFetchRaw<ApiResponse<{ message: string }>>(
+      `/api/v1/storytrack/delete/participant?${sp.toString()}`,
+      {
+        method: "DELETE",
+        signal,
+      }
     );
   },
 
@@ -54,6 +87,48 @@ export const storyTrackApi = {
 
     return apiFetchRaw<PageResponse<CapsuleDashboardItem>>(
       `/api/v1/storytrack/creater/capsuleList?${sp.toString()}`,
+      { signal }
+    );
+  },
+
+  /**
+   * 참여한 스토리트랙 목록 조회
+   * @param params 페이지네이션 파라미터
+   */
+  joinedList: (
+    params?: { page?: number; size?: number },
+    signal?: AbortSignal
+  ) => {
+    const page = params?.page ?? 0;
+    const size = params?.size ?? 10;
+
+    const sp = new URLSearchParams();
+    sp.set("page", String(page));
+    sp.set("size", String(size));
+
+    return apiFetchRaw<StoryTrackJoinedListResponse>(
+      `/api/v1/storytrack/participant/joinedList?${sp.toString()}`,
+      { signal }
+    );
+  },
+
+  /**
+   * 내가 만든 스토리트랙 목록 조회
+   * @param params 페이지네이션 파라미터
+   */
+  mineList: (
+    params?: { page?: number; size?: number },
+    signal?: AbortSignal
+  ) => {
+    const page = params?.page ?? 0;
+    const size = params?.size ?? 10;
+
+    const sp = new URLSearchParams();
+    sp.set("page", String(page));
+    sp.set("size", String(size));
+
+    return apiFetchRaw<StoryTrackMineListResponse>(
+      `/api/v1/storytrack/creater/storytrackList?${sp.toString()}`,
       { signal }
     );
   },

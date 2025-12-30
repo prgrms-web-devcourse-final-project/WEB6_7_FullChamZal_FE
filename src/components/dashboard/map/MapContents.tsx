@@ -149,7 +149,11 @@ export default function MapContents() {
   const filteredData = filter(data);
 
   return id ? (
-    <LetterDetailView isPublic={true} capsuleId={Number(id)} />
+    <LetterDetailView
+      isPublic={true}
+      capsuleId={Number(id)}
+      initialLocation={myLocation}
+    />
   ) : (
     <div className="h-full flex flex-col gap-4">
       {/* 헤더 */}

@@ -69,7 +69,7 @@ export default function MailboxPage({
   const isBookmark = type === "bookmark";
   const currentPos = useCurrentPositionOnce(type !== "send");
 
-  const size = isBookmark ? 24 : 10;
+  const size = 24;
 
   // 1) send/receive
   const sendReceiveInf = useInfiniteQuery({
@@ -88,7 +88,6 @@ export default function MailboxPage({
     getNextPageParam: (lastPage) => {
       const d = lastPage.data;
       if (d.last) return undefined;
-      // number는 현재 페이지 index
       return d.number + 1;
     },
   });

@@ -9,7 +9,7 @@ export default function DashBoardMain() {
       <div className="space-y-9">
         {/* 오늘 열람 가능한 편지 */}
         <TodayLetters />
-        {/* 시작 인사 느낌 */}
+        {/* 미열람 편지 */}
         <PendingLetters />
         {/* 통계 */}
         <ActivityStats />
