@@ -91,12 +91,14 @@ export default function LoginForm() {
           <button
             type="button"
             className="cursor-pointer underline hover:text-text-3"
+            onClick={() => router.push("/auth/account-recovery?mode=FIND_ID")}
           >
             아이디 찾기
           </button>
           <button
             type="button"
             className="cursor-pointer underline hover:text-text-3"
+            onClick={() => router.push("/auth/account-recovery?mode=FIND_PW")}
           >
             비밀번호 찾기
           </button>
