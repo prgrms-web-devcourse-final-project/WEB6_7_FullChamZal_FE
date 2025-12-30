@@ -48,7 +48,9 @@ import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
 
-type UICapsule = {
+type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
+
+export type UICapsule = {
   capsuleColor?: string;
   title: string;
   content: string;
@@ -108,6 +110,7 @@ export default function LetterDetailModal({
   locationLat = null,
   locationLng = null,
   password = null,
+  initialData = null,
 }: {
   uuId?: string;
   capsuleId: number;
@@ -120,6 +123,7 @@ export default function LetterDetailModal({
   locationLat?: number | null;
   locationLng?: number | null;
   password?: string | null;
+  initialData?: UICapsule | null; // LetterDetailView에서 이미 가져온 데이터
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -395,9 +399,10 @@ export default function LetterDetailModal({
   };
 
   // 상세 조회 query (open일 때만)
+  // initialData가 있으면 API 호출하지 않음 (중복 요청 방지)
   const { data, isLoading, isError, error } = useQuery<UICapsule>({
     queryKey: ["capsuleDetailModal", role, capsuleId, password, isSender],
-    enabled: open && capsuleId > 0,
+    enabled: open && capsuleId > 0 && !initialData,
     retry: false,
     queryFn: async ({ signal }) => {
       // 1) 관리자 상세
@@ -484,13 +489,16 @@ export default function LetterDetailModal({
 
   useEffect(() => {
     if (!open) return;
-    setIsBookmarked(!!data?.isBookmarked);
-  }, [open, data?.isBookmarked]);
+    setIsBookmarked(!!(initialData?.isBookmarked ?? data?.isBookmarked));
+  }, [open, initialData?.isBookmarked, data?.isBookmarked]);
 
   // open이 아니면 렌더 자체 안 함
   if (!open) return null;
 
-  if (isLoading) {
+  // initialData가 있으면 바로 사용, 없으면 useQuery 결과 사용
+  const capsuleData = initialData ?? data;
+
+  if (!initialData && isLoading) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center py-15">
@@ -528,7 +536,7 @@ export default function LetterDetailModal({
     );
   }
 
-  if (!data) {
+  if (!capsuleData) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center py-15">
@@ -548,7 +556,7 @@ export default function LetterDetailModal({
     );
   }
 
-  const capsule = data;
+  const capsule = capsuleData;
 
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";

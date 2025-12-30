@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import LetterDetailModal from "./LetterDetailModal";
+import LetterDetailModal, { type UICapsule } from "./LetterDetailModal";
 import LetterLockedView from "./LetterLockedView";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 
@@ -120,7 +120,8 @@ export default function LetterDetailView({
     retry: false,
     // 공개 캡슐의 경우 위치 정보가 준비될 때까지 대기
     // initialLocation이 있으면 즉시 실행, 없으면 currentLocation이 설정될 때까지 대기
-    enabled: capsuleId > 0 && (initialLocation !== null || currentLocation !== null),
+    enabled:
+      capsuleId > 0 && (initialLocation !== null || currentLocation !== null),
   });
 
   if (isLoading) {
@@ -167,6 +168,22 @@ export default function LetterDetailView({
   }
 
   // 열람 가능
+  // LetterDetailView에서 이미 데이터를 가져왔으므로, LetterDetailModal에 전달하여 중복 요청 방지
+  const modalData: UICapsule = {
+    capsuleColor: capsule.capsuleColor ?? null,
+    title: capsule.title,
+    content: capsule.content,
+    createdAt: capsule.createdAt,
+    writerNickname: capsule.senderNickname,
+    recipient: capsule.recipient ?? null,
+    unlockType: capsule.unlockType,
+    unlockAt: capsule.unlockAt,
+    unlockUntil: capsule.unlockUntil,
+    locationName: capsule.locationName ?? null,
+    viewStatus: !!capsule.viewStatus,
+    isBookmarked: !!capsule.isBookmarked,
+  };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-8">
       <LetterDetailModal
@@ -175,6 +192,7 @@ export default function LetterDetailView({
         role="USER"
         open={true}
         password={password}
+        initialData={modalData}
       />
     </div>
   );
