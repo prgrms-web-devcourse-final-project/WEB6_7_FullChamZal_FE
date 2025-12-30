@@ -41,27 +41,37 @@ export default function Sidebar({
   return (
     <>
       {/* 데스크탑 Sidebar */}
-      <aside className="w-72 h-full border-r border-outline hidden lg:flex flex-col justify-between p-6">
-        <div className="space-y-9">
-          <div className="flex items-center gap-2 text-primary">
-            <Logo className="w-9" />
-            <span className="text-2xl font-paperozi font-extrabold">
-              Dear. ___
-            </span>
-          </div>
+      <aside className="w-72 border-r border-outline hidden lg:flex flex-col h-dvh">
+        {/* 상단(스크롤 영역) */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-6">
+          <div className="space-y-9">
+            <div className="flex items-center gap-2 text-primary">
+              <Logo className="w-9" />
+              <span className="text-2xl font-paperozi font-extrabold">
+                Dear. ___
+              </span>
+            </div>
 
-          <Profile mode="user" onClick={() => setIsProfileOpen(true)} me={me} />
-          <MenuTab mode="user" />
-          <MyMailbox />
+            <Profile
+              mode="user"
+              onClick={() => setIsProfileOpen(true)}
+              me={me}
+            />
+            <MenuTab mode="user" />
+            <MyMailbox />
+          </div>
         </div>
 
-        <button
-          onClick={handleLogout}
-          className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm"
-        >
-          <LogOut size={20} />
-          <span>로그아웃</span>
-        </button>
+        {/* 하단(고정) */}
+        <div className="p-6 border-t border-outline">
+          <button
+            onClick={handleLogout}
+            className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm w-full"
+          >
+            <LogOut size={20} />
+            <span>로그아웃</span>
+          </button>
+        </div>
       </aside>
 
       {/* 모바일 Drawer */}
