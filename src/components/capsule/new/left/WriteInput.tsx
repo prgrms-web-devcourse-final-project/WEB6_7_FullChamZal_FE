@@ -25,7 +25,7 @@ export default function WriteInput({
         value={value}
         onChange={onChange}
         readOnly={readOnly}
-        className="py-2.5 px-3 bg-sub-2 rounded-lg w-full outline-none border border-white focus:border focus:border-primary-2"
+        className="placeholder:text-sm md:placeholder:text-base py-2.5 px-3 bg-sub-2 rounded-lg w-full outline-none border border-white focus:border focus:border-primary-2"
       />
     </>
   );

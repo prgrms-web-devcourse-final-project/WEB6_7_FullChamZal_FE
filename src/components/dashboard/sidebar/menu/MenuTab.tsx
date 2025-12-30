@@ -74,9 +74,14 @@ const USER_ITEMS: MenuItem[] = [
   },
 ];
 
-export default function MenuTab({ mode }: { mode: Mode }) {
+export default function MenuTab({
+  mode,
+  onNavigate,
+}: {
+  mode: Mode;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
-
   const items = mode === "admin" ? ADMIN_ITEMS : USER_ITEMS;
 
   return (
@@ -96,6 +101,7 @@ export default function MenuTab({ mode }: { mode: Mode }) {
               mode={mode}
               item={item}
               isActive={isActive}
+              onClick={onNavigate}
             />
           );
         })}

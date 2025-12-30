@@ -7,8 +7,8 @@ interface Props {
 
 export default function TrackTabMenu({ activeTab, onChange }: Props) {
   const tabs = [
-    { key: "route", label: "경로" },
     { key: "map", label: "지도" },
+    { key: "route", label: "경로" },
   ] as const;
 
   return (

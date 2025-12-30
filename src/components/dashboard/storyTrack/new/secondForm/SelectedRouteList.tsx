@@ -53,7 +53,8 @@ export default function SelectedRouteList({
 
       {items.length === 0 ? (
         <div className="text-sm text-text-4 border border-outline rounded-xl p-4">
-          아직 추가된 경로가 없어요. 위에서 공개 편지를 선택해 추가해보세요.
+          아직 추가된 경로가 없어요. <br />
+          위에서 공개 편지를 선택해 추가해보세요.
         </div>
       ) : (
         <DndContext

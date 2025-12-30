@@ -21,7 +21,6 @@ export default function AllTrackPage() {
 
   const queryClient = useQueryClient();
 
-  // queryKey를 한 곳에서만 만들기 (prefetch에서도 그대로 재사용)
   const listQueryKey = useMemo(
     () => (p: number) =>
       ["allStoryTrack", p, size, search, status, sort] as const,
@@ -37,7 +36,6 @@ export default function AllTrackPage() {
   } = useQuery({
     queryKey: listQueryKey(page),
     queryFn: async ({ signal }) => {
-      // TODO: 서버가 search/status/sort를 지원하면 params에 함께 넣기
       return await storyTrackApi.allList({ page, size }, signal);
     },
     staleTime: 30_000,
@@ -52,7 +50,6 @@ export default function AllTrackPage() {
 
   // 인접 페이지 프리패치 (이전/다음)
   useEffect(() => {
-    // totalElements가 없거나 로딩 중이면 스킵
     if (!pageInfo) return;
 
     const prefetch = (p: number) =>
@@ -68,15 +65,15 @@ export default function AllTrackPage() {
   }, [pageInfo, page, lastPage, size, queryClient, listQueryKey]);
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 space-y-4 lg:p-8 lg:space-y-6">
       <div className="space-y-3 flex-none">
         <BackButton />
         <div className="space-y-2">
-          <h3 className="text-3xl font-medium">
+          <h3 className="text-xl lg:text-3xl font-medium">
             공개 스토리트랙 둘러보기
             <span className="text-primary px-1">_</span>
           </h3>
-          <p className="text-text-2">
+          <p className="text-sm lg:text-base text-text-2">
             다양한 스토리트랙을 탐색하고 참여해보세요
           </p>
         </div>
@@ -95,7 +92,7 @@ export default function AllTrackPage() {
           }}
           type="text"
           placeholder="스토리트랙 검색..."
-          className="w-full p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
+          className="w-full p-2.5 pl-10 md:p-4 md:pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
         />
       </div>
 
@@ -121,14 +118,15 @@ export default function AllTrackPage() {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      {/* 필터 */}
+      <div className="flex flex-wrap items-center gap-2 text-xs md:text-base">
         <div className="flex gap-2">
           <button
             onClick={() => {
               setStatus("all");
               setPage(0);
             }}
-            className={`px-3 py-2 rounded-xl border ${
+            className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "all"
                 ? "border-primary text-primary"
                 : "border-outline text-text-2"
@@ -173,7 +171,7 @@ export default function AllTrackPage() {
               setSort(e.target.value as SortOption);
               setPage(0);
             }}
-            className="appearance-none h-11 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
+            className="cursor-pointer appearance-none py-2 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
           >
             <option value="newest">최신순</option>
             <option value="popular">인기순</option>
@@ -192,7 +190,7 @@ export default function AllTrackPage() {
             setSort("newest");
             setPage(0);
           }}
-          className="px-3 py-2 rounded-xl border border-outline text-text-2"
+          className="cursor-pointer px-3 py-2 rounded-xl border border-outline text-text-2"
         >
           초기화
         </button>

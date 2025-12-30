@@ -19,6 +19,7 @@ export const CAPTURE_ENVELOPE_PALETTE: CapsuleColor[] = [
   { name: "LAVENDER", color: "#F0E8FC" },
   { name: "MINT", color: "#E8FCF4" },
   { name: "PEACH", color: "#FFE8D6" },
+  { name: "NAVY", color: "#DDE6F3" },
 ];
 
 export const CAPTURE_COLOR_MAP = Object.fromEntries(

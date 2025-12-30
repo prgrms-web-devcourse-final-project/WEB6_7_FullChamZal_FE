@@ -3,6 +3,8 @@
 import { useState } from "react";
 import OAuthProfileModal from "@/components/auth/OauthProfileModal";
 import type { MemberMeDetail } from "@/lib/api/members/members";
+import Sidebar from "@/components/dashboard/sidebar/Sidebar";
+import { Menu } from "lucide-react";
 
 export default function DashboardShell({
   children,
@@ -11,19 +13,42 @@ export default function DashboardShell({
   children: React.ReactNode;
   me: MemberMeDetail | null;
 }) {
-  // needs 계산: memo 필요도 없음(경고 줄이려면 그냥 계산)
   const needs = !me?.nickname || !me?.phoneNumber;
-
-  // 한번 닫으면 이 세션에서는 안 뜨게(원하면 localStorage로 확장 가능)
   const [dismissed, setDismissed] = useState(false);
+  const openProfileModal = needs && !dismissed;
 
-  // state로 setOpen 하지 말고 "계산된 open" 사용
-  const open = needs && !dismissed;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
-      {children}
-      <OAuthProfileModal open={open} onClose={() => setDismissed(true)} />
+      {/* 모바일 헤더 */}
+      <header className="lg:hidden h-14 border-b border-outline flex items-center px-4">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="cursor-pointer p-2 rounded-lg hover:bg-button-hover"
+          aria-label="메뉴 열기"
+        >
+          <Menu size={20} />
+        </button>
+
+        <div className="ml-2 font-semibold">Dashboard</div>
+      </header>
+
+      <main className="relative w-full h-[calc(100vh-56px)] lg:h-screen flex overflow-hidden">
+        <Sidebar
+          me={me}
+          mobileOpen={sidebarOpen}
+          onMobileClose={() => setSidebarOpen(false)}
+        />
+        <section className="flex-1 h-full overflow-y-auto">{children}</section>
+      </main>
+
+      {/* 프로필 모달 (기존 유지) */}
+      <OAuthProfileModal
+        open={openProfileModal}
+        onClose={() => setDismissed(true)}
+      />
     </>
   );
 }

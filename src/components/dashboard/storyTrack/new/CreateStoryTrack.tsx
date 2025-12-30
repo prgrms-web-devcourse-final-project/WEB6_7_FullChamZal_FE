@@ -106,19 +106,19 @@ export default function CreateStoryTrack() {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
+    <div className="h-full lg:h-screen overflow-hidden flex flex-col">
       {/* Top + Form 영역 */}
-      <div className="flex-1 overflow-hidden p-8 flex flex-col gap-8 min-h-0">
+      <div className="flex-1 overflow-hidden p-4 lg:p-8 flex flex-col gap-4 lg:gap-8 min-h-0">
         {/* Top */}
         <div className="space-y-3 flex-none">
           <BackButton />
 
           <div className="space-y-2">
-            <h3 className="text-3xl font-medium">
+            <h3 className="text-xl lg:text-3xl font-medium">
               새 스토리트랙 만들기
               <span className="text-primary px-1">_</span>
             </h3>
-            <p className="text-text-2">
+            <p className="text-sm lg:text-base text-text-2">
               공개 스토리트랙으로 특별한 경로를 만들어보세요
             </p>
           </div>
@@ -167,7 +167,13 @@ export default function CreateStoryTrack() {
             )}
 
             {/* Step 3 */}
-            {step === 3 && <SuccessForm />}
+            {step === 3 && (
+              <SuccessForm
+                title={form.title}
+                order={form.order}
+                routeCount={form.routeLetterIds.length}
+              />
+            )}
           </form>
         </div>
       </div>
@@ -241,54 +247,62 @@ function StepHeader({ step }: { step: 1 | 2 | 3 }) {
   const circleActive = "bg-primary-2 text-white";
   const circleInactive = "border border-outline text-text-4";
 
+  const steps = [
+    { n: 1, label: "기본 정보" },
+    { n: 2, label: "경로 설정" },
+    { n: 3, label: "스토리트랙 생성 완료" },
+  ] as const;
+
+  const percent = step === 1 ? 33 : step === 2 ? 66 : 100;
+  const current = steps[step - 1];
+
   return (
-    <div className="flex items-center gap-4 flex-none">
-      <div
-        className={`flex-none flex items-center gap-3 ${
-          step === 1 ? active : inactive
-        }`}
-      >
-        <span
-          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            step === 1 ? circleActive : circleInactive
-          }`}
-        >
-          1
-        </span>
-        <span>기본 정보</span>
+    <div className="flex flex-col gap-3">
+      {/* Mobile: 현재 스텝만 (하지만 데스크탑과 동일한 원형 배지 스타일 유지) */}
+      <div className="md:hidden flex items-center justify-between">
+        <div className={`flex items-center gap-3 ${active}`}>
+          <span
+            className={`w-9 h-9 rounded-full flex items-center justify-center ${circleActive}`}
+          >
+            {current.n}
+          </span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-primary-2">{current.label}</span>
+          </div>
+        </div>
+        <span className="text-xs text-text-3">{percent}%</span>
       </div>
 
-      <div
-        className={`flex-none flex items-center gap-3 ${
-          step === 2 ? active : inactive
-        }`}
-      >
-        <span
-          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            step === 2 ? circleActive : circleInactive
-          }`}
-        >
-          2
-        </span>
-        <span>경로 설정</span>
+      {/* Mobile: 진행바 (outline 톤 유지) */}
+      <div className="md:hidden w-full h-2 bg-outline rounded-full overflow-hidden">
+        <div
+          className="h-full bg-primary-2 transition-all duration-300"
+          style={{ width: `${percent}%` }}
+        />
       </div>
 
-      <div
-        className={`flex-none flex items-center gap-3 ${
-          step === 3 ? active : inactive
-        }`}
-      >
-        <span
-          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            step === 3 ? circleActive : circleInactive
-          }`}
-        >
-          3
-        </span>
-        <span>스토리트랙 생성 완료</span>
-      </div>
+      {/* Desktop: 기존 그대로 */}
+      <div className="hidden md:flex items-center gap-4">
+        {steps.map((s) => (
+          <div
+            key={s.n}
+            className={`flex-none flex items-center gap-3 ${
+              step === s.n ? active : inactive
+            }`}
+          >
+            <span
+              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                step === s.n ? circleActive : circleInactive
+              }`}
+            >
+              {s.n}
+            </span>
+            <span>{s.label}</span>
+          </div>
+        ))}
 
-      <div className="w-full h-0.5 bg-outline" />
+        <div className="w-full h-0.5 bg-outline" />
+      </div>
     </div>
   );
 }

@@ -42,6 +42,37 @@ export default function YearlyLetterOverview() {
   const sendCount = sendData?.data.totalElements ?? 0;
   const receiveCount = receiveData?.data.totalElements ?? 0;
 
+  const total = sendCount + receiveCount;
+
+  const activityBadge = (() => {
+    if (total >= 50)
+      return {
+        label: "매우 활발",
+        tone: "text-emerald-600",
+        Icon: TrendingUp,
+      };
+
+    if (total >= 20)
+      return {
+        label: "활발",
+        tone: "text-lime-600",
+        Icon: TrendingUp,
+      };
+
+    if (total >= 5)
+      return {
+        label: "보통",
+        tone: "text-sky-600",
+        Icon: TrendingUp,
+      };
+
+    return {
+      label: "조용",
+      tone: "text-text-3",
+      Icon: TrendingUp,
+    };
+  })();
+
   return (
     <>
       <DivBox className="lg:flex-2 space-y-9 cursor-auto hover:bg-outline/0">
@@ -50,9 +81,9 @@ export default function YearlyLetterOverview() {
             <p className="text-lg">올해의 활동</p>
             <p className="text-text-3">편지 주고받기 현황</p>
           </div>
-          <div className="text-[#4cd150] flex items-center gap-1">
-            <TrendingUp size={16} />
-            <span className="text-sm">활발</span>
+          <div className={`${activityBadge.tone} flex items-center gap-1`}>
+            <activityBadge.Icon size={16} />
+            <span className="text-sm">{activityBadge.label}</span>
           </div>
         </div>
         <div className="flex gap-4">
@@ -65,11 +96,11 @@ export default function YearlyLetterOverview() {
             <p className="text-2xl">{receiveCount}</p>
           </div>
         </div>
-        <div className="h-80 select-none outline-none [&_*:focus]:outline-none">
+        <div className="h-60 md:h-75 lg:h-80 select-none outline-none [&_*:focus]:outline-none">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={yearData}
-              margin={{ top: 20, right: 20, bottom: 20, left: 0 }}
+              margin={{ top: 20, right: 20, bottom: 20, left: -30 }}
             >
               {/* 그라데이션 정의 */}
               <defs>
@@ -88,7 +119,7 @@ export default function YearlyLetterOverview() {
               <Area
                 type="monotone"
                 dataKey="send"
-                stroke="#D6DAE1"
+                stroke="#b9bec7"
                 strokeWidth={2}
                 fill="url(#sendArea)"
                 name="보낸 편지"
@@ -96,7 +127,7 @@ export default function YearlyLetterOverview() {
               <Area
                 type="monotone"
                 dataKey="receive"
-                stroke="#FFBCB1"
+                stroke="#ffa294"
                 strokeWidth={2}
                 fill="url(#receiveArea)"
                 name="받은 편지"

@@ -1,4 +1,6 @@
-import { Lock } from "lucide-react";
+import { Globe, Lock, User } from "lucide-react";
+
+type Visibility = "PRIVATE" | "PUBLIC" | "SELF";
 
 export default function VisibilityOpt({
   value,
@@ -14,6 +16,7 @@ export default function VisibilityOpt({
         onClick={() => onChange("PRIVATE")}
         title="비공개"
         desc="개인 공개"
+        icon={<Lock size={16} />}
       />
 
       <OptionCard
@@ -21,12 +24,15 @@ export default function VisibilityOpt({
         onClick={() => onChange("PUBLIC")}
         title="공개"
         desc="모두 공개"
+        icon={<Globe size={16} />}
       />
+
       <OptionCard
         selected={value === "SELF"}
         onClick={() => onChange("SELF")}
         title="내게쓰기"
         desc="나만 보기"
+        icon={<User size={16} />}
       />
     </div>
   );
@@ -37,11 +43,13 @@ function OptionCard({
   onClick,
   title,
   desc,
+  icon,
 }: {
   selected: boolean;
   onClick: () => void;
   title: string;
   desc: string;
+  icon: React.ReactNode;
 }) {
   return (
     <div
@@ -52,7 +60,7 @@ function OptionCard({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onClick();
       }}
-      className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer border-2
+      className={`w-full py-3 md:p-4 rounded-xl flex flex-col md:flex-row items-center gap-3 cursor-pointer border-2 transition
         ${
           selected
             ? "border-primary bg-primary/5"
@@ -63,10 +71,10 @@ function OptionCard({
         className={`w-8 h-8 rounded-lg flex items-center justify-center
           ${selected ? "bg-primary text-white" : "bg-text-5 text-white"}`}
       >
-        <Lock size={16} />
+        {icon}
       </div>
 
-      <div>
+      <div className="min-w-0 text-center md:text-start">
         <p className="text-sm">{title}</p>
         <p className="text-xs text-text-3">{desc}</p>
       </div>

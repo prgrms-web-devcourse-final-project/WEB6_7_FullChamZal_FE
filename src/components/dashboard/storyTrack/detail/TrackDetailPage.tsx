@@ -12,41 +12,43 @@ import TrackMap from "./TrackMap";
 type TabType = "route" | "map";
 
 export default function TrackDetailPage() {
-  const [tab, setTab] = useState<TabType>("route");
+  const [tab, setTab] = useState<TabType>("map");
 
   return (
-    <div className="h-screen flex flex-col p-8 gap-8">
-      <div>
+    // 모바일: 전체 스크롤
+    // 데스크탑: 내부 패널 스크롤
+    <div className="min-h-dvh lg:h-screen flex flex-col p-4 lg:p-8 gap-4 lg:gap-8">
+      <div className="flex-none">
         <BackButton />
       </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden flex gap-6">
+      {/* 모바일: 세로 스택 / 데스크탑: 가로 2컬럼 */}
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0">
         {/* Left */}
-        <div className="flex-1 min-w-80 flex flex-col h-full gap-6 min-h-0">
-          <div className="border border-outline rounded-2xl">
+        <div className="lg:flex-1 lg:min-w-80 flex flex-col gap-4 lg:gap-6 min-h-0">
+          <div className="border border-outline rounded-2xl overflow-hidden">
             <TrackHeader />
           </div>
-          <div className="border border-outline rounded-2xl flex-1 min-h-0 overflow-hidden">
+
+          <div className="border border-outline rounded-2xl lg:flex-1 lg:min-h-0 overflow-hidden">
             <TrackOverview />
           </div>
         </div>
 
         {/* Right */}
-        <div className="flex-3 flex flex-col gap-6 min-h-0">
+        <div className="lg:flex-3 flex flex-col gap-4 lg:gap-6 min-h-0">
           {/* Top */}
           <div className="border border-outline rounded-2xl overflow-hidden">
             <TrackProgress />
           </div>
 
           {/* Bottom */}
-          <div className="border border-outline rounded-2xl flex-1 min-h-0 overflow-hidden flex flex-col">
-            {/* 탭 메뉴 */}
+          <div className="border border-outline rounded-2xl overflow-hidden flex flex-col lg:flex-1 lg:min-h-0">
             <TrackTabMenu activeTab={tab} onChange={setTab} />
 
-            {/* 탭 컨텐츠 */}
-            <div className="flex-1 min-h-0 overflow-auto p-6">
-              {tab === "route" && <TrackRoute />}
+            <div className="p-4 lg:p-6 overflow-visible lg:overflow-auto lg:flex-1 lg:min-h-0">
               {tab === "map" && <TrackMap />}
+              {tab === "route" && <TrackRoute />}
             </div>
           </div>
         </div>

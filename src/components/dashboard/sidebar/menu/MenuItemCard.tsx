@@ -2,13 +2,15 @@ import Link from "next/link";
 import DivBox from "../../DivBox";
 
 export function MenuItemCard({
-  mode,
   item,
   isActive,
+  mode,
+  onClick,
 }: {
-  mode: Mode;
   item: MenuItem;
   isActive: boolean;
+  mode: Mode;
+  onClick?: () => void;
 }) {
   const baseBoxClass = "px-5 py-3 rounded-[10px]";
   const activeBoxClass = `text-white shadow-md ${
@@ -19,7 +21,7 @@ export function MenuItemCard({
   const Icon = item.icon;
 
   return (
-    <Link href={item.href} className="block">
+    <Link href={item.href} onClick={onClick} className="block">
       <DivBox className={`${baseBoxClass} ${isActive ? activeBoxClass : ""}`}>
         <div className="flex items-center gap-3">
           <Icon

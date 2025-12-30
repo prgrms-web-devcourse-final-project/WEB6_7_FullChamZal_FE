@@ -151,7 +151,7 @@ export default function PendingLetters() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4 lg:ml-6">
+      <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible lg:grid-cols-4 lg:ml-6">
         {isLoading ? (
           <div className="h-20 flex flex-col justify-center">
             <p className="text-text-4">불러오는 중…</p>
@@ -198,7 +198,11 @@ export default function PendingLetters() {
             }
 
             return (
-              <DivBox key={l.capsuleId}>
+              <DivBox
+                key={l.capsuleId}
+                className="cursor-auto snap-start min-w-[85%] sm:min-w-[70%] lg:min-w-0
+    "
+              >
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <div className="flex flex-col gap-1">

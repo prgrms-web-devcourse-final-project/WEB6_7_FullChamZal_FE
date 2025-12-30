@@ -4,7 +4,7 @@ export default function TrackOverview() {
   return (
     <>
       <div className="p-6 flex flex-col h-full">
-        <div className="flex flex-col justify-between h-full">
+        <div className="flex flex-col justify-between h-full gap-4">
           <div className="space-y-6">
             <div className="space-y-4">
               {/* 제목 */}
@@ -77,7 +77,9 @@ export default function TrackOverview() {
           </button> */}
             <button className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl ">
               <X />
-              참여 중지
+              <span>참여 중지</span>
+              {/* <Play />
+              <span>참여하기</span> */}
             </button>
           </div>
         </div>

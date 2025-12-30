@@ -65,7 +65,7 @@ export default function PasswordEditModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-[420px] rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
         <div className="flex items-center justify-between">
           <h4 className="text-lg">비밀번호 변경</h4>
           <button onClick={onClose} className="cursor-pointer" type="button">
@@ -120,7 +120,9 @@ export default function PasswordEditModal({
           </div>
 
           {newPassword && confirmPassword && newPassword !== confirmPassword ? (
-            <p className="text-xs text-red-600">새 비밀번호가 일치하지 않습니다.</p>
+            <p className="text-xs text-red-600">
+              새 비밀번호가 일치하지 않습니다.
+            </p>
           ) : null}
 
           <Button className="w-full py-3" onClick={onSave} disabled={!canSave}>

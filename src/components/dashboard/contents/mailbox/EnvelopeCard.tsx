@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/static-components */
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react"; // ✅ useEffect, useRef 추가
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock, Pencil, PencilOff } from "lucide-react";
-import Link from "next/link";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
+import { useRouter } from "next/navigation";
 
 type LatLng = { lat: number; lng: number };
 
@@ -174,6 +174,8 @@ export default function EnvelopeCard({
   type,
   currentPos = null,
 }: Props) {
+  const router = useRouter();
+
   const status = useMemo(
     () => getEnvelopeStatus(capsule, type, currentPos),
     [capsule, type, currentPos]
@@ -184,6 +186,72 @@ export default function EnvelopeCard({
   // send는 항상 상세 진입 가능
   const canOpenDetail =
     type === "send" || (status.mode === "unlock" && status.isUnlocked);
+
+  // 모바일 1탭 플립 상태
+  const [flipped, setFlipped] = useState(false);
+
+  // ✅ flip 애니메이션 중 중복 탭 방지
+  const [animating, setAnimating] = useState(false);
+  const FLIP_MS = 700; // transition duration과 맞춤
+
+  // ✅ 바깥 터치 감지를 위한 ref
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const canHover = useMemo(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return false;
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  }, []);
+
+  const rotateClass = canHover
+    ? "group-hover:transform-[rotateY(180deg)]"
+    : flipped
+    ? "transform-[rotateY(180deg)]"
+    : "transform-[rotateY(0deg)]";
+
+  // ✅ 다른 곳(다른 카드 포함) 터치하면 원복
+  useEffect(() => {
+    if (!flipped) return;
+
+    const onPointerDownCapture = (ev: PointerEvent) => {
+      const el = cardRef.current;
+      if (!el) return;
+      const target = ev.target as Node | null;
+
+      // 카드 내부 터치면 무시
+      if (target && el.contains(target)) return;
+
+      setFlipped(false);
+    };
+
+    document.addEventListener("pointerdown", onPointerDownCapture, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDownCapture, true);
+    };
+  }, [flipped]);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!canOpenDetail) return;
+    if (animating) return;
+
+    // 데스크탑(hover 가능)에서는 바로 이동 (기존 hover UX 유지)
+    if (canHover) {
+      router.push(href, { scroll: false });
+      return;
+    }
+
+    // 모바일(hover 불가): 1번 탭 => 뒤집기, 2번 탭 => 이동
+    if (!flipped) {
+      e.preventDefault();
+      setAnimating(true);
+
+      requestAnimationFrame(() => setFlipped(true));
+
+      window.setTimeout(() => setAnimating(false), FLIP_MS);
+      return;
+    }
+
+    router.push(href, { scroll: false });
+  };
 
   const ReadBadgeSlot = () => {
     if (type === "send") return null;
@@ -212,10 +280,21 @@ export default function EnvelopeCard({
   const backShade3 = shiftColor(backBase, +5); // 위 삼각 (조금 밝게)
 
   const CardInner = () => (
-    <div className="relative flex flex-col items-center justify-center p-2 perspective-[1000px] group">
+    // ✅ ref를 가장 바깥 래퍼에 달기
+    <div
+      ref={cardRef}
+      className="relative flex flex-col items-center justify-center p-2 perspective-[1000px] group"
+      aria-label={canOpenDetail ? "봉투 카드" : "열 수 없는 봉투"}
+    >
       <ReadBadgeSlot />
 
-      <div className="relative w-70 h-45 transition-transform duration-500 transform-3d group-hover:transform-[rotateY(180deg)]">
+      <div
+        className={[
+          "relative w-full md:w-70 h-45 transform-3d will-change-transform",
+          "transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          rotateClass,
+        ].join(" ")}
+      >
         {/* 앞면 */}
         <div className="absolute inset-0 backface-hidden">
           <div
@@ -366,8 +445,18 @@ export default function EnvelopeCard({
   }
 
   return (
-    <Link href={href} scroll={false} className="block">
+    <div
+      role="button"
+      tabIndex={0}
+      className="block cursor-pointer"
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          router.push(href, { scroll: false });
+        }
+      }}
+    >
       <CardInner />
-    </Link>
+    </div>
   );
 }

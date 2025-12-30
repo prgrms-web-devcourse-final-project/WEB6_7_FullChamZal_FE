@@ -35,26 +35,29 @@ export default function TodayLetters() {
       <div className="space-y-5">
         {/* Text */}
         <div className="space-y-2">
-          <h2 className="text-4xl font-medium">
+          <h2 className="text-2xl lg:text-4xl font-medium">
             안녕하세요, {me?.name}님<span className="text-primary px-1">_</span>
           </h2>
-          <p className="text-text-2 text-lg ">
+          <p className="text-text-2 text-base lg:text-lg ">
             오늘은 {todayText}, 오늘 당신을 기다리는 편지가{" "}
             <span className="text-primary font-semibold">{list.length}통</span>{" "}
             있습니다.
           </p>
         </div>
         {/* Card => 총 4개 까지 */}
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:ml-6">
+        <div className=" flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory lg:grid lg:grid-cols-2 lg:overflow-visible lg:ml-6">
           {list.length === 0 ? (
-            <p>없음</p>
+            <div className="h-20 flex flex-col justify-center">
+              <p className="text-text-4">열람 예정 편지가 없습니다.</p>
+            </div>
           ) : (
-            list.map((l) => (
+            list.slice(0, 4).map((l) => (
               <button
                 key={l.capsuleId}
                 onClick={() =>
                   router.push(`/dashboard/receive?id=${l.capsuleId}`)
                 }
+                className="snap-start min-w-[85%] sm:min-w-[70%] lg:min-w-0"
               >
                 <DivBox className="w-full">
                   <div className="flex flex-col gap-3">

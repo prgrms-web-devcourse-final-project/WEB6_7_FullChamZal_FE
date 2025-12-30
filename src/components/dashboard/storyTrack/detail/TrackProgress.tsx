@@ -14,18 +14,20 @@ export default function TrackProgress() {
     <div className="h-full flex flex-col">
       {/* Header */}
       <div
-        className={`p-6  border-outline ${
+        className={`p-4 lg:p-6  border-outline ${
           collapsed ? "border-none" : "border-b"
         }`}
       >
         <div className="flex justify-between items-center">
           <div className="flex-none text-xl flex items-center gap-2">
-            <span>진행 상황</span>
-            <span className="text-sm text-primary-2">{percent}% 완료</span>
+            <span className="text-sm md:text-base">진행 상황</span>
+            <span className="text-xs md:text-sm text-primary-2">
+              {percent}% 완료
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="w-32 h-1.5 bg-outline rounded-full overflow-hidden">
+            <div className="w-28 h-1.5 bg-outline rounded-full overflow-hidden">
               <div
                 className="h-full bg-primary-2"
                 style={{ width: `${(completed / total) * 100}%` }}
@@ -57,7 +59,7 @@ export default function TrackProgress() {
             {/* 경로 */}
             <div className="flex gap-4">
               <div className="flex-1 border border-outline rounded-xl p-4 flex flex-col gap-1">
-                <span className="text-xs text-text-3">완료한 장소</span>
+                <span className="text-xs text-text-3">완료</span>
                 <span className="text-xl">{completed}</span>
               </div>
               <div className="flex-1 border border-outline rounded-xl p-4 flex flex-col gap-1">
