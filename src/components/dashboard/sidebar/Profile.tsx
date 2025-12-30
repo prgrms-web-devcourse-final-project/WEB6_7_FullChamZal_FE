@@ -49,7 +49,7 @@ export default function Profile({
 
   return (
     <button type="button" onClick={onClick} className="w-full text-left">
-      <DivBox className="border-2">
+      <DivBox className="p-4 lg:p-6 border-2">
         <div className="flex items-center gap-3">
           <div className="flex-none bg-text w-14 h-14 rounded-full">
             <div className="text-white text-xl h-full flex items-center justify-center">

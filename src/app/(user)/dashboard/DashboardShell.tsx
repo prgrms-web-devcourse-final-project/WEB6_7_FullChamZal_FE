@@ -26,7 +26,7 @@ export default function DashboardShell({
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}
-          className="p-2 rounded-lg hover:bg-button-hover"
+          className="cursor-pointer p-2 rounded-lg hover:bg-button-hover"
           aria-label="메뉴 열기"
         >
           <Menu size={20} />

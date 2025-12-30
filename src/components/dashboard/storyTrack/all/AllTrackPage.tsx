@@ -125,7 +125,7 @@ export default function AllTrackPage() {
               setStatus("all");
               setPage(0);
             }}
-            className={`px-3 py-2 rounded-xl border ${
+            className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "all"
                 ? "border-primary text-primary"
                 : "border-outline text-text-2"
@@ -170,7 +170,7 @@ export default function AllTrackPage() {
               setSort(e.target.value as SortOption);
               setPage(0);
             }}
-            className="appearance-none h-11 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
+            className="cursor-pointer appearance-none h-11 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
           >
             <option value="newest">최신순</option>
             <option value="popular">인기순</option>
@@ -189,7 +189,7 @@ export default function AllTrackPage() {
             setSort("newest");
             setPage(0);
           }}
-          className="px-3 py-2 rounded-xl border border-outline text-text-2"
+          className="cursor-pointer px-3 py-2 rounded-xl border border-outline text-text-2"
         >
           초기화
         </button>

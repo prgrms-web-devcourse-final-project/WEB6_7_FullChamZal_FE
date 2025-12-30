@@ -69,7 +69,7 @@ export default function MailboxPage({
   const isBookmark = type === "bookmark";
   const currentPos = useCurrentPositionOnce(type !== "send");
 
-  const size = 24;
+  const size = 20;
 
   // 1) send/receive
   const sendReceiveInf = useInfiniteQuery({
@@ -165,8 +165,8 @@ export default function MailboxPage({
 
   return (
     <section className="flex-1 w-full">
-      <div className="p-8">
-        <DivBox className="cursor-auto hover:bg-white space-y-12">
+      <div className="p-4 lg:p-8">
+        <DivBox className="cursor-auto hover:bg-white space-y-4 lg:space-y-12">
           <div className="flex items-center gap-4">
             <div className="text-primary">{config.icon}</div>
             <div>
@@ -183,9 +183,9 @@ export default function MailboxPage({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-8">
+          <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 flex-wrap gap-8">
             {!list.length ? (
-              <p>
+              <p className="text-text-3">
                 {isBookmark ? "북마크한 편지가 없습니다" : "편지가 없습니다"}
               </p>
             ) : (
@@ -208,16 +208,15 @@ export default function MailboxPage({
                     더 불러오는 중...
                   </div>
                 )}
-
-                {/* 더 이상 없을 때 */}
-                {!active.hasNextPage && list.length > 0 && (
-                  <div className="w-full text-center text-sm text-text-3">
-                    마지막 편지입니다.
-                  </div>
-                )}
               </>
             )}
           </div>
+          {/* 더 이상 없을 때 */}
+          {!active.hasNextPage && list.length > 0 && (
+            <div className="w-full text-center text-sm text-text-3">
+              마지막 편지입니다.
+            </div>
+          )}
         </DivBox>
       </div>
     </section>
