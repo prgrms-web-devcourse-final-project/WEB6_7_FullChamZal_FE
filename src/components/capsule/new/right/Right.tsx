@@ -43,20 +43,22 @@ export default function Right({ preview }: { preview: PreviewState }) {
   }`;
 
   return (
-    <section className="w-full h-full p-8 min-h-0 flex flex-col">
-      <div className="flex-1 min-h-0 flex flex-col gap-6">
+    <section className="w-full h-full p-4 lg:p-8 min-h-0 flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col gap-4 lg:gap-6">
         {/* 위 영역 */}
         <div className="flex-1 min-h-0 flex flex-col gap-4">
-          <span className="text-xl">미리보기</span>
+          <span className="hidden lg:block text-xl">미리보기</span>
 
           <div
-            className="flex-1 min-h-0 p-8 rounded-2xl border border-outline overflow-hidden"
+            className="flex-1 min-h-0 p-4 lg:p-8 rounded-2xl border border-outline overflow-hidden"
             style={{ backgroundColor: paperColor }}
           >
-            <div className="h-full min-h-0 flex flex-col justify-between gap-6">
+            <div className="h-full min-h-0 flex flex-col justify-between gap-3 lg:gap-6">
               {/* 제목 + Dear (수신자) */}
-              <div className="text-2xl space-x-1">
-                <p className="font-semibold">{title || "제목을 입력하세요"}</p>
+              <div className="text-lg lg:text-2xl space-x-1">
+                <p className="font-normal lg:font-semibold">
+                  {title || "제목을 입력하세요"}
+                </p>
                 <span className="text-primary font-bold">Dear.</span>
                 <span className="text-text-3">
                   {receiverName || "수신자 이름"}
@@ -65,15 +67,15 @@ export default function Right({ preview }: { preview: PreviewState }) {
 
               {/* 편지 내용 */}
               <div className="flex-1 min-h-0 overflow-y-auto">
-                <pre className="whitespace-pre-wrap wrap-break-word text-lg leading-7">
+                <pre className="whitespace-pre-wrap wrap-break-word text-base lg:text-lg leading-7">
                   {content || "편지 내용을 입력하세요"}
                 </pre>
               </div>
 
               {/* From (발신자) */}
               <div className="shrink-0 flex flex-col items-end gap-1">
-                <span className="text-text-3">{todayLabel}</span>
-                <p className="text-right text-2xl space-x-1">
+                <span className="text-text-3 text-sm">{todayLabel}</span>
+                <p className="text-right text-lg lg:text-2xl space-x-1">
                   <span className="text-primary font-bold">From.</span>
                   <span className="text-text-3">
                     {senderName || "작성자 이름"}
@@ -85,7 +87,7 @@ export default function Right({ preview }: { preview: PreviewState }) {
         </div>
 
         {/* 아래 */}
-        <div className="shrink-0 w-full text-xs text-text-4 p-4 border border-outline rounded-xl bg-white/60">
+        <div className="shrink-0 w-full text-xs text-text-4 p-4 border border-outline rounded-xl bg-white/60 space-y-1">
           <p>편지 정보</p>
           <ul className="space-y-1">
             <li>• 테마: {themeLabel}</li>
