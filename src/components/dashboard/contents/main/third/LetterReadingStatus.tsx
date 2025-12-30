@@ -14,16 +14,17 @@ import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 
 export default function LetterReadingStatus() {
-  const { data, isLoading, isError } = useQuery<unknown>({
+  const { data, isLoading, isError } = useQuery<
+    PageResponse<CapsuleDashboardItem>
+  >({
     queryKey: ["capsuleDashboard", "receive"],
-    queryFn: ({ signal }) => capsuleDashboardApi.receiveDashboard(signal),
+    queryFn: ({ signal }) =>
+      capsuleDashboardApi.receiveDashboard(undefined, signal),
     staleTime: 30_000,
     retry: 1,
   });
 
-  const receiveList: CapsuleDashboardItem[] = Array.isArray(data)
-    ? (data as CapsuleDashboardItem[])
-    : [];
+  const receiveList = data?.data.content ?? [];
 
   const viewedCount = receiveList.filter((item) => item.viewStatus).length;
   const unviewedCount = receiveList.filter((item) => !item.viewStatus).length;
@@ -42,7 +43,7 @@ export default function LetterReadingStatus() {
       <div>
         <p className="text-lg">받은 편지 열람 현황</p>
 
-        <div className="h-[360px] flex items-center justify-center select-none [&_*:focus]:outline-none">
+        <div className="h-90 flex items-center justify-center select-none [&_*:focus]:outline-none">
           {isLoading ? (
             <p className="text-text-4">불러오는 중…</p>
           ) : isError ? (
