@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
 
-export default function MyMailbox() {
+export default function MyMailbox({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   const isSend = pathname.startsWith("/dashboard/send");
@@ -48,7 +48,7 @@ export default function MyMailbox() {
       <p className="font-medium">나의 우체통</p>
       <div className="space-y-4">
         {/* 편지 쓰기 */}
-        <Link href="/capsules/new" className="block">
+        <Link href="/capsules/new" className="block" onClick={onNavigate}>
           <DivBox className="py-2 rounded-[10px]">
             <div className="flex items-center justify-center gap-2">
               <MailPlus size={20} />
@@ -58,7 +58,7 @@ export default function MyMailbox() {
         </Link>
 
         {/* 보낸 편지 */}
-        <Link href="/dashboard/send" className="block">
+        <Link href="/dashboard/send" className="block" onClick={onNavigate}>
           <DivBox className={`${baseBoxClass} ${isSend ? activeBoxClass : ""}`}>
             <div className="flex items-center gap-6">
               <Send className={isSend ? "text-white" : "text-primary"} />
@@ -75,7 +75,7 @@ export default function MyMailbox() {
         </Link>
 
         {/* 받은 편지 */}
-        <Link href="/dashboard/receive" className="block">
+        <Link href="/dashboard/receive" className="block" onClick={onNavigate}>
           <DivBox
             className={`${baseBoxClass} ${isReceive ? activeBoxClass : ""}`}
           >
@@ -96,7 +96,7 @@ export default function MyMailbox() {
         </Link>
 
         {/* 즐겨찾기 */}
-        <Link href="/dashboard/bookmark" className="block">
+        <Link href="/dashboard/bookmark" className="block" onClick={onNavigate}>
           <DivBox
             className={`${baseBoxClass} ${isBookmark ? activeBoxClass : ""}`}
           >

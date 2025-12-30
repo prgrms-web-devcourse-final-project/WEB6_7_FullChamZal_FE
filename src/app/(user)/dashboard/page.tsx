@@ -5,7 +5,7 @@ export default function DashboardPage() {
   return (
     <>
       <Suspense fallback={<div className="p-8">로딩 중...</div>}>
-        <div className="p-8">
+        <div className="p-4 lg:p-8">
           <DashBoardMain />
         </div>
       </Suspense>
