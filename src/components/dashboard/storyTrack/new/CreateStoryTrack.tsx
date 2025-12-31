@@ -8,6 +8,7 @@ import SuccessForm from "./SuccessForm";
 import FirstForm from "./FirstForm";
 import BackButton from "@/components/common/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
+import toast from "react-hot-toast";
 
 type Step = 1 | 2 | 3;
 
@@ -99,7 +100,7 @@ export default function CreateStoryTrack() {
         e instanceof Error
           ? e.message
           : "스토리트랙 생성에 실패했습니다. 다시 시도해주세요.";
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -35,6 +36,7 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
+import toast from "react-hot-toast";
 
 type PreviewState = {
   title: string;
@@ -48,6 +50,41 @@ type PreviewState = {
   envelopeColorName: string;
   paperColorName: string;
   paperColorHex: string;
+};
+
+function extractBadFields(msg: string) {
+  const m = msg.match(/문제가 된 항목:\s*([^\n\r]+)/);
+  if (!m) return null;
+
+  const fields = m[1]
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  return fields.length ? fields : null;
+}
+
+function getErrorMessage(err: unknown) {
+  if (err instanceof Error) return err.message;
+
+  if (err && typeof err === "object") {
+    const anyErr = err as Record<string, any>;
+    const candidate =
+      anyErr?.response?.data?.message ??
+      anyErr?.response?.data?.error ??
+      anyErr?.message;
+
+    if (typeof candidate === "string") return candidate;
+  }
+
+  return "편지 생성에 실패했습니다.";
+}
+
+const FIELD_LABEL: Record<string, string> = {
+  TITLE: "제목",
+  CONTENT: "내용",
+  RECEIVER_NICKNAME: "받는 사람",
+  LOCATION_NAME: "장소 이름",
 };
 
 export default function WriteForm({
@@ -198,6 +235,22 @@ export default function WriteForm({
     setContent(next.slice(0, MAX_CONTENT_LENGTH));
   };
 
+  const showBadFieldsToast = (rawMessage: string) => {
+    const fields = extractBadFields(rawMessage);
+    if (!fields) {
+      toast.error(rawMessage);
+      return;
+    }
+
+    const labels = fields.map((f) => FIELD_LABEL[f] ?? f);
+    toast.error(`유해한 내용이 감지된: ${labels.join(", ")}`, {
+      style: {
+        fontSize: "14px",
+        wordBreak: "keep-all",
+      },
+    });
+  };
+
   // 제출 핸들러
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -221,37 +274,37 @@ export default function WriteForm({
 
     // TODO: 미입력 폼 체크 - 토스트나 모달등으로 변경 예정
     if (!titleValue) {
-      window.alert("제목을 입력해 주세요.");
+      toast.error("제목을 입력해 주세요.");
       return;
     }
     if (isPrivateOnly && !receiveNameValue) {
-      window.alert("받는 사람을 입력해 주세요.");
+      toast.error("받는 사람을 입력해 주세요.");
       return;
     }
     if (!contentValue) {
-      window.alert("내용을 입력해 주세요.");
+      toast.error("내용을 입력해 주세요.");
       return;
     }
     // 비공개 캡슐일 경우에만 검증
     if (isPrivateOnly) {
       if (sendMethod === "PHONE" && !phoneNum) {
-        window.alert("전화번호를 입력해 주세요.");
+        toast.error("전화번호를 입력해 주세요.");
         return;
       }
       if (sendMethod === "URL" && !capsulePassword) {
-        window.alert("비밀번호를 입력해 주세요.");
+        toast.error("비밀번호를 입력해 주세요.");
         return;
       }
     }
 
     if (!me?.memberId) {
       if (meQuery.isLoading) {
-        window.alert(
+        toast.error(
           "사용자 정보를 불러오는 중입니다. 잠시 후 다시 시도해 주세요."
         );
         return;
       }
-      window.alert("로그인 후 다시 시도해 주세요.");
+      toast.error("로그인 후 다시 시도해 주세요.");
       return;
     }
 
@@ -263,7 +316,7 @@ export default function WriteForm({
 
     // 공개 캡슐은 장소 기반이어야 함 (TIME만 선택 불가)
     if (visibility === "PUBLIC" && effectiveUnlockType === "TIME") {
-      window.alert("공개 캡슐은 '장소' 또는 '시간+장소'만 선택할 수 있습니다.");
+      toast.error("공개 캡슐은 '장소' 또는 '시간+장소'만 선택할 수 있습니다.");
       return;
     }
 
@@ -273,7 +326,7 @@ export default function WriteForm({
         effectiveUnlockType === "TIME_AND_LOCATION") &&
       (!dayForm.date || !dayForm.time)
     ) {
-      window.alert("해제 날짜와 시간을 모두 입력해 주세요.");
+      toast.error("해제 날짜와 시간을 모두 입력해 주세요.");
       return;
     }
 
@@ -282,7 +335,7 @@ export default function WriteForm({
       ((expireDayForm.date && !expireDayForm.time) ||
         (!expireDayForm.date && expireDayForm.time))
     ) {
-      window.alert("만료 날짜/시간은 둘 다 입력하거나, 둘 다 비워두세요.");
+      toast.error("만료 날짜/시간은 둘 다 입력하거나, 둘 다 비워두세요.");
       return;
     }
 
@@ -295,7 +348,7 @@ export default function WriteForm({
         !locationForm.locationLabel?.trim() ||
         !locationForm.viewingRadius)
     ) {
-      window.alert("장소를 선택하고, 장소 이름과 조회반경을 입력해 주세요.");
+      toast.error("장소를 선택하고, 장소 이름과 조회반경을 입력해 주세요.");
       return;
     }
 
@@ -381,9 +434,14 @@ export default function WriteForm({
       }
     } catch (error) {
       console.error(error);
-      const message =
-        error instanceof Error ? error.message : "편지 생성에 실패했습니다.";
-      window.alert(message);
+
+      const message = getErrorMessage(error);
+
+      if (message.includes("문제가 된 항목:")) {
+        showBadFieldsToast(message);
+      } else {
+        toast.error(message);
+      }
     } finally {
       setIsSubmitting(false);
     }

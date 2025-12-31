@@ -16,6 +16,7 @@ import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import toast from "react-hot-toast";
 
 export default function CapsuleList({
   tab,
@@ -116,7 +117,7 @@ export default function CapsuleList({
 
     onError: (error) => {
       console.error(error);
-      alert("상태 변경에 실패했습니다.");
+      toast.error("상태 변경에 실패했습니다.");
     },
   });
 

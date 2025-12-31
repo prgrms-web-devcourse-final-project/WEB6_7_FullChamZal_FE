@@ -49,6 +49,7 @@ import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
 import ReportModal from "../report/ReportModal";
+import toast from "react-hot-toast";
 
 type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
@@ -212,7 +213,7 @@ export default function LetterDetailModal({
           : typeof err === "string"
           ? err
           : "북마크 처리 중 오류가 발생했습니다.";
-      alert(msg);
+      toast.error(msg);
     },
     onSuccess: (_data, nextBookmarked) => {
       // 목록/상세 캐시 갱신
@@ -247,7 +248,7 @@ export default function LetterDetailModal({
           : typeof err === "string"
           ? err
           : "삭제 중 오류가 발생했습니다.";
-      alert(msg);
+      toast.error(msg);
     },
   });
 
@@ -270,7 +271,7 @@ export default function LetterDetailModal({
           : typeof err === "string"
           ? err
           : "백업 중 오류가 발생했습니다.";
-      alert(msg);
+      toast.error(msg);
     },
   });
 
@@ -337,7 +338,7 @@ export default function LetterDetailModal({
           : typeof err === "string"
           ? err
           : "좋아요 처리 중 오류가 발생했습니다.";
-      alert(msg);
+      toast.error(msg);
     },
   });
 
@@ -425,7 +426,7 @@ export default function LetterDetailModal({
           : typeof err === "string"
           ? err
           : "북마크 처리 중 오류가 발생했습니다.";
-      alert(msg);
+      toast.error(msg);
     }
   };
 
@@ -721,7 +722,7 @@ export default function LetterDetailModal({
           }}
         />
       )}
-      
+
       {/* 신고 모달 */}
       {isReportOpen && (
         <ReportModal
