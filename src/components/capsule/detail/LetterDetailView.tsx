@@ -8,6 +8,7 @@ import LetterDetailModal, { type UICapsule } from "./LetterDetailModal";
 import LetterLockedView from "./LetterLockedView";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import { useRouter } from "next/navigation";
+import { CircleAlert } from "lucide-react";
 
 type LatLng = { lat: number; lng: number };
 
@@ -134,6 +135,83 @@ export default function LetterDetailView({
     }
     router.push("/dashboard", { scroll: false });
   };
+
+  const shouldShowLocationPermissionGate =
+    isPublic &&
+    initialLocation === null &&
+    currentLocation === null &&
+    !!locationError;
+
+  if (shouldShowLocationPermissionGate) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-0 md:p-8">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-4 md:p-6 space-y-5">
+          {/* 헤더 */}
+          <div className="space-y-2">
+            <h2 className="text-lg font-medium text-text">
+              위치 권한이 필요해요
+            </h2>
+            <p className="text-sm text-text-2 leading-relaxed">
+              이 편지는 <span className="font-medium text-text">장소 조건</span>
+              이 있어 현재 위치 확인이 필요해요.
+              <br />
+              Chrome에서 위치 권한을{" "}
+              <span className="font-medium text-text">허용</span>으로 변경해
+              주세요.
+            </p>
+          </div>
+
+          {/* 방법 안내 */}
+          <details className="rounded-xl border border-outline bg-sub/60 px-3 md:px-4 py-3">
+            <summary className="cursor-pointer text-sm font-medium text-text">
+              Chrome에서 위치 권한 설정 방법
+            </summary>
+
+            <div className="mt-4 space-y-4 text-sm text-text-2">
+              <div>
+                <div className="font-medium text-text mb-1">
+                  모바일 (Chrome)
+                </div>
+                <ol className="list-decimal pl-4 md:pl-5 space-y-1">
+                  <li>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex gap-1">
+                        주소창 왼쪽의 자물쇠
+                        <CircleAlert size={20} className="flex-none" />
+                      </div>
+                      <span>또는 사이트 정보 아이콘을 누르세요.</span>
+                    </div>
+                  </li>
+                  <li>사이트 설정(또는 권한) → 위치로 이동하세요.</li>
+                  <li>위치를 “허용”으로 변경한 뒤 다시 시도해 주세요.</li>
+                </ol>
+              </div>
+
+              <div>
+                <div className="font-medium text-text mb-1">PC (Chrome)</div>
+                <ol className="list-decimal pl-4 md:pl-5 space-y-1">
+                  <li>
+                    <div className="flex gap-1">
+                      주소창 왼쪽의 자물쇠
+                      <CircleAlert size={20} />를 클릭하세요.
+                    </div>
+                  </li>
+                  <li>사이트 설정 → 위치 → 허용으로 변경하세요.</li>
+                  <li>페이지를 새로고침한 뒤 다시 시도해 주세요.</li>
+                </ol>
+              </div>
+
+              <p className="text-xs text-text-3 leading-relaxed">
+                위치가 “차단됨”으로 되어 있으면 확인할 수 없어요.
+                <br />
+                기기 자체 위치 서비스(GPS)가 켜져 있는지도 함께 확인해 주세요.
+              </p>
+            </div>
+          </details>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
