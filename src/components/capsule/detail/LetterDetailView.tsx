@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/purity */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import LetterDetailModal, { type UICapsule } from "./LetterDetailModal";
 import LetterLockedView from "./LetterLockedView";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import { useRouter } from "next/navigation";
+import { CircleAlert } from "lucide-react";
 
 type LatLng = { lat: number; lng: number };
 
@@ -44,7 +46,7 @@ type Props = {
   capsuleId: number;
   isProtected?: number;
   password?: string | null;
-  initialLocation?: LatLng | null; // MapContents에서 전달받은 위치 정보
+  initialLocation?: LatLng | null;
 };
 
 export default function LetterDetailView({
@@ -54,6 +56,7 @@ export default function LetterDetailView({
   password = null,
   initialLocation = null,
 }: Props) {
+  const router = useRouter();
   // 내 위치 (current)
   const [currentLocation, setCurrentLocation] = useState<LatLng | null>(
     initialLocation
@@ -96,7 +99,7 @@ export default function LetterDetailView({
     return `${lat},${lng}`;
   }, [currentLocation]);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["capsuleRead", capsuleId, password, locationKey],
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
@@ -124,6 +127,92 @@ export default function LetterDetailView({
       capsuleId > 0 && (initialLocation !== null || currentLocation !== null),
   });
 
+  const handleBack = () => {
+    // 히스토리 없는 진입(공유 링크 첫 방문) 대비
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push("/dashboard", { scroll: false });
+  };
+
+  const shouldShowLocationPermissionGate =
+    isPublic &&
+    initialLocation === null &&
+    currentLocation === null &&
+    !!locationError;
+
+  if (shouldShowLocationPermissionGate) {
+    return (
+      <div className="h-full w-full flex items-center justify-center p-0 md:p-8">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-4 md:p-6 space-y-5">
+          {/* 헤더 */}
+          <div className="space-y-2">
+            <h2 className="text-lg font-medium text-text">
+              위치 권한이 필요해요
+            </h2>
+            <p className="text-sm text-text-2 leading-relaxed">
+              이 편지는 <span className="font-medium text-text">장소 조건</span>
+              이 있어 현재 위치 확인이 필요해요.
+              <br />
+              Chrome에서 위치 권한을{" "}
+              <span className="font-medium text-text">허용</span>으로 변경해
+              주세요.
+            </p>
+          </div>
+
+          {/* 방법 안내 */}
+          <details className="rounded-xl border border-outline bg-sub/60 px-3 md:px-4 py-3">
+            <summary className="cursor-pointer text-sm font-medium text-text">
+              Chrome에서 위치 권한 설정 방법
+            </summary>
+
+            <div className="mt-4 space-y-4 text-sm text-text-2">
+              <div>
+                <div className="font-medium text-text mb-1">
+                  모바일 (Chrome)
+                </div>
+                <ol className="list-decimal pl-4 md:pl-5 space-y-1">
+                  <li>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex gap-1">
+                        주소창 왼쪽의 자물쇠
+                        <CircleAlert size={20} className="flex-none" />
+                      </div>
+                      <span>또는 사이트 정보 아이콘을 누르세요.</span>
+                    </div>
+                  </li>
+                  <li>사이트 설정(또는 권한) → 위치로 이동하세요.</li>
+                  <li>위치를 “허용”으로 변경한 뒤 다시 시도해 주세요.</li>
+                </ol>
+              </div>
+
+              <div>
+                <div className="font-medium text-text mb-1">PC (Chrome)</div>
+                <ol className="list-decimal pl-4 md:pl-5 space-y-1">
+                  <li>
+                    <div className="flex gap-1">
+                      주소창 왼쪽의 자물쇠
+                      <CircleAlert size={20} />를 클릭하세요.
+                    </div>
+                  </li>
+                  <li>사이트 설정 → 위치 → 허용으로 변경하세요.</li>
+                  <li>페이지를 새로고침한 뒤 다시 시도해 주세요.</li>
+                </ol>
+              </div>
+
+              <p className="text-xs text-text-3 leading-relaxed">
+                위치가 “차단됨”으로 되어 있으면 확인할 수 없어요.
+                <br />
+                기기 자체 위치 서비스(GPS)가 켜져 있는지도 함께 확인해 주세요.
+              </p>
+            </div>
+          </details>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
@@ -134,13 +223,33 @@ export default function LetterDetailView({
 
   // 네트워크/서버 레벨 에러 (응답 자체가 없음)
   if (isError || !data) {
-    const fallbackUnlockAt = new Date(
-      Date.now() + 10 * 60 * 1000
-    ).toISOString();
-
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-8">
-        <LetterLockedView isPublic={isPublic} unlockAt={fallbackUnlockAt} />
+      <div className="w-full h-full flex items-center justify-center p-8">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
+          <div className="text-lg font-medium">서버 오류가 발생했어요</div>
+          <p className="text-sm text-text-2">
+            잠시 후 다시 시도해 주세요.
+            <br />
+            문제가 계속되면 네트워크 상태를 확인해 주세요.
+          </p>
+
+          <div className="flex gap-2 justify-center pt-2">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="cursor-pointer px-4 py-2 rounded-lg border border-outline text-text hover:bg-button-hover"
+            >
+              뒤로 가기
+            </button>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

@@ -5,6 +5,7 @@ import Modal from "@/components/common/Modal";
 import Button from "@/components/common/Button";
 import { X } from "lucide-react";
 import { updateMe } from "@/lib/api/members/members";
+import toast from "react-hot-toast";
 
 const getErrorMessage = (e: unknown) => {
   if (e && typeof e === "object" && "message" in e) {
@@ -54,6 +55,9 @@ export default function PasswordEditModal({
       await updateMe({
         currentPassword,
         newPassword,
+      });
+      toast.success("인증번호 발송을 성공했습니다!", {
+        style: { borderColor: "#57b970" },
       });
       onClose();
     } catch (e: unknown) {

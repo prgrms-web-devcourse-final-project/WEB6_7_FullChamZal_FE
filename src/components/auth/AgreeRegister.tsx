@@ -20,7 +20,7 @@ export default function AgreeRegister({
       <div className="p-5 space-y-5 border border-outline rounded-xl bg-white">
         <div className="flex gap-2">
           <ShieldAlert size={20} />
-          <div className="w-[347px] space-y-4 text-xs md:text-base">
+          <div className="w-87 space-y-4 text-xs md:text-base">
             <p className="text-text-2 break-keep">
               개인정보보호법에 따라 Dear.___ 에 회원가입 신청하시는 분께
               수집하는 개인정보의 항목, 개인정보의 수집 및 이용목적, 개인정보의
