@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/purity */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import LetterDetailModal, { type UICapsule } from "./LetterDetailModal";
 import LetterLockedView from "./LetterLockedView";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import { useRouter } from "next/navigation";
 
 type LatLng = { lat: number; lng: number };
 
@@ -44,7 +45,7 @@ type Props = {
   capsuleId: number;
   isProtected?: number;
   password?: string | null;
-  initialLocation?: LatLng | null; // MapContents에서 전달받은 위치 정보
+  initialLocation?: LatLng | null;
 };
 
 export default function LetterDetailView({
@@ -54,6 +55,7 @@ export default function LetterDetailView({
   password = null,
   initialLocation = null,
 }: Props) {
+  const router = useRouter();
   // 내 위치 (current)
   const [currentLocation, setCurrentLocation] = useState<LatLng | null>(
     initialLocation
@@ -96,7 +98,7 @@ export default function LetterDetailView({
     return `${lat},${lng}`;
   }, [currentLocation]);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["capsuleRead", capsuleId, password, locationKey],
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
@@ -124,6 +126,15 @@ export default function LetterDetailView({
       capsuleId > 0 && (initialLocation !== null || currentLocation !== null),
   });
 
+  const handleBack = () => {
+    // 히스토리 없는 진입(공유 링크 첫 방문) 대비
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push("/dashboard", { scroll: false });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
@@ -134,13 +145,33 @@ export default function LetterDetailView({
 
   // 네트워크/서버 레벨 에러 (응답 자체가 없음)
   if (isError || !data) {
-    const fallbackUnlockAt = new Date(
-      Date.now() + 10 * 60 * 1000
-    ).toISOString();
-
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
-        <LetterLockedView isPublic={isPublic} unlockAt={fallbackUnlockAt} />
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
+          <div className="text-lg font-medium">서버 오류가 발생했어요</div>
+          <p className="text-sm text-text-2">
+            잠시 후 다시 시도해 주세요.
+            <br />
+            문제가 계속되면 네트워크 상태를 확인해 주세요.
+          </p>
+
+          <div className="flex gap-2 justify-center pt-2">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="cursor-pointer px-4 py-2 rounded-lg border border-outline text-text hover:bg-button-hover"
+            >
+              뒤로 가기
+            </button>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

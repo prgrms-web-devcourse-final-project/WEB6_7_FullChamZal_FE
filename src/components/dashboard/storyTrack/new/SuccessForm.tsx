@@ -65,7 +65,7 @@ export default function SuccessForm({
           </div>
         </div>
 
-        {/* 버튼 - 세부 페이지 확인하러 가는 버튼 */}
+        {/* 버튼 */}
         <div className="flex items-center justify-center">
           <button
             onClick={() => router.push("/dashboard/storyTrack/mine")}
