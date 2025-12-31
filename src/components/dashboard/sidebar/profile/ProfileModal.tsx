@@ -414,7 +414,7 @@ export default function ProfileModal({
                 {isEditing ? (
                   <Button
                     type="button"
-                    className="w-full py-3 border border-outline bg-white text-text hover:text-white"
+                    className="w-full py-3 border border-outline bg-white text-text hover:bg-button-hover"
                     onClick={() => {
                       setForm(initialForm);
                       setIsEditing(false);

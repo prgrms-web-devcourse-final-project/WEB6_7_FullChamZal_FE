@@ -6,6 +6,7 @@ import Button from "@/components/common/Button";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { oauthSignup } from "@/lib/api/oauth";
 import { getMeDetail } from "@/lib/api/members/members";
+import toast from "react-hot-toast";
 
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
 const isValidKoreanPhoneDigits = (digits: string) =>
@@ -93,63 +94,81 @@ export default function AuthProfilePage() {
     }
 
     setIsSending(true);
-try {
-  const res = await phoneVerificationApi.send({
-    phoneNumber: phoneDigits,
-    purpose: "SIGNUP",
-    resend: true,
-  });
-  setCooldown(res.cooldownSeconds ?? 180);
-} catch (e: unknown) {
-  const message = e instanceof Error ? e.message : "인증번호 발송에 실패했어요.";
-  setError(message);
-} finally {
-  setIsSending(false);
-}
-};
+    try {
+      const res = await phoneVerificationApi.send({
+        phoneNumber: phoneDigits,
+        purpose: "SIGNUP",
+        resend: true,
+      });
+      setCooldown(res.cooldownSeconds ?? 180);
+      toast.success("인증번호 발송을 성공했습니다!", {
+        style: { borderColor: "#57b970" },
+      });
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "인증번호 발송에 실패했어요.";
+      setError(message);
+      toast.error("인증번호 발송에 실패했습니다.");
+    } finally {
+      setIsSending(false);
+    }
+  };
 
-const onConfirm = async () => {
-  setError(null);
+  const onConfirm = async () => {
+    setError(null);
 
-  if (!canConfirm) return;
+    if (!canConfirm) return;
 
-  setIsConfirming(true);
-  try {
-    const res = await phoneVerificationApi.confirm({
-      phoneNumber: phoneDigits,
-      verificationCode: code.trim(),
-      purpose: "SIGNUP",
-    });
+    setIsConfirming(true);
+    try {
+      const res = await phoneVerificationApi.confirm({
+        phoneNumber: phoneDigits,
+        verificationCode: code.trim(),
+        purpose: "SIGNUP",
+      });
 
-    if (res.verified) setIsVerified(true);
-    else setError("인증에 실패했어요.");
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "인증번호 확인에 실패했어요.";
-    setError(message);
-  } finally {
-    setIsConfirming(false);
-  }
-};
+      if (res.verified) {
+        setIsVerified(true);
+        toast.success("인증번호 확인을 성공했습니다!", {
+          style: { borderColor: "#57b970" },
+        });
+      } else {
+        setError("인증에 실패했어요.");
+        toast.error("인증번호 확인에 실패했어요.");
+      }
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "인증번호 확인에 실패했어요.";
+      setError(message);
+      toast.error("인증번호 확인에 실패했어요.");
+    } finally {
+      setIsConfirming(false);
+    }
+  };
 
-const onSave = async () => {
-  setError(null);
-  if (!canSave) return;
+  const onSave = async () => {
+    setError(null);
+    if (!canSave) return;
 
-  setIsSaving(true);
-  try {
-    await oauthSignup({
-      nickname: nickname.trim(),
-      phoneNumber: phoneDigits,
-    });
-    router.replace("/dashboard");
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "저장에 실패했어요.";
-    setError(message);
-  } finally {
-    setIsSaving(false);
-  }
-};
+    setIsSaving(true);
+    try {
+      await oauthSignup({
+        nickname: nickname.trim(),
+        phoneNumber: phoneDigits,
+      });
 
+      toast.success("저장을 성공했습니다!", {
+        style: { borderColor: "#57b970" },
+      });
+      router.replace("/dashboard");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "저장에 실패했어요.";
+      setError(message);
+      toast.error("저장에 실패했어요.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-sub px-4">
@@ -186,7 +205,12 @@ const onSave = async () => {
               className="flex-1 py-3 px-4 border border-outline rounded-xl outline-none focus:ring-2 focus:ring-primary-3"
               placeholder="'-' 없이 입력"
             />
-            <Button type="button" onClick={onSend} disabled={!canSend} className="w-24">
+            <Button
+              type="button"
+              onClick={onSend}
+              disabled={!canSend}
+              className="w-24"
+            >
               {cooldown > 0 ? `${cooldown}s` : isSending ? "전송" : "인증"}
             </Button>
           </div>
@@ -205,7 +229,12 @@ const onSave = async () => {
               placeholder="인증번호를 입력해주세요"
               disabled={isVerified}
             />
-            <Button type="button" onClick={onConfirm} disabled={!canConfirm} className="w-28">
+            <Button
+              type="button"
+              onClick={onConfirm}
+              disabled={!canConfirm}
+              className="w-28"
+            >
               {isVerified ? "완료" : isConfirming ? "확인" : "확인"}
             </Button>
           </div>

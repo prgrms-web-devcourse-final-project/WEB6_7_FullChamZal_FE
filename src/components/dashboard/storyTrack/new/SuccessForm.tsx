@@ -68,6 +68,7 @@ export default function SuccessForm({
         {/* 버튼 */}
         <div className="flex items-center justify-center">
           <button
+            type="button"
             onClick={() => router.push("/dashboard/storyTrack/mine")}
             className="cursor-pointer py-2 px-3 md:py-3 md:px-5 ring-2 ring-primary-2 rounded-xl hover:bg-button-hover text-sm md:text-base"
           >
