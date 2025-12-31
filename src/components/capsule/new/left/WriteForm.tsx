@@ -348,7 +348,7 @@ export default function WriteForm({
         !locationForm.locationLabel?.trim() ||
         !locationForm.viewingRadius)
     ) {
-      toast.error("장소를 선택하고, 장소 이름과 조회반경을 입력해 주세요.");
+      toast.error("장소를 선택하고, 장소 이름을 입력해 주세요.");
       return;
     }
 
