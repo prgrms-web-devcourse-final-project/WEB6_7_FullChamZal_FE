@@ -239,6 +239,9 @@ export default function LetterDetailModal({
       throw new Error("삭제할 수 없습니다.");
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["capsuleDetailModal"] });
+      queryClient.invalidateQueries({ queryKey: ["capsuleDashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
       setIsDeleteSuccessOpen(true);
     },
     onError: (err: unknown) => {
@@ -699,9 +702,9 @@ export default function LetterDetailModal({
           onClose={() => setIsDeleteSuccessOpen(false)}
           onConfirm={() => {
             setIsDeleteSuccessOpen(false);
+
             if (closeHref) router.push(closeHref);
             else router.back();
-            router.refresh();
           }}
         />
       )}

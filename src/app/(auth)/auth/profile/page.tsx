@@ -108,7 +108,6 @@ export default function AuthProfilePage() {
       const message =
         e instanceof Error ? e.message : "인증번호 발송에 실패했어요.";
       setError(message);
-      toast.error("인증번호 발송에 실패했습니다.");
     } finally {
       setIsSending(false);
     }
@@ -134,13 +133,11 @@ export default function AuthProfilePage() {
         });
       } else {
         setError("인증에 실패했어요.");
-        toast.error("인증번호 확인에 실패했어요.");
       }
     } catch (e: unknown) {
       const message =
         e instanceof Error ? e.message : "인증번호 확인에 실패했어요.";
       setError(message);
-      toast.error("인증번호 확인에 실패했어요.");
     } finally {
       setIsConfirming(false);
     }
@@ -164,7 +161,6 @@ export default function AuthProfilePage() {
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "저장에 실패했어요.";
       setError(message);
-      toast.error("저장에 실패했어요.");
     } finally {
       setIsSaving(false);
     }
