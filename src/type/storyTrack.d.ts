@@ -84,6 +84,7 @@ type PageEnvelope<T> = {
 /** 공개 전체 스토리트랙   */
 type PublicStoryTrackItem = {
   storytrackId: number;
+  creatorNickname: string;
   title: string;
   description: string;
   trackType: string;
@@ -129,6 +130,7 @@ type MineStoryTrackItem = {
 type StoryTrackJoinedItem = {
   memberId: number;
   storytrackId: number;
+  creatorNickname: string;
   title: string;
   description: string;
   trackType: string;
@@ -185,3 +187,62 @@ type JoinedStoryTrackListResponse = ApiEnvelope<
 >;
 type MineStoryTrackListResponse = ApiEnvelope<PageEnvelope<MineStoryTrackItem>>;
 type StoryTrackMineListResponse = ApiResponse<StoryTrackMineListPage>;
+
+// 스토리트랙 상세 조회
+type StoryTrackDetailItem = {
+  storytrackId: number;
+  createrNickname: string;
+  title: string;
+  descripton: string;
+  storytrackType: "SEQUENTIAL" | "PARALLEL";
+  isPublic: number; // 0 | 1
+  totalSteps: number;
+  createdAt: string;
+  totalParticipant: number;
+  completeParticipant: number;
+  memberType: "CREATOR" | "NOT_JOINED" | "JOINED";
+  paths: StoryTrackPaths;
+};
+
+type StoryTrackPaths = {
+  content: StoryTrackPathItem[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+};
+
+type StoryTrackPathItem = {
+  stepOrder: number;
+  capsule: {
+    capsuleId: number;
+    createrNickname: string;
+    capsuleTitle: string;
+    capsuleContent: string;
+    unlockType: string;
+    unlock: {
+      unlockAt: string;
+      locationName: string;
+      location: {
+        address: string;
+        locationLat: number;
+        locationLng: number;
+      };
+      currentViewCount: number;
+    };
+  };
+};
+
+type StoryTrackDetailResponse = ApiEnvelope<StoryTrackDetailItem>;
+
+//스토리트랙 진행 상세 조회
+type StoryTrackProgressItem = {
+  storytrackId: number;
+  completedSteps: number;
+  lastCompletedStep: number;
+  completedAt: string;
+  createdAt: string;
+};
+
+type StoryTrackProgressResponse = ApiEnvelope<StoryTrackProgressItem>;

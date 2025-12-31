@@ -132,4 +132,46 @@ export const storyTrackApi = {
       { signal }
     );
   },
+
+  /**
+   * 스토리트랙 상세 조회
+   * @param params 캡슐id, 페이지네이션 파라미터
+   */
+  storyTrackDetail: (
+    params?: { storytrackId?: string; page?: number; size?: number },
+    signal?: AbortSignal
+  ) => {
+    const storytrackId = params?.storytrackId;
+    const page = params?.page ?? 0;
+    const size = params?.size ?? 100;
+
+    const sp = new URLSearchParams();
+    sp.set("storytrackId", String(storytrackId));
+    sp.set("page", String(page));
+    sp.set("size", String(size));
+
+    return apiFetchRaw<StoryTrackDetailResponse>(
+      `/api/v1/storytrack/dashboard?${sp.toString()}`,
+      { method: "GET", signal }
+    );
+  },
+
+  /**
+   * 스토리트랙 진행 상세 조회
+   * @param params 캡슐id 파라미터
+   */
+  storyTrackProgress: (
+    params?: { storytrackId?: string },
+    signal?: AbortSignal
+  ) => {
+    const storytrackId = params?.storytrackId;
+
+    const sp = new URLSearchParams();
+    sp.set("storytrackId", String(storytrackId));
+
+    return apiFetchRaw<StoryTrackProgressResponse>(
+      `/api/v1/storytrack/participant/progress?${sp.toString()}`,
+      { method: "GET", signal }
+    );
+  },
 };
