@@ -103,8 +103,9 @@ interface CapsuleLikeRequest {
 }
 
 interface CapsuleLikeResponse {
-  likeCount: number;
+  capsuleLikeCount: number;
   message: string;
+  isLiked?: boolean; // readLike API 응답에만 포함됨
 }
 
 interface CapsuleSendReadResponse {
