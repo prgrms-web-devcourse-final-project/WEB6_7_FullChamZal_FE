@@ -7,6 +7,7 @@ import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock, Pencil, PencilOff } from "lucide-react";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
 import { useRouter } from "next/navigation";
+import { distanceMeters } from "@/lib/hooks/distanceMeters";
 
 type LatLng = { lat: number; lng: number };
 
@@ -15,25 +16,6 @@ type Props = {
   type: "send" | "receive" | "bookmark";
   currentPos?: LatLng | null;
 };
-
-/* 위치 계산 */
-function distanceMeters(a: LatLng, b: LatLng) {
-  const R = 6371e3;
-  const toRad = (v: number) => (v * Math.PI) / 180;
-
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-
-  const lat1 = toRad(a.lat);
-  const lat2 = toRad(b.lat);
-
-  const x =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
-  return R * c;
-}
 
 /* 타입 별 UI */
 function getEnvelopeStatus(
