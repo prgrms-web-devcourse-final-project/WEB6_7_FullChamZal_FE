@@ -760,37 +760,40 @@ export default function WriteForm({
         )}
 
         {visibility === "PUBLIC" && (
-          <WriteDiv title="선착순 인원">
-            <div className="flex flex-col gap-2">
-              <div
-                className="flex items-center justify-between cursor-pointer"
-                onClick={() => {
-                  setIsMaxViewCountExpanded((prev) => !prev);
-                  if (isMaxViewCountExpanded) {
-                    setMaxViewCount("");
-                  }
-                }}
-              >
-                <span className="text-sm">선착순 인원</span>
-                {isMaxViewCountExpanded ? (
-                  <Minus size={16} />
-                ) : (
-                  <PlusIcon size={16} />
-                )}
-              </div>
-
-              {isMaxViewCountExpanded && (
-                <div>
-                  <WriteInput
-                    id="maxViewCount"
-                    type="number"
-                    placeholder="인원 수를 입력하세요"
-                    value={maxViewCount}
-                    onChange={(e) => setMaxViewCount(e.target.value)}
-                  />
+          <WriteDiv
+            title={
+              <div className="w-full">
+                <div
+                  className="flex items-center justify-between w-full cursor-pointer"
+                  onClick={() => {
+                    setIsMaxViewCountExpanded((prev) => !prev);
+                    if (isMaxViewCountExpanded) {
+                      setMaxViewCount("");
+                    }
+                  }}
+                >
+                  <span>선착순 인원</span>
+                  {isMaxViewCountExpanded ? (
+                    <Minus size={16} />
+                  ) : (
+                    <PlusIcon size={16} />
+                  )}
                 </div>
-              )}
-            </div>
+                <p className="text-xs text-text-3 mt-1">
+                  이 편지를 열어볼 수 있는 최대 인원수를 설정해 보세요
+                </p>
+              </div>
+            }
+          >
+            {isMaxViewCountExpanded ? (
+              <WriteInput
+                id="maxViewCount"
+                type="number"
+                placeholder="인원 수를 입력하세요"
+                value={maxViewCount}
+                onChange={(e) => setMaxViewCount(e.target.value)}
+              />
+            ) : null}
           </WriteDiv>
         )}
 
