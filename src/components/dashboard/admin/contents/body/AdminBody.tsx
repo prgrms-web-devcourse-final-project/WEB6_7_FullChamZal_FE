@@ -67,7 +67,7 @@ export default function AdminBody({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 md:space-y-6 lg:space-y-8">
       {/* 검색 */}
       <div className="relative w-full">
         <Search
@@ -77,7 +77,7 @@ export default function AdminBody({
         <input
           type="text"
           placeholder={searchPlaceholder}
-          className="w-full p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
+          className="w-full text-xs md:text-base p-3 lg:p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
           value={keywordInput}
           onChange={(e) => setKeywordInput(e.target.value)}
           onBlur={commitKeyword} // 포커스 빠질 때 검색 적용

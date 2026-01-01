@@ -18,5 +18,5 @@ export default async function AdminDashboardLayout({
   if (me.role === "USER") redirect("/dashboard");
   if (me.role !== "ADMIN") redirect("/auth/login");
 
-  return <AdminDashboardShell me={me}>{children}</AdminDashboardShell>;
+  return <AdminDashboardShell>{children}</AdminDashboardShell>;
 }
