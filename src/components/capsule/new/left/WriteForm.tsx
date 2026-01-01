@@ -9,6 +9,8 @@ import {
   PaintBucket,
   Send,
   Check,
+  PlusIcon,
+  Minus,
 } from "lucide-react";
 import {
   CAPTURE_ENVELOPE_PALETTE,
@@ -127,6 +129,8 @@ export default function WriteForm({
     lat: undefined,
     lng: undefined,
   });
+  const [isMaxViewCountExpanded, setIsMaxViewCountExpanded] = useState(false);
+  const [maxViewCount, setMaxViewCount] = useState("");
 
   /* 편지 내용 글자 수 제한 길이 */
   const MAX_CONTENT_LENGTH = 3000;
@@ -352,6 +356,19 @@ export default function WriteForm({
       return;
     }
 
+    // 공개 캡슐 선착순 인원 검증
+    if (visibility === "PUBLIC" && isMaxViewCountExpanded) {
+      if (!maxViewCount || maxViewCount.trim() === "") {
+        toast.error("선착순 인원을 입력해 주세요.");
+        return;
+      }
+      const maxViewCountNum = parseInt(maxViewCount, 10);
+      if (maxViewCountNum < 1) {
+        toast.error("선착순 인원은 1 이상이어야 합니다.");
+        return;
+      }
+    }
+
     const envelopeSelected = envelopeThemes[selectedEnvelope];
     const paperSelected = paperThemes[selectedPaper];
 
@@ -389,6 +406,10 @@ export default function WriteForm({
       capsulePackingColor: envelopeSelected?.name ?? "",
       packingColor: envelopeSelected?.name ?? "",
       contentColor: paperSelected?.name ?? "",
+      maxViewCount:
+        visibility === "PUBLIC" && isMaxViewCountExpanded
+          ? parseInt(maxViewCount, 10) || 0
+          : null,
     });
 
     try {
@@ -733,6 +754,41 @@ export default function WriteForm({
                     placeholder="비밀번호를 입력하세요."
                   />
                 </WriteDiv>
+              )}
+            </div>
+          </WriteDiv>
+        )}
+
+        {visibility === "PUBLIC" && (
+          <WriteDiv title="선착순 인원">
+            <div className="flex flex-col gap-2">
+              <div
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => {
+                  setIsMaxViewCountExpanded((prev) => !prev);
+                  if (isMaxViewCountExpanded) {
+                    setMaxViewCount("");
+                  }
+                }}
+              >
+                <span className="text-sm">선착순 인원</span>
+                {isMaxViewCountExpanded ? (
+                  <Minus size={16} />
+                ) : (
+                  <PlusIcon size={16} />
+                )}
+              </div>
+
+              {isMaxViewCountExpanded && (
+                <div>
+                  <WriteInput
+                    id="maxViewCount"
+                    type="number"
+                    placeholder="인원 수를 입력하세요"
+                    value={maxViewCount}
+                    onChange={(e) => setMaxViewCount(e.target.value)}
+                  />
+                </div>
               )}
             </div>
           </WriteDiv>

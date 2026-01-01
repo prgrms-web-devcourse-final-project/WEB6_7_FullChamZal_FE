@@ -63,7 +63,7 @@ interface CreatePublicCapsuleRequest {
   locationLat: number;
   locationLng: number;
   locationRadiusM: number;
-  maxViewCount: number;
+  maxViewCount: number | null;
   attachmentIds?: number[]; // 첨부 파일 ID 목록
 }
 
