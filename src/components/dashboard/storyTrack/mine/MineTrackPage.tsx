@@ -48,7 +48,7 @@ export default function MineTrackPage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["joinedStoryTrack", size] as const,
+    queryKey: ["mineStoryTrack", size] as const,
     queryFn: ({ pageParam = 0, signal }) =>
       storyTrackApi.mineList({ page: pageParam, size }, signal),
     getNextPageParam: (lastPage) => {
@@ -60,9 +60,9 @@ export default function MineTrackPage() {
     initialPageParam: 0,
   });
 
-  const content: StoryTrackJoinedItem[] = useMemo(() => {
+  const content: StoryTrackMineItem[] = useMemo(() => {
     return (data?.pages.flatMap((p) => p.data.content ?? []) ??
-      []) as StoryTrackJoinedItem[];
+      []) as StoryTrackMineItem[];
   }, [data]);
 
   const infiniteEnabled = Boolean(hasNextPage) && !isFetchingNextPage;

@@ -2,7 +2,7 @@ import { ListOrdered, MapPin, Shuffle, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function MineCard({ track }: { track: StoryTrackJoinedItem }) {
+export default function MineCard({ track }: { track: StoryTrackMineItem }) {
   return (
     <Link
       href={`/dashboard/storyTrack/${track.storytrackId}`}
