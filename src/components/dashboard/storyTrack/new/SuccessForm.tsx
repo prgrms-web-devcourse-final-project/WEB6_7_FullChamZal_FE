@@ -6,14 +6,14 @@ import { useRouter } from "next/navigation";
 
 type Props = {
   title?: string;
-  order?: "ordered" | "free";
+  order?: TrackType;
   routeCount?: number;
   imageUrl?: string;
 };
 
 export default function SuccessForm({
   title = "새 스토리트랙 제목",
-  order = "ordered",
+  order = "SEQUENTIAL",
   routeCount = 0,
   imageUrl,
 }: Props) {
@@ -55,7 +55,7 @@ export default function SuccessForm({
             <div className="text-sm text-text-2">
               트랙 유형:{" "}
               <span className="text-text">
-                {order === "ordered" ? "순서대로" : "순서 없음"}
+                {order === "SEQUENTIAL" ? "순서대로" : "순서 없음"}
               </span>
             </div>
 

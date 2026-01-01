@@ -212,7 +212,7 @@ export default function AllTrackPage() {
             className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "all"
                 ? "border-primary text-primary"
-                : "border-outline text-text-2"
+                : "border-outline text-text-2 hover:bg-button-hover"
             }`}
           >
             전체
@@ -222,7 +222,7 @@ export default function AllTrackPage() {
             className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "PARTICIPANT"
                 ? "border-primary text-primary"
-                : "border-outline text-text-2"
+                : "border-outline text-text-2 hover:bg-button-hover"
             }`}
           >
             참여중
@@ -232,7 +232,7 @@ export default function AllTrackPage() {
             className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "NOT_JOINED"
                 ? "border-primary text-primary"
-                : "border-outline text-text-2"
+                : "border-outline text-text-2 hover:bg-button-hover"
             }`}
           >
             미참여
@@ -242,7 +242,7 @@ export default function AllTrackPage() {
             className={`cursor-pointer px-3 py-2 rounded-xl border ${
               status === "COMPLETED"
                 ? "border-primary text-primary"
-                : "border-outline text-text-2"
+                : "border-outline text-text-2 hover:bg-button-hover"
             }`}
           >
             완료
@@ -273,7 +273,7 @@ export default function AllTrackPage() {
             setStatus("all");
             setSort("newest");
           }}
-          className="cursor-pointer px-3 py-2 rounded-xl border border-outline text-text-2"
+          className="cursor-pointer px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-button-hover"
         >
           초기화
         </button>

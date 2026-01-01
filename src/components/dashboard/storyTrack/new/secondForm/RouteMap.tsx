@@ -14,7 +14,7 @@ type Letter = {
 
 type Props = {
   routeItems: Letter[];
-  order: "ordered" | "free";
+  order: TrackType;
 };
 
 function getKakao(): KakaoNamespace | null {
@@ -158,7 +158,7 @@ export default function RouteMap({ routeItems, order }: Props) {
             <div className="relative flex flex-col items-center">
               {/* 마커 */}
               <div className="w-10 h-10 rounded-full bg-primary-2 border-2 border-white shadow-lg flex items-center justify-center">
-                {order === "ordered" ? (
+                {order === "SEQUENTIAL" ? (
                   <span className="text-white text-xs font-semibold">
                     {index + 1}
                   </span>

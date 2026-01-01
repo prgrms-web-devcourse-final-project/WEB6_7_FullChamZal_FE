@@ -50,9 +50,9 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
           <div className="flex items-center gap-1.5">
             <div className="flex-none w-6 h-6 rounded-full bg-black text-white text-xs flex items-center justify-center">
               {/* 그 사람의 프로필 */}
-              {track.title?.[0] ?? "?"}
+              {track.creatorNickname?.[0] ?? "?"}
             </div>
-            <p className="text-xs text-text-2">이름 들어갈 자리</p>
+            <p className="text-xs text-text-2">{track.creatorNickname}</p>
           </div>
 
           {/* 진행 상황 */}

@@ -69,9 +69,9 @@ export default function FirstForm({ value, onChange }: Props) {
                   <input
                     type="radio"
                     name="order"
-                    value="ordered"
-                    checked={value.order === "ordered"}
-                    onChange={() => onChange({ order: "ordered" })}
+                    value="SEQUENTIAL"
+                    checked={value.order === "SEQUENTIAL"}
+                    onChange={() => onChange({ order: "SEQUENTIAL" })}
                     className="hidden peer"
                   />
                   <div className="flex items-center justify-center py-2.5 border-2 border-outline text-text-3 rounded-lg peer-checked:border-primary-2 peer-checked:bg-button-hover peer-checked:text-primary-2">
@@ -83,9 +83,9 @@ export default function FirstForm({ value, onChange }: Props) {
                   <input
                     type="radio"
                     name="order"
-                    value="free"
-                    checked={value.order === "free"}
-                    onChange={() => onChange({ order: "free" })}
+                    value="FREE"
+                    checked={value.order === "FREE"}
+                    onChange={() => onChange({ order: "FREE" })}
                     className="hidden peer"
                   />
                   <div className="flex items-center justify-center py-2.5 border-2 border-outline text-text-3 rounded-lg peer-checked:border-primary-2 peer-checked:bg-button-hover peer-checked:text-primary-2">

@@ -16,7 +16,7 @@ type FormState = {
   // step1
   title: string;
   description: string;
-  order: OrderType;
+  order: TrackType;
   imageFile: File | null;
 
   // step2
@@ -30,7 +30,7 @@ type Step2UIState = {
 const initialState: FormState = {
   title: "",
   description: "",
-  order: "ordered",
+  order: "SEQUENTIAL",
   imageFile: null,
   routeLetterIds: [],
 };
@@ -79,7 +79,7 @@ export default function CreateStoryTrack() {
       const payload: CreateStorytrackRequest = {
         title: form.title.trim(),
         description: form.description.trim(),
-        trackType: form.order === "ordered" ? "SEQUENTIAL" : "FREE",
+        trackType: form.order === "SEQUENTIAL" ? "SEQUENTIAL" : "FREE",
         isPublic: 1, // 기본값: 공개
         price: 0, // 기본값: 무료
         capsuleList: form.routeLetterIds.map((id) => Number(id)), // string[] → number[]
