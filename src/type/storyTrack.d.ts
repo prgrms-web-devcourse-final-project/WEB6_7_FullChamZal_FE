@@ -200,8 +200,9 @@ type StoryTrackDetailItem = {
   createdAt: string;
   totalParticipant: number;
   completeParticipant: number;
-  memberType: "CREATOR" | "NOT_JOINED" | "JOINED";
+  memberType: "CREATOR" | "NOT_JOINED" | "PARTICIPANT" | "COMPLETED";
   paths: StoryTrackPaths;
+  completedCapsuleId: number[];
 };
 
 type StoryTrackPaths = {

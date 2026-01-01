@@ -141,12 +141,11 @@ export default function TrackDetailPage() {
         <div className="lg:flex-3 flex flex-col gap-4 lg:gap-6 min-h-0">
           {/* Top */}
           {/* role이 참여자일 경우에만 보이도록 처리할 예정 */}
-          {data?.data.memberType === "NOT_JOINED" ? (
+          {(data?.data.memberType === "PARTICIPANT" ||
+            data?.data.memberType === "COMPLETED") && (
             <div className="border border-outline rounded-2xl overflow-hidden">
               <TrackProgress />
             </div>
-          ) : (
-            ""
           )}
 
           {/* Bottom */}
@@ -162,8 +161,10 @@ export default function TrackDetailPage() {
               )}
               {tab === "route" && (
                 <TrackRoute
+                  memberType={data?.data.memberType}
                   storytrackType={data?.data.storytrackType}
                   capsuleList={data?.data.paths.content}
+                  completedCapsuleList={data?.data.completedCapsuleId}
                 />
               )}
             </div>

@@ -31,7 +31,7 @@ export default function TrackProgress() {
     enabled: !!storytrackId,
   });
 
-  // 스토리트랙 상세 조회
+  // 스토리트랙 진행 상세 조회
   const {
     data: progressData,
     isError: isProgressError,
@@ -137,24 +137,32 @@ export default function TrackProgress() {
                 <Flag size={20} className="text-primary" />
                 <span>다음 목적지</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-lg">
-                  {lastCompletedCapsule?.capsule.capsuleTitle}
-                </p>
-                <p className="text-sm text-text-3">
-                  {lastCompletedCapsule?.capsule.unlock.location.address}
-                </p>
-              </div>
+              {detailData?.data.memberType === "COMPLETED" ? (
+                <div className="space-y-1">
+                  <p className="text-sm text-text-3">
+                    모든 편지를 열람했습니다.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-lg">
+                    {lastCompletedCapsule?.capsule.capsuleTitle}
+                  </p>
+                  <p className="text-sm text-text-3">
+                    {lastCompletedCapsule?.capsule.unlock.location.address}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* 시작일 / 최근 방문 */}
             <div className="w-full border border-outline rounded-xl p-4 flex">
               <div className="flex-1 flex flex-col gap-0.5">
-                <span className="text-text-3 text-sm">시작일</span>
+                <span className="text-text-3 text-sm">시작 날짜</span>
                 <span>{progressData?.data.createdAt.slice(0, 10)}</span>
               </div>
               <div className="flex-1 flex flex-col gap-0.5">
-                <span className="text-text-3 text-sm">최근 방문</span>
+                <span className="text-text-3 text-sm">완료 날짜</span>
                 <span>
                   {progressData?.data.completedAt
                     ? progressData?.data.completedAt.slice(0, 10)
