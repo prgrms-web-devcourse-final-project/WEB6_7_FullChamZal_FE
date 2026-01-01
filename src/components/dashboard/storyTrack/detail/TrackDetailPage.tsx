@@ -161,6 +161,7 @@ export default function TrackDetailPage() {
               )}
               {tab === "route" && (
                 <TrackRoute
+                  myLocation={myLocation}
                   memberType={data?.data.memberType}
                   storytrackType={data?.data.storytrackType}
                   capsuleList={data?.data.paths.content}
