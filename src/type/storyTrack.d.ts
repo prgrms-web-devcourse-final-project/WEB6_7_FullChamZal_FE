@@ -16,7 +16,7 @@ type FirstFormValue = {
   imageFile: File | null;
 };
 
-type MemberType = "CREATOR" | "NOT_JOIN" | "PARTICIPANT" | "COMPLETED";
+type MemberType = "CREATOR" | "NOT_JOINED" | "PARTICIPANT" | "COMPLETED";
 
 /* 전체 스토리 트랙 리스트 */
 type StoryTrackItem = {
