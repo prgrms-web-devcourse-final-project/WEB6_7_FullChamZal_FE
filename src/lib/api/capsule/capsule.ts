@@ -22,6 +22,7 @@ type BuildCommonArgs = {
   capsulePackingColor?: string;
   packingColor?: string;
   contentColor?: string;
+  maxViewCount?: number | null;
 };
 
 /**
@@ -192,6 +193,7 @@ export function buildPublicPayload(
     capsulePackingColor = "",
     packingColor = "",
     contentColor = "",
+    maxViewCount = null,
   } = args;
 
   const unlockAt =
@@ -248,7 +250,7 @@ export function buildPublicPayload(
       effectiveUnlockType === "TIME_AND_LOCATION"
         ? locationForm.viewingRadius
         : 0,
-    maxViewCount: 0,
+    maxViewCount: maxViewCount ?? null,
     attachmentIds: [], // 첨부 파일은 추후 구현
   };
 }

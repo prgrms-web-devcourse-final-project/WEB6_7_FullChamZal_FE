@@ -9,6 +9,7 @@ import LetterLockedView from "./LetterLockedView";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
 import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
+import { getErrorMessage } from "@/lib/utils/errorHandler";
 
 type LatLng = { lat: number; lng: number };
 
@@ -99,7 +100,7 @@ export default function LetterDetailView({
     return `${lat},${lng}`;
   }, [currentLocation]);
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["capsuleRead", capsuleId, password, locationKey],
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
@@ -221,33 +222,43 @@ export default function LetterDetailView({
     );
   }
 
+  // 에러 메시지 가져오기
+  const errorMessage = getErrorMessage(error);
+
   // 네트워크/서버 레벨 에러 (응답 자체가 없음)
   if (isError || !data) {
     return (
       <div className="w-full h-full flex items-center justify-center p-8">
         <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
-          <div className="text-lg font-medium">서버 오류가 발생했어요</div>
-          <p className="text-sm text-text-2">
-            잠시 후 다시 시도해 주세요.
-            <br />
-            문제가 계속되면 네트워크 상태를 확인해 주세요.
+          <div className="text-lg font-medium">
+            {errorMessage?.title ?? "서버 오류가 발생했어요"}
+          </div>
+          <p className="text-sm text-text-2 whitespace-pre-line">
+            {errorMessage?.description ??
+              "잠시 후 다시 시도해 주세요.\n문제가 계속되면 네트워크 상태를 확인해 주세요."}
           </p>
 
           <div className="flex gap-2 justify-center pt-2">
             <button
               type="button"
               onClick={handleBack}
-              className="cursor-pointer px-4 py-2 rounded-lg border border-outline text-text hover:bg-button-hover"
+              className={`cursor-pointer px-4 py-2 rounded-lg ${
+                errorMessage?.showRetry === false
+                  ? "bg-primary text-white hover:opacity-90"
+                  : "border border-outline text-text hover:bg-button-hover"
+              }`}
             >
               뒤로 가기
             </button>
-            <button
-              type="button"
-              onClick={() => refetch()}
-              className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
-            >
-              다시 시도
-            </button>
+            {errorMessage?.showRetry !== false && (
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
+              >
+                다시 시도
+              </button>
+            )}
           </div>
         </div>
       </div>
