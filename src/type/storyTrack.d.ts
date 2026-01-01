@@ -7,16 +7,16 @@ type Letter = {
   lng?: number; // 위치 정보 (지도 마커용)
 };
 
-type OrderType = "ordered" | "free";
+type TrackType = "SEQUENTIAL" | "FREE";
 
 type FirstFormValue = {
   title: string;
   description: string;
-  order: "ordered" | "free";
+  order: TrackType;
   imageFile: File | null;
 };
 
-type MemberType = "CREATOR" | "NOT_JOIN" | "PARTICIPANT" | "COMPLETED";
+type MemberType = "CREATOR" | "NOT_JOINED" | "PARTICIPANT" | "COMPLETED";
 
 /* 전체 스토리 트랙 리스트 */
 type StoryTrackItem = {
@@ -24,7 +24,7 @@ type StoryTrackItem = {
   createrName: string;
   title: string;
   desctiption: string;
-  trackType: string;
+  trackType: TrackType;
   isPublic: number;
   price: number;
   totalSteps: number;
@@ -48,7 +48,7 @@ type StoryTrackListResponse = ApiResponse<StoryTrackListPage>;
 type CreateStorytrackRequest = {
   title: string;
   description: string;
-  trackType: "SEQUENTIAL" | "FREE";
+  trackType: TrackType;
   isPublic: number; // 0: 비공개, 1: 공개
   price: number;
   capsuleList: number[]; // capsuleId 배열
@@ -59,7 +59,7 @@ type CreateStorytrackResponse = {
   storytrackId: number;
   title: string;
   description: string;
-  trackType: "SEQUENTIAL" | "FREE";
+  trackType: TrackType;
   isPublic: number;
   price: number;
   totalSteps: number;
@@ -81,64 +81,21 @@ type PageEnvelope<T> = {
   last: boolean;
 };
 
-/** 공개 전체 스토리트랙   */
-type PublicStoryTrackItem = {
-  storytrackId: number;
-  title: string;
-  description: string;
-  trackType: string;
-  isPublic: number;
-  price: number;
-  totalSteps: number;
-  createdAt: string;
-  totalMemberCount: number;
-};
-
-/**  참여한 스토리트랙  */
-type JoinedStoryTrackItem = {
-  memberId: number;
-  storytrackId: number;
-  title: string;
-  description: string;
-  trackType: string;
-  isPublic: number;
-  price: number;
-  totalSteps: number;
-  completedSteps: number;
-  lastCompletedStep: number;
-  startedAt: string;
-  completedAt: string;
-  createdAt: string;
-  totalMemberCount: number;
-};
-
-/**  내가 만든 스토리트랙  */
-type MineStoryTrackItem = {
-  storytrackId: number;
-  title: string;
-  description: string;
-  trackType: string;
-  isPublic: number;
-  price: number;
-  totalSteps: number;
-  createdAt: string;
-  totalMemberCount: number;
-};
-
 /* 참여한 스토리트랙 리스트 item (participant/joinedList) */
 type StoryTrackJoinedItem = {
   memberId: number;
   storytrackId: number;
+  creatorNickname: string;
   title: string;
   description: string;
-  trackType: string;
-  isPublic: number;
+  trackType: TrackType;
+  isPublic: 0 | 1;
   price: number;
   totalSteps: number;
   completedSteps: number;
   lastCompletedStep: number;
   startedAt: string;
-  completedAt: string;
+  completedAt: string | null;
   createdAt: string;
   totalMemberCount: number;
 };
@@ -159,7 +116,7 @@ type StoryTrackMineItem = {
   storytrackId: number;
   title: string;
   description: string;
-  trackType: string;
+  trackType: TrackType;
   isPublic: number;
   price: number;
   totalSteps: number;
@@ -176,12 +133,4 @@ type StoryTrackMineListPage = {
   last: boolean;
 };
 
-// 응답 타입
-type PublicStoryTrackListResponse = ApiEnvelope<
-  PageEnvelope<PublicStoryTrackItem>
->;
-type JoinedStoryTrackListResponse = ApiEnvelope<
-  PageEnvelope<JoinedStoryTrackItem>
->;
-type MineStoryTrackListResponse = ApiEnvelope<PageEnvelope<MineStoryTrackItem>>;
 type StoryTrackMineListResponse = ApiResponse<StoryTrackMineListPage>;

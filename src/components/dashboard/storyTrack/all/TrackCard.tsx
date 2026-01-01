@@ -15,7 +15,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
   const [overlayOpen, setOverlayOpen] = useState(false);
 
   const [memberType, setMemberType] = useState<MemberType>(
-    track.memberType ?? "NOT_JOIN"
+    track.memberType ?? "NOT_JOINED"
   );
 
   const isTouch = useMemo(() => {
@@ -69,7 +69,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
       storyTrackApi.participantStorytrack({ storytrackId: track.storytrackId }),
     onMutate: async () => setMemberType("PARTICIPANT"),
     onError: () =>
-      setMemberType((track.memberType as MemberType) ?? "NOT_JOIN"),
+      setMemberType((track.memberType as MemberType) ?? "NOT_JOINED"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["allStoryTrack"] });
       await queryClient.invalidateQueries({ queryKey: ["joinedStoryTrack"] });
@@ -82,7 +82,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
       storyTrackApi.deleteParticipantStorytrack({
         storytrackId: track.storytrackId,
       }),
-    onMutate: async () => setMemberType("NOT_JOIN"),
+    onMutate: async () => setMemberType("NOT_JOINED"),
     onError: () =>
       setMemberType((track.memberType as MemberType) ?? "PARTICIPANT"),
     onSuccess: async () => {
