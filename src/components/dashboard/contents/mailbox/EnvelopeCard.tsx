@@ -172,11 +172,9 @@ export default function EnvelopeCard({
   // 모바일 1탭 플립 상태
   const [flipped, setFlipped] = useState(false);
 
-  // ✅ flip 애니메이션 중 중복 탭 방지
   const [animating, setAnimating] = useState(false);
   const FLIP_MS = 700; // transition duration과 맞춤
 
-  // ✅ 바깥 터치 감지를 위한 ref
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   const canHover = useMemo(() => {
@@ -190,7 +188,6 @@ export default function EnvelopeCard({
     ? "transform-[rotateY(180deg)]"
     : "transform-[rotateY(0deg)]";
 
-  // ✅ 다른 곳(다른 카드 포함) 터치하면 원복
   useEffect(() => {
     if (!flipped) return;
 
@@ -262,7 +259,6 @@ export default function EnvelopeCard({
   const backShade3 = shiftColor(backBase, +5); // 위 삼각 (조금 밝게)
 
   const CardInner = () => (
-    // ✅ ref를 가장 바깥 래퍼에 달기
     <div
       ref={cardRef}
       className="relative flex flex-col items-center justify-center p-2 perspective-[1000px] group"

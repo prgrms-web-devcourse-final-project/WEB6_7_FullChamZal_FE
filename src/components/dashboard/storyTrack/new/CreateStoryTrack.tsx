@@ -8,6 +8,7 @@ import SuccessForm from "./SuccessForm";
 import FirstForm from "./FirstForm";
 import BackButton from "@/components/common/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
+import toast from "react-hot-toast";
 
 type Step = 1 | 2 | 3;
 
@@ -15,7 +16,7 @@ type FormState = {
   // step1
   title: string;
   description: string;
-  order: OrderType;
+  order: TrackType;
   imageFile: File | null;
 
   // step2
@@ -29,7 +30,7 @@ type Step2UIState = {
 const initialState: FormState = {
   title: "",
   description: "",
-  order: "ordered",
+  order: "SEQUENTIAL",
   imageFile: null,
   routeLetterIds: [],
 };
@@ -78,7 +79,7 @@ export default function CreateStoryTrack() {
       const payload: CreateStorytrackRequest = {
         title: form.title.trim(),
         description: form.description.trim(),
-        trackType: form.order === "ordered" ? "SEQUENTIAL" : "FREE",
+        trackType: form.order === "SEQUENTIAL" ? "SEQUENTIAL" : "FREE",
         isPublic: 1, // 기본값: 공개
         price: 0, // 기본값: 무료
         capsuleList: form.routeLetterIds.map((id) => Number(id)), // string[] → number[]
@@ -99,7 +100,7 @@ export default function CreateStoryTrack() {
         e instanceof Error
           ? e.message
           : "스토리트랙 생성에 실패했습니다. 다시 시도해주세요.";
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

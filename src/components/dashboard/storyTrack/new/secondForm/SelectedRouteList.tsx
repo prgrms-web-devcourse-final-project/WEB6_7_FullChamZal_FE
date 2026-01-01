@@ -24,7 +24,7 @@ export default function SelectedRouteList({
   onReorder,
   onRemove,
 }: {
-  order: OrderType;
+  order: TrackType;
   items: Letter[];
   onReorder: (next: Letter[]) => void;
   onRemove: (id: string) => void;
@@ -69,7 +69,7 @@ export default function SelectedRouteList({
                   key={item.id}
                   item={item}
                   index={index}
-                  showIndex={order === "ordered"}
+                  showIndex={order === "SEQUENTIAL"}
                   onRemove={() => onRemove(item.id)}
                 />
               ))}

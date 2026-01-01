@@ -8,7 +8,7 @@ import SelectedRouteList from "./SelectedRouteList";
 import RouteMap from "./RouteMap";
 
 type Props = {
-  order: OrderType;
+  order: TrackType;
   value: { routeItems: Letter[] };
   onChange: (patch: Partial<{ routeItems: Letter[] }>) => void;
 };

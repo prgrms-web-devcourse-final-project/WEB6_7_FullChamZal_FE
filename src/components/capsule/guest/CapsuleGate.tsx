@@ -37,7 +37,6 @@ export default function CapsuleGate({ uuId }: { uuId: string }) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
         <LetterPasswordModal
-          capsuleId={capsuleId}
           isProtected={isProtected}
           onSuccess={(pw) => setPassword(pw)}
         />

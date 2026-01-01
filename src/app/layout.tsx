@@ -1,6 +1,7 @@
 import "@/css/index.css";
 import Script from "next/script";
 import Providers from "./providers";
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "Next.js",
@@ -16,7 +17,25 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <Providers>
-          {children}{" "}
+          {children}
+
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 2500,
+              style: {
+                borderRadius: "12px",
+                border: "2px solid #ff2600",
+                background: "rgb(255,255,255)",
+                backdropFilter: "blur(8px)",
+                color: "#070d19",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.10)",
+                fontSize: "16px",
+                padding: "12px 16px",
+              },
+            }}
+          />
+
           <Script
             src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_KEY}&libraries=services,clusterer&autoload=false`}
             strategy="beforeInteractive"

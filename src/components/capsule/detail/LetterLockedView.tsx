@@ -37,7 +37,7 @@ function calcDDay(unlockAtMs: number) {
 
 function TimeBox({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="border border-outline px-4 py-3 rounded-2xl bg-sub text-center min-w-[86px]">
+    <div className="border border-outline px-4 py-3 rounded-2xl bg-sub text-center min-w-21.5">
       <div className="text-2xl font-semibold">{value}</div>
       <div className="text-xs text-text-2">{label}</div>
     </div>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -7,10 +6,8 @@ import Logo from "@/components/common/Logo";
 import ForbiddenPage from "./ForbiddenPage";
 
 export default function LetterUnlockModal({
-  capsuleId,
   onSuccess,
 }: {
-  capsuleId: number;
   isProtected: number;
   onSuccess: (password: string) => void;
 }) {
@@ -20,7 +17,7 @@ export default function LetterUnlockModal({
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
+
     // 비밀번호만 검증하고, 실제 read API는 LetterDetailView에서 호출하도록 변경
     // 중복 요청 방지를 위해 비밀번호만 onSuccess로 전달
     if (password.trim().length === 0) {
