@@ -5,7 +5,7 @@ export default function SecondSection() {
     <>
       <section id="why" className="py-20 md:py-60">
         <div className="relative w-full h-105 md:h-140">
-          <div className="relative z-10 w-full max-w-[680px] font-paperlogy space-y-8 md:space-y-15">
+          <div className="relative z-10 w-full max-w-170 font-paperlogy space-y-8 md:space-y-15">
             <div>
               <p className="md:text-2xl">
                 정보는 속도가 중요하지만, <br />
@@ -23,7 +23,7 @@ export default function SecondSection() {
               </p>
             </div>
           </div>
-          <div className="relative sm:absolute bottom-0 right-0 md:-right-15 lg:-right-30 sm:w-[60vw] md:w-[520px] lg:w-[632px] h-full md:h-[460px] lg:h-140 z-0">
+          <div className="relative sm:absolute bottom-0 right-0 md:-right-15 lg:-right-30 sm:w-[60vw] md:w-130 lg:w-158 h-full md:h-115 lg:h-140 z-0">
             <div className="relative w-full h-full">
               <Image
                 src="/img/section2.jpg"

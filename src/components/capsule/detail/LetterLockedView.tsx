@@ -319,7 +319,7 @@ export default function LetterLockedView({
                 onClick={() => router.push("/auth/login")}
                 type="button"
               >
-                로그인하고 저장하기
+                대시보드로 이동
               </button>
             </div>
           )}

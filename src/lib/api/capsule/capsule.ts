@@ -23,6 +23,7 @@ type BuildCommonArgs = {
   packingColor?: string;
   contentColor?: string;
   maxViewCount?: number | null;
+  attachmentIds?: number[];
 };
 
 /**
@@ -40,6 +41,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     effectiveUnlockType,
     dayForm,
     locationForm,
+    attachmentIds = [],
   } = args;
 
   const unlockAt =
@@ -86,6 +88,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     packingColor: args.packingColor ?? "",
     contentColor: args.contentColor ?? "",
     maxViewCount: 0,
+    attachmentIds,
   };
 }
 
@@ -111,6 +114,7 @@ export function buildPrivatePayload(
     locationForm,
     packingColor = "",
     contentColor = "",
+    attachmentIds = [],
   } = args;
 
   const unlockAt =
@@ -168,6 +172,7 @@ export function buildPrivatePayload(
     packingColor,
     contentColor,
     maxViewCount: 0,
+    attachmentIds,
   };
 }
 
@@ -194,6 +199,7 @@ export function buildPublicPayload(
     packingColor = "",
     contentColor = "",
     maxViewCount = null,
+    attachmentIds = [],
   } = args;
 
   const unlockAt =
@@ -251,7 +257,7 @@ export function buildPublicPayload(
         ? locationForm.viewingRadius
         : 0,
     maxViewCount: maxViewCount ?? null,
-    attachmentIds: [], // 첨부 파일은 추후 구현
+    attachmentIds,
   };
 }
 

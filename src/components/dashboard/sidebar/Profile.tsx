@@ -48,7 +48,11 @@ export default function Profile({
   const firstChar = isAdmin ? "A" : me?.name?.[0] ?? "";
 
   return (
-    <button type="button" onClick={onClick} className="w-full text-left">
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${isAdmin ?? "cursor-pointer"} w-full text-left`}
+    >
       <DivBox className="p-4 lg:p-6 border-2">
         <div className="flex items-center gap-3">
           <div className="flex-none bg-text w-14 h-14 rounded-full">

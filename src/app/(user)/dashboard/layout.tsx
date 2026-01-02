@@ -1,5 +1,5 @@
 import { authApiServer } from "@/lib/api/auth/auth.server";
-import DashboardShell from "./DashboardShell";
+import DashboardShell from "../../../components/dashboard/DashboardShell";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({

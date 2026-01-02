@@ -217,7 +217,7 @@ export default function MapContents() {
           {/* 사용자 위치 불러오기 버튼 */}
           <button
             type="button"
-            className="bg-white absolute bottom-4 right-4 p-3 rounded-xl z-10 shadow-lg text-primary"
+            className="cursor-pointer bg-white absolute bottom-4 right-4 p-3 rounded-xl z-10 shadow-lg text-primary"
             onClick={MoveMyLocation}
           >
             <LocateFixed size={24} />
@@ -226,7 +226,7 @@ export default function MapContents() {
           {/* 모바일: 리스트 열기 버튼 */}
           <button
             type="button"
-            className="lg:hidden absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-xl z-10 shadow-lg text-sm bg-primary-2 text-white"
+            className="cursor-pointer lg:hidden absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-xl z-10 shadow-lg text-sm bg-primary-2 text-white"
             onClick={() => setIsListOpen(true)}
           >
             주변 편지 보기 (
@@ -245,7 +245,7 @@ export default function MapContents() {
               <button
                 type="button"
                 onClick={() => setIsFilterOpen((v) => !v)}
-                className="p-2 rounded-lg hover:bg-sub transition"
+                className="cursor-pointer p-2 rounded-lg hover:bg-sub transition"
                 aria-haspopup="menu"
                 aria-expanded={isFilterOpen}
               >
@@ -320,7 +320,7 @@ export default function MapContents() {
                     setIsListOpen(true);
                     setIsFilterOpen((v) => !v);
                   }}
-                  className="p-2 rounded-lg hover:bg-sub transition"
+                  className="cursor-pointer p-2 rounded-lg hover:bg-sub transition"
                   aria-haspopup="menu"
                   aria-expanded={isFilterOpen}
                 >
@@ -330,7 +330,7 @@ export default function MapContents() {
                 <button
                   type="button"
                   onClick={() => setIsListOpen(false)}
-                  className="p-2 rounded-lg hover:bg-sub transition"
+                  className="cursor-pointer p-2 rounded-lg hover:bg-sub transition"
                   aria-label="닫기"
                 >
                   ✕

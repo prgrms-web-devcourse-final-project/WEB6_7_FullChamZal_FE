@@ -11,7 +11,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import DataTable from "../DataTable";
 import { AlertCircle, MinusCircle, XCircle } from "lucide-react";
-import ModerationDetail from "./ModerationDetail";
+import ModerationDetail from "./detail/ModerationDetail";
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
 
 function DecisionBadge({ decision }: { decision: ModerationDecision }) {
   if (decision === "SKIPPED") {
@@ -134,7 +135,7 @@ export default function ModerationList({
       {
         key: "createdAt",
         header: "생성 시간",
-        cell: (m: AdminModeration) => m.createdAt,
+        cell: (m: AdminModeration) => formatDateTime(m.createdAt),
       },
       {
         key: "userId",

@@ -1,17 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 
-/**
- * CapsuleDashboardItem을 Letter 타입으로 변환
- */
 function toLetter(item: CapsuleDashboardItem): Letter {
   return {
     id: String(item.capsuleId),
     title: item.title,
     placeName: item.locationName ?? undefined,
-    createdAt: item.createAt,
+    createdAt: item.createAt ?? "", // ✅ 방어
     lat: item.locationLat ?? undefined,
     lng: item.locationLng ?? undefined,
   };
@@ -19,19 +17,20 @@ function toLetter(item: CapsuleDashboardItem): Letter {
 
 export default function PublicLetterPicker({
   onSelect,
+  selectedIds = [],
 }: {
   onSelect: (letter: Letter) => void;
+  selectedIds?: string[]; // ✅ Set 금지
 }) {
-  // 공개 캡슐 목록 조회
-  // 캡슐 100개 최대, 100개 이상이 필요하면 무한스크롤 구현 필요
+  const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["storytrackCapsuleList"],
     queryFn: ({ signal }) =>
       storyTrackApi.getCapsuleList({ page: 0, size: 100 }, signal),
-    staleTime: 1000 * 30, // 30초간 캐시 유지: 이 시간 동안은 API 재호출 없이 캐시된 데이터 사용
+    staleTime: 1000 * 30,
   });
 
-  // 로딩 중
   if (isLoading) {
     return (
       <div className="px-4 py-8 text-center text-text-3 text-sm">
@@ -40,7 +39,6 @@ export default function PublicLetterPicker({
     );
   }
 
-  // 에러 발생
   if (isError) {
     return (
       <div className="px-4 py-8 text-center text-text-3 text-sm">
@@ -49,10 +47,8 @@ export default function PublicLetterPicker({
     );
   }
 
-  // 데이터 변환
   const letters: Letter[] = data?.data?.content?.map(toLetter) ?? [];
 
-  // 빈 목록
   if (letters.length === 0) {
     return (
       <div className="px-4 py-8 text-center text-text-3 text-sm">
@@ -63,20 +59,42 @@ export default function PublicLetterPicker({
 
   return (
     <ul className="divide-y divide-outline">
-      {letters.map((l) => (
-        <li key={l.id}>
-          <button
-            type="button"
-            onClick={() => onSelect(l)}
-            className="w-full text-left px-4 py-3 hover:bg-button-hover"
-          >
-            <div className="text-sm text-text">{l.title}</div>
-            <div className="text-xs text-text-4">
-              {l.placeName ?? "위치 미지정"}
-            </div>
-          </button>
-        </li>
-      ))}
+      {letters.map((l) => {
+        const already = selectedSet.has(l.id);
+
+        return (
+          <li key={l.id}>
+            <button
+              type="button"
+              disabled={already}
+              onClick={() => onSelect(l)}
+              className={[
+                "w-full text-left px-4 py-3 transition",
+                already
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-button-hover active:scale-[0.99]",
+              ].join(" ")}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-text line-clamp-1">
+                    {l.title}
+                  </div>
+                  <div className="text-xs text-text-4 line-clamp-1">
+                    {l.placeName ?? "위치 미지정"}
+                  </div>
+                </div>
+
+                {already ? (
+                  <span className="shrink-0 inline-flex items-center rounded-full border border-outline bg-white px-2 py-1 text-[11px] text-text-3">
+                    추가됨
+                  </span>
+                ) : null}
+              </div>
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
 }

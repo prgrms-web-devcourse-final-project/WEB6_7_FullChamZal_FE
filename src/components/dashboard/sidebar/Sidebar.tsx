@@ -105,7 +105,7 @@ export default function Sidebar({
                 <button
                   type="button"
                   onClick={onMobileClose}
-                  className="p-2 rounded-lg hover:bg-button-hover"
+                  className="cursor-pointer p-2 rounded-lg hover:bg-button-hover"
                   aria-label="메뉴 닫기"
                 >
                   <X size={20} />

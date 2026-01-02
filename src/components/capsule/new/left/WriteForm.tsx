@@ -11,6 +11,7 @@ import {
   Check,
   PlusIcon,
   Minus,
+  X,
 } from "lucide-react";
 import {
   CAPTURE_ENVELOPE_PALETTE,
@@ -22,10 +23,11 @@ import VisibilityOpt from "./VisibilityOpt";
 import WriteInput from "./WriteInput";
 import UnlockConditionTabs from "./UnlockConditionTabs";
 import { useEffect, useRef, useState } from "react";
+import { useCleanupTempFiles } from "@/lib/hooks/useCleanupTempFiles";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
 import ActiveModal from "../../../common/ActiveModal";
@@ -38,6 +40,7 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
+import { attachmentApi } from "@/lib/api/capsule/attachment";
 import toast from "react-hot-toast";
 
 type PreviewState = {
@@ -67,6 +70,20 @@ function extractBadFields(msg: string) {
 }
 
 function getErrorMessage(err: unknown) {
+  // ApiError인 경우 code 확인
+  if (err && typeof err === "object" && "code" in err) {
+    const apiError = err as { code?: string; message?: string };
+
+    // 특정 에러 코드에 대한 메시지
+    if (apiError.code === "CPSF004") {
+      return "이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+    }
+
+    if (apiError.message) {
+      return apiError.message;
+    }
+  }
+
   if (err instanceof Error) return err.message;
 
   if (err && typeof err === "object") {
@@ -90,12 +107,18 @@ const FIELD_LABEL: Record<string, string> = {
 };
 
 export default function WriteForm({
+  preview,
   onPreviewChange,
 }: {
   preview: PreviewState;
   onPreviewChange: (next: PreviewState) => void;
 }) {
   const router = useRouter();
+  /* 빠른 편지 쓰기 템플릿 쿼리문 확인 */
+  const sp = useSearchParams();
+  const template = (sp.get("template") as TemplateId | null) ?? null;
+  const didInitRef = useRef(false);
+
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [result, setResult] = useState<{
     userName: string;
@@ -131,6 +154,19 @@ export default function WriteForm({
   });
   const [isMaxViewCountExpanded, setIsMaxViewCountExpanded] = useState(false);
   const [maxViewCount, setMaxViewCount] = useState("");
+
+  /* 이미지 업로드 관련 */
+  const [uploadedAttachments, setUploadedAttachments] = useState<
+    {
+      attachmentId: number;
+      fileName: string;
+      previewUrl?: string;
+    }[]
+  >([]);
+  // cleanup에서 최신 값을 참조하기 위한 ref
+  const uploadedAttachmentsRef = useRef(uploadedAttachments);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   /* 편지 내용 글자 수 제한 길이 */
   const MAX_CONTENT_LENGTH = 3000;
@@ -238,6 +274,107 @@ export default function WriteForm({
     const next = e.currentTarget.value;
     setContent(next.slice(0, MAX_CONTENT_LENGTH));
   };
+
+  // 이미지 파일 선택 핸들러
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const MAX_FILES = 3; // 최대 3개까지
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+    // 기존 파일 수 확인
+    const currentCount = uploadedAttachments.length;
+    if (currentCount + files.length > MAX_FILES) {
+      toast.error(`이미지는 최대 ${MAX_FILES}개까지 업로드할 수 있습니다.`);
+      // input 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    // 파일 검증 및 처리
+    const validFiles: File[] = [];
+    for (const file of files) {
+      // 이미지 파일만 허용
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name}: 이미지 파일만 업로드할 수 있습니다.`);
+        continue;
+      }
+
+      // 파일 크기 제한
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name}: 파일 크기는 10MB 이하여야 합니다.`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) {
+      // input 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      for (const file of validFiles) {
+        const response = await attachmentApi.uploadByServer(file);
+
+        // 미리보기 URL 생성 (로컬)
+        const previewUrl = URL.createObjectURL(file);
+
+        setUploadedAttachments((prev) => [
+          ...prev,
+          {
+            attachmentId: response.attachmentId,
+            fileName: file.name,
+            previewUrl,
+          },
+        ]);
+      }
+      toast.success(`${validFiles.length}개의 이미지가 업로드되었습니다.`);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsUploading(false);
+      // input 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  // 이미지 삭제 핸들러
+  const handleRemoveAttachment = async (attachmentId: number) => {
+    try {
+      await attachmentApi.deleteTemp(attachmentId);
+      setUploadedAttachments((prev) => {
+        const removed = prev.find((a) => a.attachmentId === attachmentId);
+        if (removed?.previewUrl) {
+          URL.revokeObjectURL(removed.previewUrl);
+        }
+        return prev.filter((a) => a.attachmentId !== attachmentId);
+      });
+      toast.success("이미지가 삭제되었습니다.");
+    } catch {
+      toast.error("이미지 삭제에 실패했습니다.");
+    }
+  };
+
+  // uploadedAttachments 변경 시 ref 업데이트
+  useEffect(() => {
+    uploadedAttachmentsRef.current = uploadedAttachments;
+  }, [uploadedAttachments]);
+
+  // 임시 파일 자동 정리 훅 사용
+  // ㄴ 브라우저 탭 나가기 (beforeunload)
+  // ㄴ 컴포넌트 언마운트 (뒤로가기, 페이지 이동 등)
+  useCleanupTempFiles(uploadedAttachmentsRef);
 
   const showBadFieldsToast = (rawMessage: string) => {
     const fields = extractBadFields(rawMessage);
@@ -372,6 +509,8 @@ export default function WriteForm({
     const envelopeSelected = envelopeThemes[selectedEnvelope];
     const paperSelected = paperThemes[selectedPaper];
 
+    const attachmentIds = uploadedAttachments.map((a) => a.attachmentId);
+
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
       senderName,
@@ -389,6 +528,7 @@ export default function WriteForm({
       contentColor: paperSelected?.name ?? "",
       capsuleColor: paperSelected?.name ?? "",
       capsulePackingColor: envelopeSelected?.name ?? "",
+      attachmentIds,
     });
 
     const publicPayload = buildPublicPayload({
@@ -410,6 +550,7 @@ export default function WriteForm({
         visibility === "PUBLIC" && isMaxViewCountExpanded
           ? parseInt(maxViewCount, 10) || 0
           : null,
+      attachmentIds,
     });
 
     try {
@@ -426,6 +567,7 @@ export default function WriteForm({
               effectiveUnlockType,
               dayForm,
               locationForm,
+              attachmentIds,
             });
             return createMyCapsule(myPayload);
           })()
@@ -456,6 +598,15 @@ export default function WriteForm({
     } catch (error) {
       console.error(error);
 
+      // 에러 발생 시 업로드된 임시 파일들 정리
+      for (const attachment of uploadedAttachments) {
+        try {
+          await attachmentApi.deleteTemp(attachment.attachmentId);
+        } catch {
+          // 무시
+        }
+      }
+
       const message = getErrorMessage(error);
 
       if (message.includes("문제가 된 항목:")) {
@@ -467,6 +618,62 @@ export default function WriteForm({
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+
+    if (template === "future-me") {
+      setVisibility("SELF");
+      setUnlockType("TIME");
+      setReceiveName("미래의 나");
+      setTitle("1년 뒤의 나에게");
+
+      const now = new Date();
+      const oneYearLater = new Date(now);
+      oneYearLater.setFullYear(now.getFullYear() + 1);
+
+      const yyyy = oneYearLater.getFullYear();
+      const mm = String(oneYearLater.getMonth() + 1).padStart(2, "0");
+      const dd = String(oneYearLater.getDate()).padStart(2, "0");
+      const hh = String(oneYearLater.getHours()).padStart(2, "0");
+      const min = String(oneYearLater.getMinutes()).padStart(2, "0");
+
+      setDayForm({ date: `${yyyy}-${mm}-${dd}`, time: `${hh}:${min}` });
+
+      setContent(
+        `안녕, 1년 뒤의 나!\n\n지금 나는...\n\n1년 뒤 너는 어떤 모습일까?\n\n- 오늘의 고민:\n- 지금 가장 중요한 것:\n- 너에게 해주고 싶은 말:`
+      );
+    }
+
+    if (template === "thanks") {
+      setVisibility("PRIVATE");
+      setUnlockType("TIME");
+
+      setReceiveName("고마운 사람");
+      setTitle("고마웠던 마음을 전하며");
+
+      setContent(
+        `안녕하세요.\n\n` +
+          `이 편지를 쓰게 된 이유는, 그때의 고마움을 제대로 전하지 못한 것 같아서예요.\n\n` +
+          `• 고마웠던 순간은 언제였나요?\n` +
+          `- \n\n` +
+          `• 그때 상대가 해준 말이나 행동은 무엇이었나요?\n` +
+          `- \n\n` +
+          `• 그 일이 나에게 어떤 의미였나요?\n` +
+          `- \n\n` +
+          `지금 이 마음을 한 문장으로 전한다면:\n` +
+          `- `
+      );
+    }
+
+    if (template === "public") {
+      setVisibility("PUBLIC");
+      setUnlockType("LOCATION");
+      setTitle("공개 편지");
+      setContent("누군가에게 들려주고 싶은 이야기를 적어보세요.");
+    }
+  }, [template]);
 
   return (
     <>
@@ -502,7 +709,7 @@ export default function WriteForm({
                     key={`${item.name}-${idx}`}
                     type="button"
                     onClick={() => setSelectedEnvelope(idx)}
-                    className={`relative aspect-square rounded-2xl border-2 transition ${
+                    className={`cursor-pointer relative aspect-square rounded-2xl border-2 transition ${
                       selectedEnvelope === idx
                         ? "border-primary bg-primary/10"
                         : "border-outline"
@@ -527,7 +734,7 @@ export default function WriteForm({
                     key={`${item.name}-${idx}`}
                     type="button"
                     onClick={() => setSelectedPaper(idx)}
-                    className={`relative aspect-square rounded-2xl border-2 transition ${
+                    className={`cursor-pointer relative aspect-square rounded-2xl border-2 transition ${
                       selectedPaper === idx
                         ? "border-primary bg-primary/10"
                         : "border-outline"
@@ -552,7 +759,7 @@ export default function WriteForm({
         <WriteDiv title="보내는 사람">
           <div className="space-y-2">
             <div className="flex items-center justify-end gap-3 text-sm text-text-1 -mt-8 mb-2">
-              <label className="flex items-center gap-1 cursor-pointer">
+              <label className="flex items-center gap-1">
                 <input
                   type="checkbox"
                   checked={senderMode === "name"}
@@ -560,7 +767,7 @@ export default function WriteForm({
                 />
                 <span>이름</span>
               </label>
-              <label className="flex items-center gap-1 cursor-pointer">
+              <label className="flex items-center gap-1">
                 <input
                   type="checkbox"
                   checked={senderMode === "nickname"}
@@ -638,7 +845,85 @@ export default function WriteForm({
         </WriteDiv>
 
         <WriteDiv title="이미지 첨부 (선택사항)">
-          <div></div>
+          <div className="space-y-3">
+            {/* 파일 선택 버튼 */}
+            <div className="flex items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                id="image-upload"
+                disabled={isUploading}
+              />
+              <label
+                htmlFor="image-upload"
+                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-white text-sm font-medium transition-colors ${
+                  isUploading
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-sub-2 hover:border-primary-2"
+                }`}
+              >
+                <ImageIcon size={16} />
+                {isUploading ? "업로드 중..." : "파일 선택"}
+              </label>
+              {isUploading && (
+                <span className="text-sm text-text-3">
+                  이미지를 업로드하는 중...
+                </span>
+              )}
+            </div>
+
+            {/* 업로드된 이미지 목록 */}
+            {uploadedAttachments.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {uploadedAttachments.map((attachment) => (
+                  <div
+                    key={attachment.attachmentId}
+                    className="relative group aspect-square rounded-lg overflow-hidden border border-outline bg-sub-2"
+                  >
+                    {attachment.previewUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={attachment.previewUrl}
+                        alt={attachment.fileName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // 이미지 로드 실패 시 대체 UI 표시
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-text-3 text-xs">
+                        <ImageIcon size={24} />
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRemoveAttachment(attachment.attachmentId)
+                      }
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                      aria-label="이미지 삭제"
+                    >
+                      <X size={16} />
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60 text-white text-xs truncate">
+                      {attachment.fileName}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 안내 메시지 */}
+            <p className="text-xs text-text-3">
+              이미지 파일만 업로드 가능합니다. (최대 3개, 파일당 10MB)
+            </p>
+          </div>
         </WriteDiv>
 
         <WriteDiv title="해제 조건">

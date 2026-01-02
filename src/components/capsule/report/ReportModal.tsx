@@ -135,10 +135,10 @@ export default function ReportModal({
             </div>
 
             <button
+              type="button"
               onClick={handleClose}
               className="cursor-pointer p-2 rounded-lg hover:bg-white/10 transition"
               aria-label="닫기"
-              type="button"
             >
               <X size={20} />
             </button>

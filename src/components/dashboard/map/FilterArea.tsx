@@ -37,7 +37,7 @@ export default function FilterArea({
               key={opt.value}
               type="button"
               onClick={() => onRadiusChange(opt.value)}
-              className={`px-3 py-2 rounded-lg text-sm border transition
+              className={`cursor-pointer px-3 py-2 rounded-lg text-sm border transition
                 ${
                   radius === opt.value
                     ? "border-primary bg-primary/5 text-primary"
@@ -101,14 +101,14 @@ export default function FilterArea({
         <button
           type="button"
           onClick={onReset}
-          className="w-full py-2 rounded-lg border border-outline text-sm hover:bg-sub transition"
+          className="cursor-pointer w-full py-2 rounded-lg border border-outline text-sm hover:bg-sub transition"
         >
           초기화
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="w-full py-2 rounded-lg bg-primary text-white text-sm hover:opacity-90 transition"
+          className="cursor-pointer w-full py-2 rounded-lg bg-primary text-white text-sm hover:opacity-90 transition"
         >
           적용
         </button>
