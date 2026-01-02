@@ -196,7 +196,7 @@ export default function CreateStoryTrack() {
               <Button
                 type="button"
                 onClick={() => setStep((s) => (s === 2 ? 1 : s))}
-                className="md:font-normal py-2 px-8 bg-white border border-outline text-text"
+                className="md:font-normal py-2 px-8 bg-white border border-outline text-text hover:bg-button-hover"
               >
                 이전
               </Button>

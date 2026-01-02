@@ -39,7 +39,7 @@ export default function SortableRouteItem({
       {/* Drag handle */}
       <button
         type="button"
-        className="p-1 rounded-md hover:bg-button-hover text-text-4"
+        className="cursor-grab p-1 rounded-md hover:bg-button-hover text-text-4"
         aria-label="드래그해서 순서 변경"
         {...attributes}
         {...listeners}
@@ -66,7 +66,7 @@ export default function SortableRouteItem({
       <button
         type="button"
         onClick={onRemove}
-        className="p-2 rounded-md hover:bg-button-hover text-text-4 hover:text-text"
+        className="cursor-pointer p-2 rounded-md hover:bg-button-hover text-text-4 hover:text-text"
         aria-label="삭제"
       >
         <Trash2 size={18} />
