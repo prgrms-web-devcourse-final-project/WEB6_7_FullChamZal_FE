@@ -780,7 +780,9 @@ export default function LetterDetailModal({
                     isProtected ? "justify-end" : "justify-center"
                   }`}
                 >
-                  <span className="text-text-2">해제 조건:</span>
+                  <span className="hidden md:block text-text-2">
+                    해제 조건:
+                  </span>
                   <div className="flex items-center gap-1 text-text-3">
                     <div className="flex-none">
                       {isTime ? (
@@ -914,16 +916,6 @@ export default function LetterDetailModal({
                     </button>
                   </div>
                 )}
-
-                <div className="flex-1 flex items-center justify-center">
-                  <button
-                    type="button"
-                    className="cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <LinkIcon size={16} className="text-primary" />
-                    <span>링크 복사</span>
-                  </button>
-                </div>
 
                 {isPublic && (
                   <div className="flex-1 flex items-center justify-center">
