@@ -878,20 +878,17 @@ export default function LetterDetailModal({
                   <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
                   </pre>
-                  
+
                   {/* 첨부 이미지 */}
                   {capsule.attachments && capsule.attachments.length > 0 && (
-                    <div className="grid grid-cols-1 gap-3 mt-4">
+                    <div className="flex flex-col gap-3 mt-4 items-start">
                       {capsule.attachments.map((attachment) => (
-                        <div
-                          key={attachment.attachmentId}
-                          className="relative rounded-lg overflow-hidden border border-outline bg-sub-2"
-                        >
+                        <div key={attachment.attachmentId} className="relative">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={attachment.presignedUrl}
                             alt={`첨부 이미지 ${attachment.attachmentId}`}
-                            className="w-full h-auto max-h-96 object-contain"
+                            className="max-h-96 h-auto object-contain"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = "none";
