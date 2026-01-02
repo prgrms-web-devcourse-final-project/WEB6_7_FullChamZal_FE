@@ -335,27 +335,34 @@ export default function EnvelopeCard({
                     viewBox="0 0 280 180"
                     fill="none"
                   >
-                    <path
-                      d="M0.134766 0H280V180H0.134766V0Z"
-                      fill={backShade3}
-                    />
-                    <g filter="url(#filter0_d_150_532)">
-                      <rect
-                        x="31"
-                        y="27"
-                        width="218"
-                        height="136"
-                        fill="#fff"
-                      />
+                    <defs>
+                      <filter
+                        id="cardShadow"
+                        x="0"
+                        y="0"
+                        width="280"
+                        height="180"
+                        filterUnits="userSpaceOnUse"
+                        colorInterpolationFilters="sRGB"
+                      >
+                        <feDropShadow
+                          dx="0"
+                          dy="4"
+                          stdDeviation="6"
+                          floodColor="#000"
+                          floodOpacity="0.18"
+                        />
+                      </filter>
+                    </defs>
+                    <path d="M0 11H280V180H0V11Z" fill={backShade3} />
+                    <g filter="url(#cardShadow)" className="shadow-md">
+                      <rect x="31" width="218" height="128" fill="#FDFDFD" />
                     </g>
                     <path
-                      d="M0.134766 0L140.068 85.7547L280 0V180H0.134766V0Z"
+                      d="M0 11L140 91.5142L280 11V180H0V11Z"
                       fill={backShade1}
                     />
-                    <path
-                      d="M279.866 180H0L139.933 85.7547L279.866 180Z"
-                      fill={backShade2}
-                    />
+                    <path d="M280 180H0L140 92L280 180Z" fill={backShade2} />
                   </svg>
                 </div>
 

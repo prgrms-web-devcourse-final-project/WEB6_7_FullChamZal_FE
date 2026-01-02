@@ -1,7 +1,6 @@
 export function formatDateTime(isoString: string) {
-  const date = new Date(isoString);
-
-  return date.toLocaleString("ko-KR", {
+  return new Date(isoString).toLocaleString("ko-KR", {
+    timeZone: "Asia/Seoul",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

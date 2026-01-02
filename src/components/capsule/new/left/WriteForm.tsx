@@ -851,7 +851,6 @@ export default function WriteForm({
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                multiple
                 onChange={handleFileSelect}
                 className="hidden"
                 id="image-upload"
