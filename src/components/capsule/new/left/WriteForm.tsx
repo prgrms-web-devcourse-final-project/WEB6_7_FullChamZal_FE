@@ -364,14 +364,84 @@ export default function WriteForm({
     uploadedAttachmentsRef.current = uploadedAttachments;
   }, [uploadedAttachments]);
 
-  // 컴포넌트 언마운트 시 미리보기 URL 정리
+  // 브라우저 탭 나가기 시 임시 파일 삭제 (beforeunload)
+  // 참고: beforeunload에서는 비동기 작업이 완료되지 않을 수 있으므로,
+  // fetch with keepalive 옵션 사용하여 페이지 이탈 후에도 요청이 전송되도록 함
   useEffect(() => {
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
+    const handleBeforeUnload = () => {
+      const attachments = uploadedAttachmentsRef.current;
+      if (attachments.length > 0) {
+        // 새로고침은 제외하지만 beforeunload는 구분할 수 없으므로
+        // 일단 삭제 시도 (서버에서 상태 체크하므로 중복 삭제는 안전)
+        attachments.forEach((attachment) => {
+          try {
+            // fetch with keepalive 옵션으로 페이지 이탈 후에도 요청이 전송되도록
+            fetch(
+              `${API_BASE}/api/v1/capsule/upload/${attachment.attachmentId}`,
+              {
+                method: "DELETE",
+                keepalive: true,
+                credentials: "include", // 쿠키 기반 인증을 위해 필요
+              }
+            ).catch(() => {
+              // 실패해도 무시 (서버 스케줄러가 처리)
+            });
+          } catch {
+            // 무시
+          }
+        });
+
+        // 미리보기 URL은 즉시 정리
+        attachments.forEach((attachment) => {
+          if (attachment.previewUrl) {
+            URL.revokeObjectURL(attachment.previewUrl);
+          }
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     return () => {
-      uploadedAttachmentsRef.current.forEach((attachment) => {
-        if (attachment.previewUrl) {
-          URL.revokeObjectURL(attachment.previewUrl);
-        }
-      });
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  // 컴포넌트 언마운트 시 (뒤로가기, 페이지 이동, 취소 버튼 클릭 등) 임시 파일 삭제
+  useEffect(() => {
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
+    return () => {
+      const attachments = uploadedAttachmentsRef.current;
+      if (attachments.length > 0) {
+        // 언마운트 시에는 비동기 작업이 완료되지 않을 수 있으므로
+        // fetch with keepalive 옵션 사용
+        attachments.forEach((attachment) => {
+          try {
+            fetch(
+              `${API_BASE}/api/v1/capsule/upload/${attachment.attachmentId}`,
+              {
+                method: "DELETE",
+                keepalive: true,
+                credentials: "include", // 쿠키 기반 인증을 위해 필요
+              }
+            ).catch(() => {
+              // 실패해도 무시 (서버 스케줄러가 처리)
+            });
+          } catch {
+            // 무시
+          }
+        });
+
+        // 미리보기 URL 정리
+        attachments.forEach((attachment) => {
+          if (attachment.previewUrl) {
+            URL.revokeObjectURL(attachment.previewUrl);
+          }
+        });
+      }
     };
   }, []);
 
