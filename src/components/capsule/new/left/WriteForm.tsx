@@ -11,6 +11,7 @@ import {
   Check,
   PlusIcon,
   Minus,
+  X,
 } from "lucide-react";
 import {
   CAPTURE_ENVELOPE_PALETTE,
@@ -38,6 +39,7 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
+import { attachmentApi } from "@/lib/api/capsule/attachment";
 import toast from "react-hot-toast";
 
 type PreviewState = {
@@ -67,6 +69,20 @@ function extractBadFields(msg: string) {
 }
 
 function getErrorMessage(err: unknown) {
+  // ApiError인 경우 code 확인
+  if (err && typeof err === "object" && "code" in err) {
+    const apiError = err as { code?: string; message?: string };
+
+    // 특정 에러 코드에 대한 메시지
+    if (apiError.code === "CPSF004") {
+      return "이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+    }
+
+    if (apiError.message) {
+      return apiError.message;
+    }
+  }
+
   if (err instanceof Error) return err.message;
 
   if (err && typeof err === "object") {
@@ -131,6 +147,19 @@ export default function WriteForm({
   });
   const [isMaxViewCountExpanded, setIsMaxViewCountExpanded] = useState(false);
   const [maxViewCount, setMaxViewCount] = useState("");
+
+  /* 이미지 업로드 관련 */
+  const [uploadedAttachments, setUploadedAttachments] = useState<
+    {
+      attachmentId: number;
+      fileName: string;
+      previewUrl?: string;
+    }[]
+  >([]);
+  // cleanup에서 최신 값을 참조하기 위한 ref
+  const uploadedAttachmentsRef = useRef(uploadedAttachments);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   /* 편지 내용 글자 수 제한 길이 */
   const MAX_CONTENT_LENGTH = 3000;
@@ -238,6 +267,85 @@ export default function WriteForm({
     const next = e.currentTarget.value;
     setContent(next.slice(0, MAX_CONTENT_LENGTH));
   };
+
+  // 이미지 파일 선택 핸들러
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 이미지 파일만 허용
+    if (!file.type.startsWith("image/")) {
+      toast.error("이미지 파일만 업로드할 수 있습니다.");
+      return;
+    }
+
+    // 파일 크기 제한 (10MB)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("파일 크기는 10MB 이하여야 합니다.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const response = await attachmentApi.uploadByServer(file);
+
+      // 미리보기 URL 생성 (로컬)
+      const previewUrl = URL.createObjectURL(file);
+
+      setUploadedAttachments((prev) => [
+        ...prev,
+        {
+          attachmentId: response.attachmentId,
+          fileName: file.name,
+          previewUrl,
+        },
+      ]);
+
+      toast.success("이미지가 업로드되었습니다.");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsUploading(false);
+      // input 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  // 이미지 삭제 핸들러
+  const handleRemoveAttachment = async (attachmentId: number) => {
+    try {
+      await attachmentApi.deleteTemp(attachmentId);
+      setUploadedAttachments((prev) => {
+        const removed = prev.find((a) => a.attachmentId === attachmentId);
+        if (removed?.previewUrl) {
+          URL.revokeObjectURL(removed.previewUrl);
+        }
+        return prev.filter((a) => a.attachmentId !== attachmentId);
+      });
+      toast.success("이미지가 삭제되었습니다.");
+    } catch {
+      toast.error("이미지 삭제에 실패했습니다.");
+    }
+  };
+
+  // uploadedAttachments 변경 시 ref 업데이트
+  useEffect(() => {
+    uploadedAttachmentsRef.current = uploadedAttachments;
+  }, [uploadedAttachments]);
+
+  // 컴포넌트 언마운트 시 미리보기 URL 정리
+  useEffect(() => {
+    return () => {
+      uploadedAttachmentsRef.current.forEach((attachment) => {
+        if (attachment.previewUrl) {
+          URL.revokeObjectURL(attachment.previewUrl);
+        }
+      });
+    };
+  }, []);
 
   const showBadFieldsToast = (rawMessage: string) => {
     const fields = extractBadFields(rawMessage);
@@ -391,6 +499,8 @@ export default function WriteForm({
       capsulePackingColor: envelopeSelected?.name ?? "",
     });
 
+    const attachmentIds = uploadedAttachments.map((a) => a.attachmentId);
+
     const publicPayload = buildPublicPayload({
       memberId: me.memberId,
       senderName,
@@ -410,6 +520,7 @@ export default function WriteForm({
         visibility === "PUBLIC" && isMaxViewCountExpanded
           ? parseInt(maxViewCount, 10) || 0
           : null,
+      attachmentIds,
     });
 
     try {
@@ -455,6 +566,15 @@ export default function WriteForm({
       }
     } catch (error) {
       console.error(error);
+
+      // 에러 발생 시 업로드된 임시 파일들 정리
+      for (const attachment of uploadedAttachments) {
+        try {
+          await attachmentApi.deleteTemp(attachment.attachmentId);
+        } catch {
+          // 무시
+        }
+      }
 
       const message = getErrorMessage(error);
 
@@ -638,7 +758,75 @@ export default function WriteForm({
         </WriteDiv>
 
         <WriteDiv title="이미지 첨부 (선택사항)">
-          <div></div>
+          <div className="space-y-3">
+            {/* 파일 선택 버튼 */}
+            <div className="flex items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                id="image-upload"
+                disabled={isUploading}
+              />
+              <label
+                htmlFor="image-upload"
+                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-white text-sm font-medium transition-colors ${
+                  isUploading
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-sub-2 hover:border-primary-2"
+                }`}
+              >
+                <ImageIcon size={16} />
+                {isUploading ? "업로드 중..." : "파일 선택"}
+              </label>
+              {isUploading && (
+                <span className="text-sm text-text-3">
+                  이미지를 업로드하는 중...
+                </span>
+              )}
+            </div>
+
+            {/* 업로드된 이미지 목록 */}
+            {uploadedAttachments.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {uploadedAttachments.map((attachment) => (
+                  <div
+                    key={attachment.attachmentId}
+                    className="relative group aspect-square rounded-lg overflow-hidden border border-outline"
+                  >
+                    {attachment.previewUrl && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={attachment.previewUrl}
+                        alt={attachment.fileName}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRemoveAttachment(attachment.attachmentId)
+                      }
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="이미지 삭제"
+                    >
+                      <X size={16} />
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60 text-white text-xs truncate">
+                      {attachment.fileName}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 안내 메시지 */}
+            <p className="text-xs text-text-3">
+              이미지 파일만 업로드 가능합니다. (최대 10MB)
+            </p>
+          </div>
         </WriteDiv>
 
         <WriteDiv title="해제 조건">

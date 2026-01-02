@@ -23,6 +23,7 @@ type BuildCommonArgs = {
   packingColor?: string;
   contentColor?: string;
   maxViewCount?: number | null;
+  attachmentIds?: number[];
 };
 
 /**
@@ -194,6 +195,7 @@ export function buildPublicPayload(
     packingColor = "",
     contentColor = "",
     maxViewCount = null,
+    attachmentIds = [],
   } = args;
 
   const unlockAt =
@@ -251,7 +253,7 @@ export function buildPublicPayload(
         ? locationForm.viewingRadius
         : 0,
     maxViewCount: maxViewCount ?? null,
-    attachmentIds: [], // 첨부 파일은 추후 구현
+    attachmentIds,
   };
 }
 
