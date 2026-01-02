@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, PencilLine } from "lucide-react";
+import { Clock, Globe, PencilLine, Sparkles } from "lucide-react";
 import DivBox from "../../../DivBox";
 import { useRouter } from "next/navigation";
 
@@ -8,22 +8,37 @@ const TEMPLATES: {
   id: TemplateId;
   title: string;
   desc: string;
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
+  accentClass: string;
+  bgClass: string;
+  ringClass: string;
 }[] = [
   {
     id: "future-me",
     title: "미래의 나에게",
     desc: "지금으로부터 1년 뒤, 다시 만나볼 편지",
+    icon: <Clock className="w-5 h-5" />,
+    accentClass: "text-primary",
+    bgClass: "bg-primary/5",
+    ringClass: "hover:ring-primary/30",
   },
   {
     id: "thanks",
     title: "감사 · 칭찬 편지",
     desc: "고마웠던 마음을 솔직하게 전해보세요",
+    icon: <Sparkles className="w-5 h-5" />,
+    accentClass: "text-emerald-600",
+    bgClass: "bg-emerald-500/10",
+    ringClass: "hover:ring-emerald-500/30",
   },
   {
     id: "public",
     title: "공개 편지 작성하기",
     desc: "세상에 들려주고 싶은 이야기를 적어보세요",
+    icon: <Globe className="w-5 h-5" />,
+    accentClass: "text-indigo-600",
+    bgClass: "bg-indigo-500/10",
+    ringClass: "hover:ring-indigo-500/30",
   },
 ];
 
@@ -52,15 +67,25 @@ export default function QuickWrite() {
           {TEMPLATES.map((t) => (
             <DivBox
               key={t.id}
-              className="space-y-4 hover:bg-sub cursor-pointer"
+              className={[
+                "space-y-4 cursor-pointer transition border-none",
+                "ring-1 ring-transparent hover:ring-2",
+                t.ringClass,
+                t.bgClass,
+              ].join(" ")}
               onClick={() => goNew(t.id)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === "Enter" && goNew(t.id)}
             >
-              <Clock />
+              <div
+                className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${t.bgClass}`}
+              >
+                <span className={t.accentClass}>{t.icon}</span>
+              </div>
+
               <div className="space-y-2">
-                <p>{t.title}</p>
+                <p className="font-medium">{t.title}</p>
                 <p className="text-sm text-text-3">{t.desc}</p>
               </div>
             </DivBox>
