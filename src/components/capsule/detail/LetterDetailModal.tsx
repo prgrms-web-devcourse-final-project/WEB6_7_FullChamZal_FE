@@ -11,7 +11,6 @@ import {
   Bookmark,
   Clock,
   Heart,
-  LinkIcon,
   MessageSquareWarning,
   MoreHorizontal,
   MapPin,
@@ -916,6 +915,16 @@ export default function LetterDetailModal({
                     </button>
                   </div>
                 )}
+
+                {/* <div className="flex-1 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <LinkIcon size={16} className="text-primary" />
+                    <span>링크 복사</span>
+                  </button>
+                </div> */}
 
                 {isPublic && (
                   <div className="flex-1 flex items-center justify-center">

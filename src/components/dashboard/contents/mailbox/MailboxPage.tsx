@@ -166,7 +166,7 @@ export default function MailboxPage({
   return (
     <section className="flex-1 w-full">
       <div className="p-4 lg:p-8">
-        <DivBox className="cursor-auto hover:bg-white space-y-4 lg:space-y-12">
+        <DivBox className="cursor-auto space-y-4 lg:space-y-12">
           <div className="flex items-center gap-4">
             <div className="text-primary">{config.icon}</div>
             <div>

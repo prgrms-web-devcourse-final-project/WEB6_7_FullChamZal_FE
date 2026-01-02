@@ -21,7 +21,7 @@ export default function QuickWrite() {
             </div>
           </div>
           <div className="flex flex-col md:flex-row gap-4">
-            <DivBox className="space-y-4">
+            <DivBox className="space-y-4 hover:bg-sub">
               <Clock />
               <div className="space-y-2">
                 <p>미래의 나에게</p>
@@ -30,14 +30,14 @@ export default function QuickWrite() {
                 </p>
               </div>
             </DivBox>
-            <DivBox className="space-y-4">
+            <DivBox className="space-y-4 hover:bg-sub">
               <Clock />
               <div className="space-y-2">
                 <p>뭐할지 생각</p>
                 <p className="text-sm text-text-3">해서 추가하기</p>
               </div>
             </DivBox>
-            <DivBox className="space-y-4">
+            <DivBox className="space-y-4 hover:bg-sub">
               <Clock />
               <div className="space-y-2">
                 <p>공개 편지 작성하기</p>
@@ -48,7 +48,7 @@ export default function QuickWrite() {
             </DivBox>
           </div>
           <DivBox
-            className="py-4 flex items-center justify-center gap-4"
+            className="py-4 flex items-center justify-center gap-4 hover:bg-sub"
             onClick={() => router.push("/capsules/new")}
           >
             <PencilLine size={20} />
