@@ -48,7 +48,7 @@ export default function WritePage() {
         <button
           type="button"
           onClick={() => setIsPreviewOpen(true)}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary-2 text-white py-3"
+          className="cursor-pointer w-full flex items-center justify-center gap-2 rounded-xl bg-primary-2 text-white py-3"
         >
           <Eye size={18} />
           미리보기
@@ -71,7 +71,7 @@ export default function WritePage() {
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(false)}
-                className="p-2 rounded-lg hover:bg-outline/30"
+                className="cursor-pointer p-2 rounded-lg hover:bg-outline/30"
               >
                 <X size={18} />
               </button>

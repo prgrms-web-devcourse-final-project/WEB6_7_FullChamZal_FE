@@ -68,7 +68,7 @@ export default function MapList({ listData, onClick, focus }: MapListProps) {
             <button
               key={d.capsuleId}
               type="button"
-              className="group w-full text-left rounded-xl hover:bg-button-hover focus:bg-primary-2"
+              className="group cursor-pointer w-full text-left rounded-xl hover:bg-button-hover focus:bg-primary-2"
               onClick={() =>
                 onClick(d.capsuleId, d.capsuleLatitude, d.capsuleLongitude)
               }

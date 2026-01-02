@@ -13,7 +13,7 @@ export default function FilterRow({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition
+      className={`cursor-pointer w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition
         ${active ? "bg-primary/5 text-primary" : "hover:bg-sub text-text-2"}`}
     >
       <span>{label}</span>
