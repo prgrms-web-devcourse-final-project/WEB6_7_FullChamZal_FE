@@ -11,7 +11,6 @@ import {
   Bookmark,
   Clock,
   Heart,
-  LinkIcon,
   MessageSquareWarning,
   MoreHorizontal,
   MapPin,
@@ -19,6 +18,7 @@ import {
   Reply,
   Trash2,
   X,
+  Download,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -403,9 +403,8 @@ export default function LetterDetailModal({
   // 저장 버튼 핸들러 (공개 편지 저장하기)
   const handleSave = async () => {
     try {
-      const me = await authApiClient.me();
-      console.log("me:", me);
-      if (!me) throw Object.assign(new Error("NO_ME"), { status: 401 });
+      const loggedIn = await authApiClient.isLoggedIn();
+      if (!loggedIn) throw Object.assign(new Error("NO_ME"), { status: 401 });
 
       const unlockAt = new Date().toISOString();
       saveMutation.mutate({ capsuleId, isSendSelf: 0, unlockAt });
@@ -421,6 +420,7 @@ export default function LetterDetailModal({
       }
 
       console.error("save error:", err);
+      toast.error("저장 중 오류가 발생했습니다.");
     }
   };
 
@@ -453,6 +453,27 @@ export default function LetterDetailModal({
       toast.error(msg);
     }
   };
+
+  // 공개 편지일 때 "보는 사람" 이름 가져오기
+  const { data: viewerName } = useQuery({
+    queryKey: ["viewerName"],
+    enabled: open && isPublic, // 공개 편지 모달 열렸을 때만
+    retry: false,
+    queryFn: async () => {
+      // 로그인 안 했으면 기본 호칭
+      const loggedIn = await authApiClient.isLoggedIn();
+      if (!loggedIn) return null;
+
+      const me = await authApiClient.me();
+      // 프로젝트 DTO에 맞게 우선순위 정하기
+      return (
+        (me as any)?.nickname ??
+        (me as any)?.name ??
+        (me as any)?.userId ??
+        null
+      );
+    },
+  });
 
   // 상세 조회 query (open일 때만)
   // initialData가 있으면 API 호출하지 않음 (중복 요청 방지)
@@ -562,7 +583,7 @@ export default function LetterDetailModal({
   if (!open) return null;
 
   // initialData가 있으면 바로 사용, 없으면 useQuery 결과 사용
-  const capsuleData = initialData ?? data;
+  const capsule = initialData ?? data;
 
   if (!initialData && isLoading) {
     return (
@@ -602,7 +623,7 @@ export default function LetterDetailModal({
     );
   }
 
-  if (!capsuleData) {
+  if (!capsule) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center p-15">
@@ -622,7 +643,10 @@ export default function LetterDetailModal({
     );
   }
 
-  const capsule = capsuleData;
+  // 공개 편지이면 보는 사람 이름, 비공개 편지일 경우 받는 사람 이름, 그냥 빈 데이터이면 당신
+  const dearName = isPublic
+    ? viewerName ?? "당신"
+    : capsule.recipient ?? "당신";
 
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
@@ -776,19 +800,31 @@ export default function LetterDetailModal({
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
-          <div className="shrink-0 border-b px-8 py-4 border-outline">
-            <div className="flex justify-between items-center gap-4">
-              <div className="md:flex-1 truncate">{capsule.title}</div>
+          <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
+            <div className="flex justify-between items-center gap-2 md:gap-4">
+              <div className="block md:flex md:flex-2">
+                <div className="flex-none md:flex-1 truncate font-medium text-base md:text-lg lg:text-xl">
+                  제목: {capsule.title}
+                </div>
 
-              <div
-                className={`flex-1 flex items-center gap-1 ${
-                  isProtected ? "justify-end" : "justify-center"
-                }`}
-              >
-                <span className="hidden md:block text-text-2">해제 조건:</span>
-                <div className="flex items-center gap-1 text-text-3">
-                  {isTime ? <Clock size={16} /> : <MapPin size={16} />}
-                  <span className="line-clamp-1">{unlockLabel}</span>
+                <div
+                  className={`flex items-center gap-1 text-xs md:text-sm lg:text-base ${
+                    isProtected ? "justify-end" : "justify-center"
+                  }`}
+                >
+                  <span className="hidden md:block text-text-2">
+                    해제 조건:
+                  </span>
+                  <div className="flex items-center gap-1 text-text-3">
+                    <div className="flex-none">
+                      {isTime ? (
+                        <Clock className="w-3 md:w-4 " />
+                      ) : (
+                        <MapPin className="w-3 md:w-4" />
+                      )}
+                    </div>
+                    <span className="line-clamp-1">{unlockLabel}</span>
+                  </div>
                 </div>
               </div>
 
@@ -817,24 +853,25 @@ export default function LetterDetailModal({
                           <DropdownMenuItem
                             onClick={() => backupMutation.mutate(capsuleId)}
                           >
-                            <PencilLine className="text-primary" />
+                            <Download className="text-primary" />
                             {backupMutation.isPending
                               ? "백업 중..."
                               : "백업하기"}
                           </DropdownMenuItem>
                         )}
-                        {isSender && (
-                          <DropdownMenuItem
-                            onClick={() => {
-                              router.push(
-                                `/capsules/edit?capsuleId=${capsuleId}`
-                              );
-                            }}
-                          >
-                            <PencilLine className="text-primary" />
-                            수정하기
-                          </DropdownMenuItem>
-                        )}
+                        {isSender ||
+                          (capsule.viewStatus && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                router.push(
+                                  `/capsules/edit?capsuleId=${capsuleId}`
+                                );
+                              }}
+                            >
+                              <PencilLine className="text-primary" />
+                              수정하기
+                            </DropdownMenuItem>
+                          ))}
                         {(isSender || isReceiver) && (
                           <DropdownMenuItem
                             variant="destructive"
@@ -865,13 +902,13 @@ export default function LetterDetailModal({
           {/* Body */}
           <div className="flex-1 overflow-hidden">
             <div
-              className="w-full h-full p-15"
+              className="w-full h-full p-4 md:p-6 lg:p-12"
               style={{ backgroundColor: detailHex }}
             >
-              <div className="w-full h-full flex flex-col justify-between gap-8">
-                <div className="text-2xl space-x-1">
+              <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8">
+                <div className="text-base md:text-xl lg:text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span>{capsule.recipient ?? "(수신자 정보 없음)"}</span>
+                  <span>{dearName}</span>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto space-y-4">
@@ -900,11 +937,11 @@ export default function LetterDetailModal({
                   )}
                 </div>
 
-                <div className="shrink-0 flex flex-col items-end gap-2">
-                  <span className="text-text-3">
+                <div className="shrink-0 flex flex-col items-end gap-1 lg:gap-2">
+                  <span className="text-xs md:text-sm lg:text-base text-text-3">
                     {formatDate(capsule.createdAt)}
                   </span>
-                  <div className="text-2xl space-x-1">
+                  <div className="text-base md:text-xl lg:text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
                     <span>{capsule.writerNickname}</span>
                   </div>
@@ -933,7 +970,7 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
-                <div className="flex-1 flex items-center justify-center">
+                {/* <div className="flex-1 flex items-center justify-center">
                   <button
                     type="button"
                     className="cursor-pointer flex items-center justify-center gap-2"
@@ -941,7 +978,7 @@ export default function LetterDetailModal({
                     <LinkIcon size={16} className="text-primary" />
                     <span>링크 복사</span>
                   </button>
-                </div>
+                </div> */}
 
                 {isPublic && (
                   <div className="flex-1 flex items-center justify-center">

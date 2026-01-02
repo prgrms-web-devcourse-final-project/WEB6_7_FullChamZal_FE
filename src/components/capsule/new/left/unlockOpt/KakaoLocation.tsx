@@ -356,7 +356,7 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
             onClick={moveToMyLocation}
             disabled={!ready || isLocating}
             aria-label="내 위치로 이동"
-            className="bg-white absolute bottom-3 right-3 p-3 rounded-xl z-10 shadow-lg text-primary disabled:opacity-50"
+            className="cursor-pointer bg-white absolute bottom-3 right-3 p-3 rounded-xl z-10 shadow-lg text-primary disabled:opacity-50"
           >
             <LocateFixed size={22} />
           </button>
@@ -379,7 +379,7 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
                 <button
                   key={item.id}
                   type="button"
-                  className="w-full text-left px-3 py-2 hover:bg-sub-2 border-b border-outline last:border-b-0"
+                  className="cursor-pointer w-full text-left px-3 py-2 hover:bg-sub-2 border-b border-outline last:border-b-0"
                   onClick={() => {
                     // x/y(문자열)을 lng/lat(숫자)로 변환
 

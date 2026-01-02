@@ -56,7 +56,7 @@ export default function UsersSection() {
   };
 
   return (
-    <div className="w-full space-y-8">
+    <div className="w-full space-y-4 md:space-y-6 lg:space-y-8">
       <AdminHeader
         title="사용자 관리"
         content="전체 회원을 조회하고 관리할 수 있습니다"

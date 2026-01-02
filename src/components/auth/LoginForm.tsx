@@ -1,10 +1,11 @@
 "use client";
 
 import Input from "@/components/common/Input";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Button from "../common/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApiClient } from "@/lib/api/auth/auth.client";
+import { useMe } from "@/lib/hooks/useMe";
 
 function getErrorMessage(err: unknown) {
   if (err instanceof Error) return err.message;
@@ -31,6 +32,20 @@ export default function LoginForm() {
   const [pw, setPw] = useState("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
+
+  const { data: me, isLoading: meLoading } = useMe();
+
+  useEffect(() => {
+    if (meLoading) return;
+    if (!me) return;
+
+    const isAdmin = me.role === "ADMIN";
+    const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
+    const target = returnUrl ?? fallbackTarget;
+
+    router.replace(target);
+    router.refresh();
+  }, [me, meLoading, returnUrl, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

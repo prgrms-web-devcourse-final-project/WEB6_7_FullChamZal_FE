@@ -94,7 +94,7 @@ export default function JoinedTrackPage() {
             {error instanceof Error ? error.message : String(error)}
           </pre>
           <button
-            className="mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
+            className="cursor-pointer mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
             onClick={() => refetch()}
             type="button"
           >

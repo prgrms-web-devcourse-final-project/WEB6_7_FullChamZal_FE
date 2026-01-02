@@ -2,14 +2,71 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Flag } from "lucide-react";
+import { useParams } from "next/navigation";
+import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
+import { useQuery } from "@tanstack/react-query";
 
 export default function TrackProgress() {
   const [collapsed, setCollapsed] = useState(true);
 
-  const completed = 2;
-  const total = 5;
-  const percent = Math.round((completed / total) * 100);
+  const params = useParams();
+  const storytrackId =
+    typeof params.trackId === "string" ? params.trackId : undefined;
+  const [page] = useState(0);
+  const [size] = useState(100);
 
+  // 스토리트랙 상세 조회
+  const {
+    data: detailData,
+    isError: isDetailError,
+    error: detailError,
+  } = useQuery({
+    queryKey: ["storyTrackDetail", storytrackId],
+    queryFn: async ({ signal }) => {
+      return await storyTrackApi.storyTrackDetail(
+        { storytrackId, page, size },
+        signal
+      );
+    },
+    enabled: !!storytrackId,
+  });
+
+  // 스토리트랙 진행 상세 조회
+  const {
+    data: progressData,
+    isError: isProgressError,
+    error: progressError,
+  } = useQuery({
+    queryKey: ["storyTrackProgress", storytrackId],
+    queryFn: async ({ signal }) => {
+      return await storyTrackApi.storyTrackProgress({ storytrackId }, signal);
+    },
+    enabled: !!storytrackId,
+  });
+
+  const completed = progressData?.data.completedSteps;
+  const total = detailData?.data.totalSteps;
+  const percent =
+    typeof completed === "number" && typeof total === "number" && total > 0
+      ? Math.round((completed / total) * 100)
+      : 0;
+
+  const lastCompletedCapsule =
+    detailData?.data.paths.content[
+      progressData ? progressData?.data.lastCompletedStep : 0
+    ];
+
+  if (isDetailError || isProgressError) {
+    return (
+      <div>
+        {progressError
+          ? "진행 상세 조회 API 에러: " + String(progressError)
+          : "" + detailError
+          ? "스토리트랙 상세 조회 API 에러: " + String(detailError)
+          : ""}
+      </div>
+    );
+  }
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -30,7 +87,7 @@ export default function TrackProgress() {
             <div className="w-28 h-1.5 bg-outline rounded-full overflow-hidden">
               <div
                 className="h-full bg-primary-2"
-                style={{ width: `${(completed / total) * 100}%` }}
+                style={{ width: `${percent}%` }}
               />
             </div>
 
@@ -60,11 +117,13 @@ export default function TrackProgress() {
             <div className="flex gap-4">
               <div className="flex-1 border border-outline rounded-xl p-4 flex flex-col gap-1">
                 <span className="text-xs text-text-3">완료</span>
-                <span className="text-xl">{completed}</span>
+                <span className="text-xl">{completed ?? 0}</span>
               </div>
               <div className="flex-1 border border-outline rounded-xl p-4 flex flex-col gap-1">
                 <span className="text-xs text-text-3">남은 장소</span>
-                <span className="text-xl">{total - completed}</span>
+                <span className="text-xl">
+                  {typeof total === "number" ? total - (completed ?? 0) : "-"}
+                </span>
               </div>
               <div className="flex-1 border border-outline rounded-xl p-4 flex flex-col gap-1">
                 <span className="text-xs text-text-3">전체 장소</span>
@@ -78,23 +137,37 @@ export default function TrackProgress() {
                 <Flag size={20} className="text-primary" />
                 <span>다음 목적지</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-lg">잠실 한강공원</p>
-                <p className="text-sm text-text-3">
-                  서울특별시 송파구 올림픽로 139
-                </p>
-              </div>
+              {detailData?.data.memberType === "COMPLETED" ? (
+                <div className="space-y-1">
+                  <p className="text-sm text-text-3">
+                    모든 편지를 열람했습니다.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-lg">
+                    {lastCompletedCapsule?.capsule.capsuleTitle}
+                  </p>
+                  <p className="text-sm text-text-3">
+                    {lastCompletedCapsule?.capsule.unlock.location.address}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* 시작일 / 최근 방문 */}
             <div className="w-full border border-outline rounded-xl p-4 flex">
               <div className="flex-1 flex flex-col gap-0.5">
-                <span className="text-text-3 text-sm">시작일</span>
-                <span>2024. 12. 20</span>
+                <span className="text-text-3 text-sm">시작 날짜</span>
+                <span>{progressData?.data.createdAt.slice(0, 10)}</span>
               </div>
               <div className="flex-1 flex flex-col gap-0.5">
-                <span className="text-text-3 text-sm">최근 방문</span>
-                <span>2024. 12. 21</span>
+                <span className="text-text-3 text-sm">완료 날짜</span>
+                <span>
+                  {progressData?.data.completedAt
+                    ? progressData?.data.completedAt.slice(0, 10)
+                    : "-"}
+                </span>
               </div>
             </div>
           </div>

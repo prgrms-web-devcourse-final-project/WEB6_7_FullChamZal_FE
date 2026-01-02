@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import ReportCard from "./ReportCard";
-import ReportDetailModal from "./ReportDetailModal";
+import ReportDetailModal from "./detail/ReportDetailModal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminReportApi } from "@/lib/api/admin/reports/adminReports";
 import Pagination from "@/components/common/Pagination";

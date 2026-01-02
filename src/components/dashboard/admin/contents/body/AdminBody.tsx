@@ -67,31 +67,30 @@ export default function AdminBody({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 md:space-y-6 lg:space-y-8">
       {/* 검색 */}
-      <div className="relative w-full">
-        <Search
-          size={20}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-text-4"
-        />
-        <input
-          type="text"
-          placeholder={searchPlaceholder}
-          className="w-full p-4 pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
-          value={keywordInput}
-          onChange={(e) => setKeywordInput(e.target.value)}
-          onBlur={commitKeyword} // 포커스 빠질 때 검색 적용
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              commitKeyword(); // Enter로 검색 적용
-            }
-            if (e.key === "Escape") {
-              e.preventDefault();
-              cancelKeyword(); // (옵션) ESC로 입력 취소
-            }
-          }}
-        />
+      <div className="w-full">
+        <div className="flex items-center gap-3 w-full bg-white/80 border border-outline rounded-xl focus-within:border-primary-2 px-4 py-3 lg:py-4">
+          <Search size={20} className="text-text-4 shrink-0" />
+          <input
+            type="text"
+            placeholder={searchPlaceholder}
+            className="w-full bg-transparent outline-none text-xs md:text-base"
+            value={keywordInput}
+            onChange={(e) => setKeywordInput(e.target.value)}
+            onBlur={commitKeyword} // 포커스 빠질 때 검색 적용
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                commitKeyword(); // Enter로 검색 적용
+              }
+              if (e.key === "Escape") {
+                e.preventDefault();
+                cancelKeyword(); // ESC로 입력 취소
+              }
+            }}
+          />
+        </div>
       </div>
 
       {/* 메뉴 탭 */}

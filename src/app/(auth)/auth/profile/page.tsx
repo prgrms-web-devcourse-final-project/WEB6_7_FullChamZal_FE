@@ -242,7 +242,7 @@ export default function AuthProfilePage() {
 
         <button
           type="button"
-          className="w-full text-center text-xs text-text-3 underline"
+          className="cursor-pointer w-full text-center text-xs text-text-3 underline"
           onClick={() => router.replace("/dashboard")}
         >
           나중에 할래요

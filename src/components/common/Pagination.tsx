@@ -29,7 +29,7 @@ export default function Pagination({
 
       <button
         type="button"
-        className="px-3 py-1 rounded-lg border border-outline disabled:opacity-40"
+        className="cursor-pointer px-3 py-1 rounded-lg border border-outline disabled:opacity-40"
         onClick={() => onPageChange(Math.max(0, page - 1))}
         disabled={isFirst}
       >
@@ -38,7 +38,7 @@ export default function Pagination({
 
       <button
         type="button"
-        className="px-3 py-1 rounded-lg border border-outline disabled:opacity-40"
+        className="cursor-pointer px-3 py-1 rounded-lg border border-outline disabled:opacity-40"
         onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
         disabled={isLast}
       >

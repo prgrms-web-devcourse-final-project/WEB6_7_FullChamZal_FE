@@ -7,6 +7,7 @@ import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock, Pencil, PencilOff } from "lucide-react";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
 import { useRouter } from "next/navigation";
+import { distanceMeters } from "@/lib/hooks/distanceMeters";
 
 type LatLng = { lat: number; lng: number };
 
@@ -15,25 +16,6 @@ type Props = {
   type: "send" | "receive" | "bookmark";
   currentPos?: LatLng | null;
 };
-
-/* 위치 계산 */
-function distanceMeters(a: LatLng, b: LatLng) {
-  const R = 6371e3;
-  const toRad = (v: number) => (v * Math.PI) / 180;
-
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-
-  const lat1 = toRad(a.lat);
-  const lat2 = toRad(b.lat);
-
-  const x =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
-  return R * c;
-}
 
 /* 타입 별 UI */
 function getEnvelopeStatus(
@@ -227,26 +209,26 @@ export default function EnvelopeCard({
   }, [flipped]);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!canOpenDetail) return;
     if (animating) return;
 
-    // 데스크탑(hover 가능)에서는 바로 이동 (기존 hover UX 유지)
+    // 데스크탑(hover 가능)에서는 "열 수 있는 편지"만 바로 이동
     if (canHover) {
+      if (!canOpenDetail) return;
       router.push(href, { scroll: false });
       return;
     }
 
-    // 모바일(hover 불가): 1번 탭 => 뒤집기, 2번 탭 => 이동
+    // 모바일(hover 불가): 1번 탭 => 뒤집기 (잠겨 있어도 OK)
     if (!flipped) {
       e.preventDefault();
       setAnimating(true);
-
       requestAnimationFrame(() => setFlipped(true));
-
       window.setTimeout(() => setAnimating(false), FLIP_MS);
       return;
     }
 
+    // 모바일 2번 탭 => 열 수 있을 때만 이동
+    if (!canOpenDetail) return;
     router.push(href, { scroll: false });
   };
 
@@ -432,24 +414,21 @@ export default function EnvelopeCard({
     </div>
   );
 
-  if (!canOpenDetail) {
-    return (
-      <div className="cursor-not-allowed opacity-80" aria-disabled="true">
-        <CardInner />
-      </div>
-    );
-  }
-
   return (
     <div
       role="button"
       tabIndex={0}
-      className="block cursor-pointer"
+      className={[
+        "block",
+        canOpenDetail ? "cursor-pointer" : "cursor-not-allowed opacity-80",
+      ].join(" ")}
+      aria-disabled={!canOpenDetail}
       onClick={handleClick}
       onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          router.push(href, { scroll: false });
-        }
+        if (e.key !== "Enter") return;
+
+        if (!canOpenDetail) return;
+        router.push(href, { scroll: false });
       }}
     >
       <CardInner />

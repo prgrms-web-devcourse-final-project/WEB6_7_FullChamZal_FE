@@ -84,7 +84,7 @@ export default function MainSection() {
         <Background />
         <div className="relative w-full h-screen z-10 flex items-center justify-center font-paperlogy">
           <div className="max-w-430 min-h-100 flex flex-col items-center justify-center">
-            <h2 className="font-extrabold text-5xl md:text-[112px] md:leading-[132px] bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
+            <h2 className="font-extrabold text-5xl md:text-[112px] md:leading-33 bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
               Dear.&nbsp;
               <span>{visibleText}</span>
               <span className="typing-cursor font-normal">|</span>

@@ -166,7 +166,7 @@ export default function MailboxPage({
   return (
     <section className="flex-1 w-full">
       <div className="p-4 lg:p-8">
-        <DivBox className="cursor-auto hover:bg-white space-y-4 lg:space-y-12">
+        <DivBox className="cursor-auto space-y-4 lg:space-y-12">
           <div className="flex items-center gap-4">
             <div className="text-primary">{config.icon}</div>
             <div>
@@ -183,7 +183,7 @@ export default function MailboxPage({
             </div>
           </div>
 
-          <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 flex-wrap gap-8">
+          <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 flex-wrap gap-8">
             {!list.length ? (
               <p className="text-text-3">
                 {isBookmark ? "북마크한 편지가 없습니다" : "편지가 없습니다"}
