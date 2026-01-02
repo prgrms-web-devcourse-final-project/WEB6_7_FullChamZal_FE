@@ -82,6 +82,11 @@ type CapsuleDashboardItem = {
   locationLng?: number | null;
 };
 
+type CapsuleAttachmentViewResponse = {
+  presignedUrl: string;
+  attachmentId: number;
+};
+
 type CapsuleDashboardSendItem = {
   capsuleId: number;
   capsuleColor: string;
@@ -101,6 +106,7 @@ type CapsuleDashboardSendItem = {
   locationRadiusM: number;
   isBookmarked: boolean;
   result: string;
+  attachments?: CapsuleAttachmentViewResponse[];
 };
 
 /* 북마크 */

@@ -25,6 +25,7 @@ interface CreatePrivateCapsuleRequest {
   maxViewCount: number;
   capsuleColor?: string;
   capsulePackingColor?: string;
+  attachmentIds?: number[]; // 첨부 파일 ID 목록
 }
 
 interface CreateMyCapsuleRequest {
@@ -45,6 +46,7 @@ interface CreateMyCapsuleRequest {
   packingColor: string;
   contentColor: string;
   maxViewCount: number;
+  attachmentIds?: number[]; // 첨부 파일 ID 목록
 }
 
 interface CreatePublicCapsuleRequest {
@@ -111,6 +113,11 @@ interface CapsuleLikeResponse {
   isLiked?: boolean; // readLike API 응답에만 포함됨
 }
 
+interface CapsuleAttachmentViewResponse {
+  presignedUrl: string;
+  attachmentId: number;
+}
+
 interface CapsuleSendReadResponse {
   capsuleId: number;
   capsuleColor: string;
@@ -128,6 +135,7 @@ interface CapsuleSendReadResponse {
   locationLat: number;
   locationLng: number;
   result: string;
+  attachments?: CapsuleAttachmentViewResponse[];
 }
 
 interface CapsuleBackupResponse {

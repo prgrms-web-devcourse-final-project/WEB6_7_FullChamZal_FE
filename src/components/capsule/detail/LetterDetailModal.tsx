@@ -72,6 +72,12 @@ export type UICapsule = {
 
   // 어드민은 필요x
   isBookmarked?: boolean;
+
+  // 첨부 이미지 목록
+  attachments?: Array<{
+    presignedUrl: string;
+    attachmentId: number;
+  }>;
 };
 
 type PostLoginAction =
@@ -525,6 +531,7 @@ export default function LetterDetailModal({
 
           viewStatus: !!s.viewStatus,
           isBookmarked: !!s.isBookmarked,
+          attachments: s.attachments,
         };
       }
 
@@ -562,6 +569,7 @@ export default function LetterDetailModal({
 
         viewStatus: !!u.viewStatus,
         isBookmarked: !!u.isBookmarked,
+        attachments: u.attachments,
       };
     },
   });
@@ -903,10 +911,30 @@ export default function LetterDetailModal({
                   <span>{dearName}</span>
                 </div>
 
-                <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
-                  <pre className="whitespace-pre-wrap wrap-break-word text-sm md:text-base lg:text-lg">
+                <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto space-y-4">
+                  <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
                   </pre>
+
+                  {/* 첨부 이미지 */}
+                  {capsule.attachments && capsule.attachments.length > 0 && (
+                    <div className="flex flex-col gap-3 mt-4 items-start">
+                      {capsule.attachments.map((attachment) => (
+                        <div key={attachment.attachmentId} className="relative">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={attachment.presignedUrl}
+                            alt={`첨부 이미지 ${attachment.attachmentId}`}
+                            className="max-h-96 h-auto object-contain"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="shrink-0 flex flex-col items-end gap-1 lg:gap-2">
