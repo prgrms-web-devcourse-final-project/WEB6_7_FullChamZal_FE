@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Map, Plus, X } from "lucide-react";
 
 import PublicLetterPicker from "./PublicLetterPicker";
 import SelectedRouteList from "./SelectedRouteList";
 import RouteMap from "./RouteMap";
+import Modal from "@/components/common/Modal"; // 경로는 프로젝트에 맞게
 
 type Props = {
   order: TrackType;
@@ -19,8 +20,13 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
   const routeItems = value.routeItems;
 
+  const selectedIds = useMemo(
+    () => new Set(routeItems.map((x) => x.id)),
+    [routeItems]
+  );
+
   const addLetter = (letter: Letter) => {
-    if (routeItems.some((x) => x.id === letter.id)) return;
+    if (selectedIds.has(letter.id)) return;
     onChange({ routeItems: [...routeItems, letter] });
   };
 
@@ -38,10 +44,11 @@ export default function SecondForm({ order, value, onChange }: Props) {
         {/* Left - 경로 설정 */}
         <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-4 lg:p-8 flex flex-col">
           <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-4 lg:space-y-6">
-            {/* 헤더 + 지도 보기 버튼을 내부로 이동 */}
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-2">
-                <div className="text-base lg:text-xl">경로 설정</div>
+                <div className="text-base lg:text-xl font-semibold text-text">
+                  경로 설정
+                </div>
                 <p className="text-xs md:text-sm text-text-2">
                   공개 편지 목록에서 클릭하여 선택하세요.
                   <br />
@@ -49,52 +56,27 @@ export default function SecondForm({ order, value, onChange }: Props) {
                 </p>
               </div>
 
-              {/* 모바일에서만 보이는 지도 버튼 (고정 버튼 제거) */}
               <button
                 type="button"
                 onClick={() => setOpenMap(true)}
-                className="md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-white px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
+                className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-white px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
               >
                 <Map size={16} />
                 지도
               </button>
             </div>
 
-            {/* 버튼 */}
+            {/* 모달 열기 버튼 - 살짝 더 ‘버튼’답게 */}
             <button
               type="button"
-              onClick={() => setOpenPicker((v) => !v)}
-              className="cursor-pointer flex items-center justify-center gap-1 text-text-3 py-2 md:py-4 w-full border border-outline rounded-xl hover:bg-button-hover text-xs md:text-sm lg:text-base"
+              onClick={() => setOpenPicker(true)}
+              className="cursor-pointer w-full rounded-xl border border-outline bg-white hover:bg-button-hover
+                         py-3 md:py-4 text-xs md:text-sm lg:text-base flex items-center justify-center gap-2
+                         shadow-sm active:scale-[0.99] transition"
             >
               <Plus size={20} />
-              내가 작성한 공개 편지 목록에서 선택
+              공개 편지에서 선택하기
             </button>
-
-            {/* 인라인 Picker */}
-            {openPicker && (
-              <div className="border border-outline rounded-xl overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 bg-white">
-                  <div className="text-sm text-text">공개 편지 목록</div>
-                  <button
-                    type="button"
-                    onClick={() => setOpenPicker(false)}
-                    className="p-1 rounded-md hover:bg-button-hover"
-                    aria-label="닫기"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-
-                <div className="max-h-90 overflow-y-auto">
-                  <PublicLetterPicker
-                    onSelect={(letter: Letter) => {
-                      addLetter(letter);
-                      setOpenPicker(false);
-                    }}
-                  />
-                </div>
-              </div>
-            )}
 
             <SelectedRouteList
               order={order}
@@ -105,10 +87,52 @@ export default function SecondForm({ order, value, onChange }: Props) {
           </div>
         </div>
 
-        {/* Right - 지도 (데스크탑에서만 보여줌) */}
+        {/* Right - 지도 (데스크탑) */}
         <div className="hidden md:block flex-1 h-full min-h-0 border border-outline rounded-xl overflow-hidden">
           <RouteMap routeItems={routeItems} order={order} />
         </div>
+
+        {/* 공개 편지 선택 모달 */}
+        <Modal open={openPicker} onClose={() => setOpenPicker(false)}>
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl border border-outline overflow-hidden">
+            <div className="px-5 py-4 border-b border-outline bg-white">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-base font-semibold text-text">
+                    공개 편지 목록
+                  </div>
+                  <p className="mt-1 text-xs text-text-3">
+                    선택하면 경로에 바로 추가돼요.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenPicker(false)}
+                  className="cursor-pointer p-2 rounded-lg hover:bg-button-hover"
+                  aria-label="닫기"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className="max-h-[70dvh] overflow-y-auto">
+              <PublicLetterPicker
+                selectedIds={selectedIds}
+                onSelect={(letter: Letter) => {
+                  addLetter(letter);
+                  setOpenPicker(false);
+                }}
+              />
+            </div>
+
+            <div className="px-5 py-3 border-t border-outline text-xs text-text-4">
+              이미 추가된 편지는{" "}
+              <span className="font-medium text-text-3">추가됨</span>으로
+              표시돼요.
+            </div>
+          </div>
+        </Modal>
 
         {/* 모바일: 지도 바텀시트 */}
         {openMap ? (
@@ -125,7 +149,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
                 <button
                   type="button"
                   onClick={() => setOpenMap(false)}
-                  className="p-2 rounded-lg hover:bg-button-hover"
+                  className="cursor-pointer p-2 rounded-lg hover:bg-button-hover"
                   aria-label="닫기"
                 >
                   <X size={18} />

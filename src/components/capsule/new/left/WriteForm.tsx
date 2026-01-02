@@ -564,7 +564,7 @@ export default function WriteForm({
                     key={`${item.name}-${idx}`}
                     type="button"
                     onClick={() => setSelectedEnvelope(idx)}
-                    className={`relative aspect-square rounded-2xl border-2 transition ${
+                    className={`cursor-pointer relative aspect-square rounded-2xl border-2 transition ${
                       selectedEnvelope === idx
                         ? "border-primary bg-primary/10"
                         : "border-outline"
@@ -589,7 +589,7 @@ export default function WriteForm({
                     key={`${item.name}-${idx}`}
                     type="button"
                     onClick={() => setSelectedPaper(idx)}
-                    className={`relative aspect-square rounded-2xl border-2 transition ${
+                    className={`cursor-pointer relative aspect-square rounded-2xl border-2 transition ${
                       selectedPaper === idx
                         ? "border-primary bg-primary/10"
                         : "border-outline"
@@ -614,7 +614,7 @@ export default function WriteForm({
         <WriteDiv title="보내는 사람">
           <div className="space-y-2">
             <div className="flex items-center justify-end gap-3 text-sm text-text-1 -mt-8 mb-2">
-              <label className="flex items-center gap-1 cursor-pointer">
+              <label className="flex items-center gap-1">
                 <input
                   type="checkbox"
                   checked={senderMode === "name"}
@@ -622,7 +622,7 @@ export default function WriteForm({
                 />
                 <span>이름</span>
               </label>
-              <label className="flex items-center gap-1 cursor-pointer">
+              <label className="flex items-center gap-1">
                 <input
                   type="checkbox"
                   checked={senderMode === "nickname"}

@@ -293,7 +293,7 @@ export default function ProfileModal({
 
                 <button
                   type="button"
-                  className="w-full text-center text-xs text-text-3 underline"
+                  className="cursor-pointer w-full text-center text-xs text-text-3 underline"
                 >
                   비밀번호를 잊으셨나요?
                 </button>

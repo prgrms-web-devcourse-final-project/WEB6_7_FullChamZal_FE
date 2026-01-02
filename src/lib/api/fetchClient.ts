@@ -22,6 +22,33 @@ type ApiFetchOptions = RequestInit & {
   json?: unknown;
 };
 
+function isRedirectResponse(res: Response) {
+  const status = res.status;
+
+  const statusRedirect =
+    status === 301 ||
+    status === 302 ||
+    status === 303 ||
+    status === 307 ||
+    status === 308;
+
+  const opaqueRedirect = res.type === "opaqueredirect";
+
+  return statusRedirect || opaqueRedirect;
+}
+
+async function safeJson<T>(res: Response): Promise<T | null> {
+  // 204 / 빈 바디 방어
+  if (res.status === 204) return null;
+
+  // content-length=0 이거나 아예 json이 아닐 수 있으니 방어적으로
+  try {
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
 export async function apiFetch<T>(
   path: string,
   options: ApiFetchOptions = {}
@@ -36,15 +63,18 @@ export async function apiFetch<T>(
     credentials: "include",
     signal: options.signal,
     cache: "no-store",
+
+    redirect: "manual",
   });
 
-  let envelope: ApiEnvelope<T> | null = null;
-
-  try {
-    envelope = (await res.json()) as ApiEnvelope<T>;
-  } catch {
-    // body 없는 경우 대비
+  if (isRedirectResponse(res)) {
+    throw new ApiError("로그인이 필요합니다.", {
+      code: "AUTH_REDIRECT",
+      status: 401,
+    });
   }
+
+  const envelope = await safeJson<ApiEnvelope<T>>(res);
 
   if (!res.ok) {
     throw new ApiError(envelope?.message ?? "요청 실패", {
@@ -75,9 +105,17 @@ export async function apiFetchRaw<T>(
     credentials: "include",
     signal: options.signal,
     cache: "no-store",
+    redirect: "manual",
   });
 
-  const body = (await res.json().catch(() => null)) as unknown;
+  if (isRedirectResponse(res)) {
+    throw new ApiError("로그인이 필요합니다.", {
+      code: "AUTH_REDIRECT",
+      status: 401,
+    });
+  }
+
+  const body = await safeJson<unknown>(res);
 
   if (!res.ok) {
     const message =
