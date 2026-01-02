@@ -61,7 +61,10 @@ export default function Right({ preview }: { preview: PreviewState }) {
                 </p>
                 <span className="text-primary font-bold">Dear.</span>
                 <span className="text-text-3">
-                  {receiverName || "수신자 이름"}
+                  {receiverName ||
+                    (preview.visibility === "PUBLIC"
+                      ? "당신"
+                      : "받는 사람을 입력하세요")}
                 </span>
               </div>
 
