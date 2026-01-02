@@ -90,8 +90,10 @@ const FIELD_LABEL: Record<string, string> = {
 };
 
 export default function WriteForm({
+  preview,
   onPreviewChange,
 }: {
+  preview: PreviewState;
   onPreviewChange: (next: PreviewState) => void;
 }) {
   const router = useRouter();
