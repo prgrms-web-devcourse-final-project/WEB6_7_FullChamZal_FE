@@ -45,10 +45,12 @@ export default function CapsuleGate({ uuId }: { uuId: string }) {
   }
 
   return (
-    <LetterDetailView
-      capsuleId={capsuleId}
-      isProtected={isProtected}
-      password={password}
-    />
+    <div className="w-full min-h-screen flex items-center justify-center">
+      <LetterDetailView
+        capsuleId={capsuleId}
+        isProtected={isProtected}
+        password={password}
+      />
+    </div>
   );
 }

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Button from "@/components/common/Button";
 import Logo from "@/components/common/Logo";
-import ForbiddenPage from "./ForbiddenPage";
 
 export default function LetterUnlockModal({
   onSuccess,
@@ -28,8 +27,6 @@ export default function LetterUnlockModal({
     // 비밀번호만 전달 (read API는 LetterDetailView에서 호출)
     onSuccess(password);
   };
-
-  if (error === "이 캡슐의 수신자가 아닙니다.") return <ForbiddenPage />;
 
   return (
     <section className="w-full max-w-120 rounded-3xl border border-outline bg-white shadow-xl p-10">
