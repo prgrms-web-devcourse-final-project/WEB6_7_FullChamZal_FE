@@ -282,7 +282,7 @@ export default function EnvelopeCard({
             <div className="flex justify-between h-full text-sm">
               <div className="w-2/5">
                 <p className="line-clamp-1">
-                  Dear.{capsule.recipient ?? "(수신자 정보 없음)"}
+                  Dear.{capsule.recipient ?? "당신"}
                 </p>
                 <div className="space-y-2">
                   <div className="w-full h-px bg-white"></div>
