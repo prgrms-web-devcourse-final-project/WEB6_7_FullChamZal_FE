@@ -88,7 +88,7 @@ export default function AdminBody({
             }
             if (e.key === "Escape") {
               e.preventDefault();
-              cancelKeyword(); // (옵션) ESC로 입력 취소
+              cancelKeyword(); // ESC로 입력 취소
             }
           }}
         />

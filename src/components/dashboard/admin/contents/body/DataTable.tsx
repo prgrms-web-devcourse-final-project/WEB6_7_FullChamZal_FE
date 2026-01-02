@@ -6,6 +6,11 @@ type Column<T> = {
   cell: (row: T) => React.ReactNode;
   skeleton?: React.ReactNode;
   className?: string;
+
+  // 반응형
+  mobileLabel?: React.ReactNode; // 카드뷰에서 label로 쓸 텍스트
+  hideOnMobile?: boolean; // 모바일 카드에서 숨길 컬럼
+  hideBelow?: "sm" | "md" | "lg" | "xl"; // 테이블에서 특정 breakpoint 아래 숨김
 };
 
 function SkeletonBar({ w = "w-24" }: { w?: string }) {
@@ -33,7 +38,7 @@ export default function DataTable<T>({
     <div className="rounded-2xl border border-outline overflow-x-auto overflow-y-hidden">
       <table className="min-w-387.5">
         <thead>
-          <tr className="border-b border-outline text-left [&>th]:py-4 [&>th]:px-6">
+          <tr className="text-sm md:text-base border-b border-outline text-left [&>th]:py-2 md:[&>th]:py-4 [&>th]:px-6">
             {columns.map((col) => (
               <th key={col.key} className={col.className}>
                 {col.header}
@@ -48,7 +53,7 @@ export default function DataTable<T>({
             Array.from({ length: skeletonRowCount }).map((_, rIdx) => (
               <tr
                 key={`sk-${rIdx}`}
-                className="text-sm border-b border-sub last:border-b-0 [&>td]:py-4 [&>td]:px-6"
+                className="text-sm border-b border-sub last:border-b-0 [&>td]:py-2 md:[&>td]:py-4 [&>td]:px-4 md:[&>td]:px-6"
               >
                 {columns.map((col, cIdx) => (
                   <td key={`sk-${rIdx}-${col.key}`} className={col.className}>
@@ -84,7 +89,7 @@ export default function DataTable<T>({
             rows.map((row) => (
               <tr
                 key={getRowKey(row)}
-                className="text-sm border-b border-sub last:border-b-0 [&>td]:py-4 [&>td]:px-6"
+                className="text-sm border-b border-sub last:border-b-0 [&>td]:py-2 md:[&>td]:py-4 [&>td]:px-4 md:[&>td]:px-6"
               >
                 {columns.map((col) => (
                   <td key={col.key} className={col.className}>

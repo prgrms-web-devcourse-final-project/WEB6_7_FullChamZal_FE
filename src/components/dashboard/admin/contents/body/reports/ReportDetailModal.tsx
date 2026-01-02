@@ -106,7 +106,7 @@ export default function ReportDetailModal({
       adminReportApi.get({ reportId: reportId as number, signal }),
   });
 
-  const r: any = report;
+  const r: AdminReportDetail = report as AdminReportDetail;
 
   // 모달 열릴 때 초기값
   useEffect(() => {
