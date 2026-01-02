@@ -228,7 +228,7 @@ export default function LetterDetailView({
   // 네트워크/서버 레벨 에러 (응답 자체가 없음)
   if (isError || !data) {
     return (
-      <div className="w-full h-full flex items-center justify-center p-8">
+      <div className="w-full min-h-full flex items-center justify-center p-8">
         <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
           <div className="text-lg font-medium">
             {errorMessage?.title ?? "서버 오류가 발생했어요"}
