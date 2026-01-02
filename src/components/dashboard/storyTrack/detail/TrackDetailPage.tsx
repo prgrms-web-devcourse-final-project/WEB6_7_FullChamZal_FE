@@ -104,6 +104,8 @@ export default function TrackDetailPage() {
         (myLocation ? (
           <LetterDetailView
             isPublic={true}
+            isStoryTrack={true}
+            storytrackId={storytrackId}
             capsuleId={Number(capsuleId)}
             initialLocation={myLocation}
           />
