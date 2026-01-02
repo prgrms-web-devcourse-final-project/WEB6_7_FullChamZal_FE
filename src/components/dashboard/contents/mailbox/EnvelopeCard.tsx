@@ -227,26 +227,26 @@ export default function EnvelopeCard({
   }, [flipped]);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!canOpenDetail) return;
     if (animating) return;
 
-    // 데스크탑(hover 가능)에서는 바로 이동 (기존 hover UX 유지)
+    // 데스크탑(hover 가능)에서는 "열 수 있는 편지"만 바로 이동
     if (canHover) {
+      if (!canOpenDetail) return;
       router.push(href, { scroll: false });
       return;
     }
 
-    // 모바일(hover 불가): 1번 탭 => 뒤집기, 2번 탭 => 이동
+    // 모바일(hover 불가): 1번 탭 => 뒤집기 (잠겨 있어도 OK)
     if (!flipped) {
       e.preventDefault();
       setAnimating(true);
-
       requestAnimationFrame(() => setFlipped(true));
-
       window.setTimeout(() => setAnimating(false), FLIP_MS);
       return;
     }
 
+    // 모바일 2번 탭 => 열 수 있을 때만 이동
+    if (!canOpenDetail) return;
     router.push(href, { scroll: false });
   };
 
@@ -432,24 +432,21 @@ export default function EnvelopeCard({
     </div>
   );
 
-  if (!canOpenDetail) {
-    return (
-      <div className="cursor-not-allowed opacity-80" aria-disabled="true">
-        <CardInner />
-      </div>
-    );
-  }
-
   return (
     <div
       role="button"
       tabIndex={0}
-      className="block cursor-pointer"
+      className={[
+        "block",
+        canOpenDetail ? "cursor-pointer" : "cursor-not-allowed opacity-80",
+      ].join(" ")}
+      aria-disabled={!canOpenDetail}
       onClick={handleClick}
       onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          router.push(href, { scroll: false });
-        }
+        if (e.key !== "Enter") return;
+
+        if (!canOpenDetail) return;
+        router.push(href, { scroll: false });
       }}
     >
       <CardInner />

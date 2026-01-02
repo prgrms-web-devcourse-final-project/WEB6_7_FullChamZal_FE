@@ -768,19 +768,31 @@ export default function LetterDetailModal({
       <div className="flex h-full justify-center md:p-15 p-6">
         <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
           {/* Header */}
-          <div className="shrink-0 border-b px-8 py-4 border-outline">
-            <div className="flex justify-between items-center gap-4">
-              <div className="md:flex-1 truncate">{capsule.title}</div>
+          <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
+            <div className="flex justify-between items-center gap-2 md:gap-4">
+              <div className="block md:flex md:flex-2">
+                <div className="flex-none md:flex-1 truncate font-medium text-base md:text-lg lg:text-xl">
+                  제목: {capsule.title}
+                </div>
 
-              <div
-                className={`flex-1 flex items-center gap-1 ${
-                  isProtected ? "justify-end" : "justify-center"
-                }`}
-              >
-                <span className="hidden md:block text-text-2">해제 조건:</span>
-                <div className="flex items-center gap-1 text-text-3">
-                  {isTime ? <Clock size={16} /> : <MapPin size={16} />}
-                  <span className="line-clamp-1">{unlockLabel}</span>
+                <div
+                  className={`flex items-center gap-1 text-xs md:text-sm lg:text-base ${
+                    isProtected ? "justify-end" : "justify-center"
+                  }`}
+                >
+                  <span className="hidden md:block text-text-2">
+                    해제 조건:
+                  </span>
+                  <div className="flex items-center gap-1 text-text-3">
+                    <div className="flex-none">
+                      {isTime ? (
+                        <Clock className="w-3 md:w-4 " />
+                      ) : (
+                        <MapPin className="w-3 md:w-4" />
+                      )}
+                    </div>
+                    <span className="line-clamp-1">{unlockLabel}</span>
+                  </div>
                 </div>
               </div>
 
@@ -857,26 +869,26 @@ export default function LetterDetailModal({
           {/* Body */}
           <div className="flex-1 overflow-hidden">
             <div
-              className="w-full h-full p-15"
+              className="w-full h-full p-4 md:p-6 lg:p-12"
               style={{ backgroundColor: detailHex }}
             >
-              <div className="w-full h-full flex flex-col justify-between gap-8">
-                <div className="text-2xl space-x-1">
+              <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8">
+                <div className="text-base md:text-xl lg:text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
                   <span>{capsule.recipient ?? "(수신자 정보 없음)"}</span>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
-                  <pre className="whitespace-pre-wrap wrap-break-word text-lg">
+                  <pre className="whitespace-pre-wrap wrap-break-word text-sm md:text-base lg:text-lg">
                     {capsule.content}
                   </pre>
                 </div>
 
-                <div className="shrink-0 flex flex-col items-end gap-2">
-                  <span className="text-text-3">
+                <div className="shrink-0 flex flex-col items-end gap-1 lg:gap-2">
+                  <span className="text-xs md:text-sm lg:text-base text-text-3">
                     {formatDate(capsule.createdAt)}
                   </span>
-                  <div className="text-2xl space-x-1">
+                  <div className="text-base md:text-xl lg:text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
                     <span>{capsule.writerNickname}</span>
                   </div>
@@ -904,16 +916,6 @@ export default function LetterDetailModal({
                     </button>
                   </div>
                 )}
-
-                <div className="flex-1 flex items-center justify-center">
-                  <button
-                    type="button"
-                    className="cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <LinkIcon size={16} className="text-primary" />
-                    <span>링크 복사</span>
-                  </button>
-                </div>
 
                 {isPublic && (
                   <div className="flex-1 flex items-center justify-center">
