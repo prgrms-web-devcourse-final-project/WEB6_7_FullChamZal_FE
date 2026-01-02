@@ -5,31 +5,17 @@
 import Modal from "@/components/common/Modal";
 import { adminReportApi } from "@/lib/api/admin/reports/adminReports";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Clock5, Flag, ShieldAlert, User, X } from "lucide-react";
+import { Clock5, Flag, ShieldAlert, User } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { Field } from "./Field";
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
+
+import ReportDetailHeader from "./ReportDetailHeader";
+import AdminProcessSection from "./AdminProcessSection";
+import ReportDetailFooter from "./ReportDetailFooter";
 
 type ReportStatus = "PENDING" | "REVIEWING" | "ACCEPTED" | "REJECTED";
-
 type ReportAction = "NONE" | "HIDE_CAPSULE" | "SUSPEND_MEMBER";
-
-const ACTION_OPTIONS: { value: ReportAction; label: string; hint?: string }[] =
-  [
-    {
-      value: "NONE",
-      label: "조치 없음",
-      hint: "경고/기록만 남기고 조치하지 않음",
-    },
-    {
-      value: "HIDE_CAPSULE",
-      label: "캡슐 숨김",
-      hint: "신고 대상 캡슐을 비노출 처리",
-    },
-    {
-      value: "SUSPEND_MEMBER",
-      label: "회원 정지",
-      hint: "정지 해제 일시가 필요",
-    },
-  ];
 
 function isReportStatus(v: any): v is ReportStatus {
   return (
@@ -49,11 +35,6 @@ function toIsoFromLocal(value: string) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return null;
   return d.toISOString();
-}
-
-function formatDateTime(v?: string | null) {
-  if (!v) return "-";
-  return String(v).replace("T", " ").slice(0, 19);
 }
 
 function compactBody(obj: Record<string, any>) {
@@ -259,20 +240,12 @@ export default function ReportDetailModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-2xl mx-auto rounded-xl bg-white flex flex-col max-h-[85vh] overflow-hidden">
-        {/* Header */}
-        <div className="py-4 px-6 flex justify-between items-center border-b border-outline shrink-0">
-          <div className="flex-1">
-            <h4 className="text-lg">신고 상세 정보</h4>
-            <span className="text-xs">신고 ID: #{reportId ?? "-"}</span>
-          </div>
-          <button type="button" onClick={onClose} className="cursor-pointer">
-            <X />
-          </button>
-        </div>
+      <div className="w-[min(672px,94vw)] md:w-full md:max-w-2xl mx-auto rounded-xl bg-white flex flex-col max-h-[88dvh] md:max-h-[85vh] overflow-hidden">
+        {/* Header (분리) */}
+        <ReportDetailHeader reportId={reportId} onClose={onClose} />
 
         {/* Body */}
-        <div className="flex-1 min-h-0 w-full overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 min-h-0 w-full overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
           {isLoading && <div className="text-sm text-text-3">불러오는 중…</div>}
 
           {isError && (
@@ -303,7 +276,8 @@ export default function ReportDetailModal({
                   <User className="text-blue-800" />
                   <span className="text-blue-900">신고자 정보</span>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <Field
                     label="닉네임"
                     value={getReporterDisplayName(r)}
@@ -333,7 +307,8 @@ export default function ReportDetailModal({
                   <ShieldAlert className="text-red-800" />
                   <span className="text-red-900">신고 대상</span>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <Field
                     label="대상 타입"
                     value={r.targetType ?? "-"}
@@ -364,6 +339,7 @@ export default function ReportDetailModal({
                   <Flag className="text-yellow-700" />
                   <span className="text-yellow-900">신고 내용</span>
                 </div>
+
                 <div className="space-y-3">
                   <div className="space-y-1">
                     <span className="text-sm text-yellow-800">신고 사유</span>
@@ -371,6 +347,7 @@ export default function ReportDetailModal({
                       {r.reasonType ?? "-"}
                     </p>
                   </div>
+
                   <div className="space-y-1">
                     <span className="text-sm text-yellow-800">상세 설명</span>
                     <p className="text-yellow-900 py-2 px-3 bg-white rounded-lg whitespace-pre-wrap">
@@ -380,125 +357,23 @@ export default function ReportDetailModal({
                 </div>
               </div>
 
-              {/* 관리자 처리 입력 */}
-              <div className="rounded-xl border border-outline p-4 space-y-4">
-                <div className="text-sm font-semibold">관리자 처리</div>
-
-                {/* 조치 타입 선택 */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs text-text-3">조치 타입</div>
-
-                    {/* 선택된 값 칩 */}
-                    <span
-                      className={[
-                        "text-[11px] px-2 py-1 rounded-full border",
-                        action === "NONE"
-                          ? "bg-gray-50 text-gray-700 border-gray-200"
-                          : action === "HIDE_CAPSULE"
-                          ? "bg-orange-50 text-orange-700 border-orange-200"
-                          : "bg-red-50 text-red-700 border-red-200",
-                      ].join(" ")}
-                    >
-                      {ACTION_OPTIONS.find((o) => o.value === action)?.label ??
-                        action}
-                    </span>
-                  </div>
-
-                  <div className="relative">
-                    {/* 커스텀 화살표 */}
-                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                      <svg
-                        viewBox="0 0 20 20"
-                        className={[
-                          "h-4 w-4",
-                          !actionable || isMutating
-                            ? "text-gray-300"
-                            : "text-gray-500",
-                        ].join(" ")}
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-
-                    <select
-                      className={[
-                        "w-full appearance-none rounded-xl border px-3 py-3 pr-10 text-sm outline-none transition",
-                        "bg-white",
-                        !actionable || isMutating
-                          ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
-                          : "border-outline hover:border-admin/40 focus:border-admin focus:ring-4 focus:ring-admin/15",
-                      ].join(" ")}
-                      value={action}
-                      onChange={(e) =>
-                        setAction(e.target.value as ReportAction)
-                      }
-                      disabled={!actionable || isMutating}
-                    >
-                      {ACTION_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>
-                          {o.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* 힌트 박스 */}
-                  <div
-                    className={[
-                      "rounded-lg border px-3 py-2 text-xs leading-relaxed",
-                      action === "NONE"
-                        ? "bg-gray-50 border-gray-200 text-gray-600"
-                        : action === "HIDE_CAPSULE"
-                        ? "bg-orange-50 border-orange-200 text-orange-700"
-                        : "bg-red-50 border-red-200 text-red-700",
-                    ].join(" ")}
-                  >
-                    {ACTION_OPTIONS.find((o) => o.value === action)?.hint ?? ""}
-                  </div>
-                </div>
-
-                {/* 처리 메모 */}
-                <div className="space-y-1">
-                  <div className="text-xs text-text-3">처리 메모</div>
-                  <textarea
-                    className="w-full min-h-22.5 rounded-lg border border-outline p-3 text-sm outline-none focus:ring-2 focus:ring-admin/30"
-                    value={processMemo}
-                    onChange={(e) => setProcessMemo(e.target.value)}
-                    placeholder="처리 사유/근거를 남겨주세요. (선택)"
-                    disabled={!actionable || isMutating}
-                  />
-                </div>
-
-                {/* 제재 종료일: 회원정지일 때만 활성 */}
-                <div className="space-y-1">
-                  <div className="text-xs text-text-3">
-                    제재 종료일{" "}
-                    {action === "SUSPEND_MEMBER" ? "(필수)" : "(선택/미사용)"}
-                  </div>
-                  <input
-                    type="datetime-local"
-                    className="w-full rounded-lg border border-outline p-3 text-sm outline-none focus:ring-2 focus:ring-admin/30 disabled:bg-gray-50"
-                    value={sanctionUntilLocal}
-                    onChange={(e) => setSanctionUntilLocal(e.target.value)}
-                    disabled={
-                      !actionable || isMutating || action !== "SUSPEND_MEMBER"
-                    }
-                  />
-                </div>
-              </div>
+              {/* 관리자 처리 (분리) */}
+              <AdminProcessSection
+                actionable={actionable}
+                isMutating={isMutating}
+                action={action}
+                setAction={setAction}
+                processMemo={processMemo}
+                setProcessMemo={setProcessMemo}
+                sanctionUntilLocal={sanctionUntilLocal}
+                setSanctionUntilLocal={setSanctionUntilLocal}
+              />
 
               {/* 타임라인 */}
               <div className="p-4 bg-sub border border-outline rounded-lg space-y-2">
-                <div className="flex items-center gap-1">
-                  <Clock5 size={20} />
-                  <span>처리 타임라인</span>
+                <div className="flex items-center gap-2">
+                  <Clock5 size={18} className="shrink-0" />
+                  <span className="text-sm font-medium">처리 타임라인</span>
                 </div>
                 <p className="text-sm text-text-3">
                   신고 접수: {formatDateTime(r.createdAt)}
@@ -515,49 +390,14 @@ export default function ReportDetailModal({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="py-4 px-6 border-t border-outline shrink-0">
-          <div className="flex gap-3">
-            <button
-              className="cursor-pointer flex-1 rounded-xl bg-admin p-2 text-white hover:bg-admin/80 disabled:opacity-50"
-              disabled={!r || !actionable || isMutating}
-              onClick={handleApprove}
-            >
-              {isMutating ? "처리 중…" : "신고 승인"}
-            </button>
-
-            <button
-              className="cursor-pointer flex-1 rounded-xl p-2 hover:bg-sub border border-outline disabled:opacity-50"
-              disabled={!r || !actionable || isMutating}
-              onClick={handleReject}
-            >
-              {isMutating ? "처리 중…" : "신고 반려"}
-            </button>
-          </div>
-        </div>
+        {/* Footer (분리) */}
+        <ReportDetailFooter
+          disabled={!r || !actionable || isMutating}
+          isMutating={isMutating}
+          onApprove={handleApprove}
+          onReject={handleReject}
+        />
       </div>
     </Modal>
-  );
-}
-
-function Field({
-  label,
-  value,
-  theme,
-  wide,
-}: {
-  label: string;
-  value: string;
-  theme: "blue" | "red";
-  wide?: boolean;
-}) {
-  const labelClass = theme === "blue" ? "text-blue-800" : "text-red-800";
-  const valueClass = theme === "blue" ? "text-blue-900" : "text-red-900";
-
-  return (
-    <div className={`flex flex-col gap-1 ${wide ? "col-span-2" : ""}`}>
-      <span className={`text-sm ${labelClass}`}>{label}</span>
-      <span className={`${valueClass} wrap-break-word`}>{value}</span>
-    </div>
   );
 }

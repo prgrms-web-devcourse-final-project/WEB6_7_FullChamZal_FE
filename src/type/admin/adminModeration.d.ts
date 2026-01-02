@@ -70,7 +70,6 @@ type ModerationGroup = {
   results: ModerationResult[];
 };
 
-// byField의 키는 TITLE/CONTENT/... 처럼 확장될 수 있어서 string으로 열어두는 게 안전
 type ModerationRaw = {
   overall: ModerationGroup;
   byField: Record<string, ModerationGroup>;

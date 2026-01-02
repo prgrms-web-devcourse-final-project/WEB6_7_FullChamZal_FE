@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  TrendingUp,
+  Tag,
+} from "lucide-react";
+
 const MODERATION_CATEGORY_LABEL: Record<
   string,
   { title: string; desc: string }
@@ -90,34 +98,58 @@ export default function SummaryBlock({
   const categories = first?.categories;
   const scores = first?.category_scores;
 
-  // flagged=true인 카테고리(우선 노출)
   const flaggedKeys = categories
     ? Object.entries(categories)
         .filter(([, v]) => v === true)
         .map(([k]) => k)
     : [];
 
-  // 점수 상위 N개 (항상 보여주면 “왜 flagged인지” 이해가 빨라짐)
   const topScores = scores
     ? Object.entries(scores)
         .sort((a, b) => Number(b[1]) - Number(a[1]))
         .slice(0, 6)
     : [];
 
-  // summary 문장
   const summaryLine = (() => {
-    if (!first) return "분석 결과가 없습니다.";
-    if (flagged === false) return "✅ 유해 요소가 감지되지 않았습니다.";
-    if (!scores) return "⚠️ 유해 가능성이 감지되었습니다.";
+    if (!first)
+      return (
+        <span className="flex items-center gap-1">
+          <Info size={14} /> 분석 결과가 없습니다.
+        </span>
+      );
+
+    if (flagged === false)
+      return (
+        <span className="flex items-center gap-1 text-green-700">
+          <CheckCircle size={14} /> 유해 요소가 감지되지 않았습니다.
+        </span>
+      );
+
+    if (!scores)
+      return (
+        <span className="flex items-center gap-1 text-orange-600">
+          <AlertTriangle size={14} /> 유해 가능성이 감지되었습니다.
+        </span>
+      );
 
     const [topKey, topScore] = topScores[0] ?? [];
     const meta = topKey ? MODERATION_CATEGORY_LABEL[topKey] : null;
-    if (!meta) return "⚠️ 유해 가능성이 감지되었습니다.";
+    if (!meta)
+      return (
+        <span className="flex items-center gap-1 text-orange-600">
+          <AlertTriangle size={14} /> 유해 가능성이 감지되었습니다.
+        </span>
+      );
 
     const risk = getRiskLevel(Number(topScore));
-    return `⚠️ ${meta.title} 위험이 ${risk.label} (${formatPct(
-      Number(topScore)
-    )})`;
+    return (
+      <span className="flex items-center gap-1">
+        <AlertTriangle size={14} className={risk.color} />
+        <span>
+          {meta.title} 위험이 {risk.label} ({formatPct(Number(topScore))})
+        </span>
+      </span>
+    );
   })();
 
   return (
@@ -131,11 +163,19 @@ export default function SummaryBlock({
         {typeof flagged === "boolean" ? (
           <div
             className={[
-              "text-xs font-semibold shrink-0",
+              "flex items-center gap-1 text-xs font-semibold shrink-0",
               flagged ? "text-orange-600" : "text-green-700",
             ].join(" ")}
           >
-            {flagged ? "검출됨" : "통과"}
+            {flagged ? (
+              <>
+                <AlertTriangle size={14} /> 검출됨
+              </>
+            ) : (
+              <>
+                <CheckCircle size={14} /> 통과
+              </>
+            )}
           </div>
         ) : null}
       </div>
@@ -145,10 +185,13 @@ export default function SummaryBlock({
         {summaryLine}
       </div>
 
-      {/* Flagged categories (Korean badges) */}
-      {categories ? (
+      {/* Flagged categories */}
+      {categories && (
         <div className="mt-3">
-          <div className="text-xs text-gray-500 mb-1">검출된 항목</div>
+          <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
+            <Tag size={12} />
+            검출된 항목
+          </div>
 
           {flaggedKeys.length === 0 ? (
             <div className="text-xs text-gray-600">
@@ -160,33 +203,32 @@ export default function SummaryBlock({
             <div className="flex flex-wrap gap-2">
               {flaggedKeys.map((k) => {
                 const meta = MODERATION_CATEGORY_LABEL[k];
-                const label = meta?.title ?? k; // 매핑 없으면 key fallback
                 return (
                   <span
                     key={k}
                     className="rounded-full bg-white border px-2 py-0.5 text-xs"
                     title={meta?.desc ?? k}
                   >
-                    {label}
+                    {meta?.title ?? k}
                   </span>
                 );
               })}
             </div>
           )}
         </div>
-      ) : null}
+      )}
 
-      {/* Top scores list */}
-      {scores ? (
+      {/* Top scores */}
+      {scores && (
         <div className="mt-3">
-          <div className="text-xs text-gray-500 mb-1">위험 점수 상위</div>
+          <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
+            <TrendingUp size={12} />
+            위험 점수 상위
+          </div>
 
           <div className="space-y-1 text-sm">
             {topScores.map(([key, score]) => {
               const meta = MODERATION_CATEGORY_LABEL[key];
-              const label = meta?.title ?? key;
-              const desc = meta?.desc ?? "";
-
               const s = Number(score);
               const risk = getRiskLevel(s);
 
@@ -196,12 +238,14 @@ export default function SummaryBlock({
                   className="flex items-start justify-between gap-2"
                 >
                   <div className="min-w-0">
-                    <div className="font-semibold truncate">{label}</div>
-                    {desc ? (
+                    <div className="font-semibold truncate">
+                      {meta?.title ?? key}
+                    </div>
+                    {meta?.desc && (
                       <div className="text-xs text-gray-500 truncate">
-                        {desc}
+                        {meta.desc}
                       </div>
-                    ) : null}
+                    )}
                   </div>
 
                   <div
@@ -214,9 +258,8 @@ export default function SummaryBlock({
             })}
           </div>
         </div>
-      ) : null}
+      )}
 
-      {/* No data fallback */}
       {!first && (
         <div className="mt-2 text-xs text-gray-600">results[0]가 없습니다.</div>
       )}
