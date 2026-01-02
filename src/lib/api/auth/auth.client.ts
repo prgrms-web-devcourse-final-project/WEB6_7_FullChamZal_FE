@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiFetch } from "../fetchClient";
 
 export const authApiClient = {
@@ -12,6 +13,17 @@ export const authApiClient = {
 
   me: (signal?: AbortSignal) =>
     apiFetch<MemberMe>("/api/v1/members/me", { signal }),
+
+  isLoggedIn: async (signal?: AbortSignal) => {
+    try {
+      await apiFetch<MemberMe>("/api/v1/members/me", { signal });
+      return true;
+    } catch (e: any) {
+      const status = e?.status ?? e?.response?.status;
+      if (status === 401 || status === 403) return false;
+      throw e;
+    }
+  },
 
   logout: () => apiFetch<void>("/api/v1/auth/logout", { method: "POST" }),
 };

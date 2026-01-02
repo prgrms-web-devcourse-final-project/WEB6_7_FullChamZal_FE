@@ -397,9 +397,8 @@ export default function LetterDetailModal({
   // 저장 버튼 핸들러 (공개 편지 저장하기)
   const handleSave = async () => {
     try {
-      const me = await authApiClient.me();
-      console.log("me:", me);
-      if (!me) throw Object.assign(new Error("NO_ME"), { status: 401 });
+      const loggedIn = await authApiClient.isLoggedIn();
+      if (!loggedIn) throw Object.assign(new Error("NO_ME"), { status: 401 });
 
       const unlockAt = new Date().toISOString();
       saveMutation.mutate({ capsuleId, isSendSelf: 0, unlockAt });
@@ -415,6 +414,7 @@ export default function LetterDetailModal({
       }
 
       console.error("save error:", err);
+      toast.error("저장 중 오류가 발생했습니다.");
     }
   };
 
