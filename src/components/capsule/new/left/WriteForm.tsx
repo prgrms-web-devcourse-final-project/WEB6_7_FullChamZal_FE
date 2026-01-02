@@ -270,39 +270,67 @@ export default function WriteForm({
 
   // 이미지 파일 선택 핸들러
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    // 이미지 파일만 허용
-    if (!file.type.startsWith("image/")) {
-      toast.error("이미지 파일만 업로드할 수 있습니다.");
+    const MAX_FILES = 3; // 최대 3개까지
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+    // 기존 파일 수 확인
+    const currentCount = uploadedAttachments.length;
+    if (currentCount + files.length > MAX_FILES) {
+      toast.error(`이미지는 최대 ${MAX_FILES}개까지 업로드할 수 있습니다.`);
+      // input 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       return;
     }
 
-    // 파일 크기 제한 (10MB)
-    const MAX_FILE_SIZE = 10 * 1024 * 1024;
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("파일 크기는 10MB 이하여야 합니다.");
+    // 파일 검증 및 처리
+    const validFiles: File[] = [];
+    for (const file of files) {
+      // 이미지 파일만 허용
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name}: 이미지 파일만 업로드할 수 있습니다.`);
+        continue;
+      }
+
+      // 파일 크기 제한
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name}: 파일 크기는 10MB 이하여야 합니다.`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) {
+      // input 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       return;
     }
 
     setIsUploading(true);
     try {
-      const response = await attachmentApi.uploadByServer(file);
+      for (const file of validFiles) {
+        const response = await attachmentApi.uploadByServer(file);
 
-      // 미리보기 URL 생성 (로컬)
-      const previewUrl = URL.createObjectURL(file);
+        // 미리보기 URL 생성 (로컬)
+        const previewUrl = URL.createObjectURL(file);
 
-      setUploadedAttachments((prev) => [
-        ...prev,
-        {
-          attachmentId: response.attachmentId,
-          fileName: file.name,
-          previewUrl,
-        },
-      ]);
-
-      toast.success("이미지가 업로드되었습니다.");
+        setUploadedAttachments((prev) => [
+          ...prev,
+          {
+            attachmentId: response.attachmentId,
+            fileName: file.name,
+            previewUrl,
+          },
+        ]);
+      }
+      toast.success(`${validFiles.length}개의 이미지가 업로드되었습니다.`);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
@@ -765,6 +793,7 @@ export default function WriteForm({
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleFileSelect}
                 className="hidden"
                 id="image-upload"
@@ -794,22 +823,31 @@ export default function WriteForm({
                 {uploadedAttachments.map((attachment) => (
                   <div
                     key={attachment.attachmentId}
-                    className="relative group aspect-square rounded-lg overflow-hidden border border-outline"
+                    className="relative group aspect-square rounded-lg overflow-hidden border border-outline bg-sub-2"
                   >
-                    {attachment.previewUrl && (
+                    {attachment.previewUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={attachment.previewUrl}
                         alt={attachment.fileName}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // 이미지 로드 실패 시 대체 UI 표시
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                        }}
                       />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-text-3 text-xs">
+                        <ImageIcon size={24} />
+                      </div>
                     )}
                     <button
                       type="button"
                       onClick={() =>
                         handleRemoveAttachment(attachment.attachmentId)
                       }
-                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-10"
                       aria-label="이미지 삭제"
                     >
                       <X size={16} />
@@ -824,7 +862,7 @@ export default function WriteForm({
 
             {/* 안내 메시지 */}
             <p className="text-xs text-text-3">
-              이미지 파일만 업로드 가능합니다. (최대 10MB)
+              이미지 파일만 업로드 가능합니다. (최대 3개, 파일당 10MB)
             </p>
           </div>
         </WriteDiv>
