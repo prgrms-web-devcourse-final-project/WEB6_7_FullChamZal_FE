@@ -18,6 +18,7 @@ import {
   Reply,
   Trash2,
   X,
+  Download,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -820,24 +821,25 @@ export default function LetterDetailModal({
                           <DropdownMenuItem
                             onClick={() => backupMutation.mutate(capsuleId)}
                           >
-                            <PencilLine className="text-primary" />
+                            <Download className="text-primary" />
                             {backupMutation.isPending
                               ? "백업 중..."
                               : "백업하기"}
                           </DropdownMenuItem>
                         )}
-                        {isSender && (
-                          <DropdownMenuItem
-                            onClick={() => {
-                              router.push(
-                                `/capsules/edit?capsuleId=${capsuleId}`
-                              );
-                            }}
-                          >
-                            <PencilLine className="text-primary" />
-                            수정하기
-                          </DropdownMenuItem>
-                        )}
+                        {isSender ||
+                          (capsule.viewStatus && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                router.push(
+                                  `/capsules/edit?capsuleId=${capsuleId}`
+                                );
+                              }}
+                            >
+                              <PencilLine className="text-primary" />
+                              수정하기
+                            </DropdownMenuItem>
+                          ))}
                         {(isSender || isReceiver) && (
                           <DropdownMenuItem
                             variant="destructive"
