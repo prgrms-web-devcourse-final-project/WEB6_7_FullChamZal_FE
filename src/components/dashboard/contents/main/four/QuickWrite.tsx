@@ -4,8 +4,6 @@ import { Clock, PencilLine } from "lucide-react";
 import DivBox from "../../../DivBox";
 import { useRouter } from "next/navigation";
 
-type TemplateId = "future-me" | "thanks" | "public";
-
 const TEMPLATES: {
   id: TemplateId;
   title: string;

@@ -40,9 +40,6 @@ import {
 } from "@/lib/api/capsule/capsule";
 import toast from "react-hot-toast";
 
-/* 빠른 편지 쓰기 템플릿 타입 */
-type TemplateId = "future-me" | "thanks" | "public";
-
 type PreviewState = {
   title: string;
   senderName: string;
