@@ -1,7 +1,7 @@
 "use client";
 
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ListOrdered,
   Pencil,
@@ -19,6 +19,7 @@ export default function TrackOverview() {
   const params = useParams();
   const storytrackId =
     typeof params.trackId === "string" ? params.trackId : undefined;
+  const queryClient = useQueryClient();
   const [page] = useState(0);
   const [size] = useState(100);
 
@@ -37,6 +38,61 @@ export default function TrackOverview() {
     },
     enabled: !!storytrackId,
   });
+
+  // 참여하기
+  const joinMutation = useMutation({
+    mutationFn: () =>
+      storyTrackApi.participantStorytrack({
+        storytrackId: Number(storytrackId),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["storyTrackDetail", storytrackId],
+      });
+      queryClient.removeQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "allStoryTrack",
+      });
+      queryClient.removeQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "joinedStoryTrack",
+      });
+    },
+  });
+
+  // 참여취소
+  const cancelMutation = useMutation({
+    mutationFn: () =>
+      storyTrackApi.deleteParticipantStorytrack({
+        storytrackId: Number(storytrackId),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["storyTrackDetail", storytrackId],
+      });
+      queryClient.removeQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "allStoryTrack",
+      });
+      queryClient.removeQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "joinedStoryTrack",
+      });
+    },
+  });
+
+  const serverMemberType = trackData?.data.memberType;
+  const memberType: MemberType | undefined = joinMutation.isPending
+    ? "PARTICIPANT"
+    : cancelMutation.isPending
+    ? "NOT_JOINED"
+    : serverMemberType;
+
+  const isPending = joinMutation.isPending || cancelMutation.isPending;
 
   if (isError) {
     console.error(error);
@@ -118,7 +174,7 @@ export default function TrackOverview() {
 
           {/* 버튼 */}
           <div className="w-full">
-            {trackData?.data.memberType === "CREATOR" ? (
+            {memberType === "CREATOR" ? (
               <div className="grid grid-cols-2 gap-2">
                 <button className="cursor-pointer justify-center bg-text-2 hover:bg-text-3 text-white px-4 py-2 rounded-xl flex items-center gap-2">
                   <Pencil />
@@ -129,15 +185,27 @@ export default function TrackOverview() {
                   삭제
                 </button>
               </div>
-            ) : trackData?.data.memberType === "NOT_JOINED" ? (
-              <button className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl ">
+            ) : memberType === "NOT_JOINED" ? (
+              <button
+                className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl"
+                disabled={isPending}
+                onClick={() => {
+                  joinMutation.mutate();
+                }}
+              >
                 <Play />
-                <span>참여하기</span>
+                <span>{isPending ? "처리중..." : "참여하기"}</span>
               </button>
             ) : (
-              <button className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl ">
+              <button
+                className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl"
+                disabled={isPending}
+                onClick={() => {
+                  cancelMutation.mutate();
+                }}
+              >
                 <X />
-                <span>참여 중지</span>
+                <span>{isPending ? "처리중..." : "참여 취소"}</span>
               </button>
             )}
           </div>

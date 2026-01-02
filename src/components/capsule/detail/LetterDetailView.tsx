@@ -3,10 +3,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LetterDetailModal, { type UICapsule } from "./LetterDetailModal";
 import LetterLockedView from "./LetterLockedView";
-import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import {
+  guestCapsuleApi,
+  storyTrackCapsuleApi,
+} from "@/lib/api/capsule/guestCapsule";
 import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
 
@@ -43,6 +46,8 @@ function getCurrentPosition(): Promise<LatLng> {
 
 type Props = {
   isPublic?: boolean;
+  isStoryTrack?: boolean;
+  storytrackId?: string;
   capsuleId: number;
   isProtected?: number;
   password?: string | null;
@@ -51,12 +56,15 @@ type Props = {
 
 export default function LetterDetailView({
   isPublic = false,
+  isStoryTrack = false,
+  storytrackId,
   capsuleId,
   isProtected,
   password = null,
   initialLocation = null,
 }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   // 내 위치 (current)
   const [currentLocation, setCurrentLocation] = useState<LatLng | null>(
     initialLocation
@@ -99,26 +107,47 @@ export default function LetterDetailView({
     return `${lat},${lng}`;
   }, [currentLocation]);
 
+  //스토리트랙 캡슐, 일반 캡슐 queryKey 구분
+  const queryKey = isStoryTrack
+    ? ["storyTrackCapsuleRead", storytrackId, capsuleId, password, locationKey]
+    : ["capsuleRead", capsuleId, password, locationKey];
+
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["capsuleRead", capsuleId, password, locationKey],
+    queryKey: queryKey,
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
 
       const locationLat = currentLocation?.lat ?? 0;
       const locationLng = currentLocation?.lng ?? 0;
 
-      const res = await guestCapsuleApi.read(
-        {
-          capsuleId,
-          unlockAt,
-          locationLat,
-          locationLng,
-          password,
-        },
-        signal
-      );
-
-      return res;
+      if (isStoryTrack && storytrackId) {
+        const res = await storyTrackCapsuleApi.read(
+          {
+            storytrackId,
+          },
+          {
+            capsuleId,
+            unlockAt,
+            locationLat,
+            locationLng,
+            password,
+          },
+          signal
+        );
+        return res;
+      } else {
+        const res = await guestCapsuleApi.read(
+          {
+            capsuleId,
+            unlockAt,
+            locationLat,
+            locationLng,
+            password,
+          },
+          signal
+        );
+        return res;
+      }
     },
     retry: false,
     // 공개 캡슐의 경우 위치 정보가 준비될 때까지 대기
@@ -126,6 +155,18 @@ export default function LetterDetailView({
     enabled:
       capsuleId > 0 && (initialLocation !== null || currentLocation !== null),
   });
+
+  //캡슐 읽기 성공하면 storyTrackDetail 재요청
+  useEffect(() => {
+    if (isStoryTrack && storytrackId && data?.result === "SUCCESS") {
+      queryClient.invalidateQueries({
+        queryKey: ["storyTrackDetail", storytrackId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["storyTrackProgress", storytrackId],
+      });
+    }
+  }, [isStoryTrack, storytrackId, data, queryClient]);
 
   const handleBack = () => {
     // 히스토리 없는 진입(공유 링크 첫 방문) 대비

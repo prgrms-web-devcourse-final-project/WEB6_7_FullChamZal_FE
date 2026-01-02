@@ -34,3 +34,25 @@ export const guestCapsuleApi = {
     });
   },
 };
+
+export const storyTrackCapsuleApi = {
+  // 검증 및 조회
+  read: (
+    params: { storytrackId: string },
+    body: CapsuleReadRequest,
+    signal?: AbortSignal
+  ) => {
+    const query = new URLSearchParams({
+      storytrackId: params.storytrackId,
+    }).toString();
+
+    return apiFetch<CapsuleReadData>(
+      `/api/v1/storytrack/participant/capsuleOpen?${query}`,
+      {
+        method: "POST",
+        json: body,
+        signal,
+      }
+    );
+  },
+};
