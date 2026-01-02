@@ -232,18 +232,6 @@ export default function EnvelopeCard({
     router.push(href, { scroll: false });
   };
 
-  const ReadBadgeSlot = () => {
-    if (type === "send") return null;
-
-    return status.mode === "unlock" && status.isUnlocked && status.isRead ? (
-      <div className="absolute top-3 left-3 z-10">
-        <div className="px-2 py-1 rounded-full text-xs bg-white/80 shadow">
-          읽음
-        </div>
-      </div>
-    ) : null;
-  };
-
   const DEFAULT_HEX = CAPTURE_COLOR_MAP.BEIGE ?? "#FFDED8";
 
   const packingKey = (capsule.capsulePackingColor ?? "BEIGE")
@@ -264,8 +252,6 @@ export default function EnvelopeCard({
       className="relative flex flex-col items-center justify-center p-2 perspective-[1000px] group"
       aria-label={canOpenDetail ? "봉투 카드" : "열 수 없는 봉투"}
     >
-      <ReadBadgeSlot />
-
       <div
         className={[
           "relative w-full md:w-70 h-45 transform-3d will-change-transform",
@@ -282,7 +268,7 @@ export default function EnvelopeCard({
             <div className="flex justify-between h-full text-sm">
               <div className="w-2/5">
                 <p className="line-clamp-1">
-                  Dear.{capsule.recipient ?? "(수신자 정보 없음)"}
+                  Dear.{capsule.recipient ?? "당신"}
                 </p>
                 <div className="space-y-2">
                   <div className="w-full h-px bg-white"></div>
@@ -337,74 +323,125 @@ export default function EnvelopeCard({
           </div>
         </div>
 
-        {/* 뒷면 */}
-        <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="absolute inset-0">
-              <svg width="280" height="180" viewBox="0 0 280 180" fill="none">
-                <path d="M0 0H280V180H0V0Z" fill={backShade1} />
-                <path d="M280 180H0L140 86L280 180Z" fill={backShade2} />
-                <path d="M280 0H0L140 118L280 0Z" fill={backShade3} />
-              </svg>
+        {status.mode === "unlock" && status.isUnlocked && status.isRead ? (
+          <>
+            {/* 뒷면 */}
+            <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="absolute inset-0">
+                  <svg
+                    width="280"
+                    height="180"
+                    viewBox="0 0 280 180"
+                    fill="none"
+                  >
+                    <path
+                      d="M0.134766 0H280V180H0.134766V0Z"
+                      fill={backShade3}
+                    />
+                    <g filter="url(#filter0_d_150_532)">
+                      <rect
+                        x="31"
+                        y="27"
+                        width="218"
+                        height="136"
+                        fill="#fff"
+                      />
+                    </g>
+                    <path
+                      d="M0.134766 0L140.068 85.7547L280 0V180H0.134766V0Z"
+                      fill={backShade1}
+                    />
+                    <path
+                      d="M279.866 180H0L139.933 85.7547L279.866 180Z"
+                      fill={backShade2}
+                    />
+                  </svg>
+                </div>
+
+                <div className="relative text-text-2 flex flex-col items-center justify-center gap-2">
+                  <span>읽음</span>
+                </div>
+              </div>
             </div>
+          </>
+        ) : (
+          <>
+            {/* 뒷면 */}
+            <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="absolute inset-0">
+                  <svg
+                    width="280"
+                    height="180"
+                    viewBox="0 0 280 180"
+                    fill="none"
+                  >
+                    <path d="M0 0H280V180H0V0Z" fill={backShade1} />
+                    <path d="M280 180H0L140 86L280 180Z" fill={backShade2} />
+                    <path d="M280 0H0L140 118L280 0Z" fill={backShade3} />
+                  </svg>
+                </div>
 
-            <div className="relative text-text-2 flex flex-col items-center justify-center gap-2">
-              {type === "send" && status.mode === "send" ? (
-                <>
-                  <span className="font-medium">{status.statusText}</span>
-                  <div className="w-15 h-15 rounded-full bg-white shadow-lg flex items-center justify-center">
-                    {status.isRead ? <Lock /> : <Unlock />}
-                  </div>
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white shadow-lg">
-                    {status.canEdit ? (
-                      <Pencil size={14} />
-                    ) : (
-                      <PencilOff size={14} />
-                    )}
-                    <span className="text-xs">{status.editText}</span>
-                  </div>
-                  {status.canEdit ? (
-                    <span className="text-xs">클릭하여 확인/수정</span>
-                  ) : (
-                    <span className="text-xs text-text-3">
-                      열람 후에는 수정할 수 없어요
-                    </span>
-                  )}
-                </>
-              ) : status.mode === "unlock" ? (
-                <>
-                  <span className="font-medium">{status.statusText}</span>
-                  <div className="w-15 h-15 rounded-full bg-white shadow-lg flex items-center justify-center">
-                    {status.isUnlocked ? <Unlock /> : <Lock />}
-                  </div>
-
-                  {status.isUnlocked && !status.isRead ? (
-                    <span className="text-xs">클릭하여 읽기</span>
-                  ) : null}
-
-                  {!status.isUnlocked ? (
+                <div className="relative text-text-2 flex flex-col items-center justify-center gap-2">
+                  {type === "send" && status.mode === "send" ? (
                     <>
+                      <span className="font-medium">{status.statusText}</span>
+                      <div className="w-15 h-15 rounded-full bg-white shadow-lg flex items-center justify-center">
+                        {status.isRead ? <Lock /> : <Unlock />}
+                      </div>
                       <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white shadow-lg">
-                        {status.isTime ? (
-                          <Clock size={14} />
+                        {status.canEdit ? (
+                          <Pencil size={14} />
                         ) : (
-                          <MapPin size={14} />
+                          <PencilOff size={14} />
                         )}
-                        <span className="text-xs line-clamp-1">
-                          {status.conditionLabel}
+                        <span className="text-xs">{status.editText}</span>
+                      </div>
+                      {status.canEdit ? (
+                        <span className="text-xs">클릭하여 확인/수정</span>
+                      ) : (
+                        <span className="text-xs text-text-3">
+                          열람 후에는 수정할 수 없어요
                         </span>
+                      )}
+                    </>
+                  ) : status.mode === "unlock" ? (
+                    <>
+                      <span className="font-medium">{status.statusText}</span>
+                      <div className="w-15 h-15 rounded-full bg-white shadow-lg flex items-center justify-center">
+                        {status.isUnlocked ? <Unlock /> : <Lock />}
                       </div>
 
-                      <span className="text-xs text-text-3">
-                        {status.locationHint ?? "해제 후 열람 가능"}
-                      </span>
+                      {status.isUnlocked && !status.isRead ? (
+                        <span className="text-xs">클릭하여 읽기</span>
+                      ) : null}
+
+                      {!status.isUnlocked ? (
+                        <>
+                          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white shadow-lg">
+                            {status.isTime ? (
+                              <Clock size={14} />
+                            ) : (
+                              <MapPin size={14} />
+                            )}
+                            <span className="text-xs line-clamp-1">
+                              {status.conditionLabel}
+                            </span>
+                          </div>
+
+                          <span className="text-xs text-text-3">
+                            {status.locationHint ?? "해제 후 열람 가능"}
+                          </span>
+                        </>
+                      ) : null}
                     </>
                   ) : null}
-                </>
-              ) : null}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       <div

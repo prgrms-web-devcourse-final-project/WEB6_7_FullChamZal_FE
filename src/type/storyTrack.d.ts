@@ -155,13 +155,13 @@ type StoryTrackDetailItem = {
   createrNickname: string;
   title: string;
   descripton: string;
-  storytrackType: "SEQUENTIAL" | "PARALLEL";
+  storytrackType: TrackType;
   isPublic: number; // 0 | 1
   totalSteps: number;
   createdAt: string;
   totalParticipant: number;
   completeParticipant: number;
-  memberType: "CREATOR" | "NOT_JOINED" | "PARTICIPANT" | "COMPLETED";
+  memberType: MemberType;
   paths: StoryTrackPaths;
   completedCapsuleId: number[];
 };

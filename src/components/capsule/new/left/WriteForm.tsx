@@ -107,7 +107,6 @@ const FIELD_LABEL: Record<string, string> = {
 };
 
 export default function WriteForm({
-  preview,
   onPreviewChange,
 }: {
   preview: PreviewState;
@@ -337,7 +336,7 @@ export default function WriteForm({
           },
         ]);
       }
-      toast.success(`${validFiles.length}개의 이미지가 업로드되었습니다.`);
+      toast.success(`${validFiles.length}개의 이미지가 업로드되었습니다!`);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
