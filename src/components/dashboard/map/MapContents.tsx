@@ -81,6 +81,10 @@ export default function MapContents() {
             lat: position.coords.latitude, //위도값 저장
             lng: position.coords.longitude, //경도값 저장
           });
+          setMapLocation({
+            lat: position.coords.latitude, //위도값 저장
+            lng: position.coords.longitude, //경도값 저장
+          });
         },
         (err) => {
           showErrorMsg(err);

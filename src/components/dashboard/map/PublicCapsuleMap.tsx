@@ -23,18 +23,13 @@ const EventMarkerContainer = ({
 
   return (
     <CustomOverlayMap position={position} zIndex={isFocus ? 999 : 1}>
-      <div
-        className={`relative flex flex-col items-center`}
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
-        onClick={onClick}
-      >
+      <div className={`relative flex flex-col items-center`} onClick={onClick}>
         {/* title */}
         <div
           className={`absolute bottom-full mb-2 p-3 text-sm rounded-lg shadow bg-white ${
             isVisible || isFocus
               ? "opacity-100 cursor-pointer"
-              : "opacity-0 pointer-none"
+              : "opacity-0 pointer-none pointer-events-none"
           }`}
           onClick={showCapsule}
         >
@@ -46,6 +41,8 @@ const EventMarkerContainer = ({
             isFocus ? "bg-primary scale-[1.2]" : "bg-primary-2"
           }`}
           onClick={onClick}
+          onMouseEnter={() => setIsVisible(true)}
+          onMouseLeave={() => setIsVisible(false)}
         >
           <MapPin color="white"></MapPin>
         </div>
@@ -80,6 +77,7 @@ export default function PublicCapsuleMap({
   const mapRef = useRef<kakao.maps.Map | null>(null);
   const circleRef = useRef<kakao.maps.Circle | null>(null);
   const router = useRouter();
+  const [mapReady, setMapReady] = useState(false);
 
   //props로 받은 location 위치가 바뀌면 지도 센터 좌표 변경, 내 반경 원 그리기
   useEffect(() => {
@@ -109,14 +107,14 @@ export default function PublicCapsuleMap({
       circleRef.current = circle;
       return () => circle.setMap(null);
     }
-  }, [radius, location, myLocation]);
+  }, [radius, location, myLocation, mapReady]);
 
   useEffect(() => {
     if (!focus || !mapRef.current) return;
     if (focus) {
       mapRef.current.setLevel(1, { animate: true });
     }
-  }, [data, focus]);
+  }, [data, focus, mapReady]);
 
   return (
     <>
@@ -128,6 +126,7 @@ export default function PublicCapsuleMap({
         //생성 시 해당 지도 객체를 저장
         onCreate={(map) => {
           mapRef.current = map;
+          setMapReady(true);
         }}
       >
         {/* 내 위치 마커 */}
