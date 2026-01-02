@@ -124,7 +124,7 @@ export default function TrackOverview() {
   return (
     <>
       <div className="p-6 flex flex-col h-full">
-        <div className="flex flex-col justify-between h-full gap-4">
+        <div className="flex-1 overflow-y-auto">
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="text-xl">{trackData?.data.title}</div>
@@ -160,7 +160,7 @@ export default function TrackOverview() {
               </div>
             </div>
 
-            <div className="w-full h-px bg-outline"></div>
+            <div className="w-full h-px bg-outline" />
 
             <div className="space-y-4">
               <div className="text-sm space-y-2">
@@ -186,8 +186,10 @@ export default function TrackOverview() {
               생성일: {trackData?.data.createdAt?.slice(0, 10)}
             </span>
           </div>
+        </div>
 
-          {/* 버튼 */}
+        {/* 버튼 */}
+        <div className="pt-4">
           <div className="w-full">
             {memberType === "CREATOR" ? (
               <div className="grid grid-cols-2 gap-2">
