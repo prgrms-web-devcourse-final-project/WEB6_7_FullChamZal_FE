@@ -9,7 +9,7 @@ function toLetter(item: CapsuleDashboardItem): Letter {
     id: String(item.capsuleId),
     title: item.title,
     placeName: item.locationName ?? undefined,
-    createdAt: item.createAt ?? "", // ✅ 방어
+    createdAt: item.createAt ?? "",
     lat: item.locationLat ?? undefined,
     lng: item.locationLng ?? undefined,
   };
@@ -20,7 +20,7 @@ export default function PublicLetterPicker({
   selectedIds = [],
 }: {
   onSelect: (letter: Letter) => void;
-  selectedIds?: string[]; // ✅ Set 금지
+  selectedIds?: string[];
 }) {
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
@@ -68,12 +68,12 @@ export default function PublicLetterPicker({
               type="button"
               disabled={already}
               onClick={() => onSelect(l)}
-              className={[
-                "w-full text-left px-4 py-3 transition",
-                already
-                  ? "opacity-60 cursor-not-allowed"
-                  : "hover:bg-button-hover active:scale-[0.99]",
-              ].join(" ")}
+              className={`w-full text-left rounded-xl border-2 border-outline bg-white px-4 py-3 transition active:scale-[0.99]
+                  ${
+                    already
+                      ? "border-primary border opacity-40 cursor-not-allowed"
+                      : "hover:bg-button-hover cursor-pointer"
+                  }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -86,10 +86,14 @@ export default function PublicLetterPicker({
                 </div>
 
                 {already ? (
-                  <span className="shrink-0 inline-flex items-center rounded-full border border-outline bg-white px-2 py-1 text-[11px] text-text-3">
+                  <span className="shrink-0 inline-flex items-center rounded-full border border-primary px-2 py-1 text-xs text-primary">
                     추가됨
                   </span>
-                ) : null}
+                ) : (
+                  <span className="shrink-0 inline-flex items-center rounded-full border border-outline bg-white px-2 py-1 text-xs text-text-4">
+                    선택
+                  </span>
+                )}
               </div>
             </button>
           </li>
