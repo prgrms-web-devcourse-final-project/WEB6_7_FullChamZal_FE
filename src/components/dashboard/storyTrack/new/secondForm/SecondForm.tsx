@@ -6,7 +6,7 @@ import { Map, Plus, X } from "lucide-react";
 import PublicLetterPicker from "./PublicLetterPicker";
 import SelectedRouteList from "./SelectedRouteList";
 import RouteMap from "./RouteMap";
-import Modal from "@/components/common/Modal"; // 경로는 프로젝트에 맞게
+import Modal from "@/components/common/Modal";
 
 type Props = {
   order: TrackType;
@@ -20,13 +20,15 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
   const routeItems = value.routeItems;
 
-  const selectedIds = useMemo(
-    () => new Set(routeItems.map((x) => x.id)),
+  // ✅ Set은 props로 넘기지 말고 list로 넘겨서 안전하게 처리
+  const selectedIdList = useMemo(
+    () => routeItems.map((x) => x.id),
     [routeItems]
   );
+  const selectedSet = useMemo(() => new Set(selectedIdList), [selectedIdList]);
 
   const addLetter = (letter: Letter) => {
-    if (selectedIds.has(letter.id)) return;
+    if (selectedSet.has(letter.id)) return;
     onChange({ routeItems: [...routeItems, letter] });
   };
 
@@ -66,7 +68,6 @@ export default function SecondForm({ order, value, onChange }: Props) {
               </button>
             </div>
 
-            {/* 모달 열기 버튼 - 살짝 더 ‘버튼’답게 */}
             <button
               type="button"
               onClick={() => setOpenPicker(true)}
@@ -108,7 +109,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
                 <button
                   type="button"
                   onClick={() => setOpenPicker(false)}
-                  className="cursor-pointer p-2 rounded-lg hover:bg-button-hover"
+                  className="cursor-pointer p-2 rounded-full hover:bg-button-hover"
                   aria-label="닫기"
                 >
                   <X size={18} />
@@ -118,7 +119,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
             <div className="max-h-[70dvh] overflow-y-auto">
               <PublicLetterPicker
-                selectedIds={selectedIds}
+                selectedIds={selectedIdList} // ✅ list로 전달
                 onSelect={(letter: Letter) => {
                   addLetter(letter);
                   setOpenPicker(false);
@@ -138,11 +139,11 @@ export default function SecondForm({ order, value, onChange }: Props) {
         {openMap ? (
           <div
             className="md:hidden fixed inset-0 z-9999 bg-black/40"
-            onMouseDown={() => setOpenMap(false)}
+            onClick={() => setOpenMap(false)}
           >
             <div
               className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl border-t border-outline h-[85dvh] flex flex-col overflow-hidden"
-              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-outline">
                 <div className="font-medium">지도</div>

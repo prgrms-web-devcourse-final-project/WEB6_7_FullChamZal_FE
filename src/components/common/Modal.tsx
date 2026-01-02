@@ -17,11 +17,11 @@ export default function Modal({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className={`fixed w-full h-full inset-0 ${zIndexClassName} bg-black/40`}
+          className={`fixed inset-0 w-full h-full ${zIndexClassName} bg-black/40`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onMouseDown={onClose}
+          onClick={onClose}
         >
           <motion.div
             className="relative w-full h-dvh overflow-y-auto overscroll-contain touch-pan-y flex items-start justify-center px-6 lg:px-8 py-6 lg:items-center"
@@ -29,7 +29,7 @@ export default function Modal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             {children}
           </motion.div>
