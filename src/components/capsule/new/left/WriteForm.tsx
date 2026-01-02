@@ -503,6 +503,8 @@ export default function WriteForm({
     const envelopeSelected = envelopeThemes[selectedEnvelope];
     const paperSelected = paperThemes[selectedPaper];
 
+    const attachmentIds = uploadedAttachments.map((a) => a.attachmentId);
+
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
       senderName,
@@ -520,9 +522,8 @@ export default function WriteForm({
       contentColor: paperSelected?.name ?? "",
       capsuleColor: paperSelected?.name ?? "",
       capsulePackingColor: envelopeSelected?.name ?? "",
+      attachmentIds,
     });
-
-    const attachmentIds = uploadedAttachments.map((a) => a.attachmentId);
 
     const publicPayload = buildPublicPayload({
       memberId: me.memberId,
@@ -560,6 +561,7 @@ export default function WriteForm({
               effectiveUnlockType,
               dayForm,
               locationForm,
+              attachmentIds,
             });
             return createMyCapsule(myPayload);
           })()

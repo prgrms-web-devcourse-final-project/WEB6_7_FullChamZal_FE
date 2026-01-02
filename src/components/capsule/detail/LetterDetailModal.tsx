@@ -72,6 +72,12 @@ export type UICapsule = {
 
   // 어드민은 필요x
   isBookmarked?: boolean;
+
+  // 첨부 이미지 목록
+  attachments?: Array<{
+    presignedUrl: string;
+    attachmentId: number;
+  }>;
 };
 
 type PostLoginAction =
@@ -504,6 +510,7 @@ export default function LetterDetailModal({
 
           viewStatus: !!s.viewStatus,
           isBookmarked: !!s.isBookmarked,
+          attachments: s.attachments,
         };
       }
 
@@ -541,6 +548,7 @@ export default function LetterDetailModal({
 
         viewStatus: !!u.viewStatus,
         isBookmarked: !!u.isBookmarked,
+        attachments: u.attachments,
       };
     },
   });
@@ -866,10 +874,33 @@ export default function LetterDetailModal({
                   <span>{capsule.recipient ?? "(수신자 정보 없음)"}</span>
                 </div>
 
-                <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
+                <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto space-y-4">
                   <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
                   </pre>
+                  
+                  {/* 첨부 이미지 */}
+                  {capsule.attachments && capsule.attachments.length > 0 && (
+                    <div className="grid grid-cols-1 gap-3 mt-4">
+                      {capsule.attachments.map((attachment) => (
+                        <div
+                          key={attachment.attachmentId}
+                          className="relative rounded-lg overflow-hidden border border-outline bg-sub-2"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={attachment.presignedUrl}
+                            alt={`첨부 이미지 ${attachment.attachmentId}`}
+                            className="w-full h-auto max-h-96 object-contain"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="shrink-0 flex flex-col items-end gap-2">

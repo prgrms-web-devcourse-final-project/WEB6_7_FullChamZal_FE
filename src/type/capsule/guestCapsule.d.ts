@@ -19,6 +19,11 @@ type CapsuleReadRequest = {
 
 type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
+type CapsuleAttachmentViewResponse = {
+  presignedUrl: string;
+  attachmentId: number;
+};
+
 type CapsuleReadData = {
   capsuleId: number;
   capsuleColor: string;
@@ -37,6 +42,7 @@ type CapsuleReadData = {
   locationLng?: number;
   isBookmarked: boolean;
   result: string;
+  attachments?: CapsuleAttachmentViewResponse[];
 };
 
 type ApiResponse<T> = {

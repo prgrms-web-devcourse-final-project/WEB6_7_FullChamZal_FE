@@ -41,6 +41,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     effectiveUnlockType,
     dayForm,
     locationForm,
+    attachmentIds = [],
   } = args;
 
   const unlockAt =
@@ -87,6 +88,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
     packingColor: args.packingColor ?? "",
     contentColor: args.contentColor ?? "",
     maxViewCount: 0,
+    attachmentIds,
   };
 }
 
@@ -112,6 +114,7 @@ export function buildPrivatePayload(
     locationForm,
     packingColor = "",
     contentColor = "",
+    attachmentIds = [],
   } = args;
 
   const unlockAt =
@@ -169,6 +172,7 @@ export function buildPrivatePayload(
     packingColor,
     contentColor,
     maxViewCount: 0,
+    attachmentIds,
   };
 }
 
