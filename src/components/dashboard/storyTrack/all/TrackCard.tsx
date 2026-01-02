@@ -73,12 +73,14 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
     mutationFn: () =>
       storyTrackApi.participantStorytrack({ storytrackId: track.storytrackId }),
     onMutate: async () => setMemberType("PARTICIPANT"),
-    onError: () =>
-      setMemberType((track.memberType as MemberType) ?? "NOT_JOINED"),
+    onError: () => {
+      setMemberType((track.memberType as MemberType) ?? "NOT_JOINED");
+      toast.error("참여하기를 실패했습니다.");
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["allStoryTrack"] });
       await queryClient.invalidateQueries({ queryKey: ["joinedStoryTrack"] });
-      toast.success("참여 완료!", {
+      toast.success("참여하기가 완료되었습니다!", {
         style: { borderColor: "#57b970" },
       });
     },
@@ -91,11 +93,16 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         storytrackId: track.storytrackId,
       }),
     onMutate: async () => setMemberType("NOT_JOINED"),
-    onError: () =>
-      setMemberType((track.memberType as MemberType) ?? "PARTICIPANT"),
+    onError: () => {
+      setMemberType((track.memberType as MemberType) ?? "PARTICIPANT");
+      toast.error("참여취소를 실패했습니다.");
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["allStoryTrack"] });
       await queryClient.invalidateQueries({ queryKey: ["joinedStoryTrack"] });
+      toast.success("참여취소가 완료되었습니다.", {
+        style: { borderColor: "#57b970" },
+      });
     },
   });
 
@@ -157,9 +164,6 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
           onConfirm={() => {
             setIsCancelConfirmOpen(false);
             cancelMutation.mutate();
-            toast.success("참여 취소 완료!", {
-              style: { borderColor: "#57b970" },
-            });
           }}
         />
       )}

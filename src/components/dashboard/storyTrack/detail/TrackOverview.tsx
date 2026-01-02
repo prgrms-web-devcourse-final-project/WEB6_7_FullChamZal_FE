@@ -15,6 +15,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import toast from "react-hot-toast";
 
 export default function TrackOverview() {
   const router = useRouter();
@@ -27,7 +28,6 @@ export default function TrackOverview() {
   const [size] = useState(100);
 
   // ConfirmModal open state
-  const [isJoinConfirmOpen, setIsJoinConfirmOpen] = useState(false);
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
 
   // 스토리트랙 상세 조회
@@ -66,6 +66,12 @@ export default function TrackOverview() {
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
+      toast.success("참여하기가 완료되었습니다!", {
+        style: { borderColor: "#57b970" },
+      });
+    },
+    onError: () => {
+      toast.error("참여하기를 실패했습니다.");
     },
   });
 
@@ -75,20 +81,29 @@ export default function TrackOverview() {
       storyTrackApi.deleteParticipantStorytrack({
         storytrackId: Number(storytrackId),
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["storyTrackDetail", storytrackId],
       });
-      queryClient.removeQueries({
+      await queryClient.removeQueries({
         predicate: (query) =>
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "allStoryTrack",
       });
-      queryClient.removeQueries({
+      await queryClient.removeQueries({
         predicate: (query) =>
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
+      toast.success("참여취소가 완료되었습니다!", {
+        style: { borderColor: "#57b970" },
+      });
+
+      router.push("/dashboard/storyTrack/joined");
+      router.refresh();
+    },
+    onError: () => {
+      toast.error("참여취소를 실패했습니다.");
     },
   });
 
@@ -189,7 +204,7 @@ export default function TrackOverview() {
               <button
                 className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl"
                 disabled={isPending}
-                onClick={() => setIsJoinConfirmOpen(true)}
+                onClick={() => joinMutation.mutate()}
               >
                 <Play />
                 <span>{isPending ? "처리중..." : "참여하기"}</span>
@@ -208,21 +223,6 @@ export default function TrackOverview() {
         </div>
       </div>
 
-      {/* 참여하기 확인 모달 */}
-      {isJoinConfirmOpen && (
-        <ConfirmModal
-          active="success"
-          title="스토리트랙 참여"
-          content="이 스토리트랙에 참여하시겠습니까?"
-          open={isJoinConfirmOpen}
-          onClose={() => setIsJoinConfirmOpen(false)}
-          onConfirm={() => {
-            setIsJoinConfirmOpen(false);
-            joinMutation.mutate();
-          }}
-        />
-      )}
-
       {/* 참여취소 확인 모달 */}
       {isCancelConfirmOpen && (
         <ConfirmModal
@@ -234,8 +234,6 @@ export default function TrackOverview() {
           onConfirm={() => {
             setIsCancelConfirmOpen(false);
             cancelMutation.mutate();
-            router.refresh();
-            router.push("/dashboard/storyTrack/joined");
           }}
         />
       )}
