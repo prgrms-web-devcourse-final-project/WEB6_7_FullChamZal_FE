@@ -32,8 +32,8 @@ export default function CapsuleGate({ uuId }: { uuId: string }) {
 
   const { capsuleId, existedPassword, isProtected } = payload;
 
-  // 비밀번호 있는 캡슐이면: 비밀번호 입력 → 성공 시 상세로
-  if (existedPassword && !password) {
+  // 비밀번호가 존재하고 isProtected가 0인 캡슐이면: 비밀번호 입력 → 성공 시 상세로
+  if (existedPassword && !isProtected && !password) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
         <LetterPasswordModal
