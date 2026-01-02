@@ -25,7 +25,7 @@ import { useEffect, useRef, useState } from "react";
 import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/common/Button";
 import CopyTemplate from "../modal/CopyTemplate";
 import ActiveModal from "../../../common/ActiveModal";
@@ -92,10 +92,14 @@ const FIELD_LABEL: Record<string, string> = {
 export default function WriteForm({
   onPreviewChange,
 }: {
-  preview: PreviewState;
   onPreviewChange: (next: PreviewState) => void;
 }) {
   const router = useRouter();
+  /* 빠른 편지 쓰기 템플릿 쿼리문 확인 */
+  const sp = useSearchParams();
+  const template = (sp.get("template") as TemplateId | null) ?? null;
+  const didInitRef = useRef(false);
+
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [result, setResult] = useState<{
     userName: string;
@@ -467,6 +471,62 @@ export default function WriteForm({
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+
+    if (template === "future-me") {
+      setVisibility("SELF");
+      setUnlockType("TIME");
+      setReceiveName("미래의 나");
+      setTitle("1년 뒤의 나에게");
+
+      const now = new Date();
+      const oneYearLater = new Date(now);
+      oneYearLater.setFullYear(now.getFullYear() + 1);
+
+      const yyyy = oneYearLater.getFullYear();
+      const mm = String(oneYearLater.getMonth() + 1).padStart(2, "0");
+      const dd = String(oneYearLater.getDate()).padStart(2, "0");
+      const hh = String(oneYearLater.getHours()).padStart(2, "0");
+      const min = String(oneYearLater.getMinutes()).padStart(2, "0");
+
+      setDayForm({ date: `${yyyy}-${mm}-${dd}`, time: `${hh}:${min}` });
+
+      setContent(
+        `안녕, 1년 뒤의 나!\n\n지금 나는...\n\n1년 뒤 너는 어떤 모습일까?\n\n- 오늘의 고민:\n- 지금 가장 중요한 것:\n- 너에게 해주고 싶은 말:`
+      );
+    }
+
+    if (template === "thanks") {
+      setVisibility("PRIVATE");
+      setUnlockType("TIME");
+
+      setReceiveName("고마운 사람");
+      setTitle("고마웠던 마음을 전하며");
+
+      setContent(
+        `안녕하세요.\n\n` +
+          `이 편지를 쓰게 된 이유는, 그때의 고마움을 제대로 전하지 못한 것 같아서예요.\n\n` +
+          `• 고마웠던 순간은 언제였나요?\n` +
+          `- \n\n` +
+          `• 그때 상대가 해준 말이나 행동은 무엇이었나요?\n` +
+          `- \n\n` +
+          `• 그 일이 나에게 어떤 의미였나요?\n` +
+          `- \n\n` +
+          `지금 이 마음을 한 문장으로 전한다면:\n` +
+          `- `
+      );
+    }
+
+    if (template === "public") {
+      setVisibility("PUBLIC");
+      setUnlockType("LOCATION");
+      setTitle("공개 편지");
+      setContent("누군가에게 들려주고 싶은 이야기를 적어보세요.");
+    }
+  }, [template]);
 
   return (
     <>

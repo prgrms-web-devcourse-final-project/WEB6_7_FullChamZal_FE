@@ -104,7 +104,7 @@ export default function FourthSection() {
           <h4 className="block mb-4 md:mb-0 md:hidden font-semibold text-admin text-3xl md:text-4xl">
             Dear.___
           </h4>
-          <div className="space-y-20 md:space-y-[660px]">
+          <div className="space-y-20 md:space-y-165">
             {stepsData.map((item, index) => (
               <div
                 key={item.step}

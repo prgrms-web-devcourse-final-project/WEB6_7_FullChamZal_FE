@@ -1,3 +1,6 @@
+/* 빠른 편지 쓰기 템플릿 타입 */
+type TemplateId = "future-me" | "thanks" | "public";
+
 type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
 interface CreatePrivateCapsuleRequest {
