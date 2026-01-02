@@ -448,6 +448,27 @@ export default function LetterDetailModal({
     }
   };
 
+  // 공개 편지일 때 "보는 사람" 이름 가져오기
+  const { data: viewerName } = useQuery({
+    queryKey: ["viewerName"],
+    enabled: open && isPublic, // 공개 편지 모달 열렸을 때만
+    retry: false,
+    queryFn: async () => {
+      // 로그인 안 했으면 기본 호칭
+      const loggedIn = await authApiClient.isLoggedIn();
+      if (!loggedIn) return null;
+
+      const me = await authApiClient.me();
+      // 프로젝트 DTO에 맞게 우선순위 정하기
+      return (
+        (me as any)?.nickname ??
+        (me as any)?.name ??
+        (me as any)?.userId ??
+        null
+      );
+    },
+  });
+
   // 상세 조회 query (open일 때만)
   // initialData가 있으면 API 호출하지 않음 (중복 요청 방지)
   const { data, isLoading, isError, error } = useQuery<UICapsule>({
@@ -554,7 +575,7 @@ export default function LetterDetailModal({
   if (!open) return null;
 
   // initialData가 있으면 바로 사용, 없으면 useQuery 결과 사용
-  const capsuleData = initialData ?? data;
+  const capsule = initialData ?? data;
 
   if (!initialData && isLoading) {
     return (
@@ -594,7 +615,7 @@ export default function LetterDetailModal({
     );
   }
 
-  if (!capsuleData) {
+  if (!capsule) {
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center p-15">
@@ -614,7 +635,10 @@ export default function LetterDetailModal({
     );
   }
 
-  const capsule = capsuleData;
+  // 공개 편지이면 보는 사람 이름, 비공개 편지일 경우 받는 사람 이름, 그냥 빈 데이터이면 당신
+  const dearName = isPublic
+    ? viewerName ?? "당신"
+    : capsule.recipient ?? "당신";
 
   const isTime =
     capsule.unlockType === "TIME" || capsule.unlockType === "TIME_AND_LOCATION";
@@ -876,7 +900,7 @@ export default function LetterDetailModal({
               <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8">
                 <div className="text-base md:text-xl lg:text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span>{capsule.recipient ?? "(수신자 정보 없음)"}</span>
+                  <span>{dearName}</span>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto">
