@@ -50,6 +50,7 @@ import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
 import ReportModal from "../report/ReportModal";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
@@ -921,10 +922,10 @@ export default function LetterDetailModal({
                     <div className="flex flex-col gap-3 mt-4 items-start">
                       {capsule.attachments.map((attachment) => (
                         <div key={attachment.attachmentId} className="relative">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
+                          <Image
                             src={attachment.presignedUrl}
                             alt={`첨부 이미지 ${attachment.attachmentId}`}
+                            fill
                             className="max-h-96 h-auto object-contain"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;

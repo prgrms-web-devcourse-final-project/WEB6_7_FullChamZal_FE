@@ -141,7 +141,7 @@ export default function PendingLetters() {
             <p className="text-sm text-text-3">편지를 불러오지 못했어요.</p>
           ) : (
             <p className="text-sm text-text-3">
-              아직 열리지 않은 편지가{" "}
+              아직 열지 않은 편지가{" "}
               <span className="text-primary font-semibold">
                 {unViewLetters.length}통
               </span>{" "}
