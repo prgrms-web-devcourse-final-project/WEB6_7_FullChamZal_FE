@@ -1,4 +1,4 @@
-import AccountRecoveryPage from "@/components/auth/Account-recovery";
+import AccountRecoveryPage from "@/components/auth/account/AccountRecoveryPage";
 import { Suspense } from "react";
 
 export default function Page() {
