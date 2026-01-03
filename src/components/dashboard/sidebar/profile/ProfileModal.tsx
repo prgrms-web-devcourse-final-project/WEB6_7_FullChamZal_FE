@@ -16,6 +16,8 @@ import {
 import AccountDeleteModal from "./AccountDeleteModal";
 import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import toast from "react-hot-toast";
+import AccountRecoveryModal from "@/components/auth/account/AccountRecoveryModal";
 
 type ProfileForm = {
   name: string;
@@ -48,6 +50,9 @@ export default function ProfileModal({
     }),
     []
   );
+
+  /* 비밀번호 찾기 모달 */
+  const [isAccountRecoveryOpen, setIsAccountRecoveryOpen] = useState(false);
 
   const [me, setMe] = useState<MemberMeDetail | null>(null);
 
@@ -184,6 +189,9 @@ export default function ProfileModal({
       if (res?.nextNicknameChangeDate) {
         setNextNicknameChangeDate(res.nextNicknameChangeDate);
       }
+      toast.success("프로필 수정이 완료되었습니다!", {
+        style: { borderColor: "#57b970" },
+      });
     } catch (e: unknown) {
       setError(getErrorMessage(e));
     } finally {
@@ -294,6 +302,7 @@ export default function ProfileModal({
                 <button
                   type="button"
                   className="cursor-pointer w-full text-center text-xs text-text-3 underline"
+                  onClick={() => setIsAccountRecoveryOpen(true)}
                 >
                   비밀번호를 잊으셨나요?
                 </button>
@@ -453,6 +462,12 @@ export default function ProfileModal({
       <AccountDeleteModal
         open={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
+      />
+
+      <AccountRecoveryModal
+        open={isAccountRecoveryOpen}
+        onClose={() => setIsAccountRecoveryOpen(false)}
+        initialMode="FIND_PW"
       />
     </>
   );
