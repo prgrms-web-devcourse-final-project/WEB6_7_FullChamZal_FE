@@ -175,8 +175,32 @@ export const storyTrackApi = {
     );
   },
 
-  deleteStoryTrack: (payload: { storytrackId: number }, signal?: AbortSignal) => {
-    const qs = new URLSearchParams({ storytrackId: String(payload.storytrackId) });
+  /**
+   * 스토리트랙 경로 수정 (단일 step)
+   * @param payload 경로 수정 요청 데이터
+   */
+  updatePath: (payload: UpdatePathRequest, signal?: AbortSignal) => {
+    return apiFetchRaw<ApiResponse<UpdatePathResponse>>(
+      "/api/v1/storytrack/update",
+      {
+        method: "PUT",
+        json: payload,
+        signal,
+      }
+    );
+  },
+
+  /**
+   * 스토리트랙 삭제 (작성자)
+   * @param payload 스토리트랙 ID
+   */
+  deleteStoryTrack: (
+    payload: { storytrackId: number },
+    signal?: AbortSignal
+  ) => {
+    const qs = new URLSearchParams({
+      storytrackId: String(payload.storytrackId),
+    });
 
     return apiFetchRaw<ApiResponse<{ storytrackId: number; message: string }>>(
       `/api/v1/storytrack/delete?${qs.toString()}`,

@@ -19,9 +19,11 @@ function toLetter(item: CapsuleDashboardItem): Letter {
 export default function PublicLetterPicker({
   selectedIds,
   onSelect,
+  selectedLabel = "추가됨",
 }: {
   selectedIds?: string[];
   onSelect: (letter: Letter) => void;
+  selectedLabel?: string;
 }) {
   const [q, setQ] = useState("");
 
@@ -120,7 +122,7 @@ export default function PublicLetterPicker({
 
                   {already ? (
                     <span className="shrink-0 inline-flex items-center rounded-full border border-primary px-2 py-1 text-xs text-primary">
-                      추가됨
+                      {selectedLabel}
                     </span>
                   ) : (
                     <span className="shrink-0 inline-flex items-center rounded-full border border-outline bg-white px-2 py-1 text-xs text-text-4">
@@ -136,3 +138,4 @@ export default function PublicLetterPicker({
     </div>
   );
 }
+

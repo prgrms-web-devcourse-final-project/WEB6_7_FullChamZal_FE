@@ -238,7 +238,17 @@ export default function TrackOverview() {
             <div className="w-full">
               {memberType === "CREATOR" ? (
                 <div className="grid grid-cols-2 gap-2">
-                  <button className="cursor-pointer justify-center bg-text-2 hover:bg-text-3 text-white px-4 py-2 rounded-xl flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (storytrackId) {
+                        router.push(
+                          `/dashboard/storyTrack/${storytrackId}/edit`
+                        );
+                      }
+                    }}
+                    className="cursor-pointer justify-center bg-text-2 hover:bg-text-3 text-white px-4 py-2 rounded-xl flex items-center gap-2"
+                  >
                     <Pencil />
                     수정
                   </button>
