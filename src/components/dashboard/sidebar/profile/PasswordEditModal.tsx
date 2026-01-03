@@ -56,7 +56,7 @@ export default function PasswordEditModal({
         currentPassword,
         newPassword,
       });
-      toast.success("인증번호 발송을 성공했습니다!", {
+      toast.success("비밀번호가 변경되었습니다!", {
         style: { borderColor: "#57b970" },
       });
       onClose();
