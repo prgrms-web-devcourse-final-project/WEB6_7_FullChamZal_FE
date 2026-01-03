@@ -174,4 +174,18 @@ export const storyTrackApi = {
       { method: "GET", signal }
     );
   },
+
+  deleteStoryTrack: (payload: { storytrackId: number }, signal?: AbortSignal) => {
+    const qs = new URLSearchParams({ storytrackId: String(payload.storytrackId) });
+
+    return apiFetchRaw<ApiResponse<{ storytrackId: number; message: string }>>(
+      `/api/v1/storytrack/delete?${qs.toString()}`,
+      {
+        method: "DELETE",
+        signal,
+      }
+    );
+  },
 };
+
+export default storyTrackApi;

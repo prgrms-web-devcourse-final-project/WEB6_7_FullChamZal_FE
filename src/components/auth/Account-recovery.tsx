@@ -109,7 +109,7 @@ export default function AccountRecoveryPage() {
   const canSend =
     phoneNumber.trim().length >= 10 &&
     !sendCodeMutation.isPending &&
-    (mode === "FIND_ID" || inputUserId.trim().length > 0); // PW 모드면 아이디 입력해야 발송
+    (mode === "FIND_ID" || inputUserId.trim().length > 0); 
 
   const canConfirm =
     phoneNumber.trim().length >= 10 &&
