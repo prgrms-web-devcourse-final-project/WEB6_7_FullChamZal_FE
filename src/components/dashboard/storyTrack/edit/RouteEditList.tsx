@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MapPin, RefreshCw } from "lucide-react";
-import PublicLetterPicker from "../new/secondForm/PublicLetterPicker";
+import PublicLetterPicker from "../common/PublicLetterPicker";
 import Modal from "@/components/common/Modal";
 import { X } from "lucide-react";
 
@@ -104,12 +104,13 @@ export default function RouteEditList({ order, items, onReplace }: Props) {
             <PublicLetterPicker
               selectedIds={items.map((x) => x.id)}
               onSelect={handleReplace}
+              selectedLabel="선택됨"
             />
           </div>
 
           <div className="px-5 py-3 border-t border-outline text-xs text-text-4">
             현재 경로에 사용 중인 편지는{" "}
-            <span className="font-medium text-text-3">추가됨</span>으로
+            <span className="font-medium text-text-3">선택됨</span>으로
             표시돼요.
           </div>
         </div>
