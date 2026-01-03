@@ -208,3 +208,32 @@ type StoryTrackProgressItem = {
 };
 
 type StoryTrackProgressResponse = ApiEnvelope<StoryTrackProgressItem>;
+
+// 스토리트랙 경로 수정
+type UpdatePathRequest = {
+  storytrackId: number;
+  stepOrderId: number;
+  updatedCapsuleId: number;
+};
+
+type UpdatePathResponse = {
+  storytrackId: number;
+  updatedStepOrder: number;
+  capsule: {
+    capsuleId: number;
+    createrNickname: string;
+    capsuleTitle: string;
+    capsuleContent: string;
+    unlockType: string;
+    unlock: {
+      unlockAt: string;
+      locationName: string;
+      location: {
+        address: string;
+        locationLat: number;
+        locationLng: number;
+      };
+      currentViewCount: number;
+    };
+  };
+};
