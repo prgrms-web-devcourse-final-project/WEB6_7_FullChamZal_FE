@@ -10,6 +10,63 @@ function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
+/** ✅ unlockAt이 UTC로 파싱되도록 보정 (Z/offset 없으면 UTC로 간주하고 Z 붙임) */
+function toUtcIso(s: string) {
+  if (/[zZ]$|[+\-]\d{2}:\d{2}$/.test(s)) return s;
+  return s.replace(" ", "T") + "Z";
+}
+
+/** ✅ 화면 표시: KST(+9) 기준 날짜/시간 포맷 */
+function formatKstDate(ms: number) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(ms));
+}
+
+function formatKstDateTime(ms: number) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(ms));
+}
+
+/** ✅ D-day 계산도 KST '자정 기준'으로 */
+function kstYmd(ms: number) {
+  // YYYY-MM-DD 형태로 안정적으로 뽑기
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(ms));
+}
+
+function diffDaysKst(targetMs: number, nowMs: number) {
+  const [ty, tm, td] = kstYmd(targetMs).split("-").map(Number);
+  const [ny, nm, nd] = kstYmd(nowMs).split("-").map(Number);
+
+  // KST 자정(00:00 KST) -> UTC ms 로 환산 (KST = UTC+9)
+  const targetKstMidnightUtcMs = Date.UTC(ty, tm - 1, td) - 9 * 3600_000;
+  const nowKstMidnightUtcMs = Date.UTC(ny, nm - 1, nd) - 9 * 3600_000;
+
+  return Math.floor((targetKstMidnightUtcMs - nowKstMidnightUtcMs) / 86400_000);
+}
+
+function calcDDayKst(unlockAtMs: number, nowMs: number) {
+  const diffDays = diffDaysKst(unlockAtMs, nowMs);
+  if (diffDays === 0) return "D-Day";
+  if (diffDays > 0) return `D-${diffDays}`;
+  return `D+${Math.abs(diffDays)}`;
+}
+
 function formatRemaining(ms: number) {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   const days = Math.floor(totalSec / 86400);
@@ -17,22 +74,6 @@ function formatRemaining(ms: number) {
   const minutes = Math.floor((totalSec % 3600) / 60);
   const seconds = totalSec % 60;
   return { days, hours, minutes, seconds };
-}
-
-function calcDDay(unlockAtMs: number) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const target = new Date(unlockAtMs);
-  target.setHours(0, 0, 0, 0);
-
-  const diffDays = Math.floor(
-    (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  );
-
-  if (diffDays === 0) return "D-Day";
-  if (diffDays > 0) return `D-${diffDays}`;
-  return `D+${Math.abs(diffDays)}`;
 }
 
 function TimeBox({ label, value }: { label: string; value: number | string }) {
@@ -130,8 +171,8 @@ export default function LetterLockedView({
   unlockType = "TIME",
   currentLocation,
   targetLocation,
-  viewingRadius = 50, // 반경(미터) 표시 + 판정에 사용
-  locationName = "없음", // 장소 별칭 표시
+  viewingRadius = 50,
+  locationName = "없음",
   locationErrorMessage,
 }: {
   isPublic: boolean;
@@ -147,7 +188,7 @@ export default function LetterLockedView({
 
   // ---------------- TIME ----------------
   const unlockTime = useMemo(() => {
-    const t = new Date(unlockAt).getTime();
+    const t = new Date(toUtcIso(unlockAt)).getTime();
     return Number.isFinite(t) ? t : NaN;
   }, [unlockAt]);
 
@@ -162,13 +203,12 @@ export default function LetterLockedView({
     ? remainingMsRaw <= 0
     : false;
 
-  // 시간이 이미 지났으면 0으로 고정
   const remainingMs = Number.isFinite(unlockTime)
     ? Math.max(0, remainingMsRaw)
     : 0;
 
   const t = formatRemaining(remainingMs);
-  const dDay = Number.isFinite(unlockTime) ? calcDDay(unlockTime) : "-";
+  const dDay = Number.isFinite(unlockTime) ? calcDDayKst(unlockTime, now) : "-";
 
   // ---------------- LOCATION ----------------
   const distance = useMemo(() => {
@@ -176,10 +216,9 @@ export default function LetterLockedView({
     return distanceMeter(currentLocation, targetLocation);
   }, [currentLocation, targetLocation]);
 
-  // 반경 기반으로 위치 조건 충족 여부 판단
   const isLocationUnlocked = useMemo(() => {
-    if (unlockType === "TIME") return true; // 위치 조건 없는 타입
-    if (distance == null) return false; // 거리 계산 불가면 미충족
+    if (unlockType === "TIME") return true;
+    if (distance == null) return false;
     return distance <= viewingRadius;
   }, [unlockType, distance, viewingRadius]);
 
@@ -238,7 +277,7 @@ export default function LetterLockedView({
                 <p className="text-sm">
                   오픈 날짜:{" "}
                   {Number.isFinite(unlockTime)
-                    ? new Date(unlockTime).toLocaleDateString()
+                    ? formatKstDate(unlockTime)
                     : "-"}
                 </p>
               </div>
@@ -255,7 +294,7 @@ export default function LetterLockedView({
               <p className="text-xs text-text-2">
                 오픈 시각:{" "}
                 {Number.isFinite(unlockTime)
-                  ? new Date(unlockTime).toLocaleString()
+                  ? formatKstDateTime(unlockTime)
                   : "-"}
               </p>
             </div>
@@ -269,7 +308,6 @@ export default function LetterLockedView({
                 <p className="text-sm">지정된 장소에 도착해야 열 수 있어요</p>
               </div>
 
-              {/* 장소 별칭 + 반경 표시 */}
               <div className="text-xs text-text-3 flex flex-col items-center gap-1">
                 <p>장소 이름: {locationName}</p>
                 <p>기준 반경: {Math.round(viewingRadius)} m</p>
