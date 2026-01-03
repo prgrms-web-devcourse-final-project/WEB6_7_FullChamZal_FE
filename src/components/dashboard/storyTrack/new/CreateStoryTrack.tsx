@@ -9,6 +9,7 @@ import FirstForm from "./FirstForm";
 import BackButton from "@/components/common/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Step = 1 | 2 | 3;
 
@@ -37,6 +38,7 @@ const initialState: FormState = {
 
 export default function CreateStoryTrack() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [step, setStep] = useState<Step>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,6 +92,10 @@ export default function CreateStoryTrack() {
 
       // 성공 시 Step 3으로 이동
       if (response.code === "200") {
+        queryClient.invalidateQueries({ queryKey: ["mineStoryTrack"] });
+        toast.success("스토리트랙 생성이 완료되었습니다!", {
+          style: { borderColor: "#57b970" },
+        });
         setStep(3);
       } else {
         throw new Error(response.message || "스토리트랙 생성에 실패했습니다.");

@@ -6,30 +6,7 @@ import DivBox from "../../../DivBox";
 import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useEffect, useMemo, useState } from "react";
-
-// 날짜 포맷
-function formatKoreanDateTime(iso: string) {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-// D-Day 계산
-function formatDDay(iso: string) {
-  const target = new Date(iso).getTime();
-  if (Number.isNaN(target)) return "-";
-
-  const diff = Math.ceil((target - Date.now()) / (1000 * 60 * 60 * 24));
-  if (diff > 0) return `D-${diff}`;
-  if (diff === 0) return "D-Day";
-  return `D+${Math.abs(diff)}`;
-}
+import { formatDateTime } from "@/lib/hooks/formatDateTime";
 
 // 거리 계산 (Haversine)
 function calcDistanceKm(
@@ -61,7 +38,7 @@ function formatDistance(km: number) {
 // 해제 조건 텍스트
 function getUnlockConditionText(l: CapsuleDashboardItem) {
   const type = l.unlockType as UnlockType;
-  const timeText = l.unlockAt ? formatKoreanDateTime(l.unlockAt) : null;
+  const timeText = l.unlockAt ? formatDateTime(l.unlockAt) : null;
   const locText = l.locationName ?? "지정 위치";
 
   switch (type) {
@@ -141,7 +118,7 @@ export default function PendingLetters() {
             <p className="text-sm text-text-3">편지를 불러오지 못했어요.</p>
           ) : (
             <p className="text-sm text-text-3">
-              아직 열리지 않은 편지가{" "}
+              아직 열지 않은 편지가{" "}
               <span className="text-primary font-semibold">
                 {unViewLetters.length}통
               </span>{" "}
@@ -178,7 +155,7 @@ export default function PendingLetters() {
               l.unlockAt
             ) {
               SubIcon = Clock;
-              subText = formatDDay(l.unlockAt);
+              subText = formatDateTime(l.unlockAt);
             }
 
             // LOCATION + 위치정보 있으면 거리로 업데이트

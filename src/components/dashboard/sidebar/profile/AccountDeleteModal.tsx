@@ -44,9 +44,11 @@ export default function AccountDeleteModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-[420px] rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
         <div className="space-y-2">
-          <h4 className="text-lg text-center">정말로 계정을 삭제하시겠습니까?</h4>
+          <h4 className="text-lg text-center">
+            정말로 계정을 삭제하시겠습니까?
+          </h4>
           <p className="text-xs text-text-3 text-center">
             탈퇴 후에는 서비스 이용 기록과 개인 정보가 삭제됩니다.
           </p>

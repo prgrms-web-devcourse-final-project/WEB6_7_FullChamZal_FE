@@ -6,16 +6,14 @@ import MapList from "./MapList";
 import FilterArea from "./FilterArea";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
-
-//서버 렌더링 방지
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
+
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
 });
 
-//필터링 타입
 export type Radius = 1500 | 1000 | 500;
 export type ViewedFilter = "ALL" | "UNREAD" | "READ";
 export type AccessibleFilter = "ALL" | "ACCESSIBLE" | "INACCESSIBLE";
@@ -28,26 +26,32 @@ export default function MapContents() {
   const [radius, setRadius] = useState<Radius>(1000);
   const [viewed, setViewed] = useState<ViewedFilter>("ALL");
   const [accessible, setAccessible] = useState<AccessibleFilter>("ALL");
-  const filterRef = useRef<HTMLDivElement | null>(null);
+
+  // ref 분리 (기존 filterRef 제거)
+  const desktopFilterRef = useRef<HTMLDivElement | null>(null);
+  const mobileFilterRef = useRef<HTMLDivElement | null>(null);
 
   //map center 위치
   const [mapLocation, setMapLocation] = useState<{
     lat: number;
     lng: number;
   } | null>({ lat: 37.579763, lng: 126.977045 });
+
   //사용자 위치
   const [myLocation, setMyLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
+
   //위치 정보 에러 메세지
   const [error, setError] = useState<string | null>(null);
+
   //포커스 된 card
   const [focus, setFocus] = useState<{ id: number; ts: number } | null>(null);
+
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  //위치 정보 가져오기 실패했을 때 상황에 따른 에러 메세지
   const showErrorMsg = (error: GeolocationPositionError) => {
     switch (error.code) {
       case error.PERMISSION_DENIED:
@@ -67,7 +71,6 @@ export default function MapContents() {
     }
   };
 
-  //현재 사용자 위치로 map center 이동
   const MoveMyLocation = () => {
     if (!myLocation) return;
     setMapLocation({ ...myLocation });
@@ -78,6 +81,10 @@ export default function MapContents() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setMyLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          setMapLocation({
             lat: position.coords.latitude, //위도값 저장
             lng: position.coords.longitude, //경도값 저장
           });
@@ -87,15 +94,25 @@ export default function MapContents() {
         }
       );
     }
-
-    const onDown = (e: MouseEvent) => {
-      if (!filterRef.current) return;
-      if (!filterRef.current.contains(e.target as Node)) setIsFilterOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-
-    return () => document.removeEventListener("mousedown", onDown);
   }, []);
+
+  // 클릭 아웃사이드로 필터 닫기 (ref 2개 모두 검사)
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!isFilterOpen) return;
+
+      const t = e.target as Node;
+
+      const inDesktop = desktopFilterRef.current?.contains(t) ?? false;
+      const inMobile = mobileFilterRef.current?.contains(t) ?? false;
+
+      if (!inDesktop && !inMobile) setIsFilterOpen(false);
+    };
+
+    // capture: 내부 클릭보다 먼저 잡아서 안정적
+    document.addEventListener("mousedown", onDown, true);
+    return () => document.removeEventListener("mousedown", onDown, true);
+  }, [isFilterOpen]);
 
   //근처 공개 캡슐 조회
   const {
@@ -106,13 +123,8 @@ export default function MapContents() {
   } = useQuery({
     queryKey: ["publicCapsules", myLocation?.lat, myLocation?.lng, radius],
     queryFn: () => {
-      if (!myLocation) {
-        throw new Error("현재 위치 정보 없음");
-      }
-      if (isError) {
-        throw queryError;
-      }
-
+      if (!myLocation) throw new Error("현재 위치 정보 없음");
+      if (isError) throw queryError;
       return fetchPublicCapsules({
         lat: myLocation.lat,
         lng: myLocation.lng,
@@ -123,7 +135,6 @@ export default function MapContents() {
     staleTime: 1000 * 30,
   });
 
-  //조회 상태 필터
   const filter = (data: PublicCapsule[] | undefined) => {
     if (data) {
       let result = data;
@@ -131,20 +142,19 @@ export default function MapContents() {
         case "ALL":
           break;
         case "UNREAD":
-          result = result.filter((d: PublicCapsule) => d.isViewed === false);
+          result = result.filter((d) => d.isViewed === false);
           break;
         case "READ":
-          result = result.filter((d: PublicCapsule) => d.isViewed === true);
+          result = result.filter((d) => d.isViewed === true);
           break;
       }
       switch (accessible) {
         case "ALL":
           return result;
         case "ACCESSIBLE":
-          return result.filter((d: PublicCapsule) => d.isUnlockable === true);
-
+          return result.filter((d) => d.isUnlockable === true);
         case "INACCESSIBLE":
-          return result.filter((d: PublicCapsule) => d.isUnlockable === false);
+          return result.filter((d) => d.isUnlockable === false);
       }
     } else return [];
   };
@@ -178,7 +188,6 @@ export default function MapContents() {
       <div className="flex-1 flex lg:flex-row flex-col gap-4 min-h-0">
         {/* 지도 */}
         <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden ">
-          {/* 위치 정보 접근 불가능 시 안내*/}
           {error ? (
             <div className="w-full h-full absolute z-20 flex items-center justify-center select-none">
               <div className="inset-0 absolute bg-black opacity-50"></div>
@@ -197,7 +206,6 @@ export default function MapContents() {
             ""
           )}
 
-          {/* 지도 컴포넌트 */}
           {mapLocation ? (
             <PublicCapsuleMap
               radius={radius}
@@ -214,7 +222,6 @@ export default function MapContents() {
             error
           )}
 
-          {/* 사용자 위치 불러오기 버튼 */}
           <button
             type="button"
             className="cursor-pointer bg-white absolute bottom-4 right-4 p-3 rounded-xl z-10 shadow-lg text-primary"
@@ -223,7 +230,6 @@ export default function MapContents() {
             <LocateFixed size={24} />
           </button>
 
-          {/* 모바일: 리스트 열기 버튼 */}
           <button
             type="button"
             className="cursor-pointer lg:hidden absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-xl z-10 shadow-lg text-sm bg-primary-2 text-white"
@@ -240,8 +246,8 @@ export default function MapContents() {
           <div className="flex justify-between flex-none px-6 items-center">
             <span className="text-lg">주변 편지</span>
 
-            {/* 필터 */}
-            <div className="relative" ref={filterRef}>
+            {/* 데스크탑 필터 ref */}
+            <div className="relative" ref={desktopFilterRef}>
               <button
                 type="button"
                 onClick={() => setIsFilterOpen((v) => !v)}
@@ -271,7 +277,6 @@ export default function MapContents() {
             </div>
           </div>
 
-          {/* 리스트 영역 */}
           {myLocation ? (
             isLoading ? (
               <div className="text-center text-text-3 text-sm">로딩중</div>
@@ -294,7 +299,6 @@ export default function MapContents() {
 
         {/* 모바일 리스트 */}
         <div className="lg:hidden">
-          {/* overlay */}
           <div
             className={`fixed inset-0 z-9998 bg-black/40 transition-opacity ${
               isListOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -302,7 +306,6 @@ export default function MapContents() {
             onClick={() => setIsListOpen(false)}
           />
 
-          {/* sheet */}
           <div
             className={`fixed left-0 right-0 bottom-0 z-9999 bg-white rounded-t-2xl border-t border-outline
               transition-transform duration-200 ease-out
@@ -313,7 +316,6 @@ export default function MapContents() {
               <span>주변 편지</span>
 
               <div className="flex items-center gap-2">
-                {/* 필터 버튼 */}
                 <button
                   type="button"
                   onClick={() => {
@@ -338,8 +340,8 @@ export default function MapContents() {
               </div>
             </div>
 
-            {/* 필터 영역 (모바일에서는 시트 내부에 표시) */}
-            <div className="relative px-5 pt-3" ref={filterRef}>
+            {/* 모바일 필터 ref */}
+            <div className="relative px-5 pt-3" ref={mobileFilterRef}>
               {isFilterOpen && (
                 <FilterArea
                   radius={radius}

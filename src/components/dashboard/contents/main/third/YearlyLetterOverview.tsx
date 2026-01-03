@@ -1,6 +1,7 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, TrendingUp } from "lucide-react";
 import DivBox from "../../../DivBox";
 import {
   Area,
@@ -15,134 +16,162 @@ import {
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
 
+type YearLettersItem = {
+  name: string;
+  send: number;
+  receive: number;
+};
+
 export default function YearlyLetterOverview() {
-  /** 보낸 편지 */
-  const { data: sendData } = useQuery({
-    queryKey: ["capsuleDashboard", "send", "count"],
-    queryFn: ({ signal }) =>
-      capsuleDashboardApi.sendDashboard({ page: 0, size: 1 }, signal),
-  });
+  const nowYear = new Date().getFullYear();
 
-  /** 받은 편지 */
-  const { data: receiveData } = useQuery({
-    queryKey: ["capsuleDashboard", "receive", "count"],
-    queryFn: ({ signal }) =>
-      capsuleDashboardApi.receiveDashboard({ page: 0, size: 1 }, signal),
-  });
-
-  const year = new Date().getFullYear();
+  // 시작은 현재 연도
+  const [year, setYear] = useState<number>(nowYear);
 
   const { data: yearLetters } = useQuery({
     queryKey: ["yearLetters", year],
     queryFn: ({ signal }) => capsuleDashboardApi.yearLetters(year, signal),
   });
 
-  const yearData = yearLetters?.data.data ?? [];
+  const yearData = useMemo<YearLettersItem[]>(() => {
+    return yearLetters?.data.data ?? [];
+  }, [yearLetters]);
 
-  const sendCount = sendData?.data.totalElements ?? 0;
-  const receiveCount = receiveData?.data.totalElements ?? 0;
+  // 그 해 월별 집계 합산 => 그 해 보낸/받은 편지 수
+  const { sendCount, receiveCount, total } = useMemo(() => {
+    const sendCount = yearData.reduce((acc, cur) => acc + (cur.send ?? 0), 0);
+    const receiveCount = yearData.reduce(
+      (acc, cur) => acc + (cur.receive ?? 0),
+      0
+    );
+    return { sendCount, receiveCount, total: sendCount + receiveCount };
+  }, [yearData]);
 
-  const total = sendCount + receiveCount;
-
-  const activityBadge = (() => {
+  const activityBadge = useMemo(() => {
     if (total >= 50)
-      return {
-        label: "매우 활발",
-        tone: "text-emerald-600",
-        Icon: TrendingUp,
-      };
-
+      return { label: "매우 활발", tone: "text-emerald-600", Icon: TrendingUp };
     if (total >= 20)
-      return {
-        label: "활발",
-        tone: "text-lime-600",
-        Icon: TrendingUp,
-      };
-
+      return { label: "활발", tone: "text-lime-600", Icon: TrendingUp };
     if (total >= 5)
-      return {
-        label: "보통",
-        tone: "text-sky-600",
-        Icon: TrendingUp,
-      };
+      return { label: "보통", tone: "text-sky-600", Icon: TrendingUp };
+    return { label: "조용", tone: "text-text-3", Icon: TrendingUp };
+  }, [total]);
 
-    return {
-      label: "조용",
-      tone: "text-text-3",
-      Icon: TrendingUp,
-    };
-  })();
+  /* 지금보다 뒤에 연도는 보지 못하게 */
+  const canGoNext = year < nowYear;
+  const canGoPrev = true;
 
   return (
-    <>
-      <DivBox className="lg:flex-2 space-y-9 cursor-auto hover:bg-outline/0">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <p className="text-lg">올해의 활동</p>
-            <p className="text-text-3">편지 주고받기 현황</p>
+    <DivBox className="lg:flex-2 space-y-6 cursor-auto hover:bg-outline/0">
+      {/* 헤더 */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-base md:text-lg">{year}년 활동</p>
+          <p className="text-sm md:text-base text-text-3">편지 주고받기 현황</p>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* 연도 이전/다음 */}
+          <div className="flex items-center gap-1 rounded-full border border-outline bg-white p-1">
+            <button
+              type="button"
+              disabled={!canGoPrev}
+              onClick={() => setYear((y) => y - 1)}
+              className={[
+                "cursor-pointer w-6 h-6 md:h-8 md:w-8 grid place-items-center rounded-full transition",
+                canGoPrev
+                  ? "hover:bg-button-hover text-text"
+                  : "opacity-40 cursor-not-allowed",
+              ].join(" ")}
+              aria-label="이전 연도"
+            >
+              <ChevronLeft size={18} />
+            </button>
+
+            <div className="px-1 md:px-2 text-xs md:text-sm">{year}</div>
+
+            <button
+              type="button"
+              disabled={!canGoNext}
+              onClick={() => setYear((y) => y + 1)}
+              className={[
+                "cursor-pointer w-6 h-6 md:h-8 md:w-8 grid place-items-center rounded-full transition",
+                canGoNext
+                  ? "hover:bg-button-hover text-text"
+                  : "opacity-40 cursor-not-allowed",
+              ].join(" ")}
+              aria-label="다음 연도"
+            >
+              <ChevronRight size={18} />
+            </button>
           </div>
-          <div className={`${activityBadge.tone} flex items-center gap-1`}>
+
+          {/* 활동 뱃지 */}
+          <div
+            className={`${activityBadge.tone} flex-none flex items-center gap-1`}
+          >
             <activityBadge.Icon size={16} />
             <span className="text-sm">{activityBadge.label}</span>
           </div>
         </div>
-        <div className="flex gap-4">
-          <div className="w-full px-4 py-3 bg-sub rounded-[10px] space-y-2">
-            <p className="text-sm">보낸 편지</p>
-            <p className="text-12 text-2xl">{sendCount}</p>
-          </div>
-          <div className="w-full px-4 py-3 bg-primary-5 rounded-[10px] space-y-2">
-            <p className="text-sm">받은 편지</p>
-            <p className="text-2xl">{receiveCount}</p>
-          </div>
+      </div>
+
+      {/* 카운트 */}
+      <div className="flex gap-4">
+        <div className="w-full px-4 py-3 bg-sub rounded-[10px] space-y-2">
+          <p className="text-sm">보낸 편지</p>
+          <p className="text-2xl">{sendCount}</p>
         </div>
-        <div className="h-60 md:h-75 lg:h-80 select-none outline-none [&_*:focus]:outline-none">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart
-              data={yearData}
-              margin={{ top: 20, right: 20, bottom: 20, left: -30 }}
-            >
-              {/* 그라데이션 정의 */}
-              <defs>
-                <linearGradient id="sendArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#D6DAE1" stopOpacity={0.7} />
-                  <stop offset="95%" stopColor="#D6DAE1" stopOpacity={0} />
-                </linearGradient>
-
-                <linearGradient id="receiveArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#FFBCB1" stopOpacity={0.7} />
-                  <stop offset="95%" stopColor="#FFBCB1" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-
-              {/* 영역 채우기 */}
-              <Area
-                type="monotone"
-                dataKey="send"
-                stroke="#b9bec7"
-                strokeWidth={2}
-                fill="url(#sendArea)"
-                name="보낸 편지"
-              />
-              <Area
-                type="monotone"
-                dataKey="receive"
-                stroke="#ffa294"
-                strokeWidth={2}
-                fill="url(#receiveArea)"
-                name="받은 편지"
-              />
-
-              <CartesianGrid stroke="#E7E5E4" strokeDasharray="5 5" />
-
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Legend align="right" />
-              <Tooltip />
-            </ComposedChart>
-          </ResponsiveContainer>
+        <div className="w-full px-4 py-3 bg-primary-5 rounded-[10px] space-y-2">
+          <p className="text-sm">받은 편지</p>
+          <p className="text-2xl">{receiveCount}</p>
         </div>
-      </DivBox>
-    </>
+      </div>
+
+      {/* 차트 */}
+      <div className="h-60 md:h-75 lg:h-80 select-none outline-none [&_*:focus]:outline-none">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart
+            data={yearData}
+            margin={{ top: 20, right: 20, bottom: 20, left: -30 }}
+          >
+            <defs>
+              <linearGradient id="sendArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#D6DAE1" stopOpacity={0.7} />
+                <stop offset="95%" stopColor="#D6DAE1" stopOpacity={0} />
+              </linearGradient>
+
+              <linearGradient id="receiveArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#FFBCB1" stopOpacity={0.7} />
+                <stop offset="95%" stopColor="#FFBCB1" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+
+            <Area
+              type="monotone"
+              dataKey="send"
+              stroke="#b9bec7"
+              strokeWidth={2}
+              fill="url(#sendArea)"
+              name="보낸 편지"
+            />
+            <Area
+              type="monotone"
+              dataKey="receive"
+              stroke="#ffa294"
+              strokeWidth={2}
+              fill="url(#receiveArea)"
+              name="받은 편지"
+            />
+
+            <CartesianGrid stroke="#E7E5E4" strokeDasharray="5 5" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Legend align="right" />
+            <Tooltip />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+    </DivBox>
   );
 }

@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { CustomOverlayMap, Map } from "react-kakao-maps-sdk";
 
 type TrackMapProps = {
-  storytrackType?: "SEQUENTIAL" | "PARALLEL";
+  storytrackType?: TrackType;
   capsuleList?: StoryTrackPathItem[];
 };
 

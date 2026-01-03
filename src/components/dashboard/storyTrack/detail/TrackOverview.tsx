@@ -15,17 +15,23 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import toast from "react-hot-toast";
 
 export default function TrackOverview() {
+  const router = useRouter();
   const params = useParams();
   const router = useRouter();
 
   const storytrackId =
     typeof params.trackId === "string" ? params.trackId : undefined;
 
+
   const queryClient = useQueryClient();
   const [page] = useState(0);
   const [size] = useState(100);
+
+  // ConfirmModal open state
+  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   // 스토리트랙 상세 조회
@@ -59,6 +65,12 @@ export default function TrackOverview() {
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
+      toast.success("참여하기가 완료되었습니다!", {
+        style: { borderColor: "#57b970" },
+      });
+    },
+    onError: () => {
+      toast.error("참여하기를 실패했습니다.");
     },
   });
 
@@ -68,19 +80,59 @@ export default function TrackOverview() {
       storyTrackApi.deleteParticipantStorytrack({
         storytrackId: Number(storytrackId),
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["storyTrackDetail", storytrackId],
       });
-      queryClient.removeQueries({
+      await queryClient.removeQueries({
         predicate: (query) =>
           Array.isArray(query.queryKey) && query.queryKey[0] === "allStoryTrack",
       });
-      queryClient.removeQueries({
+      await queryClient.removeQueries({
         predicate: (query) =>
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
+      toast.success("참여취소가 완료되었습니다!", {
+        style: { borderColor: "#57b970" },
+      });
+
+      router.push("/dashboard/storyTrack/joined");
+      router.refresh();
+    },
+    onError: () => {
+      toast.error("참여취소를 실패했습니다.");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => {
+      if (!storytrackId) throw new Error("storytrackId가 없습니다.");
+      return storyTrackApi.deleteStoryTrack({ storytrackId: Number(storytrackId) });
+    },
+    onSuccess: () => {
+      // 상세 캐시 제거
+      queryClient.removeQueries({
+        queryKey: ["storyTrackDetail", storytrackId],
+      });
+
+      // 목록 캐시 제거/갱신 (프로젝트에서 쓰는 키 그대로)
+      queryClient.removeQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey[0] === "allStoryTrack",
+      });
+      await queryClient.removeQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "joinedStoryTrack",
+      });
+      queryClient.removeQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey[0] === "mineStoryTrack",
+      });
+
+      router.replace("/dashboard/storyTrack/mine");
+      router.refresh();
     },
   });
 
@@ -132,7 +184,7 @@ export default function TrackOverview() {
 
   return (
     <div className="p-6 flex flex-col h-full">
-      <div className="flex flex-col justify-between h-full gap-4">
+      <div className="flex-1 overflow-y-auto">
         <div className="space-y-6">
           <div className="space-y-4">
             {/* 제목 */}
@@ -154,20 +206,23 @@ export default function TrackOverview() {
                 )}
               </div>
 
-              <div className="bg-button-hover border-2 border-outline rounded-full px-2 flex items-center gap-1 text-text-2">
-                <Route size={16} />
-                <span className="text-sm">{trackData?.data.totalSteps}개 장소</span>
+                <div className="bg-button-hover border-2 border-outline rounded-full px-2 flex items-center gap-1 text-text-2">
+                  <Route size={16} />
+                  <span className="text-sm">
+                    {trackData?.data.totalSteps}개 장소
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-text-3">
+                <Users size={16} />
+                <span className="text-sm">
+                  {trackData?.data.totalParticipant}명 참여 중
+                </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 text-text-3">
-              <Users size={16} />
-              <span className="text-sm">{trackData?.data.totalParticipant}명 참여 중</span>
-            </div>
-          </div>
-
           {/* 구분선 */}
-          <div className="w-full h-px bg-outline"></div>
+            <div className="w-full h-px bg-outline" />
 
           {/* 소개 */}
           <div className="space-y-4">
@@ -188,7 +243,7 @@ export default function TrackOverview() {
           </div>
 
           {/* 구분선 */}
-          <div className="w-full h-px bg-outline"></div>
+            <div className="w-full h-px bg-outline" />
 
           {/* 생성일 */}
           <span className="text-text-3 text-sm">
@@ -197,45 +252,59 @@ export default function TrackOverview() {
         </div>
 
         {/* 버튼 */}
-        <div className="w-full">
-          {memberType === "CREATOR" ? (
-            <div className="grid grid-cols-2 gap-2">
-              <button className="cursor-pointer justify-center bg-text-2 hover:bg-text-3 text-white px-4 py-2 rounded-xl flex items-center gap-2">
-                <Pencil />
-                수정
-              </button>
-
+        <div className="pt-4">
+          <div className="w-full">
+            {memberType === "CREATOR" ? (
+              <div className="grid grid-cols-2 gap-2">
+                <button className="cursor-pointer justify-center bg-text-2 hover:bg-text-3 text-white px-4 py-2 rounded-xl flex items-center gap-2">
+                  <Pencil />
+                  수정
+                </button>
+                <button className="cursor-pointer justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60" disabled={isPending || !storytrackId}
+                onClick={() => setIsDeleteOpen(true)}>
+                  <Trash2 />
+                  {deleteMutation.isPending ? "삭제 중..." : "삭제"}
+                </button>
+              </div>
+            ) : memberType === "NOT_JOINED" ? (
               <button
-                className="cursor-pointer justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60"
-                disabled={isPending || !storytrackId}
-                onClick={() => setIsDeleteOpen(true)}
+                className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
+                disabled={isPending}
+                onClick={() => joinMutation.mutate()}
               >
-                <Trash2 />
-                {deleteMutation.isPending ? "삭제 중..." : "삭제"}
+                <Play />
+                <span>{isPending ? "처리중..." : "참여하기"}</span>
               </button>
-            </div>
-          ) : memberType === "NOT_JOINED" ? (
-            <button
-              className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
-              disabled={isPending}
-              onClick={() => joinMutation.mutate()}
-            >
-              <Play />
-              <span>{isPending ? "처리중..." : "참여하기"}</span>
-            </button>
-          ) : (
-            <button
-              className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
-              disabled={isPending}
-              onClick={() => cancelMutation.mutate()}
-            >
-              <X />
-              <span>{isPending ? "처리중..." : "참여 취소"}</span>
-            </button>
-          )}
+            ) : (
+              <button
+                className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
+                disabled={isPending}
+                onClick={() => setIsCancelConfirmOpen(true)}
+              >
+                <X />
+                <span>{isPending ? "처리중..." : "참여 취소"}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
+      {/* 참여취소 확인 모달 */}
+      {isCancelConfirmOpen && (
+        <ConfirmModal
+          active="fail"
+          title="참여 취소"
+          content="참여를 취소하시겠습니까?"
+          open={isCancelConfirmOpen}
+          onClose={() => setIsCancelConfirmOpen(false)}
+          onConfirm={() => {
+            setIsCancelConfirmOpen(false);
+            cancelMutation.mutate();
+          }}
+        />
+      )}
+
+{/* 삭제 모달 */}
       <ConfirmModal
         active="fail"
         title="스토리트랙 삭제"
@@ -247,7 +316,6 @@ export default function TrackOverview() {
          deleteMutation.mutate();
   }}
 />
-
-    </div>
+    </>
   );
 }

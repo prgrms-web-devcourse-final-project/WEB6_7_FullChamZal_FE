@@ -41,7 +41,7 @@ export default function LetterReadingStatus() {
   return (
     <DivBox className="lg:flex-1 flex flex-col justify-between cursor-auto hover:bg-outline/0">
       <div>
-        <p className="text-lg">받은 편지 열람 현황</p>
+        <p className="text-base md:text-lg">받은 편지 열람 현황</p>
 
         <div className="h-90 flex items-center justify-center select-none [&_*:focus]:outline-none">
           {isLoading ? (
@@ -70,7 +70,7 @@ export default function LetterReadingStatus() {
                     value={`총 ${total}통`}
                     position="center"
                     fill="#111827"
-                    style={{ fontSize: 28, fontWeight: 500 }}
+                    className="text-2xl md:text-3xl font-medium"
                   />
                 </Pie>
                 <Tooltip />
