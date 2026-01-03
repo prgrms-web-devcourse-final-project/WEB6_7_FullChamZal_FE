@@ -3,7 +3,6 @@
 import { useMemo, useState, useEffect } from "react";
 import Button from "@/components/common/Button";
 import { useRouter, useParams } from "next/navigation";
-import SuccessForm from "../new/SuccessForm";
 import BackButton from "@/components/common/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
@@ -11,8 +10,6 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import RouteEditList from "./RouteEditList";
 import RouteMap from "../new/secondForm/RouteMap";
 import { Map, X } from "lucide-react";
-
-type Step = 1 | 2;
 
 type FormState = {
   routeLetterIds: string[];
@@ -31,7 +28,6 @@ export default function EditStoryTrack() {
   const storytrackId =
     typeof params.trackId === "string" ? params.trackId : undefined;
 
-  const [step, setStep] = useState<Step>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openMap, setOpenMap] = useState(false);
 
@@ -112,7 +108,6 @@ export default function EditStoryTrack() {
   };
 
   const handleSubmit = async () => {
-    if (step !== 1) return;
     if (!storytrackId) return;
 
     if (!hasChanges) {
@@ -165,7 +160,9 @@ export default function EditStoryTrack() {
       toast.success("스토리트랙 경로 수정이 완료되었습니다!", {
         style: { borderColor: "#57b970" },
       });
-      setStep(2);
+
+      // 상세 페이지로 이동
+      router.push(`/dashboard/storyTrack/${storytrackIdNum}`);
     } catch (e) {
       console.error("스토리트랙 수정 실패:", e);
       const errorMessage =
@@ -205,67 +202,51 @@ export default function EditStoryTrack() {
           </div>
         </div>
 
-        {/* 진행 상태 */}
-        <StepHeader step={step} />
-
         {/* Form */}
         <div className="flex-1 min-h-0 overflow-hidden">
           <form className="h-full">
             {/* Step 1: 경로 수정 */}
-            {step === 1 && (
-              <div className="h-full min-h-0">
-                <div className="flex gap-8 h-full min-h-0">
-                  {/* Left - 경로 목록 */}
-                  <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-4 lg:p-8 flex flex-col">
-                    <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-4 lg:space-y-6">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-2">
-                          <div className="text-base lg:text-xl font-semibold text-text">
-                            경로 수정
-                          </div>
-                          <p className="text-xs md:text-sm text-text-2">
-                            각 경로 옆의 교체 버튼을 클릭하여 편지를 교체할 수
-                            있습니다.
-                          </p>
-                        </div>
 
-                        <button
-                          type="button"
-                          onClick={() => setOpenMap(true)}
-                          className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-white px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
-                        >
-                          <Map size={16} />
-                          지도
-                        </button>
+            <div className="h-full min-h-0">
+              <div className="flex gap-8 h-full min-h-0">
+                {/* Left - 경로 목록 */}
+                <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-4 lg:p-8 flex flex-col">
+                  <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-4 lg:space-y-6">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-2">
+                        <div className="text-base lg:text-xl font-semibold text-text">
+                          경로 수정
+                        </div>
+                        <p className="text-xs md:text-sm text-text-2">
+                          각 경로 옆의 교체 버튼을 클릭하여 편지를 교체할 수
+                          있습니다.
+                        </p>
                       </div>
 
-                      <RouteEditList
-                        order={form.order}
-                        items={step1.routeItems}
-                        onReplace={handleReplace}
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setOpenMap(true)}
+                        className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-white px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
+                      >
+                        <Map size={16} />
+                        지도
+                      </button>
                     </div>
-                  </div>
 
-                  {/* Right - 지도 (데스크탑) */}
-                  <div className="hidden md:block flex-1 h-full min-h-0 border border-outline rounded-xl overflow-hidden">
-                    <RouteMap
-                      routeItems={step1.routeItems}
+                    <RouteEditList
                       order={form.order}
+                      items={step1.routeItems}
+                      onReplace={handleReplace}
                     />
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* Step 2: 완료 */}
-            {step === 2 && (
-              <SuccessForm
-                title={form.title}
-                order={form.order}
-                routeCount={form.routeLetterIds.length}
-              />
-            )}
+                {/* Right - 지도 (데스크탑) */}
+                <div className="hidden md:block flex-1 h-full min-h-0 border border-outline rounded-xl overflow-hidden">
+                  <RouteMap routeItems={step1.routeItems} order={form.order} />
+                </div>
+              </div>
+            </div>
           </form>
         </div>
       </div>
@@ -275,43 +256,23 @@ export default function EditStoryTrack() {
         <div className="px-8 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
           <div className="flex justify-between items-center">
             {/* 왼쪽 버튼 */}
-            {step === 1 ? (
-              <Button
-                type="button"
-                onClick={handleCancel}
-                className="md:font-normal py-2 px-8 bg-white border border-outline text-text"
-              >
-                취소
-              </Button>
-            ) : null}
+            <Button
+              type="button"
+              onClick={handleCancel}
+              className="md:font-normal py-2 px-8 bg-white border border-outline text-text"
+            >
+              취소
+            </Button>
 
             {/* 오른쪽 버튼 */}
-            {step === 1 && (
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!hasChanges || isSubmitting}
-                className="md:font-normal py-2 px-8"
-              >
-                {isSubmitting ? "수정 중..." : "경로 수정"}
-              </Button>
-            )}
-
-            {step === 2 && (
-              <Button
-                type="button"
-                onClick={() => {
-                  if (storytrackId) {
-                    router.push(`/dashboard/storyTrack/${storytrackId}`);
-                  } else {
-                    router.push("/dashboard/storyTrack/mine");
-                  }
-                }}
-                className="md:font-normal py-2 px-8 ml-auto"
-              >
-                완료
-              </Button>
-            )}
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!hasChanges || isSubmitting}
+              className="md:font-normal py-2 px-8"
+            >
+              {isSubmitting ? "수정 중..." : "경로 수정"}
+            </Button>
           </div>
         </div>
       </div>
@@ -344,72 +305,6 @@ export default function EditStoryTrack() {
           </div>
         </div>
       ) : null}
-    </div>
-  );
-}
-
-/** 진행 상태 헤더: step에 따라 active 스타일 변경 */
-function StepHeader({ step }: { step: 1 | 2 }) {
-  const active = "text-primary-2";
-  const inactive = "text-text-4";
-  const circleActive = "bg-primary-2 text-white";
-  const circleInactive = "border border-outline text-text-4";
-
-  const steps = [
-    { n: 1, label: "경로 수정" },
-    { n: 2, label: "수정 완료" },
-  ] as const;
-
-  const percent = step === 1 ? 50 : 100;
-  const current = steps[step - 1];
-
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Mobile: 현재 스텝만 */}
-      <div className="md:hidden flex items-center justify-between">
-        <div className={`flex items-center gap-3 ${active}`}>
-          <span
-            className={`w-9 h-9 rounded-full flex items-center justify-center ${circleActive}`}
-          >
-            {current.n}
-          </span>
-          <div className="flex flex-col leading-tight">
-            <span className="text-primary-2">{current.label}</span>
-          </div>
-        </div>
-        <span className="text-xs text-text-3">{percent}%</span>
-      </div>
-
-      {/* Mobile: 진행바 */}
-      <div className="md:hidden w-full h-2 bg-outline rounded-full overflow-hidden">
-        <div
-          className="h-full bg-primary-2 transition-all duration-300"
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-
-      {/* Desktop: 기존 그대로 */}
-      <div className="hidden md:flex items-center gap-4">
-        {steps.map((s) => (
-          <div
-            key={s.n}
-            className={`flex-none flex items-center gap-3 ${
-              step === s.n ? active : inactive
-            }`}
-          >
-            <span
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                step === s.n ? circleActive : circleInactive
-              }`}
-            >
-              {s.n}
-            </span>
-            <span>{s.label}</span>
-          </div>
-        ))}
-
-        <div className="w-full h-0.5 bg-outline" />
-      </div>
     </div>
   );
 }
