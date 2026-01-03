@@ -40,7 +40,7 @@ export default function RouteEditList({ order, items, onReplace }: Props) {
                   key={`${item.id}-${stepOrder}`}
                   className="border border-outline rounded-xl p-4 bg-white hover:bg-sub-2 transition-colors"
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         {order === "SEQUENTIAL" && (
@@ -66,7 +66,6 @@ export default function RouteEditList({ order, items, onReplace }: Props) {
                       className="shrink-0 cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline bg-white hover:bg-button-hover text-sm text-text-3 transition-colors"
                     >
                       <RefreshCw size={14} />
-                      교체
                     </button>
                   </div>
                 </li>
