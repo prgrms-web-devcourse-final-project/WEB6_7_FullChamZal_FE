@@ -8,13 +8,13 @@ type Column<T> = {
   className?: string;
 
   // 반응형
-  mobileLabel?: React.ReactNode; // 카드뷰에서 label로 쓸 텍스트
-  hideOnMobile?: boolean; // 모바일 카드에서 숨길 컬럼
-  hideBelow?: "sm" | "md" | "lg" | "xl"; // 테이블에서 특정 breakpoint 아래 숨김
+  mobileLabel?: React.ReactNode;
+  hideOnMobile?: boolean;
+  hideBelow?: "sm" | "md" | "lg" | "xl";
 };
 
 function SkeletonBar({ w = "w-24" }: { w?: string }) {
-  return <div className={`h-3 ${w} rounded-md bg-[#cecece] animate-pulse`} />;
+  return <div className={`h-5 ${w} rounded-md bg-gray-200 animate-pulse`} />;
 }
 
 export default function DataTable<T>({

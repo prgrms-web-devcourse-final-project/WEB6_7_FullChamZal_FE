@@ -5,6 +5,8 @@ import AdminHeader from "../AdminHeader";
 import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
+import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
+import AdminError from "@/components/common/error/admin/AdminError";
 
 const CAPSULE_TABS = [
   { key: "all", label: "전체" },
@@ -44,6 +46,28 @@ export default function CapsuleSection() {
       adminCapsulesApi.list({ tab: "locked", ...base, signal }),
     staleTime: 30_000,
   });
+
+  const isInitialLoading =
+    qAll.isLoading ||
+    qPublic.isLoading ||
+    qPrivate.isLoading ||
+    qLocked.isLoading;
+
+  if (isInitialLoading) return <AdminDashboardPageSkeleton />;
+
+  const hasError =
+    qAll.isError || qPublic.isError || qPrivate.isError || qLocked.isError;
+  if (hasError)
+    return (
+      <AdminError
+        onRetry={() => {
+          qAll.refetch();
+          qPublic.refetch();
+          qPrivate.refetch();
+          qLocked.refetch();
+        }}
+      />
+    );
 
   const counts = {
     total: qAll.data?.totalElements ?? 0,
