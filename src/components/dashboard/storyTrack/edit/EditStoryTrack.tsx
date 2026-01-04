@@ -107,6 +107,15 @@ export default function EditStoryTrack() {
     }));
   };
 
+  const handleReorder = (next: Letter[]) => {
+    // 순서 변경 (UI만 업데이트, 실제 API 호출은 handleSubmit에서 처리)
+    setStep1({ routeItems: next });
+    setForm((prev) => ({
+      ...prev,
+      routeLetterIds: next.map((x) => x.id),
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!storytrackId) return;
 
@@ -197,7 +206,8 @@ export default function EditStoryTrack() {
               <span className="text-primary px-1">_</span>
             </h3>
             <p className="text-sm lg:text-base text-text-2">
-              각 경로의 편지를 교체할 수 있습니다
+              각 경로의 편지를 교체하거나 위/아래 버튼으로 순서를 변경할 수
+              있습니다.
             </p>
           </div>
         </div>
@@ -218,8 +228,8 @@ export default function EditStoryTrack() {
                           경로 수정
                         </div>
                         <p className="text-xs md:text-sm text-text-2">
-                          각 경로 옆의 교체 버튼을 클릭하여 편지를 교체할 수
-                          있습니다.
+                          각 경로 옆의 교체 버튼으로 편지를 교체하거나, 위/아래
+                          버튼으로 순서를 변경할 수 있습니다.
                         </p>
                       </div>
 
@@ -237,6 +247,7 @@ export default function EditStoryTrack() {
                       order={form.order}
                       items={step1.routeItems}
                       onReplace={handleReplace}
+                      onReorder={handleReorder}
                     />
                   </div>
                 </div>
