@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
+import YearlyLetterSkeleton from "@/components/skeleton/dashboard/home/YearlyLetterSkeleton";
 
 type YearLettersItem = {
   name: string;
@@ -28,7 +29,7 @@ export default function YearlyLetterOverview() {
   // 시작은 현재 연도
   const [year, setYear] = useState<number>(nowYear);
 
-  const { data: yearLetters } = useQuery({
+  const { data: yearLetters, isLoading } = useQuery({
     queryKey: ["yearLetters", year],
     queryFn: ({ signal }) => capsuleDashboardApi.yearLetters(year, signal),
   });
@@ -61,8 +62,10 @@ export default function YearlyLetterOverview() {
   const canGoNext = year < nowYear;
   const canGoPrev = true;
 
+  if (isLoading) return <YearlyLetterSkeleton />;
+
   return (
-    <DivBox className="lg:flex-2 space-y-6 cursor-auto hover:bg-outline/0">
+    <DivBox className="lg:flex-2 space-y-6 cursor-auto">
       {/* 헤더 */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">

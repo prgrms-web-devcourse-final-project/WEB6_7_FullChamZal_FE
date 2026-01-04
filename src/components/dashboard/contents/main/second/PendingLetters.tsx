@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useEffect, useMemo, useState } from "react";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
+import PendingLettersSkeleton from "@/components/skeleton/dashboard/home/PendingLettersSkeleton";
 
 // 거리 계산 (Haversine)
 function calcDistanceKm(
@@ -105,6 +106,8 @@ export default function PendingLetters() {
     [receiveList]
   );
 
+  if (isLoading) return <PendingLettersSkeleton />;
+
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-2.5">
@@ -128,7 +131,7 @@ export default function PendingLetters() {
         </div>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible lg:grid-cols-4 lg:ml-6">
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible lg:grid-cols-4 lg:ml-6">
         {isLoading ? (
           <div className="h-20 flex flex-col justify-center">
             <p className="text-text-4">불러오는 중…</p>

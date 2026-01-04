@@ -12,6 +12,7 @@ import {
 import DivBox from "../../../DivBox";
 import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import LetterReadingSkeleton from "@/components/skeleton/dashboard/home/LetterReadingSkeleton";
 
 export default function LetterReadingStatus() {
   const { data, isLoading, isError } = useQuery<
@@ -38,6 +39,7 @@ export default function LetterReadingStatus() {
 
   const total = viewedCount + unviewedCount;
 
+  if (isLoading) return <LetterReadingSkeleton />;
   return (
     <DivBox className="lg:flex-1 flex flex-col justify-between cursor-auto hover:bg-outline/0">
       <div>

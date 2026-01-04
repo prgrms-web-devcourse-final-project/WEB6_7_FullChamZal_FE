@@ -1,6 +1,7 @@
 "use client";
 
 import DivBox from "@/components/dashboard/DivBox";
+import TodayLettersSkeleton from "@/components/skeleton/dashboard/home/TodayLettersSkeleton";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
@@ -23,12 +24,14 @@ export default function TodayLetters() {
     weekday: "long",
   });
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["dailyUnlocked"],
     queryFn: ({ signal }) => capsuleDashboardApi.dailyUnlocked(signal),
   });
 
   const list = data?.data.data ?? [];
+
+  if (isLoading) return <TodayLettersSkeleton />;
 
   return (
     <>
@@ -45,7 +48,7 @@ export default function TodayLetters() {
           </p>
         </div>
         {/* Card => 총 4개 까지 */}
-        <div className=" flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory lg:grid lg:grid-cols-2 lg:overflow-visible lg:ml-6">
+        <div className=" flex gap-4 overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-2 lg:overflow-visible lg:ml-6">
           {list.length === 0 ? (
             <div className="h-20 flex flex-col justify-center">
               <p className="text-text-4">열람 예정 편지가 없습니다.</p>
