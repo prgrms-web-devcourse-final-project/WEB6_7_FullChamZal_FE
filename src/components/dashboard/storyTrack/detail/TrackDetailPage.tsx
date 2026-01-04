@@ -93,10 +93,10 @@ export default function TrackDetailPage() {
     retry: 1,
   });
 
-  const { data, isLoading, isFetching, isError, error, refetch } = query;
+  const { data, isLoading, isError, error, refetch } = query;
 
   // 로딩 처리
-  if (!storytrackId || isLoading || isFetching) {
+  if (!storytrackId || isLoading) {
     return <TrackDetailSkeleton />;
   }
 
@@ -141,58 +141,60 @@ export default function TrackDetailPage() {
             }}
           />
         )
-      ) : null}
-
-      <div className="flex-none">
-        <BackButton />
-      </div>
-
-      {/* 모바일: 세로 스택 / 데스크탑: 가로 2컬럼 */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0">
-        {/* Left */}
-        <div className="lg:flex-1 lg:min-w-80 flex flex-col gap-4 lg:gap-6 min-h-0">
-          <div className="border border-outline rounded-2xl overflow-hidden">
-            <TrackHeader />
+      ) : (
+        <>
+          <div className="flex-none">
+            <BackButton />
           </div>
 
-          <div className="border border-outline rounded-2xl lg:flex-1 lg:min-h-0 overflow-hidden">
-            <TrackOverview />
-          </div>
-        </div>
+          {/* 모바일: 세로 스택 / 데스크탑: 가로 2컬럼 */}
+          <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0">
+            {/* Left */}
+            <div className="lg:flex-1 lg:min-w-80 flex flex-col gap-4 lg:gap-6 min-h-0">
+              <div className="border border-outline rounded-2xl overflow-hidden">
+                <TrackHeader />
+              </div>
 
-        {/* Right */}
-        <div className="lg:flex-3 flex flex-col gap-4 lg:gap-6 min-h-0">
-          {/* Top */}
-          {(memberType === "PARTICIPANT" || memberType === "COMPLETED") && (
-            <div className="border border-outline rounded-2xl overflow-hidden">
-              <TrackProgress />
+              <div className="border border-outline rounded-2xl lg:flex-1 lg:min-h-0 overflow-hidden">
+                <TrackOverview />
+              </div>
             </div>
-          )}
 
-          {/* Bottom */}
-          <div className="border border-outline rounded-2xl overflow-hidden flex flex-col lg:flex-1 lg:min-h-0">
-            <TrackTabMenu activeTab={tab} onChange={setTab} />
+            {/* Right */}
+            <div className="lg:flex-3 flex flex-col gap-4 lg:gap-6 min-h-0">
+              {/* Top */}
+              {(memberType === "PARTICIPANT" || memberType === "COMPLETED") && (
+                <div className="border border-outline rounded-2xl overflow-hidden">
+                  <TrackProgress />
+                </div>
+              )}
 
-            <div className="overflow-visible lg:overflow-auto lg:flex-1 lg:min-h-0">
-              {tab === "map" && (
-                <TrackMap
-                  storytrackType={data?.data.storytrackType}
-                  capsuleList={paths}
-                />
-              )}
-              {tab === "route" && (
-                <TrackRoute
-                  myLocation={myLocation}
-                  memberType={memberType}
-                  storytrackType={data?.data.storytrackType}
-                  capsuleList={paths}
-                  completedCapsuleList={data?.data.completedCapsuleId}
-                />
-              )}
+              {/* Bottom */}
+              <div className="border border-outline rounded-2xl overflow-hidden flex flex-col lg:flex-1 lg:min-h-0">
+                <TrackTabMenu activeTab={tab} onChange={setTab} />
+
+                <div className="overflow-visible lg:overflow-auto lg:flex-1 lg:min-h-0">
+                  {tab === "map" && (
+                    <TrackMap
+                      storytrackType={data?.data.storytrackType}
+                      capsuleList={paths}
+                    />
+                  )}
+                  {tab === "route" && (
+                    <TrackRoute
+                      myLocation={myLocation}
+                      memberType={memberType}
+                      storytrackType={data?.data.storytrackType}
+                      capsuleList={paths}
+                      completedCapsuleList={data?.data.completedCapsuleId}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
