@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Button from "@/components/common/Button";
 import { useRouter, useParams } from "next/navigation";
 import BackButton from "@/components/common/BackButton";
@@ -79,14 +79,11 @@ export default function EditStoryTrack() {
   }, [trackData]);
 
   // 변경사항이 있는지 확인
-  const hasChanges = useMemo(() => {
-    return (
-      originalRouteItems.length !== step1.routeItems.length ||
-      originalRouteItems.some(
-        (original, index) => original.id !== step1.routeItems[index]?.id
-      )
+  const hasChanges =
+    originalRouteItems.length !== step1.routeItems.length ||
+    originalRouteItems.some(
+      (original, index) => original.id !== step1.routeItems[index]?.id
     );
-  }, [originalRouteItems, step1.routeItems]);
 
   const handleCancel = () => {
     if (storytrackId) {
