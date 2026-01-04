@@ -232,55 +232,52 @@ export default function TrackOverview() {
               생성일: {trackData?.data.createdAt?.slice(0, 10)}
             </span>
           </div>
-
-          {/* 버튼 */}
-          <div className="pt-4">
-            <div className="w-full">
-              {memberType === "CREATOR" ? (
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (storytrackId) {
-                        router.push(
-                          `/dashboard/storyTrack/${storytrackId}/edit`
-                        );
-                      }
-                    }}
-                    className="cursor-pointer justify-center bg-text-2 hover:bg-text-3 text-white px-4 py-2 rounded-xl flex items-center gap-2"
-                  >
-                    <Pencil />
-                    수정
-                  </button>
-                  <button
-                    className="cursor-pointer justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60"
-                    disabled={isPending || !storytrackId}
-                    onClick={() => setIsDeleteOpen(true)}
-                  >
-                    <Trash2 />
-                    {deleteMutation.isPending ? "삭제 중..." : "삭제"}
-                  </button>
-                </div>
-              ) : memberType === "NOT_JOINED" ? (
+        </div>
+        {/* 버튼 */}
+        <div className="pt-4">
+          <div className="w-full">
+            {memberType === "CREATOR" ? (
+              <div className="grid grid-cols-2 gap-2">
                 <button
-                  className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
-                  disabled={isPending}
-                  onClick={() => joinMutation.mutate()}
+                  type="button"
+                  onClick={() => {
+                    if (storytrackId) {
+                      router.push(`/dashboard/storyTrack/${storytrackId}/edit`);
+                    }
+                  }}
+                  className="cursor-pointer justify-center bg-text-2 hover:bg-text-3 text-white px-4 py-2 rounded-xl flex items-center gap-2"
                 >
-                  <Play />
-                  <span>{isPending ? "처리중..." : "참여하기"}</span>
+                  <Pencil />
+                  수정
                 </button>
-              ) : (
                 <button
-                  className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
-                  disabled={isPending}
-                  onClick={() => setIsCancelConfirmOpen(true)}
+                  className="cursor-pointer justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60"
+                  disabled={isPending || !storytrackId}
+                  onClick={() => setIsDeleteOpen(true)}
                 >
-                  <X />
-                  <span>{isPending ? "처리중..." : "참여 취소"}</span>
+                  <Trash2 />
+                  {deleteMutation.isPending ? "삭제 중..." : "삭제"}
                 </button>
-              )}
-            </div>
+              </div>
+            ) : memberType === "NOT_JOINED" ? (
+              <button
+                className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
+                disabled={isPending}
+                onClick={() => joinMutation.mutate()}
+              >
+                <Play />
+                <span>{isPending ? "처리중..." : "참여하기"}</span>
+              </button>
+            ) : (
+              <button
+                className="w-full flex items-center justify-center gap-2 cursor-pointer bg-primary hover:bg-primary-3 text-white px-4 py-3 rounded-xl disabled:opacity-60"
+                disabled={isPending}
+                onClick={() => setIsCancelConfirmOpen(true)}
+              >
+                <X />
+                <span>{isPending ? "처리중..." : "참여 취소"}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

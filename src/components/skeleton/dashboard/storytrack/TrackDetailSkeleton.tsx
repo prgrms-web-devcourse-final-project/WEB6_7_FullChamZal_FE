@@ -13,7 +13,7 @@ export default function TrackDetailSkeleton() {
 
             <div className="border border-outline rounded-2xl lg:flex-1 lg:min-h-0 overflow-hidden bg-white/80">
               <div className="p-6 flex flex-col h-full">
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 flex flex-col justify-between overflow-y-auto">
                   <div className="space-y-6">
                     <div className="space-y-4">
                       {/* title */}
