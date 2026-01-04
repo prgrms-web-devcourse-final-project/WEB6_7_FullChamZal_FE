@@ -9,6 +9,7 @@ import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
+import MapContentsSkeleton from "@/components/skeleton/dashboard/map/MapContentsSkeleton";
 
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
@@ -160,6 +161,8 @@ export default function MapContents() {
   };
 
   const filteredData = filter(data);
+
+  if (isLoading) return <MapContentsSkeleton />;
 
   return id ? (
     <LetterDetailView

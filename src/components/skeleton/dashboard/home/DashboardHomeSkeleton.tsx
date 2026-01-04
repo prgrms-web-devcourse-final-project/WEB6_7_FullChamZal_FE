@@ -1,7 +1,7 @@
-import LetterReadingSkeleton from "./home/LetterReadingSkeleton";
-import PendingLettersSkeleton from "./home/PendingLettersSkeleton";
-import TodayLettersSkeleton from "./home/TodayLettersSkeleton";
-import YearlyLetterSkeleton from "./home/YearlyLetterSkeleton";
+import LetterReadingSkeleton from "./LetterReadingSkeleton";
+import PendingLettersSkeleton from "./PendingLettersSkeleton";
+import TodayLettersSkeleton from "./TodayLettersSkeleton";
+import YearlyLetterSkeleton from "./YearlyLetterSkeleton";
 
 export default function DashboardHomeSkeleton() {
   return (
