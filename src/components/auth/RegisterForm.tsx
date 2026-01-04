@@ -86,7 +86,7 @@ export default function RegisterForm({
     idTouched && !idRegex.test(id.trim()) ? "아이디는 4~20자여야 합니다." : "";
   const pwError =
     pwTouched && !pwRegex.test(pw)
-      ? "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다."
+      ? "비밀번호는 영문, 숫자, 특수문자를 포함해서 8자리 이상이어야 합니다."
       : "";
   const pwCheckError =
     pwCheckTouched && pw !== pwCheck ? "비밀번호가 일치하지 않습니다." : "";
@@ -396,6 +396,15 @@ export default function RegisterForm({
         </div>
 
         <div className="flex gap-3">
+          <Button
+            type="button"
+            onClick={onBack}
+            disabled={isSubmitting}
+            className="w-full py-3 border border-outline bg-white text-text md:font-normal hover:bg-button-hover"
+          >
+            뒤로 가기
+          </Button>
+
           <Button
             type="submit"
             className="w-full py-3"

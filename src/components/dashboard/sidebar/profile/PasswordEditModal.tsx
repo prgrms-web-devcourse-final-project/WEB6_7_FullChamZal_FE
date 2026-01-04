@@ -14,6 +14,9 @@ const getErrorMessage = (e: unknown) => {
   return "요청 실패";
 };
 
+// 영문 + 숫자 + 특수문자 포함, 8자 이상
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
 export default function PasswordEditModal({
   open,
   onClose,
@@ -38,11 +41,16 @@ export default function PasswordEditModal({
     setError(null);
   }, [open]);
 
+  const isPasswordValid = passwordRegex.test(newPassword);
+  const isMismatch =
+    confirmPassword.length > 0 && newPassword !== confirmPassword;
+
   const canSave =
     currentPassword.trim().length > 0 &&
     newPassword.trim().length > 0 &&
     confirmPassword.trim().length > 0 &&
-    newPassword === confirmPassword &&
+    isPasswordValid &&
+    !isMismatch &&
     !isSaving;
 
   const onSave = async () => {
@@ -104,8 +112,18 @@ export default function PasswordEditModal({
               onChange={(e) => setNewPassword(e.target.value)}
               disabled={isSaving}
               className="w-full rounded-xl border border-outline px-4 py-3 outline-none focus:ring-2 focus:ring-primary-3 disabled:bg-gray-100 disabled:text-text-3"
-              placeholder="새 비밀번호를 입력해주세요"
+              placeholder="영문, 숫자, 특수문자 포함 8자 이상"
             />
+
+            {/* 안내 문구 + 실시간 검증 */}
+            <p className="text-xs text-text-3">
+              영문, 숫자, 특수문자를 포함한 8자 이상
+            </p>
+            {!isPasswordValid && newPassword.length > 0 ? (
+              <p className="text-xs text-red-600">
+                영문, 숫자, 특수문자를 모두 포함한 8자 이상이어야 합니다.
+              </p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
@@ -123,7 +141,7 @@ export default function PasswordEditModal({
             />
           </div>
 
-          {newPassword && confirmPassword && newPassword !== confirmPassword ? (
+          {isMismatch ? (
             <p className="text-xs text-red-600">
               새 비밀번호가 일치하지 않습니다.
             </p>
