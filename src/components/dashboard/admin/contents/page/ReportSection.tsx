@@ -51,24 +51,18 @@ export default function ReportSection() {
     qAll.isLoading ||
     qAccepted.isLoading ||
     qRejected.isLoading ||
-    qRejected.isLoading ||
     qPending.isLoading;
 
   if (isInitialLoading) return <AdminDashboardPageSkeleton />;
 
   const hasError =
-    qAll.isError ||
-    qAccepted.isError ||
-    qRejected.isError ||
-    qRejected.isError ||
-    qPending.isError;
+    qAll.isError || qAccepted.isError || qRejected.isError || qPending.isError;
   if (hasError)
     return (
       <AdminError
         onRetry={() => {
           qAll.refetch();
           qAccepted.refetch();
-          qRejected.refetch();
           qRejected.refetch();
           qPending.refetch();
         }}

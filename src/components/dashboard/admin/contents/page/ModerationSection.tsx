@@ -5,6 +5,8 @@ import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
 import { AdminModerationApi } from "@/lib/api/admin/moderation/adminModeration";
+import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
+import AdminError from "@/components/common/error/admin/AdminError";
 
 const REPORT_TABS = [
   { key: "all", label: "전체" },
@@ -43,6 +45,28 @@ export default function ModerationSection() {
       AdminModerationApi.list({ tab: "flagged", ...base, signal }),
     staleTime: 30_000,
   });
+
+  const isInitialLoading =
+    qAll.isLoading ||
+    qSkipped.isLoading ||
+    qError.isLoading ||
+    qFlagged.isLoading;
+
+  if (isInitialLoading) return <AdminDashboardPageSkeleton />;
+
+  const hasError =
+    qAll.isError || qSkipped.isError || qError.isError || qFlagged.isError;
+  if (hasError)
+    return (
+      <AdminError
+        onRetry={() => {
+          qAll.refetch();
+          qSkipped.refetch();
+          qError.refetch();
+          qFlagged.refetch();
+        }}
+      />
+    );
 
   const counts = {
     total: qAll.data?.totalElements ?? 0,

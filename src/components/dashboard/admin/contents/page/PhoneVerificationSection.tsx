@@ -5,6 +5,8 @@ import AdminHeader from "../AdminHeader";
 import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
+import AdminError from "@/components/common/error/admin/AdminError";
+import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
 
 const PHONE_TABS = [
   { key: "all", label: "전체" },
@@ -47,6 +49,28 @@ export default function PhoneVerificationSection() {
       adminPhoneApi.list({ tab: "pending", ...base, signal }),
     staleTime: 30_000,
   });
+
+  const isInitialLoading =
+    qAll.isLoading ||
+    qVerified.isLoading ||
+    qExpired.isLoading ||
+    qPending.isLoading;
+
+  if (isInitialLoading) return <AdminDashboardPageSkeleton />;
+
+  const hasError =
+    qAll.isError || qVerified.isError || qExpired.isError || qPending.isError;
+  if (hasError)
+    return (
+      <AdminError
+        onRetry={() => {
+          qAll.refetch();
+          qVerified.refetch();
+          qExpired.refetch();
+          qPending.refetch();
+        }}
+      />
+    );
 
   const counts = {
     total: qAll.data?.totalElements ?? 0,
