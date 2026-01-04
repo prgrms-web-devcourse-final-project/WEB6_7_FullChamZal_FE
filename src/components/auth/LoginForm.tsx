@@ -87,7 +87,7 @@ export default function LoginForm() {
         <Input
           id="id"
           label="아이디"
-          placeholder="your123"
+          placeholder="ID"
           value={id}
           onChange={(e) => setId(e.target.value)}
         />
@@ -96,7 +96,7 @@ export default function LoginForm() {
           id="pw"
           label="비밀번호"
           type="password"
-          placeholder="********"
+          placeholder="password"
           value={pw}
           onChange={(e) => setPw(e.target.value)}
           error={error}
