@@ -1,5 +1,6 @@
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import MailboxPage from "@/components/dashboard/contents/mailbox/MailboxPage";
+import MailboxSkeleton from "@/components/skeleton/MailboxSkeleton";
 import { Suspense } from "react";
 
 export default async function SendPage({
@@ -12,7 +13,7 @@ export default async function SendPage({
 
   return (
     <>
-      <Suspense fallback={<div className="p-8">로딩 중...</div>}>
+      <Suspense fallback={<MailboxSkeleton />}>
         <MailboxPage type="send" />
         {capsuleId ? (
           <LetterDetailModal

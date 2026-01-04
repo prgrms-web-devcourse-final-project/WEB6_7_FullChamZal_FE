@@ -18,11 +18,19 @@ export default function MailboxSkeleton() {
           </div>
 
           {/* 카드 / 미리보기 영역 */}
-          <div className="flex flex-wrap md:gap-8 lg:gap-4 justify-between animate-pulse">
-            <div className="w-70 h-45 rounded-lg bg-gray-200" />
-            <div className="w-70 h-45 rounded-lg bg-gray-200" />
-            <div className="w-70 h-45 rounded-lg bg-gray-200" />
-            <div className="w-70 h-45 rounded-lg bg-gray-200" />
+          <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 flex-wrap gap-8 animate-pulse">
+            <div className="w-full flex flex-col items-center justify-center p-2">
+              <div className="w-70 h-45 rounded-lg bg-gray-200" />
+            </div>
+            <div className="w-full flex flex-col items-center justify-center p-2">
+              <div className="w-70 h-45 rounded-lg bg-gray-200" />
+            </div>
+            <div className="w-full flex flex-col items-center justify-center p-2">
+              <div className="w-70 h-45 rounded-lg bg-gray-200" />
+            </div>
+            <div className="w-full flex flex-col items-center justify-center p-2">
+              <div className="w-70 h-45 rounded-lg bg-gray-200" />
+            </div>
           </div>
         </DivBox>
       </div>

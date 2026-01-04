@@ -12,11 +12,11 @@ import {
 import DivBox from "../../../DivBox";
 import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
+import LetterReadingSkeleton from "@/components/skeleton/dashboard/home/LetterReadingSkeleton";
+import ApiError from "@/components/common/error/ApiError";
 
 export default function LetterReadingStatus() {
-  const { data, isLoading, isError } = useQuery<
-    PageResponse<CapsuleDashboardItem>
-  >({
+  const query = useQuery<PageResponse<CapsuleDashboardItem>>({
     queryKey: ["capsuleDashboard", "receive"],
     queryFn: ({ signal }) =>
       capsuleDashboardApi.receiveDashboard(undefined, signal),
@@ -24,19 +24,45 @@ export default function LetterReadingStatus() {
     retry: 1,
   });
 
+  const { data, isLoading, isError } = query;
+
+  // 로딩
+  if (isLoading) return <LetterReadingSkeleton />;
+
+  // 에러
+  if (isError) {
+    return (
+      <>
+        <div className="flex items-center justify-center w-full border p-6 border-outline rounded-2xl lg:flex-1">
+          <ApiError
+            title="열람 현황을 불러오지 못했어요."
+            description="네트워크 상태를 확인하고 다시 시도해주세요."
+            onRetry={() => query.refetch()}
+          />
+        </div>
+      </>
+    );
+  }
+
   const receiveList = data?.data.content ?? [];
 
-  const viewedCount = receiveList.filter((item) => item.viewStatus).length;
-  const unviewedCount = receiveList.filter((item) => !item.viewStatus).length;
+  const { viewedCount, unviewedCount } = receiveList.reduce(
+    (acc, item) => {
+      if (item.viewStatus) acc.viewedCount += 1;
+      else acc.unviewedCount += 1;
+      return acc;
+    },
+    { viewedCount: 0, unviewedCount: 0 }
+  );
 
   const donutData = [
     { name: "열람", value: viewedCount },
     { name: "미열람", value: unviewedCount },
   ];
 
-  const DONUT_COLORS = ["#FF583B", "#D6DAE1"];
-
   const total = viewedCount + unviewedCount;
+
+  const DONUT_COLORS = ["#FF583B", "#D6DAE1"];
 
   return (
     <DivBox className="lg:flex-1 flex flex-col justify-between cursor-auto hover:bg-outline/0">

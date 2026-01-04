@@ -16,5 +16,7 @@ export default async function DashboardLayout({
 
   if (me.role !== "USER") redirect("/auth/login");
 
+  if (me.status === "STOP") redirect("/auth/login");
+
   return <DashboardShell me={me}>{children}</DashboardShell>;
 }
