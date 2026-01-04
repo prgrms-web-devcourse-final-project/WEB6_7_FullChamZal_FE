@@ -1,6 +1,6 @@
 "use client";
 
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 import PendingLettersSkeleton from "@/components/skeleton/dashboard/home/PendingLettersSkeleton";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";

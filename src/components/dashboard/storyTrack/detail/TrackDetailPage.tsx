@@ -14,7 +14,7 @@ import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
 import ActiveModal from "@/components/common/ActiveModal";
 import TrackDetailSkeleton from "@/components/skeleton/dashboard/storytrack/TrackDetailSkeleton";
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 
 type TabType = "route" | "map";
 

@@ -17,7 +17,7 @@ import {
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
 import YearlyLetterSkeleton from "@/components/skeleton/dashboard/home/YearlyLetterSkeleton";
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 
 type YearLettersItem = {
   name: string;

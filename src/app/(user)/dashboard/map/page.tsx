@@ -6,7 +6,7 @@ export default function MapPage() {
   return (
     <>
       <Suspense fallback={<MapPageSkeleton />}>
-        <div className="w-full h-full p-4 lg:p-8">
+        <div className="w-full h-full">
           <MapContents />
         </div>
       </Suspense>

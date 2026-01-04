@@ -1,6 +1,6 @@
 "use client";
 
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 import DivBox from "@/components/dashboard/DivBox";
 import TodayLettersSkeleton from "@/components/skeleton/dashboard/home/TodayLettersSkeleton";
 import { authApiClient } from "@/lib/api/auth/auth.client";

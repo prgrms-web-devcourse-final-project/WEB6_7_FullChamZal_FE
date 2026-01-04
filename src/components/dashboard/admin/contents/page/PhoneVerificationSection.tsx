@@ -5,7 +5,7 @@ import AdminHeader from "../AdminHeader";
 import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
 
 const PHONE_TABS = [

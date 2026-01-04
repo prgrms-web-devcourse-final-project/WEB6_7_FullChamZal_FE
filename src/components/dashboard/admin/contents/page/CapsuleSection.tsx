@@ -6,7 +6,7 @@ import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
 import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 
 const CAPSULE_TABS = [
   { key: "all", label: "전체" },

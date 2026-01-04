@@ -13,7 +13,7 @@ import DivBox from "../../../DivBox";
 import { useQuery } from "@tanstack/react-query";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import LetterReadingSkeleton from "@/components/skeleton/dashboard/home/LetterReadingSkeleton";
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 
 export default function LetterReadingStatus() {
   const query = useQuery<PageResponse<CapsuleDashboardItem>>({

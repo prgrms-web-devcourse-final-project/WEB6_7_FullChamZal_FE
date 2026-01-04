@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
 import MapContentsSkeleton from "@/components/skeleton/dashboard/map/MapContentsSkeleton";
-import ApiError from "@/components/common/error/admin/ApiError";
+import ApiError from "@/components/common/error/ApiError";
 
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {
   ssr: false,
@@ -182,7 +182,7 @@ export default function MapContents() {
   }
 
   return (
-    <div className="h-full flex flex-col gap-2 lg:gap-4">
+    <div className="h-full p-4 lg:p-8 flex flex-col gap-2 lg:gap-4">
       {/* 헤더 */}
       <div className="space-y-1 lg:space-y-2">
         <h3 className="text-xl lg:text-3xl font-medium">
