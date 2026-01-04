@@ -6,6 +6,7 @@ import StoryMenuTab from "../common/StoryMenuTab";
 import MineCard from "./MineCard";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
+import StorytrackCardSkeleton from "@/components/skeleton/dashboard/storytrack/StorytrackCardSkeleton";
 
 /* 무한스크롤 */
 function useInfiniteScroll(
@@ -77,13 +78,6 @@ export default function MineTrackPage() {
       {/* 메뉴 탭 */}
       <StoryMenuTab />
 
-      {/* 로딩 */}
-      {isLoading && (
-        <div className="rounded-xl border border-outline bg-white/80 p-6 text-text-2">
-          불러오는 중...
-        </div>
-      )}
-
       {/* 에러 */}
       {isError && (
         <div className="rounded-xl border border-outline bg-white/80 p-6">
@@ -100,6 +94,9 @@ export default function MineTrackPage() {
           </button>
         </div>
       )}
+
+      {/* 로딩 */}
+      {isLoading && !isError && <StorytrackCardSkeleton count={4} />}
 
       {/* List */}
       {!isLoading && !isError && (
