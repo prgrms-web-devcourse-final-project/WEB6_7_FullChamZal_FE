@@ -25,7 +25,7 @@ export default function ReportList({
   const listQueryKey = (p: number) =>
     ["adminReports", tab, query, p, size] as const;
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: listQueryKey(page),
     queryFn: ({ signal }) =>
       adminReportApi.list({ tab, query, page, size, signal }),
@@ -54,18 +54,25 @@ export default function ReportList({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {reportData.map((item) => (
-          <ReportCard
-            key={item.id}
-            report={item}
-            onOpenDetail={(id: number) => {
-              setSelectedReportId(id);
-              setOpenDetail(true);
-            }}
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="w-full h-55 rounded-xl bg-gray-200"></div>
+          <div className="w-full h-55 rounded-xl bg-gray-200"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {reportData.map((item) => (
+            <ReportCard
+              key={item.id}
+              report={item}
+              onOpenDetail={(id: number) => {
+                setSelectedReportId(id);
+                setOpenDetail(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <Pagination
         page={page}

@@ -5,6 +5,8 @@ import AdminHeader from "../AdminHeader";
 import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
+import AdminError from "@/components/common/error/admin/AdminError";
+import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
 
 const REPORT_TABS = [
   { key: "all", label: "전체" },
@@ -44,6 +46,34 @@ export default function ReportSection() {
       adminReportApi.list({ tab: "pending", ...base, signal }),
     staleTime: 30_000,
   });
+
+  const isInitialLoading =
+    qAll.isLoading ||
+    qAccepted.isLoading ||
+    qRejected.isLoading ||
+    qRejected.isLoading ||
+    qPending.isLoading;
+
+  if (isInitialLoading) return <AdminDashboardPageSkeleton />;
+
+  const hasError =
+    qAll.isError ||
+    qAccepted.isError ||
+    qRejected.isError ||
+    qRejected.isError ||
+    qPending.isError;
+  if (hasError)
+    return (
+      <AdminError
+        onRetry={() => {
+          qAll.refetch();
+          qAccepted.refetch();
+          qRejected.refetch();
+          qRejected.refetch();
+          qPending.refetch();
+        }}
+      />
+    );
 
   const counts = {
     total: qAll.data?.totalElements ?? 0,

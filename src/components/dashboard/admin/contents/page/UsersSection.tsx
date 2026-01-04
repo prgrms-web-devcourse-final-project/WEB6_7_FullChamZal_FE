@@ -5,6 +5,8 @@ import AdminHeader from "../AdminHeader";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
 import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
+import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
+import AdminError from "@/components/common/error/admin/AdminError";
 
 const USER_TABS = [
   { key: "all", label: "전체" },
@@ -48,6 +50,25 @@ export default function UsersSection() {
     staleTime: 30_000,
   });
 
+  const isInitialLoading =
+    qAll.isLoading || qActive.isLoading || qStop.isLoading || qExit.isLoading;
+
+  if (isInitialLoading) return <AdminDashboardPageSkeleton />;
+
+  const hasError =
+    qAll.isError || qActive.isError || qStop.isError || qExit.isError;
+  if (hasError)
+    return (
+      <AdminError
+        onRetry={() => {
+          qAll.refetch();
+          qActive.refetch();
+          qStop.refetch();
+          qExit.refetch();
+        }}
+      />
+    );
+
   const counts = {
     total: qAll.data?.totalElements ?? 0,
     active: qActive.data?.totalElements ?? 0,
@@ -64,10 +85,10 @@ export default function UsersSection() {
 
       <StatsOverview
         tabs={USER_TABS}
-        totals={counts.total ?? 0}
-        second={counts.active ?? 0}
-        third={counts.stopped ?? 0}
-        fourth={counts.reported ?? 0}
+        totals={counts.total}
+        second={counts.active}
+        third={counts.stopped}
+        fourth={counts.reported}
       />
 
       <AdminBody

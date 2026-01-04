@@ -1,3 +1,4 @@
+import NotFound from "@/app/not-found";
 import CapsuleList from "./capsules/CapsuleList";
 import ModerationList from "./moderation/ModerationList";
 import PhoneList from "./phone/PhoneList";
@@ -33,5 +34,5 @@ export default function ContentsList({
     return <ModerationList tab={tab} query={keyword} />;
   }
 
-  return <div>준비중</div>;
+  return <NotFound />;
 }
