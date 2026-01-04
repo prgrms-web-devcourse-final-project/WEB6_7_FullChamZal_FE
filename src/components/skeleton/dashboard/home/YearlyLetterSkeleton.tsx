@@ -12,7 +12,7 @@ export default function YearlyLetterSkeleton() {
 
           <div className="flex items-center gap-4">
             {/* 연도별 활동 확인 버튼 */}
-            <div className="w-33 h-10 rounded-full bg-gray-200"></div>
+            <div className="w-25 h-8 md:w-33 md:h-10 rounded-full bg-gray-200"></div>
 
             {/* 활동 뱃지 */}
             <div className="w-11 h-5 rounded-lg bg-gray-200"></div>
@@ -21,8 +21,8 @@ export default function YearlyLetterSkeleton() {
 
         {/* Count */}
         <div className="flex gap-4">
-          <div className="w-full lg:h-21 rounded-[10px] bg-gray-200"></div>
-          <div className="w-full lg:h-21 rounded-[10px] bg-gray-200"></div>
+          <div className="w-full h-21 rounded-[10px] bg-gray-200"></div>
+          <div className="w-full h-21 rounded-[10px] bg-gray-200"></div>
         </div>
 
         {/* 차트 */}

@@ -1,7 +1,7 @@
 export default function LetterReadingSkeleton() {
   return (
     <>
-      <div className="flex flex-col justify-between w-full border p-6 border-outline rounded-2xl lg:flex-1 animate-pulse">
+      <div className="flex flex-col justify-between gap-8 w-full border p-6 border-outline rounded-2xl lg:flex-1 animate-pulse">
         {/* Header */}
         <div className="w-26 h-7 rounded-lg bg-gray-200"></div>
 

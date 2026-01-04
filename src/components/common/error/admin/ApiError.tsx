@@ -24,7 +24,7 @@ export default function ApiError({
         <h2 className="text-lg font-semibold text-text">{title}</h2>
 
         {/* 설명 */}
-        <p className="mt-2 whitespace-pre-line text-sm text-text-3">
+        <p className="mt-2 whitespace-pre-line text-sm text-text-3 break-keep">
           {description}
         </p>
 
