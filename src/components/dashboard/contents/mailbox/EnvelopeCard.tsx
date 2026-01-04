@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/static-components */
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react"; // ✅ useEffect, useRef 추가
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock, Pencil, PencilOff } from "lucide-react";
@@ -16,6 +16,25 @@ type Props = {
   type: "send" | "receive" | "bookmark";
   currentPos?: LatLng | null;
 };
+
+/* UTC 파싱(판정용) + KST 표시는 formatDateTime 사용 */
+function normalizeToUtcIso(s: string) {
+  // 이미 Z 또는 +hh:mm / -hh:mm 오프셋이 있으면 그대로
+  if (/[zZ]$|[+\-]\d{2}:\d{2}$/.test(s)) return s;
+
+  // "2026-01-03 10:00:00" 같은 형태도 "T"로 보정
+  const fixed = s.replace(" ", "T");
+
+  // 타임존 정보 없으면 "UTC로 들어온 값"이라고 가정하고 Z를 붙임
+  return fixed + "Z";
+}
+
+function getUtcMs(isoString?: string | null) {
+  if (!isoString) return null;
+  const utcIso = normalizeToUtcIso(String(isoString));
+  const ms = new Date(utcIso).getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
 
 /* 타입 별 UI */
 function getEnvelopeStatus(
@@ -46,13 +65,19 @@ function getEnvelopeStatus(
     unlockType === "LOCATION" || unlockType === "TIME_AND_LOCATION";
 
   // --- 시간 조건 ---
+  // 표시는 KST(+9) 고정
   const timeLabel = capsule.unlockAt
-    ? formatDateTime(capsule.unlockAt)
+    ? formatDateTime(String(capsule.unlockAt))
     : "시간 조건 없음";
 
+  // 판정은 UTC ms 기준으로 비교
+  const unlockAtUtcMs = capsule.unlockAt
+    ? getUtcMs(String(capsule.unlockAt))
+    : null;
+
   const isUnlockedByTime =
-    needsTime && capsule.unlockAt
-      ? Date.now() >= new Date(capsule.unlockAt).getTime()
+    needsTime && unlockAtUtcMs != null
+      ? Date.now() >= unlockAtUtcMs
       : !needsTime;
 
   // --- 위치 조건 ---

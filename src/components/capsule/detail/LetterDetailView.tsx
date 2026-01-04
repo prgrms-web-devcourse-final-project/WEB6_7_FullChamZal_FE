@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/capsule/guestCapsule";
 import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
+import ApiError from "@/components/common/error/ApiError";
 
 type LatLng = { lat: number; lng: number };
 
@@ -42,6 +43,34 @@ function getCurrentPosition(): Promise<LatLng> {
       { enableHighAccuracy: true, timeout: 10_000 }
     );
   });
+}
+
+/* 어떤 에러가 와도 code/message/status로 정규화 */
+function normalizeApiError(err: any): {
+  code?: string;
+  message: string;
+  status?: number;
+} {
+  if (!err) return { message: "알 수 없는 오류가 발생했습니다." };
+
+  // fetch/axios 류
+  const data =
+    err?.response?.data ??
+    err?.data ??
+    err?.cause?.response?.data ??
+    err?.cause?.data ??
+    null;
+
+  const code = data?.code ?? err?.code ?? err?.errorCode;
+  const status = err?.response?.status ?? err?.status ?? data?.status;
+
+  const message =
+    data?.message ??
+    err?.message ??
+    (err instanceof Error ? err.message : undefined) ??
+    "요청 처리 중 오류가 발생했습니다.";
+
+  return { code, status, message: String(message) };
 }
 
 type Props = {
@@ -262,69 +291,130 @@ export default function LetterDetailView({
     );
   }
 
-  // 인증 권한이 없을 때
-  if (error?.message === "인증이 필요합니다.") {
-    return (
-      <div className="w-full flex items-center justify-center p-8">
-        <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
-          <div className="text-lg font-medium">권한이 없습니다.</div>
-          <p className="text-sm text-text-2 whitespace-pre-line">
-            이 편지는 인증된 사용자에게만 공개됩니다.
-            {"\n"}
-            로그인하거나 권한을 확인한 뒤 다시 시도해 주세요.
-          </p>
+  // 여기서부터 에러 코드/메시지 기반 UI 분기
+  if (isError) {
+    const e = normalizeApiError(error);
 
-          <div className="flex gap-2 justify-center pt-2">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="cursor-pointer px-4 py-2 rounded-lg border border-outline text-text hover:bg-button-hover"
-            >
-              뒤로 가기
-            </button>
-            <button
-              type="button"
-              onClick={() => refetch()}
-              className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
-            >
-              다시 시도
-            </button>
+    // 인증 필요(로그인 필요)
+    if (e.message === "인증이 필요합니다." || e.code === "AUTH001") {
+      return (
+        <div className="w-full min-h-full flex items-center justify-center p-8">
+          <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
+            <div className="text-lg font-medium">권한이 없습니다.</div>
+            <p className="text-sm text-text-2 whitespace-pre-line">
+              이 편지는 인증된 사용자에게만 공개됩니다.
+              {"\n"}
+              로그인하거나 권한을 확인한 뒤 다시 시도해 주세요.
+            </p>
+
+            <div className="flex gap-2 justify-center pt-2">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="cursor-pointer px-4 py-2 rounded-lg border border-outline text-text hover:bg-button-hover"
+              >
+                뒤로 가기
+              </button>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
+              >
+                다시 시도
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      );
+    }
+
+    // 정지 회원
+    if (e.code === "AUTH010") {
+      return (
+        <ApiError
+          title="정지된 회원입니다."
+          description={
+            "정지된 회원은 이용할 수 없습니다.\n관리자에게 문의해주세요."
+          }
+          onRetry={handleBack}
+        />
+      );
+    }
+
+    // IP 차단
+    if (e.code === "SEC001") {
+      return (
+        <ApiError
+          title="접근이 차단되었습니다."
+          description={
+            "접근이 차단된 IP 주소입니다.\n네트워크 환경(회사/학교/공용 Wi-Fi/VPN)을 변경한 뒤 다시 시도해주세요."
+          }
+          onRetry={handleBack}
+        />
+      );
+    }
+
+    // Rate limit
+    if (e.code === "SEC002" || e.code === "SEC003" || e.status === 429) {
+      return (
+        <ApiError
+          title="요청이 너무 많아요."
+          description={
+            e.code === "SEC002"
+              ? "요청 횟수 제한을 초과했습니다.\n잠시 후 다시 시도해주세요."
+              : "잠시 후 다시 시도해주세요."
+          }
+          onRetry={() => refetch()}
+        />
+      );
+    }
+
+    // 비정상 접근 패턴 / 의심 접근
+    if (e.code === "SEC004" || e.code === "SEC006") {
+      return (
+        <ApiError
+          title="접근이 제한되었습니다."
+          description={
+            "비정상적이거나 의심스러운 접근이 감지되었습니다.\n잠시 후 다시 시도해주세요."
+          }
+          onRetry={handleBack}
+        />
+      );
+    }
+
+    // GPS 스푸핑 의심
+    if (e.code === "SEC005") {
+      return (
+        <ApiError
+          title="위치 확인에 실패했어요."
+          description={
+            "위치 정보 조작이 의심됩니다.\n가짜 GPS/개발자 옵션/위치 관련 앱을 끄고 다시 시도해주세요."
+          }
+          onRetry={() => refetch()}
+        />
+      );
+    }
+
+    // 그 외는 공통 에러
+    return (
+      <ApiError
+        title="서버 오류가 발생했어요"
+        description={
+          "잠시 후 다시 시도해주세요.\n문제가 계속되면 네트워크 상태를 확인해주세요."
+        }
+        onRetry={() => refetch()}
+      />
     );
   }
 
-  // 네트워크/서버 레벨 에러 (응답 자체가 없음)
-  if (isError || !data) {
+  // 응답 없음
+  if (!data) {
     return (
-      <div className="w-full min-h-full flex items-center justify-center p-8">
-        <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
-          <div className="text-lg font-medium">서버 오류가 발생했어요</div>
-          <p className="text-sm text-text-2 whitespace-pre-line">
-            잠시 후 다시 시도해 주세요.
-            {"\n"}
-            문제가 계속되면 네트워크 상태를 확인해 주세요.
-          </p>
-
-          <div className="flex gap-2 justify-center pt-2">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="cursor-pointer px-4 py-2 rounded-lg border border-outline text-text hover:bg-button-hover"
-            >
-              뒤로 가기
-            </button>
-            <button
-              type="button"
-              onClick={() => refetch()}
-              className="cursor-pointer px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
-            >
-              다시 시도
-            </button>
-          </div>
-        </div>
-      </div>
+      <ApiError
+        title="데이터를 불러오지 못했어요"
+        description={"잠시 후 다시 시도해주세요."}
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -336,7 +426,7 @@ export default function LetterDetailView({
     const targetLocation = isLatLng(maybeTarget) ? maybeTarget : undefined;
 
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-8">
+      <div className="h-screen w-full flex items-center justify-center p-8">
         <LetterLockedView
           isPublic={isPublic}
           unlockAt={capsule.unlockAt ?? new Date().toISOString()}
@@ -368,7 +458,7 @@ export default function LetterDetailView({
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-8">
+    <div className="h-screen w-full flex items-center justify-center p-8">
       <LetterDetailModal
         capsuleId={capsule.capsuleId}
         isProtected={isProtected}

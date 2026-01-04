@@ -20,6 +20,5 @@ export function formatDateTime(isoString: string) {
     weekday: "long",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false, // 필요 없으면 제거
   });
 }

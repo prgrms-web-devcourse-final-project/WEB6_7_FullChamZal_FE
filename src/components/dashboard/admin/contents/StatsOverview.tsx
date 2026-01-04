@@ -48,10 +48,7 @@ export default function StatsOverview({
   const values = [totals, second, third, fourth];
 
   return (
-    <div
-      className=" grid grid-cols-2 gap-3 md:grid-cols-4
-      "
-    >
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {values.map((value, idx) => {
         const style = STAT_CARD_STYLES[idx] ?? STAT_CARD_STYLES[0];
         const label = tabs[idx]?.label ?? `STAT_${idx + 1}`;

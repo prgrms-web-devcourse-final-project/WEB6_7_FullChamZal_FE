@@ -1,10 +1,11 @@
 import UsersSection from "@/components/dashboard/admin/contents/page/UsersSection";
+import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
 import { Suspense } from "react";
 
 export default function Page() {
   return (
     <>
-      <Suspense fallback={<div className="p-8">로딩 중...</div>}>
+      <Suspense fallback={<AdminDashboardPageSkeleton />}>
         <UsersSection />
       </Suspense>
     </>

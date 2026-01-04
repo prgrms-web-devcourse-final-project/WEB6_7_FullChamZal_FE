@@ -3,6 +3,8 @@
 import Button from "@/components/common/Button";
 import OverlayModal from "../OverlayModal";
 
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
 export default function ResetPasswordModal({
   open,
   onClose,
@@ -30,7 +32,10 @@ export default function ResetPasswordModal({
 }) {
   if (!open) return null;
 
+  const isPasswordValid = passwordRegex.test(newPassword);
   const mismatch = newPassword2.length > 0 && newPassword !== newPassword2;
+
+  const disabledReset = !canReset || !isPasswordValid || mismatch;
 
   return (
     <OverlayModal open={open} onClose={onClose}>
@@ -47,10 +52,20 @@ export default function ResetPasswordModal({
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               type="password"
-              placeholder="8자 이상"
+              placeholder="영문, 숫자, 특수문자 포함 8자 이상"
               autoComplete="new-password"
               className="w-full p-4 bg-white border border-outline rounded-xl outline-none focus:border-primary-2"
             />
+
+            {/* 안내 문구 + 실시간 검증 */}
+            <p className="text-xs text-text-3">
+              영문, 숫자, 특수문자를 포함한 8자 이상
+            </p>
+            {!isPasswordValid && newPassword.length > 0 && (
+              <p className="text-sm text-primary">
+                영문, 숫자, 특수문자를 모두 포함한 8자 이상이어야 합니다.
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -82,7 +97,7 @@ export default function ResetPasswordModal({
           <Button
             className="w-full py-3 md:font-normal"
             onClick={onSubmit}
-            disabled={!canReset}
+            disabled={disabledReset}
           >
             {isPending ? "변경 중..." : "비밀번호 변경"}
           </Button>

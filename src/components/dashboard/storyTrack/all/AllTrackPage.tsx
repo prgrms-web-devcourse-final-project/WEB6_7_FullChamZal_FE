@@ -6,6 +6,7 @@ import TrackCard from "./TrackCard";
 import BackButton from "@/components/common/BackButton";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
+import StorytrackCardSkeleton from "@/components/skeleton/dashboard/storytrack/StorytrackCardSkeleton";
 
 type StatusFilter = "all" | "PARTICIPANT" | "NOT_JOINED" | "COMPLETED";
 type SortOption = "newest" | "popular";
@@ -182,28 +183,6 @@ export default function AllTrackPage() {
         />
       </div>
 
-      {isLoading && (
-        <div className="rounded-xl border border-outline bg-white/80 p-6 text-text-2">
-          불러오는 중...
-        </div>
-      )}
-
-      {isError && (
-        <div className="rounded-xl border border-outline bg-white/80 p-6">
-          <p className="text-primary font-medium">불러오기에 실패했어요.</p>
-          <pre className="mt-3 text-xs whitespace-pre-wrap text-text-3">
-            {error instanceof Error ? error.message : String(error)}
-          </pre>
-          <button
-            className="cursor-pointer mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
-            onClick={() => refetch()}
-            type="button"
-          >
-            다시 시도
-          </button>
-        </div>
-      )}
-
       {/* 필터 영역 */}
       <div className="flex flex-wrap items-center gap-2 text-xs md:text-base">
         <div className="flex gap-2">
@@ -278,6 +257,26 @@ export default function AllTrackPage() {
           초기화
         </button>
       </div>
+
+      {/* 에러 */}
+      {isError && (
+        <div className="rounded-xl border border-outline bg-white/80 p-6">
+          <p className="text-primary font-medium">불러오기에 실패했어요.</p>
+          <pre className="mt-3 text-xs whitespace-pre-wrap text-text-3">
+            {error instanceof Error ? error.message : String(error)}
+          </pre>
+          <button
+            className="cursor-pointer mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
+            onClick={() => refetch()}
+            type="button"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
+      {/* 로딩 */}
+      {isLoading && !isError && <StorytrackCardSkeleton count={4} />}
 
       {/* 결과 */}
       {!isLoading && !isError && (

@@ -13,47 +13,37 @@ import { useParams, useSearchParams } from "next/navigation";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
 import ActiveModal from "@/components/common/ActiveModal";
+import TrackDetailSkeleton from "@/components/skeleton/dashboard/storytrack/TrackDetailSkeleton";
+import ApiError from "@/components/common/error/ApiError";
 
 type TabType = "route" | "map";
 
 export default function TrackDetailPage() {
   const [isLocationFailOpen, setIsLocationFailOpen] = useState(false);
   const [tab, setTab] = useState<TabType>("map");
-  //스토리트랙 id
+
+  // 스토리트랙 id
   const params = useParams();
   const storytrackId =
     typeof params.trackId === "string" ? params.trackId : undefined;
 
-  //캡슐 페이지네이션
-  const [page] = useState(0);
-  const [size] = useState(100);
+  // 캡슐 페이지네이션
+  const page = 0;
+  const size = 100;
 
-  //캡슐 상세 조회 시 캡슐 id
+  // 캡슐 상세 조회 시 캡슐 id
   const searchParams = useSearchParams();
   const capsuleId = searchParams.get("id");
 
-  // 스토리트랙 상세 조회
-  const { data, isError, error } = useQuery({
-    queryKey: ["storyTrackDetail", storytrackId],
-    queryFn: async ({ signal }) => {
-      return await storyTrackApi.storyTrackDetail(
-        { storytrackId, page, size },
-        signal
-      );
-    },
-    enabled: !!storytrackId,
-  });
-
-  //사용자 위치
+  // 사용자 위치
   const [myLocation, setMyLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
 
-  //위치 정보 에러 메세지
+  // 위치 정보 에러 메세지
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  //위치 정보 가져오기 실패했을 때 상황에 따른 에러 메세지
   const showErrorMsg = (error: GeolocationPositionError) => {
     switch (error.code) {
       case error.PERMISSION_DENIED:
@@ -77,31 +67,60 @@ export default function TrackDetailPage() {
   };
 
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setMyLocation({
-            lat: position.coords.latitude, //위도값 저장
-            lng: position.coords.longitude, //경도값 저장
-          });
-        },
-        (err) => {
-          showErrorMsg(err);
-        }
-      );
-    }
+    if (typeof window === "undefined") return;
+    if (!("geolocation" in navigator)) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setMyLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (err) => {
+        showErrorMsg(err);
+      }
+    );
   }, []);
 
-  if (isError) {
-    console.error(error);
-    return <div>{String(error)}</div>;
+  // 스토리트랙 상세 조회
+  const query = useQuery({
+    queryKey: ["storyTrackDetail", storytrackId, page, size],
+    queryFn: ({ signal }) =>
+      storyTrackApi.storyTrackDetail({ storytrackId, page, size }, signal),
+    enabled: !!storytrackId,
+    staleTime: 30_000,
+    retry: 1,
+  });
+
+  const { data, isLoading, isFetching, isError, error, refetch } = query;
+
+  // 로딩 처리
+  if (!storytrackId || isLoading || isFetching) {
+    return <TrackDetailSkeleton />;
   }
+
+  // 에러 처리
+  if (isError) {
+    return (
+      <ApiError
+        title="공개 편지를 불러오지 못했어요."
+        description={error.message}
+        onRetry={() => refetch()}
+      />
+    );
+  }
+
+  const memberType = data?.data.memberType;
+  const paths = data?.data.paths?.content ?? [];
+
   return (
     // 모바일: 전체 스크롤
     // 데스크탑: 내부 패널 스크롤
     <div className="min-h-dvh lg:h-screen flex flex-col p-4 lg:p-8 gap-4 lg:gap-8">
-      {capsuleId &&
-        (myLocation ? (
+      {/* 캡슐 상세 */}
+      {capsuleId ? (
+        myLocation ? (
           <LetterDetailView
             isPublic={true}
             isStoryTrack={true}
@@ -113,7 +132,7 @@ export default function TrackDetailPage() {
           <ActiveModal
             active="fail"
             title="위치 정보 접근 차단"
-            content={`${locationError}`}
+            content={locationError ?? "위치 정보를 사용할 수 없습니다."}
             open={isLocationFailOpen}
             onClose={() => setIsLocationFailOpen(false)}
             onConfirm={() => {
@@ -121,7 +140,9 @@ export default function TrackDetailPage() {
               window.location.reload();
             }}
           />
-        ))}
+        )
+      ) : null}
+
       <div className="flex-none">
         <BackButton />
       </div>
@@ -142,9 +163,7 @@ export default function TrackDetailPage() {
         {/* Right */}
         <div className="lg:flex-3 flex flex-col gap-4 lg:gap-6 min-h-0">
           {/* Top */}
-          {/* role이 참여자일 경우에만 보이도록 처리할 예정 */}
-          {(data?.data.memberType === "PARTICIPANT" ||
-            data?.data.memberType === "COMPLETED") && (
+          {(memberType === "PARTICIPANT" || memberType === "COMPLETED") && (
             <div className="border border-outline rounded-2xl overflow-hidden">
               <TrackProgress />
             </div>
@@ -154,19 +173,19 @@ export default function TrackDetailPage() {
           <div className="border border-outline rounded-2xl overflow-hidden flex flex-col lg:flex-1 lg:min-h-0">
             <TrackTabMenu activeTab={tab} onChange={setTab} />
 
-            <div className="p-4 lg:p-6 overflow-visible lg:overflow-auto lg:flex-1 lg:min-h-0">
+            <div className="overflow-visible lg:overflow-auto lg:flex-1 lg:min-h-0">
               {tab === "map" && (
                 <TrackMap
                   storytrackType={data?.data.storytrackType}
-                  capsuleList={data?.data.paths.content}
+                  capsuleList={paths}
                 />
               )}
               {tab === "route" && (
                 <TrackRoute
                   myLocation={myLocation}
-                  memberType={data?.data.memberType}
+                  memberType={memberType}
                   storytrackType={data?.data.storytrackType}
-                  capsuleList={data?.data.paths.content}
+                  capsuleList={paths}
                   completedCapsuleList={data?.data.completedCapsuleId}
                 />
               )}

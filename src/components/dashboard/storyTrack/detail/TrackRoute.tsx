@@ -30,7 +30,7 @@ export default function TrackRoute({
   const storytrackId =
     typeof params.trackId === "string" ? params.trackId : undefined;
 
-  // ✅ CREATOR / NOT_JOINED 는 클릭 불가
+  // CREATOR / NOT_JOINED 는 클릭 불가
   const canClick = memberType === "PARTICIPANT" || memberType === "COMPLETED";
 
   const {
@@ -52,7 +52,7 @@ export default function TrackRoute({
   }
 
   return (
-    <div className="h-full flex flex-col gap-4">
+    <div className="p-4 lg:p-6 h-full flex flex-col gap-4">
       <p className="text-base lg:text-xl">경로 상세</p>
 
       <div className="flex gap-4 lg:min-h-0">

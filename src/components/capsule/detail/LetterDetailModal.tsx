@@ -837,7 +837,7 @@ export default function LetterDetailModal({
                         type="button"
                         variant="ghost"
                         size="icon-sm"
-                        className="text-primary"
+                        className="cursor-pointer text-primary"
                         aria-label="더보기"
                       >
                         <MoreHorizontal size={18} />
@@ -890,7 +890,7 @@ export default function LetterDetailModal({
 
                 <button
                   type="button"
-                  className="cursor-pointer text-primary"
+                  className="cursor-pointer text-primary p-1 rounded-md hover:bg-button-hover"
                   onClick={close}
                   aria-label="닫기"
                 >

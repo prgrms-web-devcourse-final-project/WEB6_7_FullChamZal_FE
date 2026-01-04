@@ -10,7 +10,7 @@ export default function RegisterPage() {
   const [agreements, setAgreements] = useState({
     terms: false,
     privacy: false,
-    marketing: false, // 선택
+    marketing: false,
   });
 
   const canGoNext = agreements.terms && agreements.privacy;
@@ -20,6 +20,7 @@ export default function RegisterPage() {
       <AuthShell
         title="회원가입"
         description="Dear. ___ 과 함께 특별한 여정을 시작하세요."
+        showSocial={step === "form"}
       >
         {step === "agree" ? (
           <AgreeRegister

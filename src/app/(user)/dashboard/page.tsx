@@ -1,10 +1,11 @@
 import DashBoardMain from "@/components/dashboard/contents/main/DashBoardMain";
+import DashboardHomeSkeleton from "@/components/skeleton/dashboard/home/DashboardHomeSkeleton";
 import { Suspense } from "react";
 
 export default function DashboardPage() {
   return (
     <>
-      <Suspense fallback={<div className="p-8">로딩 중...</div>}>
+      <Suspense fallback={<DashboardHomeSkeleton />}>
         <div className="p-4 lg:p-8">
           <DashBoardMain />
         </div>

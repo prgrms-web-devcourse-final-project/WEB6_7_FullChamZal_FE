@@ -1,7 +1,7 @@
 export default function StoryHeader() {
   return (
     <>
-      <div className="space-y-2">
+      <div className="space-y-1 lg:space-y-2">
         <h3 className="text-xl lg:text-3xl font-medium">
           스토리트랙
           <span className="text-primary px-1">_</span>
