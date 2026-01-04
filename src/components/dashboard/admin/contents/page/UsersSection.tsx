@@ -6,7 +6,7 @@ import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
 import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
 import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
-import AdminError from "@/components/common/error/admin/AdminError";
+import ApiError from "@/components/common/error/admin/ApiError";
 
 const USER_TABS = [
   { key: "all", label: "전체" },
@@ -59,7 +59,7 @@ export default function UsersSection() {
     qAll.isError || qActive.isError || qStop.isError || qExit.isError;
   if (hasError)
     return (
-      <AdminError
+      <ApiError
         onRetry={() => {
           qAll.refetch();
           qActive.refetch();

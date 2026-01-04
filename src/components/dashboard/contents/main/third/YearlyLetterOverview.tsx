@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useMemo, useState } from "react";
@@ -16,6 +17,7 @@ import {
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
 import YearlyLetterSkeleton from "@/components/skeleton/dashboard/home/YearlyLetterSkeleton";
+import ApiError from "@/components/common/error/admin/ApiError";
 
 type YearLettersItem = {
   name: string;
@@ -25,26 +27,30 @@ type YearLettersItem = {
 
 export default function YearlyLetterOverview() {
   const nowYear = new Date().getFullYear();
-
-  // 시작은 현재 연도
   const [year, setYear] = useState<number>(nowYear);
 
-  const { data: yearLetters, isLoading } = useQuery({
+  const query = useQuery({
     queryKey: ["yearLetters", year],
     queryFn: ({ signal }) => capsuleDashboardApi.yearLetters(year, signal),
+    placeholderData: (prev) => prev,
+    staleTime: 30_000,
+    retry: 1,
   });
 
-  const yearData = useMemo<YearLettersItem[]>(() => {
-    return yearLetters?.data.data ?? [];
-  }, [yearLetters]);
+  const { data: yearLetters, isLoading, isError } = query;
+
+  const yearData: YearLettersItem[] = yearLetters?.data.data ?? [];
 
   // 그 해 월별 집계 합산 => 그 해 보낸/받은 편지 수
   const { sendCount, receiveCount, total } = useMemo(() => {
-    const sendCount = yearData.reduce((acc, cur) => acc + (cur.send ?? 0), 0);
-    const receiveCount = yearData.reduce(
-      (acc, cur) => acc + (cur.receive ?? 0),
-      0
-    );
+    let sendCount = 0;
+    let receiveCount = 0;
+
+    for (const cur of yearData) {
+      sendCount += cur?.send ?? 0;
+      receiveCount += cur?.receive ?? 0;
+    }
+
     return { sendCount, receiveCount, total: sendCount + receiveCount };
   }, [yearData]);
 
@@ -58,11 +64,29 @@ export default function YearlyLetterOverview() {
     return { label: "조용", tone: "text-text-3", Icon: TrendingUp };
   }, [total]);
 
-  /* 지금보다 뒤에 연도는 보지 못하게 */
+  // 지금보다 뒤에 연도는 보지 못하게
   const canGoNext = year < nowYear;
   const canGoPrev = true;
 
-  if (isLoading) return <YearlyLetterSkeleton />;
+  // 로딩
+  if (isLoading && !yearLetters) return <YearlyLetterSkeleton />;
+
+  // 에러
+  if (isError) {
+    return (
+      <>
+        <div className="flex items-center justify-center w-full border p-6 border-outline rounded-2xl lg:flex-2">
+          <ApiError
+            title="연간 활동 데이터를 불러오지 못했어요."
+            description="네트워크 상태를 확인하고 다시 시도해주세요."
+            onRetry={() => query.refetch()}
+          />
+        </div>
+      </>
+    );
+  }
+
+  const BadgeIcon = activityBadge.Icon;
 
   return (
     <DivBox className="lg:flex-2 space-y-6 cursor-auto">
@@ -79,11 +103,14 @@ export default function YearlyLetterOverview() {
             <button
               type="button"
               disabled={!canGoPrev}
-              onClick={() => setYear((y) => y - 1)}
+              onClick={() => {
+                if (!canGoPrev) return;
+                setYear((y) => y - 1);
+              }}
               className={[
-                "cursor-pointer w-6 h-6 md:h-8 md:w-8 grid place-items-center rounded-full transition",
+                "w-6 h-6 md:h-8 md:w-8 grid place-items-center rounded-full transition",
                 canGoPrev
-                  ? "hover:bg-button-hover text-text"
+                  ? "cursor-pointer hover:bg-button-hover text-text"
                   : "opacity-40 cursor-not-allowed",
               ].join(" ")}
               aria-label="이전 연도"
@@ -96,11 +123,14 @@ export default function YearlyLetterOverview() {
             <button
               type="button"
               disabled={!canGoNext}
-              onClick={() => setYear((y) => y + 1)}
+              onClick={() => {
+                if (!canGoNext) return;
+                setYear((y) => y + 1);
+              }}
               className={[
-                "cursor-pointer w-6 h-6 md:h-8 md:w-8 grid place-items-center rounded-full transition",
+                "w-6 h-6 md:h-8 md:w-8 grid place-items-center rounded-full transition",
                 canGoNext
-                  ? "hover:bg-button-hover text-text"
+                  ? "cursor-pointer hover:bg-button-hover text-text"
                   : "opacity-40 cursor-not-allowed",
               ].join(" ")}
               aria-label="다음 연도"
@@ -113,7 +143,7 @@ export default function YearlyLetterOverview() {
           <div
             className={`${activityBadge.tone} flex-none flex items-center gap-1`}
           >
-            <activityBadge.Icon size={16} />
+            <BadgeIcon size={16} />
             <span className="text-sm">{activityBadge.label}</span>
           </div>
         </div>
@@ -157,6 +187,7 @@ export default function YearlyLetterOverview() {
               strokeWidth={2}
               fill="url(#sendArea)"
               name="보낸 편지"
+              isAnimationActive={false}
             />
             <Area
               type="monotone"
@@ -165,6 +196,7 @@ export default function YearlyLetterOverview() {
               strokeWidth={2}
               fill="url(#receiveArea)"
               name="받은 편지"
+              isAnimationActive={false}
             />
 
             <CartesianGrid stroke="#E7E5E4" strokeDasharray="5 5" />

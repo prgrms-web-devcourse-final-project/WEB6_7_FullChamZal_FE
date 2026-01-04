@@ -5,7 +5,7 @@ import AdminHeader from "../AdminHeader";
 import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
-import AdminError from "@/components/common/error/admin/AdminError";
+import ApiError from "@/components/common/error/admin/ApiError";
 import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
 
 const PHONE_TABS = [
@@ -62,7 +62,7 @@ export default function PhoneVerificationSection() {
     qAll.isError || qVerified.isError || qExpired.isError || qPending.isError;
   if (hasError)
     return (
-      <AdminError
+      <ApiError
         onRetry={() => {
           qAll.refetch();
           qVerified.refetch();

@@ -6,7 +6,7 @@ import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
 import { AdminModerationApi } from "@/lib/api/admin/moderation/adminModeration";
 import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
-import AdminError from "@/components/common/error/admin/AdminError";
+import ApiError from "@/components/common/error/admin/ApiError";
 
 const REPORT_TABS = [
   { key: "all", label: "전체" },
@@ -58,7 +58,7 @@ export default function ModerationSection() {
     qAll.isError || qSkipped.isError || qError.isError || qFlagged.isError;
   if (hasError)
     return (
-      <AdminError
+      <ApiError
         onRetry={() => {
           qAll.refetch();
           qSkipped.refetch();
