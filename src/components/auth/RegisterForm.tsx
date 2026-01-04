@@ -291,7 +291,7 @@ export default function RegisterForm({
           <Input
             id="name"
             label="이름"
-            placeholder="홍길동"
+            placeholder="성함"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onBlur={() => setNameTouched(true)}
@@ -301,7 +301,7 @@ export default function RegisterForm({
           <Input
             id="nickname"
             label="닉네임"
-            placeholder="민달팽이"
+            placeholder="별명 또는 닉네임"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             onBlur={() => setNicknameTouched(true)}
@@ -311,7 +311,7 @@ export default function RegisterForm({
           <Input
             id="id"
             label="아이디"
-            placeholder="your123"
+            placeholder="영문·숫자 조합 (4~20자)"
             value={id}
             onChange={(e) => setId(e.target.value)}
             onBlur={() => setIdTouched(true)}
@@ -322,7 +322,7 @@ export default function RegisterForm({
             id="pw"
             label="비밀번호"
             type="password"
-            placeholder="********"
+            placeholder="영문·숫자·특수문자 포함 (8자 이상)"
             value={pw}
             onChange={(e) => setPw(e.target.value)}
             onBlur={() => setPwTouched(true)}
@@ -333,7 +333,7 @@ export default function RegisterForm({
             id="pwCheck"
             label="비밀번호 확인"
             type="password"
-            placeholder="********"
+            placeholder="비밀번호 재입력"
             value={pwCheck}
             onChange={(e) => setPwCheck(e.target.value)}
             onBlur={() => setPwCheckTouched(true)}
