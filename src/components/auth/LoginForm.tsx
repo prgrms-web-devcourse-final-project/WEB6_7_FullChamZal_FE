@@ -1,7 +1,7 @@
 "use client";
 
 import Input from "@/components/common/Input";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Button from "../common/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApiClient } from "@/lib/api/auth/auth.client";
@@ -20,7 +20,6 @@ function getErrorMessage(err: unknown) {
 
 export default function LoginForm() {
   const router = useRouter();
-
   const searchParams = useSearchParams();
 
   const returnUrl = useMemo(() => {
@@ -35,16 +34,20 @@ export default function LoginForm() {
 
   const { data: me, isLoading: meLoading } = useMe();
 
+  const redirectedRef = useRef(false);
+
   useEffect(() => {
+    if (redirectedRef.current) return;
     if (meLoading) return;
     if (!me) return;
+
+    redirectedRef.current = true;
 
     const isAdmin = me.role === "ADMIN";
     const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
     const target = returnUrl ?? fallbackTarget;
 
     router.replace(target);
-    router.refresh();
   }, [me, meLoading, returnUrl, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,20 +69,40 @@ export default function LoginForm() {
       const me = await authApiClient.me();
       const isAdmin = me.role === "ADMIN";
 
-      // 이동 경로 결정
       const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
-
       const target = returnUrl ?? fallbackTarget;
 
-      // 이동
+      redirectedRef.current = true;
+
       router.replace(target);
-      router.refresh();
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
+
+  if (meLoading) {
+    return (
+      <div className="space-y-4 md:space-y-6 animate-pulse">
+        <div className="space-y-3 md:space-y-5">
+          <div className="space-y-2">
+            <div className="w-20 h-6 rounded-lg bg-outline"></div>
+            <div className="h-13 rounded-xl bg-outline"></div>
+          </div>
+          <div className="space-y-2">
+            <div className="w-20 h-6 rounded-lg bg-outline"></div>
+            <div className="h-13 rounded-xl bg-outline"></div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <div className="h-4 w-16 rounded bg-outline"></div>
+            <div className="h-4 w-16 rounded bg-outline"></div>
+          </div>
+        </div>
+        <div className="h-12 rounded-xl bg-outline animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
