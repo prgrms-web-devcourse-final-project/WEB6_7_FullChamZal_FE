@@ -554,7 +554,10 @@ export default function WriteForm({
     const envelopeSelected = envelopeThemes[selectedEnvelope];
     const paperSelected = paperThemes[selectedPaper];
 
-    const attachmentIds = uploadedAttachments.map((a) => a.attachmentId);
+    // TEMP 상태인 이미지만 사용 (필터링 완료된 이미지)
+    const attachmentIds = uploadedAttachments
+      .filter((a) => a.status === "TEMP")
+      .map((a) => a.attachmentId);
 
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
@@ -938,9 +941,12 @@ export default function WriteForm({
             })()}
 
             {/* 업로드된 이미지 목록 */}
-            {uploadedAttachments.length > 0 && (
+            {uploadedAttachments.filter((a) => a.status !== "DELETED").length >
+              0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {uploadedAttachments.map((attachment) => {
+                {uploadedAttachments
+                  .filter((a) => a.status !== "DELETED")
+                  .map((attachment) => {
                   const isUploading = attachment.status === "UPLOADING";
                   const isPending = attachment.status === "PENDING";
                   const isDeleted = attachment.status === "DELETED";
