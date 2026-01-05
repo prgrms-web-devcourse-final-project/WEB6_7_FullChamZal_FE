@@ -2,6 +2,7 @@ import "@/css/index.css";
 import Script from "next/script";
 import Providers from "./providers";
 import { Toaster } from "react-hot-toast";
+import ThemeProvider from "@/components/common/ThemeProvider";
 
 export const metadata = {
   title: "Dear.___",
@@ -18,7 +19,7 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <Providers>
-          {children}
+          <ThemeProvider>{children}</ThemeProvider>
 
           <Toaster
             position="top-center"

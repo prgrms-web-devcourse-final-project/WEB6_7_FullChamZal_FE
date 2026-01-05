@@ -53,8 +53,8 @@ export default function FifthSection() {
   return (
     <section id="who" className="w-full space-y-4 md:space-y-10 py-20 md:py-60">
       <div className="space-y-3 font-semibold">
-        <h4 className="text-admin text-4xl">Dear.___</h4>
-        <p className="text-primary text-3xl">Who?</p>
+        <h4 className="text-[#172c51] text-4xl">Dear.___</h4>
+        <p className="text-[#ff2600] text-3xl">Who?</p>
       </div>
       <div className="flex flex-col md:flex-row gap-5 md:h-120">
         {items.map((item) => {
@@ -83,8 +83,8 @@ export default function FifthSection() {
                   transition={{ duration: 0.2 }}
                 >
                   <div className="bg-white/80 pt-8 p-10">
-                    <h3 className="flex flex-col font-semibold text-xl md:text-3xl text-primary mb-2">
-                      <span className="text-2xl md:text-4xl text-admin">
+                    <h3 className="flex flex-col font-semibold text-xl md:text-3xl text-[#ff2600] mb-2">
+                      <span className="text-2xl md:text-4xl text-[#172c51]">
                         Dear.
                       </span>
                       <span>{item.title}</span>

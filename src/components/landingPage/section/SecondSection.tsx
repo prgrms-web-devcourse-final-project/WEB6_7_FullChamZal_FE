@@ -9,7 +9,7 @@ export default function SecondSection() {
             <div>
               <p className="md:text-2xl">
                 정보는 속도가 중요하지만, <br />
-                <span className="text-primary font-semibold">감정</span>은
+                <span className="text-[#ff2600] font-semibold">감정</span>은
                 천천히 도착할수록 더 깊어집니다.
               </p>
             </div>
@@ -18,7 +18,7 @@ export default function SecondSection() {
                 모든 메시지가 1초 안에 도착하는 시대
               </p>
               <p className="text-xl md:text-4xl font-semibold">
-                <span className="font-bold text-primary">Dear.__</span> 는
+                <span className="font-bold text-[#ff2600]">Dear.__</span> 는
                 ‘기다림’이 있는 편지를 만듭니다.
               </p>
             </div>

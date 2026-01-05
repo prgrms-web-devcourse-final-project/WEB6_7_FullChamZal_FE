@@ -56,8 +56,8 @@ export default function ReportList({
     <>
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="w-full h-55 rounded-xl bg-gray-200"></div>
-          <div className="w-full h-55 rounded-xl bg-gray-200"></div>
+          <div className="w-full h-55 rounded-xl bg-outline"></div>
+          <div className="w-full h-55 rounded-xl bg-outline"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

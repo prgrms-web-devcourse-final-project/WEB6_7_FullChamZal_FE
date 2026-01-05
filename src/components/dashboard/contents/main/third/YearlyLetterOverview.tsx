@@ -99,7 +99,7 @@ export default function YearlyLetterOverview() {
 
         <div className="flex items-center gap-4">
           {/* 연도 이전/다음 */}
-          <div className="flex items-center gap-1 rounded-full border border-outline bg-white p-1">
+          <div className="flex items-center gap-1 rounded-full border border-outline bg-bg p-1">
             <button
               type="button"
               disabled={!canGoPrev}

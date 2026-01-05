@@ -35,7 +35,7 @@ export default function DashboardShell({
         <div className="ml-2 font-semibold">Dashboard</div>
       </header>
 
-      <main className="relative w-full h-[calc(100vh-56px)] lg:h-screen flex overflow-hidden">
+      <main className="relative w-full h-[calc(100vh-56px)] lg:h-screen flex overflow-hidden bg-bg">
         <Sidebar
           me={me}
           mobileOpen={sidebarOpen}

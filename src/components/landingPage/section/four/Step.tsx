@@ -9,7 +9,7 @@ export default function Step({ icon, step, title, contents }: StepData) {
         </div>
         <div>
           <div className="space-y-2 font-medium md:font-semibold">
-            <p className="text-xl md:text-3xl text-primary">Step {step}</p>
+            <p className="text-xl md:text-3xl text-[#ff2600]">Step {step}</p>
             <p className="text-lg md:text-xl break-keep">{title}</p>
           </div>
         </div>

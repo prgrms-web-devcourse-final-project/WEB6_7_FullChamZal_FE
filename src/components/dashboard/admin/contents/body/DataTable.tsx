@@ -14,7 +14,7 @@ type Column<T> = {
 };
 
 function SkeletonBar({ w = "w-24" }: { w?: string }) {
-  return <div className={`h-5 ${w} rounded-md bg-gray-200 animate-pulse`} />;
+  return <div className={`h-5 ${w} rounded-md bg-outline animate-pulse`} />;
 }
 
 export default function DataTable<T>({

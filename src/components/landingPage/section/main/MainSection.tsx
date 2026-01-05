@@ -101,18 +101,18 @@ export default function MainSection() {
             <div className="text-sm md:text-base font-medium flex gap-4 mt-8 md:mt-20">
               <Button
                 onClick={handleWrite}
-                className="bg-primary py-4 px-5 font-normal space-x-1"
+                className="bg-[#ff2600] py-4 px-5 font-normal space-x-1"
               >
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
-              <Button
+              <button
                 onClick={() => {
                   document.getElementById("why")?.scrollIntoView();
                 }}
-                className="border border-outline text-text px-5 bg-white hover:bg-button-hover font-normal"
+                className="cursor-pointer rounded-lg md:rounded-xl border border-[#e7e5e4] px-5 bg-white hover:bg-[#f9f9f9] font-normal"
               >
                 자세히 보기
-              </Button>
+              </button>
             </div>
           </div>
         </div>

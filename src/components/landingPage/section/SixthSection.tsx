@@ -54,13 +54,13 @@ export default function SixthSection() {
             <div className="space-x-4 text-sm md:text-base font-medium mt-8 md:mt-20">
               <Button
                 onClick={handleWrite}
-                className="bg-primary py-4 px-5 font-medium space-x-1"
+                className="bg-[#ff2600] py-4 px-5 font-medium space-x-1"
               >
                 <span>편지 쓰기</span> <ArrowRight size={20} />
               </Button>
               <Button
                 onClick={handleLogin}
-                className="border border-outline text-text py-4 px-5 bg-white hover:bg-button-hover font-normal"
+                className="border border-outline py-4 px-5 bg-white hover:bg-button-hover font-normal text-[#070d19]"
               >
                 로그인
               </Button>

@@ -4,8 +4,10 @@ import MainLandingPage from "../components/landingPage/MainLandingPage";
 export default function MainPage() {
   return (
     <>
-      <MainLandingPage />
-      <Footer />
+      <div className="text-[#070d19] bg-white">
+        <MainLandingPage />
+        <Footer />
+      </div>
     </>
   );
 }
