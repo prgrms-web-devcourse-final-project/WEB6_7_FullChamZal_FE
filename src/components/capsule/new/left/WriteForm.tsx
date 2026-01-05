@@ -40,7 +40,10 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
-import { attachmentApi } from "@/lib/api/capsule/attachment";
+import {
+  attachmentApi,
+  type CapsuleAttachmentStatus,
+} from "@/lib/api/capsule/attachment";
 import toast from "react-hot-toast";
 
 type PreviewState = {
@@ -160,6 +163,7 @@ export default function WriteForm({
       attachmentId: number;
       fileName: string;
       previewUrl?: string;
+      status: CapsuleAttachmentStatus;
     }[]
   >([]);
   // cleanup에서 최신 값을 참조하기 위한 ref
@@ -274,6 +278,33 @@ export default function WriteForm({
     setContent(next.slice(0, MAX_CONTENT_LENGTH));
   };
 
+  // 이미지 필터링 상태 폴링 함수
+  const pollAttachmentStatus = async (
+    attachmentId: number,
+    onStatusChange: (status: CapsuleAttachmentStatus) => void
+  ) => {
+    const poll = async () => {
+      try {
+        const { status } = await attachmentApi.getStatus(attachmentId);
+        onStatusChange(status);
+
+        // TEMP 또는 DELETED 상태면 폴링 종료
+        if (status === "TEMP" || status === "DELETED") {
+          return;
+        }
+
+        // 2초 후 다시 폴링
+        setTimeout(poll, 2000);
+      } catch (error) {
+        console.error(`Failed to poll status for ${attachmentId}:`, error);
+        onStatusChange("DELETED"); // 오류 발생 시 DELETED로 처리
+      }
+    };
+
+    // 초기 지연 후 폴링 시작
+    setTimeout(poll, 500);
+  };
+
   // 이미지 파일 선택 핸들러
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -322,21 +353,35 @@ export default function WriteForm({
     setIsUploading(true);
     try {
       for (const file of validFiles) {
-        const response = await attachmentApi.uploadByServer(file);
-
         // 미리보기 URL 생성 (로컬)
         const previewUrl = URL.createObjectURL(file);
 
+        // Presigned URL 방식으로 업로드
+        const response = await attachmentApi.uploadByPresignedUrl(file);
+
+        // 업로드 완료 후 상태를 PENDING으로 설정하고 폴링 시작
         setUploadedAttachments((prev) => [
           ...prev,
           {
             attachmentId: response.attachmentId,
             fileName: file.name,
             previewUrl,
+            status: "PENDING" as CapsuleAttachmentStatus, // 업로드 완료, 필터링 대기 중
           },
         ]);
+
+        // 폴링 시작: 상태가 TEMP 또는 DELETED가 될 때까지 조회
+        pollAttachmentStatus(response.attachmentId, (status) => {
+          setUploadedAttachments((prev) =>
+            prev.map((item) =>
+              item.attachmentId === response.attachmentId
+                ? { ...item, status }
+                : item
+            )
+          );
+        });
       }
-      toast.success(`${validFiles.length}개의 이미지가 업로드되었습니다!`);
+      toast.success(`${validFiles.length}개의 이미지 업로드를 시작했습니다!`);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
