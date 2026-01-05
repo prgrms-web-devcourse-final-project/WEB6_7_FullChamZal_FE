@@ -341,3 +341,21 @@ pre {
     transform: translateX(0) rotate(-2deg);
   }
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(10deg);
+  cursor: pointer;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(48%) sepia(91%) saturate(4260%) hue-rotate(6deg) brightness(95%) contrast(105%);
+  cursor: pointer;
+}
+
+[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
