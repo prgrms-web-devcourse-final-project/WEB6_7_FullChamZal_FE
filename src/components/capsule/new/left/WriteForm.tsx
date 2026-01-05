@@ -387,13 +387,26 @@ export default function WriteForm({
 
         // 폴링 시작: 상태가 TEMP 또는 DELETED가 될 때까지 조회
         pollAttachmentStatus(response.attachmentId, (status) => {
-          setUploadedAttachments((prev) =>
-            prev.map((item) =>
+          setUploadedAttachments((prev) => {
+            const prevItem = prev.find(
+              (item) => item.attachmentId === response.attachmentId
+            );
+            const prevStatus = prevItem?.status;
+
+            // DELETED로 변경되었을 때 토스트 표시
+            if (prevStatus !== "DELETED" && status === "DELETED") {
+              const fileName = prevItem?.fileName || "이미지";
+              toast.error(
+                `${fileName}: 유해 이미지로 검열되어 삭제되었습니다.`
+              );
+            }
+
+            return prev.map((item) =>
               item.attachmentId === response.attachmentId
                 ? { ...item, status }
                 : item
-            )
-          );
+            );
+          });
         });
       }
       toast.success(`${validFiles.length}개의 이미지 업로드를 시작했습니다!`);
