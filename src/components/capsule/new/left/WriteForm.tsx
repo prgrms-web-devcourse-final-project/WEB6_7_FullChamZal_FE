@@ -483,6 +483,15 @@ export default function WriteForm({
       }
     }
 
+    // 이미지 업로드 상태 검증
+    const hasPendingOrUploading = uploadedAttachments.some(
+      (a) => a.status === "PENDING" || a.status === "UPLOADING"
+    );
+    if (hasPendingOrUploading) {
+      toast.error("이미지 업로드 및 검토가 완료될 때까지 기다려주세요.");
+      return;
+    }
+
     if (!me?.memberId) {
       if (meQuery.isLoading) {
         toast.error(
