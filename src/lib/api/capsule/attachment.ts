@@ -103,13 +103,24 @@ export const attachmentApi = {
       throw new Error("Presigned URL을 받지 못했습니다.");
     }
 
+    // 디버깅: Presigned URL의 SignedHeaders 확인
+    const signedHeaders = new URL(presignedUrl).searchParams.get(
+      "X-Amz-SignedHeaders"
+    );
+    console.log("SignedHeaders=", signedHeaders);
+    console.log("Presigned URL (PUT 요청 전):", presignedUrl);
+
     // 2단계: S3에 직접 업로드
+    // 백엔드에서 Presigned URL 생성 시 contentType과 contentLength를 서명에 포함하지 않았으므로
+    // 프론트엔드에서도 이 헤더들을 보내지 않음
     const uploadResponse = await fetch(presignedUrl, {
       method: "PUT",
       body: file,
       headers: {
-        "Content-Type": file.type,
+        // "Content-Type": file.type,
+        // "x-amz-acl": "public-read",
       },
+      credentials: "omit",
       signal,
     });
 
