@@ -947,71 +947,71 @@ export default function WriteForm({
                 {uploadedAttachments
                   .filter((a) => a.status !== "DELETED")
                   .map((attachment) => {
-                  const isUploading = attachment.status === "UPLOADING";
-                  const isPending = attachment.status === "PENDING";
-                  const isDeleted = attachment.status === "DELETED";
-                  const isLoading = isUploading || isPending;
+                    const isUploading = attachment.status === "UPLOADING";
+                    const isPending = attachment.status === "PENDING";
+                    const isDeleted = attachment.status === "DELETED";
+                    const isLoading = isUploading || isPending;
 
-                  return (
-                    <div
-                      key={attachment.attachmentId}
-                      className="relative group aspect-square rounded-lg overflow-hidden border border-outline bg-sub-2"
-                    >
-                      {attachment.previewUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={attachment.previewUrl}
-                          alt={attachment.fileName}
-                          className={`w-full h-full object-cover ${
-                            isDeleted ? "opacity-50" : ""
-                          }`}
-                          onError={(e) => {
-                            // 이미지 로드 실패 시 대체 UI 표시
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-text-3 text-xs">
-                          <ImageIcon size={24} />
-                        </div>
-                      )}
-
-                      {/* 상태 오버레이 */}
-                      {isLoading && (
-                        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white z-20">
-                          <Loader2 className="animate-spin mb-2" size={24} />
-                          <span className="text-xs">
-                            {isUploading ? "업로드 중..." : "검토 중..."}
-                          </span>
-                        </div>
-                      )}
-
-                      {isDeleted && (
-                        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-20">
-                          <X className="mb-2 text-red-400" size={24} />
-                          <span className="text-xs text-center px-2">
-                            필터링 실패
-                          </span>
-                        </div>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleRemoveAttachment(attachment.attachmentId)
-                        }
-                        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-30"
-                        aria-label="이미지 삭제"
+                    return (
+                      <div
+                        key={attachment.attachmentId}
+                        className="relative group aspect-square rounded-lg overflow-hidden border border-outline bg-sub-2"
                       >
-                        <X size={16} />
-                      </button>
-                      <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60 text-white text-xs truncate z-20">
-                        {attachment.fileName}
+                        {attachment.previewUrl ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={attachment.previewUrl}
+                            alt={attachment.fileName}
+                            className={`w-full h-full object-cover ${
+                              isDeleted ? "opacity-50" : ""
+                            }`}
+                            onError={(e) => {
+                              // 이미지 로드 실패 시 대체 UI 표시
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-text-3 text-xs">
+                            <ImageIcon size={24} />
+                          </div>
+                        )}
+
+                        {/* 상태 오버레이 */}
+                        {isLoading && (
+                          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white z-20">
+                            <Loader2 className="animate-spin mb-2" size={24} />
+                            <span className="text-xs">
+                              {isUploading ? "업로드 중..." : "검토 중..."}
+                            </span>
+                          </div>
+                        )}
+
+                        {isDeleted && (
+                          <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-20">
+                            <X className="mb-2 text-red-400" size={24} />
+                            <span className="text-xs text-center px-2">
+                              필터링 실패
+                            </span>
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleRemoveAttachment(attachment.attachmentId)
+                          }
+                          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-30"
+                          aria-label="이미지 삭제"
+                        >
+                          <X size={16} />
+                        </button>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60 text-white text-xs truncate z-20">
+                          {attachment.fileName}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             )}
 
