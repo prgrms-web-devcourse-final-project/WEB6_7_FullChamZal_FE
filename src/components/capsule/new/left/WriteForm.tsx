@@ -171,6 +171,8 @@ export default function WriteForm({
   const uploadedAttachmentsRef = useRef(uploadedAttachments);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // 폴링 cleanup을 위한 timeout ID 저장
+  const pollingTimeoutsRef = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
   /* 편지 내용 글자 수 제한 길이 */
   const MAX_CONTENT_LENGTH = 3000;
@@ -284,6 +286,12 @@ export default function WriteForm({
     attachmentId: number,
     onStatusChange: (status: CapsuleAttachmentStatus) => void
   ) => {
+    // 기존 폴링이 있다면 취소
+    const existingTimeout = pollingTimeoutsRef.current.get(attachmentId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+    }
+
     const poll = async () => {
       try {
         const { status } = await attachmentApi.getStatus(attachmentId);
@@ -291,19 +299,23 @@ export default function WriteForm({
 
         // TEMP 또는 DELETED 상태면 폴링 종료
         if (status === "TEMP" || status === "DELETED") {
+          pollingTimeoutsRef.current.delete(attachmentId);
           return;
         }
 
         // 2초 후 다시 폴링
-        setTimeout(poll, 2000);
+        const timeoutId = setTimeout(poll, 2000);
+        pollingTimeoutsRef.current.set(attachmentId, timeoutId);
       } catch (error) {
         console.error(`Failed to poll status for ${attachmentId}:`, error);
         onStatusChange("DELETED"); // 오류 발생 시 DELETED로 처리
+        pollingTimeoutsRef.current.delete(attachmentId);
       }
     };
 
     // 초기 지연 후 폴링 시작
-    setTimeout(poll, 500);
+    const initialTimeoutId = setTimeout(poll, 500);
+    pollingTimeoutsRef.current.set(attachmentId, initialTimeoutId);
   };
 
   // 이미지 파일 선택 핸들러
@@ -420,6 +432,18 @@ export default function WriteForm({
   // ㄴ 브라우저 탭 나가기 (beforeunload)
   // ㄴ 컴포넌트 언마운트 (뒤로가기, 페이지 이동 등)
   useCleanupTempFiles(uploadedAttachmentsRef);
+
+  // 컴포넌트 언마운트 시 폴링 정리
+  useEffect(() => {
+    const timeoutsMap = pollingTimeoutsRef.current;
+    return () => {
+      // 모든 진행 중인 폴링 취소
+      timeoutsMap.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      timeoutsMap.clear();
+    };
+  }, []);
 
   const showBadFieldsToast = (rawMessage: string) => {
     const fields = extractBadFields(rawMessage);
