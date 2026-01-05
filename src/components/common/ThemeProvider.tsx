@@ -1,50 +1,78 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 type Theme = "light" | "dark";
+type ThemeCtx = {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  toggleTheme: () => void;
+};
 
-function applyTheme(theme: Theme) {
-  document.documentElement.setAttribute("data-theme", theme);
+const THEME_KEY = "dashboard-theme";
+
+const ThemeContext = createContext<ThemeCtx | null>(null);
+
+function getInitialTheme(): Theme {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "dark" || saved === "light") return saved;
+    const prefersDark = window.matchMedia?.(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    return prefersDark ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
+function applyTheme(t: Theme) {
+  document.documentElement.setAttribute("data-theme", t);
+  try {
+    localStorage.setItem(THEME_KEY, t);
+  } catch {}
 }
 
 export default function ThemeProvider({
   children,
-  defaultTheme = "light",
 }: {
   children: React.ReactNode;
-  defaultTheme?: Theme;
 }) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [theme, _setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    const saved = (localStorage.getItem("theme") as Theme | null) ?? null;
-    const systemDark =
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    const initial: Theme = saved ?? (systemDark ? "dark" : "light");
-    setTheme(initial);
+    const initial = getInitialTheme();
+    _setTheme(initial);
     applyTheme(initial);
   }, []);
 
-  useEffect(() => {
-    applyTheme(theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+  const setTheme = (t: Theme) => {
+    _setTheme(t);
+    applyTheme(t);
+  };
+
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+
+  const value = useMemo(
+    () => ({ theme, setTheme, toggleTheme }),
+    [theme, toggleTheme]
+  );
 
   return (
-    <>
-      {children}
-
-      <button
-        type="button"
-        onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-        className="cursor-pointer fixed bottom-6 right-6 z-9999 rounded-full border border-outline bg-glass px-4 py-2 text-sm shadow-xl backdrop-blur"
-      >
-        {theme === "dark" ? "🌙 Dark" : "☀️ Light"}
-      </button>
-    </>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
+}
+
+export function useDashboardTheme() {
+  const ctx = useContext(ThemeContext);
+  if (!ctx)
+    throw new Error("useDashboardTheme must be used within ThemeProvider");
+  return ctx;
 }

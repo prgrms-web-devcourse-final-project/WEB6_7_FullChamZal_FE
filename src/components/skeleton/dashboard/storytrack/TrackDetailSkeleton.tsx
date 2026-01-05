@@ -11,7 +11,7 @@ export default function TrackDetailSkeleton() {
           <div className="lg:flex-1 lg:min-w-80 flex flex-col gap-4 lg:gap-6 min-h-0">
             <div className="h-44 sm:h-56 lg:h-64 rounded-2xl bg-outline" />
 
-            <div className="border border-outline rounded-2xl lg:flex-1 lg:min-h-0 overflow-hidden bg-white/80">
+            <div className="border border-outline rounded-2xl lg:flex-1 lg:min-h-0 overflow-hidden bg-bg/80">
               <div className="p-6 flex flex-col h-full">
                 <div className="flex-1 flex flex-col justify-between overflow-y-auto">
                   <div className="space-y-6">

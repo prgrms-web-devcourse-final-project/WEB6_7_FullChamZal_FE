@@ -9,7 +9,7 @@ export default function StorytrackCardSkeleton({
         {Array.from({ length: count }).map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-outline bg-white space-y-3"
+            className="rounded-2xl border border-outline bg-bg space-y-3"
           >
             <div className="h-36 rounded-t-2xl bg-outline" />
             <div className="p-4 space-y-3">

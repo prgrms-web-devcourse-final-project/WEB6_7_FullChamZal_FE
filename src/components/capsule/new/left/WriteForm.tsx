@@ -858,7 +858,7 @@ export default function WriteForm({
               />
               <label
                 htmlFor="image-upload"
-                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-white text-sm font-medium transition-colors ${
+                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-bg text-sm font-medium transition-colors ${
                   isUploading
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-sub-2 hover:border-primary-2"

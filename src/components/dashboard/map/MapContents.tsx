@@ -234,7 +234,7 @@ export default function MapContents() {
 
           <button
             type="button"
-            className="cursor-pointer bg-white absolute bottom-4 right-4 p-3 rounded-xl z-10 shadow-lg text-primary"
+            className="cursor-pointer bg-bg absolute bottom-4 right-4 p-3 rounded-xl z-10 shadow-lg text-primary"
             onClick={MoveMyLocation}
             disabled={!myLocation}
           >
@@ -251,7 +251,7 @@ export default function MapContents() {
         </div>
 
         {/* 리스트 (데스크탑만) */}
-        <div className="w-90 rounded-xl bg-white/80 border border-outline hidden lg:flex flex-col gap-3 min-h-0 py-6">
+        <div className="w-90 rounded-xl bg-bg/80 border border-outline hidden lg:flex flex-col gap-3 min-h-0 py-6">
           <div className="flex justify-between flex-none px-6 items-center">
             <span className="text-lg">주변 편지</span>
 
@@ -306,7 +306,7 @@ export default function MapContents() {
           />
 
           <div
-            className={`fixed left-0 right-0 bottom-0 z-9999 bg-white rounded-t-2xl border-t border-outline
+            className={`fixed left-0 right-0 bottom-0 z-9999 bg-bg rounded-t-2xl border-t border-outline
               transition-transform duration-200 ease-out
               ${isListOpen ? "translate-y-0" : "translate-y-full"}`}
             aria-hidden={!isListOpen}

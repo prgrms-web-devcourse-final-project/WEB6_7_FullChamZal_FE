@@ -11,7 +11,7 @@ export default function WriteDiv({
 }) {
   return (
     <>
-      <div className="w-full p-4 md:p-5 bg-white/80 border border-outline rounded-xl">
+      <div className="w-full p-4 md:p-5 bg-bg/80 border border-outline rounded-xl">
         <div className="flex md:items-center flex-col md:flex-row gap-2">
           {typeof title === "string" ? <span>{title}</span> : title}
           <span className="text-text-4 text-xs md:text-sm">{warning}</span>

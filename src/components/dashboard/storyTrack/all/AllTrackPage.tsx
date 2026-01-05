@@ -179,7 +179,7 @@ export default function AllTrackPage() {
           onChange={(e) => setSearch(e.target.value)}
           type="text"
           placeholder="스토리트랙 제목이나 소개 내용으로 검색..."
-          className="w-full p-2.5 pl-10 md:p-4 md:pl-12 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
+          className="w-full p-2.5 pl-10 md:p-4 md:pl-12 bg-bg/80 border border-outline rounded-xl outline-none focus:border-primary-2"
         />
       </div>
 
@@ -234,7 +234,7 @@ export default function AllTrackPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
-            className="cursor-pointer appearance-none py-2 pl-4 pr-10 rounded-xl border border-outline bg-white/80 text-text-2 outline-none transition hover:bg-white hover:border-primary-2 focus:border-primary"
+            className="cursor-pointer appearance-none py-2 pl-4 pr-10 rounded-xl border border-outline bg-bg/80 text-text-2 outline-none transition hover:bg-bg hover:border-primary-2 focus:border-primary"
           >
             <option value="newest">최신순</option>
             <option value="popular">인기순</option>
@@ -260,13 +260,13 @@ export default function AllTrackPage() {
 
       {/* 에러 */}
       {isError && (
-        <div className="rounded-xl border border-outline bg-white/80 p-6">
+        <div className="rounded-xl border border-outline bg-bg/80 p-6">
           <p className="text-primary font-medium">불러오기에 실패했어요.</p>
           <pre className="mt-3 text-xs whitespace-pre-wrap text-text-3">
             {error instanceof Error ? error.message : String(error)}
           </pre>
           <button
-            className="cursor-pointer mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
+            className="cursor-pointer mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-bg"
             onClick={() => refetch()}
             type="button"
           >
@@ -297,7 +297,7 @@ export default function AllTrackPage() {
           <div ref={loadMoreRef} className="h-10" />
 
           {isFetchingNextPage && (
-            <div className="rounded-xl border border-outline bg-white/80 p-4 text-center text-text-2">
+            <div className="rounded-xl border border-outline bg-bg/80 p-4 text-center text-text-2">
               더 불러오는 중...
             </div>
           )}

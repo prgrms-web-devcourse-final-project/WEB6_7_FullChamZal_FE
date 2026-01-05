@@ -76,7 +76,7 @@ export default function AdminSidebar({
         />
 
         <aside
-          className={`fixed inset-y-0 left-0 z-9999 w-72 bg-white border-r border-outline transition-transform duration-200 ease-out ${
+          className={`fixed inset-y-0 left-0 z-9999 w-72 bg-bg border-r border-outline transition-transform duration-200 ease-out ${
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           aria-hidden={!mobileOpen}
@@ -111,7 +111,7 @@ export default function AdminSidebar({
             </div>
 
             {/* Footer (하단 고정) */}
-            <div className="shrink-0 p-6 border-t border-outline bg-white">
+            <div className="shrink-0 p-6 border-t border-outline bg-bg">
               <button
                 onClick={handleLogout}
                 className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm w-full"

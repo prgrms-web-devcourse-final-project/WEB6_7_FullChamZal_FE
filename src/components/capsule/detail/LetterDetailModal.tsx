@@ -590,7 +590,7 @@ export default function LetterDetailModal({
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center p-15">
-          <div className="max-w-330 w-full rounded-2xl bg-white p-8">
+          <div className="max-w-330 w-full rounded-2xl bg-bg p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">불러오는 중...</div>
               <button onClick={close} className="cursor-pointer text-primary">
@@ -607,7 +607,7 @@ export default function LetterDetailModal({
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center p-15">
-          <div className="max-w-330 w-full rounded-2xl bg-white p-8">
+          <div className="max-w-330 w-full rounded-2xl bg-bg p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">불러오기 실패</div>
               <button onClick={close} className="cursor-pointer text-primary">
@@ -628,7 +628,7 @@ export default function LetterDetailModal({
     return (
       <div className="fixed inset-0 z-9999 bg-black/50">
         <div className="flex h-full justify-center p-15">
-          <div className="max-w-330 w-full rounded-2xl bg-white p-8">
+          <div className="max-w-330 w-full rounded-2xl bg-bg p-8">
             <div className="flex items-center justify-between">
               <div className="text-lg font-semibold">편지를 찾을 수 없어요</div>
               <button onClick={close} className="cursor-pointer text-primary">
@@ -699,7 +699,7 @@ export default function LetterDetailModal({
 
       {backupMutation.isPending && (
         <div className="fixed inset-0 z-1000 bg-black/40 flex items-center justify-center">
-          <div className="bg-white rounded-xl px-6 py-4 flex items-center gap-3">
+          <div className="bg-bg rounded-xl px-6 py-4 flex items-center gap-3">
             <span className="animate-spin rounded-full h-5 w-5 border-2 border-primary-2 border-t-transparent" />
             <span className="text-sm font-medium">백업 중...</span>
           </div>
@@ -799,7 +799,7 @@ export default function LetterDetailModal({
       )}
 
       <div className="flex h-full justify-center md:p-15 p-6">
-        <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-white rounded-2xl">
+        <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-bg rounded-2xl border border-outline">
           {/* Header */}
           <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
             <div className="flex justify-between items-center gap-2 md:gap-4">
@@ -845,13 +845,14 @@ export default function LetterDetailModal({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="w-44 z-10000 bg-white shadow-lg"
+                      className="w-44 z-10000 bg-bg shadow-lg border border-outline"
                     >
                       <DropdownMenuLabel>관리</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
                         {isReceiver && (
                           <DropdownMenuItem
+                            className="hover:bg-button-hover"
                             onClick={() => backupMutation.mutate(capsuleId)}
                           >
                             <Download className="text-primary" />
@@ -863,6 +864,7 @@ export default function LetterDetailModal({
                         {isSender ||
                           (capsule.viewStatus && (
                             <DropdownMenuItem
+                              className="hover:bg-button-hover"
                               onClick={() => {
                                 router.push(
                                   `/capsules/edit?capsuleId=${capsuleId}`
@@ -875,6 +877,7 @@ export default function LetterDetailModal({
                           ))}
                         {(isSender || isReceiver) && (
                           <DropdownMenuItem
+                            className="hover:bg-button-hover"
                             variant="destructive"
                             disabled={deleteMutation.isPending}
                             onClick={() => setIsDeleteConfirmOpen(true)}
@@ -909,11 +912,11 @@ export default function LetterDetailModal({
               <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8">
                 <div className="text-base md:text-xl lg:text-2xl space-x-1">
                   <span className="text-primary font-bold">Dear.</span>
-                  <span>{dearName}</span>
+                  <span className="text-[#070d19]">{dearName}</span>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto space-y-4">
-                  <pre className="whitespace-pre-wrap wrap-break-word text-lg">
+                  <pre className="text-[#070d19] whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
                   </pre>
 
@@ -939,12 +942,14 @@ export default function LetterDetailModal({
                 </div>
 
                 <div className="shrink-0 flex flex-col items-end gap-1 lg:gap-2">
-                  <span className="text-xs md:text-sm lg:text-base text-text-3">
+                  <span className="text-xs md:text-sm lg:text-base text-[#6f7786]">
                     {formatDate(capsule.createdAt)}
                   </span>
                   <div className="text-base md:text-xl lg:text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
-                    <span>{capsule.writerNickname}</span>
+                    <span className="text-[#070d19]">
+                      {capsule.writerNickname}
+                    </span>
                   </div>
                 </div>
               </div>

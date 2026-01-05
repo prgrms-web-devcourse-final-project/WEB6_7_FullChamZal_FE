@@ -400,7 +400,7 @@ export default function RegisterForm({
             type="button"
             onClick={onBack}
             disabled={isSubmitting}
-            className="w-full py-3 border border-outline bg-white text-text md:font-normal hover:bg-button-hover"
+            className="w-full py-3 border border-outline bg-bg text-text md:font-normal hover:bg-button-hover"
           >
             뒤로 가기
           </Button>

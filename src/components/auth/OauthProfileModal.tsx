@@ -21,7 +21,6 @@ function formatPhone(v: string) {
 
 export default function OAuthProfileModal({
   open,
-  onClose,
 }: {
   open: boolean;
   onClose: () => void;
@@ -134,7 +133,6 @@ export default function OAuthProfileModal({
         phoneNumber: phoneDigits,
       });
 
-   
       router.refresh();
     } catch (e: any) {
       setError(e?.message ?? "저장에 실패했어요.");
@@ -145,7 +143,7 @@ export default function OAuthProfileModal({
 
   return (
     <Modal open={open} onClose={() => {}}>
-      <div className="w-full max-w-130 rounded-2xl border-2 border-outline bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
+      <div className="w-full max-w-130 rounded-2xl border-2 border-outline bg-bg shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
         <div className="py-4 px-6 flex justify-between items-center border-b border-outline">
           <div className="space-y-1">
             <h4 className="text-lg">프로필 설정</h4>

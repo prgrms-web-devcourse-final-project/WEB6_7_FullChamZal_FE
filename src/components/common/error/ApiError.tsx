@@ -14,7 +14,7 @@ export default function ApiError({
 }) {
   return (
     <div className="flex w-full h-full items-center justify-center p-4 lg:p-8">
-      <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-8 text-center shadow-sm">
+      <div className="w-full max-w-md rounded-2xl border border-outline bg-bg p-8 text-center shadow-sm">
         {/* 아이콘 */}
         <div className="mx-auto mb-4 inline-flex p-3 items-center justify-center rounded-full bg-red-50">
           <AlertTriangle className="h-6 w-6 text-red-500" />

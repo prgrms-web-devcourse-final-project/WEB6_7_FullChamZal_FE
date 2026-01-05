@@ -186,7 +186,7 @@ export default function CreateStoryTrack() {
       </div>
 
       {/* Bottom */}
-      <div className="flex-none border-t border-outline bg-white/95 backdrop-blur">
+      <div className="flex-none border-t border-outline bg-bg/95 backdrop-blur">
         <div className="px-8 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
           <div className="flex justify-between items-center">
             {/* 왼쪽 버튼 */}
@@ -194,7 +194,7 @@ export default function CreateStoryTrack() {
               <Button
                 type="button"
                 onClick={handleCancel}
-                className="md:font-normal py-2 px-8 bg-white border border-outline text-text"
+                className="md:font-normal py-2 px-8 bg-bg border border-outline text-text"
               >
                 취소
               </Button>
@@ -202,7 +202,7 @@ export default function CreateStoryTrack() {
               <Button
                 type="button"
                 onClick={() => setStep((s) => (s === 2 ? 1 : s))}
-                className="md:font-normal py-2 px-8 bg-white border border-outline text-text hover:bg-button-hover"
+                className="md:font-normal py-2 px-8 bg-bg border border-outline text-text hover:bg-button-hover"
               >
                 이전
               </Button>

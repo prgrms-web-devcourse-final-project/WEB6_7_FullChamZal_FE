@@ -240,7 +240,7 @@ export default function ReportDetailModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-[min(672px,94vw)] md:w-full md:max-w-2xl mx-auto rounded-xl bg-white flex flex-col max-h-[88dvh] md:max-h-[85vh] overflow-hidden">
+      <div className="w-[min(672px,94vw)] md:w-full md:max-w-2xl mx-auto rounded-xl bg-bg flex flex-col max-h-[88dvh] md:max-h-[85vh] overflow-hidden">
         {/* Header (분리) */}
         <ReportDetailHeader reportId={reportId} onClose={onClose} />
 
@@ -343,14 +343,14 @@ export default function ReportDetailModal({
                 <div className="space-y-3">
                   <div className="space-y-1">
                     <span className="text-sm text-yellow-800">신고 사유</span>
-                    <p className="text-yellow-900 py-2 px-3 bg-white rounded-lg">
+                    <p className="text-yellow-900 py-2 px-3 bg-bg rounded-lg">
                       {r.reasonType ?? "-"}
                     </p>
                   </div>
 
                   <div className="space-y-1">
                     <span className="text-sm text-yellow-800">상세 설명</span>
-                    <p className="text-yellow-900 py-2 px-3 bg-white rounded-lg whitespace-pre-wrap">
+                    <p className="text-yellow-900 py-2 px-3 bg-bg rounded-lg whitespace-pre-wrap">
                       {r.reasonDetail ?? "-"}
                     </p>
                   </div>

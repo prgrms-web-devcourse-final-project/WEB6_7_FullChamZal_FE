@@ -356,7 +356,7 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
             onClick={moveToMyLocation}
             disabled={!ready || isLocating}
             aria-label="내 위치로 이동"
-            className="cursor-pointer bg-white absolute bottom-3 right-3 p-3 rounded-xl z-10 shadow-lg text-primary disabled:opacity-50"
+            className="cursor-pointer bg-bg absolute bottom-3 right-3 p-3 rounded-xl z-10 shadow-lg text-primary disabled:opacity-50"
           >
             <LocateFixed size={22} />
           </button>
@@ -372,7 +372,7 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
         {error ? <div className="text-xs text-red-500">{error}</div> : null}
 
         {results.length ? (
-          <div className="max-h-44 overflow-auto rounded-lg border border-outline bg-white">
+          <div className="max-h-44 overflow-auto rounded-lg border border-outline bg-bg">
             {results.map((item) => {
               const address = item.road_address_name || item.address_name || "";
               return (

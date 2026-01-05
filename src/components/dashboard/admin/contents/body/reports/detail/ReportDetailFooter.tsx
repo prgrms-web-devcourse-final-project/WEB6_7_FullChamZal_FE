@@ -23,7 +23,7 @@ export default function ReportDetailFooter({
         </button>
 
         <button
-          className="cursor-pointer w-full md:flex-1 rounded-xl p-2 hover:bg-button-hover border border-outline disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+          className="cursor-pointer w-full md:flex-1 rounded-xl p-2 hover:bg-button-hover border border-outline disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-bg"
           disabled={disabled}
           onClick={onReject}
         >

@@ -79,8 +79,8 @@ export default function PublicLetterPicker({
   return (
     <div className="p-4">
       {/* 검색바 (디자인 유지) */}
-      <div className="sticky top-0 z-10 bg-white pb-3">
-        <div className="flex items-center gap-2 rounded-xl border border-outline bg-white px-3 py-2">
+      <div className="sticky top-0 z-10 bg-bg pb-3">
+        <div className="flex items-center gap-2 rounded-xl border border-outline bg-bg px-3 py-2">
           <Search size={16} className="text-text-4" />
           <input
             value={q}
@@ -103,7 +103,7 @@ export default function PublicLetterPicker({
                 type="button"
                 disabled={already}
                 onClick={() => onSelect(l)}
-                className={`w-full text-left rounded-xl border-2 border-outline bg-white px-4 py-3 transition active:scale-[0.99]
+                className={`w-full text-left rounded-xl border-2 border-outline bg-bg px-4 py-3 transition active:scale-[0.99]
                   ${
                     already
                       ? "border-primary opacity-40 cursor-not-allowed"
@@ -125,7 +125,7 @@ export default function PublicLetterPicker({
                       {selectedLabel}
                     </span>
                   ) : (
-                    <span className="shrink-0 inline-flex items-center rounded-full border border-outline bg-white px-2 py-1 text-xs text-text-4">
+                    <span className="shrink-0 inline-flex items-center rounded-full border border-outline bg-bg px-2 py-1 text-xs text-text-4">
                       선택
                     </span>
                   )}
@@ -138,4 +138,3 @@ export default function PublicLetterPicker({
     </div>
   );
 }
-

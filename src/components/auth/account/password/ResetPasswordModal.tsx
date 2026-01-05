@@ -39,7 +39,7 @@ export default function ResetPasswordModal({
 
   return (
     <OverlayModal open={open} onClose={onClose}>
-      <div className="relative w-[92%] max-w-md rounded-2xl border border-outline bg-white p-6 shadow-2xl">
+      <div className="relative w-[92%] max-w-md rounded-2xl border border-outline bg-bg p-6 shadow-2xl">
         <div className="space-y-2">
           <p className="text-lg font-semibold">비밀번호 재설정</p>
           <p className="text-sm text-text-3">새 비밀번호를 입력해주세요.</p>
@@ -54,7 +54,7 @@ export default function ResetPasswordModal({
               type="password"
               placeholder="영문, 숫자, 특수문자 포함 8자 이상"
               autoComplete="new-password"
-              className="w-full p-4 bg-white border border-outline rounded-xl outline-none focus:border-primary-2"
+              className="w-full p-4 bg-bg border border-outline rounded-xl outline-none focus:border-primary-2"
             />
 
             {/* 안내 문구 + 실시간 검증 */}
@@ -76,7 +76,7 @@ export default function ResetPasswordModal({
               type="password"
               placeholder="비밀번호 재입력"
               autoComplete="new-password"
-              className="w-full p-4 bg-white border border-outline rounded-xl outline-none focus:border-primary-2"
+              className="w-full p-4 bg-bg border border-outline rounded-xl outline-none focus:border-primary-2"
             />
             {mismatch && (
               <p className="text-sm text-primary">
@@ -88,7 +88,7 @@ export default function ResetPasswordModal({
 
         <div className="mt-6 flex gap-2">
           <Button
-            className="w-full py-3 border border-outline bg-white text-text md:font-normal hover:bg-button-hover"
+            className="w-full py-3 border border-outline bg-bg text-text md:font-normal hover:bg-button-hover"
             onClick={onClose}
           >
             닫기

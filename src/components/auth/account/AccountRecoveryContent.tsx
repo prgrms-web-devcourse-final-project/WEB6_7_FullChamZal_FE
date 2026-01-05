@@ -204,7 +204,7 @@ export default function AccountRecoveryContent({
   };
 
   return (
-    <div className="w-full max-w-xl bg-white/80 p-8 space-y-6">
+    <div className="w-full max-w-xl bg-bg/80 p-8 space-y-6">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p className="text-text-3 text-sm">

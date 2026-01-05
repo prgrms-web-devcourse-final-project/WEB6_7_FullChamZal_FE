@@ -33,7 +33,7 @@ export default function SortableRouteItem({
     <li
       ref={setNodeRef}
       style={style}
-      className={`border border-outline rounded-xl px-4 py-3 bg-white flex items-center gap-3
+      className={`border border-outline rounded-xl px-4 py-3 bg-bg flex items-center gap-3
                   ${isDragging ? "opacity-80" : ""}`}
     >
       {/* Drag handle */}

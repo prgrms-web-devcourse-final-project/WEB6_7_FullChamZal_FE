@@ -233,7 +233,7 @@ export default function EditStoryTrack() {
                       <button
                         type="button"
                         onClick={() => setOpenMap(true)}
-                        className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-white px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
+                        className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-bg px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
                       >
                         <Map size={16} />
                         지도
@@ -260,14 +260,14 @@ export default function EditStoryTrack() {
       </div>
 
       {/* Bottom */}
-      <div className="flex-none border-t border-outline bg-white/95 backdrop-blur">
+      <div className="flex-none border-t border-outline bg-bg/95 backdrop-blur">
         <div className="px-8 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
           <div className="flex justify-between items-center">
             {/* 왼쪽 버튼 */}
             <Button
               type="button"
               onClick={handleCancel}
-              className="md:font-normal py-2 px-8 bg-white border border-outline text-text"
+              className="md:font-normal py-2 px-8 bg-bg border border-outline text-text"
             >
               취소
             </Button>
@@ -292,7 +292,7 @@ export default function EditStoryTrack() {
           onClick={() => setOpenMap(false)}
         >
           <div
-            className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl border-t border-outline h-[85dvh] flex flex-col overflow-hidden"
+            className="absolute left-0 right-0 bottom-0 bg-bg rounded-t-2xl border-t border-outline h-[85dvh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-outline">

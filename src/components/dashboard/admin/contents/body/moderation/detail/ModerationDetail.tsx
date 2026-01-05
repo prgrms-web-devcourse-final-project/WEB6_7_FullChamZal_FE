@@ -55,7 +55,7 @@ export default function ModerationDetail({ open, id, onClose }: Props) {
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="relative z-10 w-[min(920px,94vw)] md:w-[min(920px,92vw)] max-h-[88dvh] md:max-h-[85vh] overflow-hidden rounded-2xl bg-white shadow-xl flex flex-col">
+      <div className="relative z-10 w-[min(920px,94vw)] md:w-[min(920px,92vw)] max-h-[88dvh] md:max-h-[85vh] overflow-hidden rounded-2xl bg-bg shadow-xl flex flex-col">
         <ModerationDetailHeader
           id={detail?.id}
           onClose={onClose}

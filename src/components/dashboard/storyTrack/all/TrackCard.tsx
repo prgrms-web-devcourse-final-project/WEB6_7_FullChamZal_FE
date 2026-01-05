@@ -123,7 +123,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         show: true,
         label: "완료",
         disabled: true,
-        className: "bg-white text-black",
+        className: "bg-text text-bg",
         onClick: undefined,
       };
     }
@@ -132,7 +132,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         show: true,
         label: isPending ? "처리 중..." : "참여취소",
         disabled: isPending,
-        className: "bg-white text-black",
+        className: "bg-text text-bg",
         onClick: () => setIsCancelConfirmOpen(true),
       };
     }
@@ -140,7 +140,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
       show: true,
       label: isPending ? "처리 중..." : "참여하기",
       disabled: isPending,
-      className: "bg-primary text-white",
+      className: "bg-primary text-text",
       onClick: () => {
         joinMutation.mutate();
       },
@@ -183,13 +183,13 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         />
 
         <div
-          className={`absolute inset-0 z-30 bg-black/60 flex items-center justify-center gap-3 transition-opacity duration-200 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:transition-opacity md:duration-200 md:flex md:items-center md:justify-center
+          className={`absolute inset-0 z-30 bg-text/60 flex items-center justify-center gap-3 transition-opacity duration-200 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:transition-opacity md:duration-200 md:flex md:items-center md:justify-center
           ${overlayClassMobile}`}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             type="button"
-            className="cursor-pointer px-4 py-2 rounded-xl bg-white text-black text-sm font-medium"
+            className="cursor-pointer px-4 py-2 rounded-xl bg-bg text-sm font-medium"
             onClick={(e) => {
               e.stopPropagation();
               setOverlayOpen(false);
@@ -229,7 +229,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
           </div>
 
           <div className="flex items-center gap-1.5">
-            <div className="flex-none w-6 h-6 rounded-full bg-black text-white text-xs flex items-center justify-center">
+            <div className="flex-none w-6 h-6 rounded-full bg-text text-bg text-xs flex items-center justify-center">
               {track.createrName?.[0] ?? "?"}
             </div>
             <p className="text-xs text-text-2">{track.createrName}</p>

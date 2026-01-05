@@ -239,7 +239,7 @@ export default function ProfileModal({
   return (
     <>
       <Modal open={open} onClose={handleClose}>
-        <div className="w-full max-w-125 rounded-2xl border-2 border-outline bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
+        <div className="w-full max-w-125 rounded-2xl border-2 border-outline bg-bg shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
           <div className="py-4 px-6 flex justify-between items-center border-b border-outline">
             <h4 className="text-lg">내 프로필</h4>
 
@@ -393,7 +393,7 @@ export default function ProfileModal({
           <div className="py-6 px-6 flex flex-col gap-3 border-t border-outline">
             {!isVerified && !isOAuthGoogle ? (
               <Button
-                className="w-full py-3 border border-outline bg-white text-text hover:text-white"
+                className="w-full py-3 border border-outline bg-bg text-text hover:text-white"
                 onClick={handleClose}
               >
                 닫기
@@ -423,7 +423,7 @@ export default function ProfileModal({
                 {isEditing ? (
                   <Button
                     type="button"
-                    className="w-full py-3 border border-outline bg-white text-text hover:bg-button-hover"
+                    className="w-full py-3 border border-outline bg-bg text-text hover:bg-button-hover"
                     onClick={() => {
                       setForm(initialForm);
                       setIsEditing(false);

@@ -4,7 +4,7 @@ export default function MailboxSkeleton() {
   return (
     <section className="flex-1 w-full">
       <div className="p-8">
-        <DivBox className="cursor-auto hover:bg-white space-y-12">
+        <DivBox className="cursor-auto hover:bg-bg space-y-12">
           {/* 상단 헤더 영역 */}
           <div className="flex items-center gap-4 animate-pulse">
             {/* 아이콘 자리 */}

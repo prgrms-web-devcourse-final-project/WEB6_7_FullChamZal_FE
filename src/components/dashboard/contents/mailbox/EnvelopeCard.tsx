@@ -274,7 +274,7 @@ export default function EnvelopeCard({
   const CardInner = () => (
     <div
       ref={cardRef}
-      className="relative flex flex-col items-center justify-center p-2 perspective-[1000px] group"
+      className="relative text-[#070d19] flex flex-col items-center justify-center p-2 perspective-[1000px] group"
       aria-label={canOpenDetail ? "봉투 카드" : "열 수 없는 봉투"}
     >
       <div
@@ -478,7 +478,7 @@ export default function EnvelopeCard({
 
       <div
         className="absolute w-60 h-px rounded-[30%]"
-        style={{ boxShadow: "20px 100px 10px 5px #EEEEF3" }}
+        style={{ boxShadow: "var(--shadow-glow)" }}
       />
     </div>
   );

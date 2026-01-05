@@ -82,13 +82,13 @@ export default function JoinedTrackPage() {
 
       {/* 에러 */}
       {isError && (
-        <div className="rounded-xl border border-outline bg-white/80 p-6">
+        <div className="rounded-xl border border-outline bg-bg/80 p-6">
           <p className="text-primary font-medium">불러오기에 실패했어요.</p>
           <pre className="mt-3 text-xs whitespace-pre-wrap text-text-3">
             {error instanceof Error ? error.message : String(error)}
           </pre>
           <button
-            className="cursor-pointer mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-white"
+            className="cursor-pointer mt-4 px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-bg"
             onClick={() => refetch()}
             type="button"
           >
@@ -119,7 +119,7 @@ export default function JoinedTrackPage() {
           <div ref={loadMoreRef} className="h-10" />
 
           {isFetchingNextPage && (
-            <div className="rounded-xl border border-outline bg-white/80 p-4 text-center text-text-2">
+            <div className="rounded-xl border border-outline bg-bg/80 p-4 text-center text-text-2">
               더 불러오는 중...
             </div>
           )}

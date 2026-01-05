@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, X } from "lucide-react";
+import { LogOut, Moon, Sun, X } from "lucide-react";
 import Logo from "../../common/Logo";
 import MenuTab from "./menu/MenuTab";
 import MyMailbox from "./MyMailbox";
@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import ProfileModal from "./profile/ProfileModal";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import type { MemberMeDetail } from "@/lib/api/members/members";
+import { useDashboardTheme } from "@/components/common/ThemeProvider";
 
 export default function Sidebar({
   me,
@@ -22,6 +23,7 @@ export default function Sidebar({
 }) {
   const router = useRouter();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { theme, toggleTheme } = useDashboardTheme();
 
   const handleLogout = () => {
     authApiClient.logout();
@@ -45,11 +47,26 @@ export default function Sidebar({
         {/* 상단(스크롤 영역) */}
         <div className="flex-1 min-h-0 overflow-y-auto p-6">
           <div className="space-y-9">
-            <div className="flex items-center gap-2 text-primary">
-              <Logo className="w-9" />
-              <span className="text-2xl font-paperozi font-extrabold">
-                Dear. ___
-              </span>
+            <div className="flex items-center justify-between gap-2">
+              {/* Logo */}
+              <div className="flex items-center gap-2 text-primary">
+                <Logo className="w-9" />
+                <span className="text-2xl font-paperozi font-extrabold">
+                  Dear. ___
+                </span>
+              </div>
+
+              {/* 다크모드 버튼 */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="cursor-pointer inline-flex items-center gap-2 rounded-xl border border-outline bg-(--color-surface) px-3 py-2 text-sm hover:bg-button-hover"
+                aria-label="테마 전환"
+              >
+                <span className="text-(--color-text)">
+                  {theme === "dark" ? <Moon /> : <Sun />}
+                </span>
+              </button>
             </div>
 
             <Profile
@@ -85,7 +102,7 @@ export default function Sidebar({
         />
 
         <aside
-          className={`fixed inset-y-0 left-0 z-9999 w-72 bg-white border-r border-outline transition-transform duration-200 ease-out ${
+          className={`fixed inset-y-0 left-0 z-9999 w-72 bg-bg border-r border-outline transition-transform duration-200 ease-out ${
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           aria-hidden={!mobileOpen}
@@ -125,7 +142,7 @@ export default function Sidebar({
             </div>
 
             {/* Footer (하단 고정) */}
-            <div className="shrink-0 p-6 border-t border-outline bg-white">
+            <div className="shrink-0 p-6 border-t border-outline bg-bg">
               <button
                 onClick={handleLogout}
                 className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm w-full"

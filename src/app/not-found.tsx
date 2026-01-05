@@ -26,7 +26,7 @@ export default function NotFound() {
     <main className="min-h-screen w-full">
       {/* background glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-24 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full blur-3xl bg-primary/5" />
+        <div className="absolute -top-24 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full blur-3xl bg-primary/5" />
       </div>
 
       <section className="relative mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-6 py-16">
@@ -39,7 +39,7 @@ export default function NotFound() {
         </div>
 
         {/* card */}
-        <div className="w-full max-w-2xl rounded-3xl bg-white/80 p-8 shadow-lg backdrop-blur">
+        <div className="w-full max-w-2xl rounded-3xl bg-bg/80 p-8 shadow-lg backdrop-blur">
           <div className="flex flex-col items-center text-center">
             <h1 className="font-semibold tracking-tight sm:text-5xl">
               <span className="text-6xl text-primary">404</span>{" "}
@@ -58,7 +58,7 @@ export default function NotFound() {
                 <div className="absolute left-6 top-1/2 -translate-y-1/2">
                   <div className="fly relative">
                     <div className="absolute -inset-3 rounded-full blur-xl bg-primary-5" />
-                    <div className="relative rounded-2xl border border-outline bg-white px-4 py-3 shadow-sm">
+                    <div className="relative rounded-2xl border border-outline bg-bg px-4 py-3 shadow-sm">
                       <div className="flex items-center gap-2">
                         <Mail className="h-5 w-5" style={{ color: POINT }} />
                         <span className="text-sm font-medium">

@@ -12,7 +12,7 @@ export default function ModerationDetailHeader({
   onClose: () => void;
 }) {
   return (
-    <div className="shrink-0 flex items-center justify-between border-b px-4 md:px-5 py-3 md:py-4 bg-white">
+    <div className="shrink-0 flex items-center justify-between border-b px-4 md:px-5 py-3 md:py-4 bg-bg">
       <div className="min-w-0">
         <div className="text-base md:text-lg font-semibold truncate">
           {title}

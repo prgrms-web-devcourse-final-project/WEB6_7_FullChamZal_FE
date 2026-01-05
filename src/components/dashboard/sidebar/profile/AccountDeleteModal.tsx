@@ -44,7 +44,7 @@ export default function AccountDeleteModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-bg p-6">
         <div className="space-y-2">
           <h4 className="text-lg text-center">
             정말로 계정을 삭제하시겠습니까?
@@ -63,7 +63,7 @@ export default function AccountDeleteModal({
         <div className="mt-6 flex gap-2">
           <Button
             type="button"
-            className="flex-1 py-3 border border-outline bg-white text-text hover:text-white"
+            className="flex-1 py-3 border border-outline bg-bg text-text hover:text-white"
             onClick={onClose}
             disabled={isDeleting}
           >

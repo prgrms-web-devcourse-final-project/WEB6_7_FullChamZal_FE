@@ -20,7 +20,7 @@ export default function ConfirmModal({
   return (
     <Modal open={open} onClose={onClose} zIndexClassName="z-[20000]">
       <div className="w-full h-full flex flex-col items-center justify-center">
-        <div className="w-full max-w-105 flex flex-col items-center gap-4 rounded-2xl border-2 border-outline bg-white p-6">
+        <div className="w-full max-w-105 flex flex-col items-center gap-4 rounded-2xl border-2 border-outline bg-bg p-6">
           <div className="w-16 h-16 rounded-full bg-sub flex items-center justify-center">
             {active === "fail" ? (
               <X size={32} strokeWidth={1} />
@@ -35,7 +35,7 @@ export default function ConfirmModal({
           <div className="w-full flex gap-2">
             <Button
               type="button"
-              className="flex-1 py-2 md:py-3 text-sm md:text-base border border-outline bg-white text-text hover:text-white"
+              className="flex-1 py-2 md:py-3 text-sm md:text-base border border-outline bg-bg text-text hover:text-white hover:bg-button-hover"
               onClick={onClose}
             >
               아니오

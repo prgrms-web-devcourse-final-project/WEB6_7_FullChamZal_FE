@@ -229,10 +229,11 @@
   --color-surface-2: #f8f8f8;
 
   --color-glass: rgba(255, 255, 255, 0.80);
-  --color-image-overlay: rgba(255, 255, 255, 0.30);
   --color-dim: rgba(0, 0, 0, 0.15);
 
-  --hero-gradient: linear-gradient(91.61deg, #ff2600 37.12%, #c9290c 77.33%);
+  --color-error: #ef4444;
+
+  --shadow-glow: 20px 100px 10px 5px rgba(238, 238, 238, 1);
 }
 
 :root[data-theme="dark"] {
@@ -266,22 +267,24 @@
   --color-surface-2: #121a2a;
 
   --color-glass: rgba(15, 22, 36, 0.78);
-  --color-image-overlay: rgba(0, 0, 0, 0.45);
   --color-dim: rgba(0, 0, 0, 0.30);
+
+  --color-error: #ff5050;
+
+  --shadow-glow: 20px 100px 10px 5px rgba(238, 238, 243, 0.5);
 }
 
 html {
   scroll-behavior: smooth;
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-
-body,
-pre {
   font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
+}
+
+pre {
+  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
 }
 
 /* Radix UI 드롭다운/팝오버 transition 비활성화 */

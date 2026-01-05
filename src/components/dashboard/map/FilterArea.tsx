@@ -21,7 +21,7 @@ export default function FilterArea({
   onClose: () => void;
 }) {
   return (
-    <div className="w-full rounded-xl border border-outline bg-white shadow-lg p-4 space-y-4 max-h-[60vh] overflow-auto lg:absolute lg:right-0 lg:mt-2 lg:w-64 lg:max-h-none z-10050">
+    <div className="w-full rounded-xl border border-outline bg-bg shadow-lg p-4 space-y-4 max-h-[60vh] overflow-auto lg:absolute lg:right-0 lg:mt-2 lg:w-64 lg:max-h-none z-10050">
       {/* 반경 선택 */}
       <div className="space-y-2">
         <p className="text-sm text-text-2">반경 선택</p>

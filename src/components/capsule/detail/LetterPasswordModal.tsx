@@ -29,7 +29,7 @@ export default function LetterUnlockModal({
   };
 
   return (
-    <section className="w-full max-w-120 rounded-3xl border border-outline bg-white shadow-xl p-10">
+    <section className="w-full max-w-120 rounded-3xl border border-outline bg-bg shadow-xl p-10">
       <div className="flex flex-col items-center gap-6">
         <div className="flex items-center gap-2 text-primary">
           <Logo className="w-9" />

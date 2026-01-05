@@ -172,7 +172,7 @@ export default function PhoneEditModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-bg p-6">
         <div className="flex items-center justify-between">
           <h4 className="text-lg">전화번호 수정</h4>
           <button onClick={onClose} className="cursor-pointer" type="button">
@@ -230,7 +230,7 @@ export default function PhoneEditModal({
 
               <div className="flex gap-2">
                 <Button
-                  className="flex-1 py-3 border border-outline bg-white text-text hover:text-white"
+                  className="flex-1 py-3 border border-outline bg-bg text-text hover:text-white"
                   type="button"
                   onClick={onBackToInput}
                   disabled={isSending || isConfirming || isSaving}
@@ -252,7 +252,7 @@ export default function PhoneEditModal({
               </div>
 
               <Button
-                className="w-full py-3 border border-outline bg-white text-text hover:text-white"
+                className="w-full py-3 border border-outline bg-bg text-text hover:text-white"
                 type="button"
                 onClick={onSend}
                 disabled={!canSend}

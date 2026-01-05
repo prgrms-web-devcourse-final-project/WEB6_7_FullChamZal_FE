@@ -14,7 +14,7 @@ export default function FindPwIntroSection({
         value={inputUserId}
         onChange={(e) => setInputUserId(e.target.value)}
         placeholder="아이디를 입력하세요"
-        className="w-full p-4 bg-white border border-outline rounded-xl outline-none focus:border-primary-2"
+        className="w-full p-4 bg-bg border border-outline rounded-xl outline-none focus:border-primary-2"
       />
       <p className="text-xs text-text-3">
         입력한 아이디와, 인증된 전화번호로 조회된 아이디가 일치할 때만 비밀번호

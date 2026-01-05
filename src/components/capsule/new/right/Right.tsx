@@ -90,7 +90,7 @@ export default function Right({ preview }: { preview: PreviewState }) {
         </div>
 
         {/* 아래 */}
-        <div className="shrink-0 w-full text-xs text-text-4 p-4 border border-outline rounded-xl bg-white/60 space-y-1">
+        <div className="shrink-0 w-full text-xs text-text-4 p-4 border border-outline rounded-xl bg-bg/60 space-y-1">
           <p>편지 정보</p>
           <ul className="space-y-1">
             <li>• 테마: {themeLabel}</li>

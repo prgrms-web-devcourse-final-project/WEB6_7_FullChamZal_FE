@@ -32,7 +32,7 @@ export default function SecondSection() {
                 className="object-cover"
                 sizes="(max-width: 640px) 70vw, (max-width: 768px) 60vw, 632px"
               />
-              <div className="absolute inset-0 bg-white/30" />
+              <div className="absolute inset-0 bg-white/20" />
             </div>
           </div>
         </div>
