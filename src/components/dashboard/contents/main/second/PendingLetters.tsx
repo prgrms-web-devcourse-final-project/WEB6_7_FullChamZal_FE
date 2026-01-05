@@ -36,6 +36,41 @@ function formatDistance(km: number) {
   return `${km.toFixed(1)}km`;
 }
 
+/* UTC 파싱(판정용) */
+function normalizeToUtcIso(s: string) {
+  if (/[zZ]$|[+\-]\d{2}:\d{2}$/.test(s)) return s;
+  const fixed = s.replace(" ", "T");
+  return fixed + "Z";
+}
+
+function getUtcMs(isoString?: string | null) {
+  if (!isoString) return null;
+  const utcIso = normalizeToUtcIso(String(isoString));
+  const ms = new Date(utcIso).getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
+
+/** 남은 시간 포맷 */
+function formatRemaining(ms: number) {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const days = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const minutes = Math.floor((totalSec % 3600) / 60);
+
+  if (days > 0) return `${days}일 ${hours}시간`;
+  if (hours > 0) return `${hours}시간 ${minutes}분`;
+  return `${minutes}분`;
+}
+
+function getRemainingText(unlockAt?: string | null) {
+  const target = getUtcMs(unlockAt);
+  if (target == null) return null;
+
+  const diff = target - Date.now();
+  if (diff <= 0) return "지금 열 수 있어요";
+  return `남은 시간 ${formatRemaining(diff)}`;
+}
+
 // 해제 조건 텍스트
 function getUnlockConditionText(l: CapsuleDashboardItem) {
   const type = l.unlockType as UnlockType;
@@ -55,11 +90,19 @@ function getUnlockConditionText(l: CapsuleDashboardItem) {
 }
 
 // 오른쪽 상단 아이콘
-function getRightIcon(type: string): LucideIcon {
+function getRightIcons(type: string): LucideIcon[] {
   const t = type as UnlockType;
-  if (t === "LOCATION") return MapPin;
-  if (t === "TIME_AND_LOCATION") return Sparkles;
-  return Clock;
+
+  switch (t) {
+    case "TIME":
+      return [Clock];
+    case "LOCATION":
+      return [MapPin];
+    case "TIME_AND_LOCATION":
+      return [Clock, MapPin];
+    default:
+      return [];
+  }
 }
 
 export default function PendingLetters() {
@@ -137,39 +180,38 @@ export default function PendingLetters() {
           </div>
         ) : (
           unViewLetters.slice(0, 4).map((l) => {
-            const RightIcon = getRightIcon(l.unlockType ?? "");
+            const RightIcons = getRightIcons(l.unlockType ?? "");
             const conditionText = getUnlockConditionText(l);
 
-            let subText = "-";
-            let SubIcon: LucideIcon = Clock;
+            const isTime =
+              l.unlockType === "TIME" || l.unlockType === "TIME_AND_LOCATION";
+            const isLocation =
+              l.unlockType === "LOCATION" ||
+              l.unlockType === "TIME_AND_LOCATION";
 
-            // unlockType별 기본값
-            if (l.unlockType === "LOCATION") {
-              SubIcon = MapPin;
-              subText = "거리 정보 없음";
-            } else if (
-              (l.unlockType === "TIME" ||
-                l.unlockType === "TIME_AND_LOCATION") &&
-              l.unlockAt
-            ) {
-              SubIcon = Clock;
-              subText = formatDateTime(l.unlockAt);
-            }
+            // 남은시간 (TIME, TIME_AND_LOCATION)
+            const remainingText = isTime
+              ? getRemainingText(l.unlockAt ?? null)
+              : null;
 
-            // LOCATION + 위치정보 있으면 거리로 업데이트
-            if (
-              l.unlockType === "LOCATION" &&
-              myLocation &&
-              l.locationLat != null &&
-              l.locationLng != null
-            ) {
-              const km = calcDistanceKm(
-                myLocation.lat,
-                myLocation.lng,
-                l.locationLat,
-                l.locationLng
-              );
-              subText = formatDistance(km);
+            // 거리 (LOCATION, TIME_AND_LOCATION)
+            let distanceText: string | null = null;
+            if (isLocation) {
+              if (
+                myLocation &&
+                l.locationLat != null &&
+                l.locationLng != null
+              ) {
+                const km = calcDistanceKm(
+                  myLocation.lat,
+                  myLocation.lng,
+                  l.locationLat,
+                  l.locationLng
+                );
+                distanceText = `남은 거리 ${formatDistance(km)}`;
+              } else {
+                distanceText = "거리 정보 없음";
+              }
             }
 
             return (
@@ -178,12 +220,17 @@ export default function PendingLetters() {
                 className="cursor-auto snap-start min-w-[85%] sm:min-w-[70%] lg:min-w-0"
               >
                 <div className="space-y-3">
-                  <div className="flex justify-between">
+                  <div className="flex items-start justify-between">
                     <div className="flex flex-col gap-1">
                       <span className="text-text-3 text-xs">보낸 사람</span>
                       <span>{l.sender}</span>
                     </div>
-                    <RightIcon size={18} />
+
+                    <div className="flex gap-1.5">
+                      {RightIcons.map((Icon, idx) => (
+                        <Icon key={idx} size={18} />
+                      ))}
+                    </div>
                   </div>
 
                   <div className="flex flex-col gap-1">
@@ -191,9 +238,29 @@ export default function PendingLetters() {
                     <span className="line-clamp-2">{conditionText}</span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-text-3">
-                    <SubIcon size={16} />
-                    <span className="text-sm">{subText}</span>
+                  {/* TIME_AND_LOCATION이면 남은시간 + 거리 둘 다 표시 */}
+                  <div className="flex gap-2 text-text-3">
+                    {remainingText ? (
+                      <div className="flex items-center gap-1">
+                        <Clock size={16} />
+                        <span className="text-sm">{remainingText}</span>
+                      </div>
+                    ) : null}
+
+                    {distanceText ? (
+                      <div className="flex items-center gap-1">
+                        <MapPin size={16} />
+                        <span className="text-sm">{distanceText}</span>
+                      </div>
+                    ) : null}
+
+                    {/* TIME인데 unlockAt이 없거나 파싱 실패하면 최소 표시 */}
+                    {!remainingText && isTime ? (
+                      <div className="flex items-center gap-1">
+                        <Clock size={16} />
+                        <span className="text-sm">시간 정보 없음</span>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </DivBox>

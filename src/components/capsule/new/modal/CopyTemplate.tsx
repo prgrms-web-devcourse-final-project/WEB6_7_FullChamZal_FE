@@ -68,7 +68,7 @@ ${data?.password ? `비밀번호: ${data.password}` : ""}
           </p>
         </div>
         <div className="border border-outline p-6 bg-sub rounded-xl">
-          <pre className="text-text-4 text-sm md:text-base whitespace-pre-wrap break-keep">
+          <pre className="text-text text-sm md:text-base whitespace-pre-wrap break-keep">
             {shareText}
           </pre>
         </div>

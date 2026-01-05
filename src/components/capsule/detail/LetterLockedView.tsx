@@ -238,7 +238,7 @@ export default function LetterLockedView({
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-120 px-4 shadow-2xl p-10 rounded-3xl">
+      <div className="w-full max-w-120 px-4 shadow-2xl p-10 rounded-3xl border border-outline">
         <div className="flex flex-col items-center justify-center gap-5">
           <div className="p-5 rounded-full bg-sub">
             <Lock size={40} />
@@ -247,14 +247,6 @@ export default function LetterLockedView({
           <div className="text-center space-y-2">
             <p className="text-xl font-semibold">{msg.title}</p>
             <p className="text-text-2 whitespace-pre-line">{msg.desc}</p>
-
-            {msg.status.length > 0 ? (
-              <ul className="mt-2 space-y-1 text-xs text-text-2">
-                {msg.status.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-            ) : null}
 
             {locationErrorMessage ? (
               <p className="mt-2 text-xs text-error">{locationErrorMessage}</p>
@@ -275,12 +267,10 @@ export default function LetterLockedView({
                 <p className="text-sm">
                   오픈 날짜:{" "}
                   {Number.isFinite(unlockTime)
-                    ? formatKstDate(unlockTime)
+                    ? formatKstDateTime(unlockTime)
                     : "-"}
                 </p>
               </div>
-
-              <p className="text-lg font-semibold">{dDay}</p>
 
               <div className="flex items-center gap-2">
                 {t.days > 0 && <TimeBox label="days" value={t.days} />}
@@ -288,48 +278,49 @@ export default function LetterLockedView({
                 <TimeBox label="min" value={pad2(t.minutes)} />
                 <TimeBox label="sec" value={pad2(t.seconds)} />
               </div>
-
-              <p className="text-xs text-text-2">
-                오픈 시각:{" "}
-                {Number.isFinite(unlockTime)
-                  ? formatKstDateTime(unlockTime)
-                  : "-"}
-              </p>
             </div>
           ) : null}
 
           {/* ---------- LOCATION UI ---------- */}
           {showLocation ? (
-            <div className="w-full flex flex-col items-center gap-2 mt-2">
+            <div className="w-full flex flex-col items-center gap-4">
               <div className="flex items-center gap-2 text-text-2">
                 <MapPin size={16} />
                 <p className="text-sm">지정된 장소에 도착해야 열 수 있어요</p>
               </div>
 
-              <div className="text-xs text-text-3 flex flex-col items-center gap-1">
-                <p>장소 이름: {locationName}</p>
-                <p>기준 반경: {Math.round(viewingRadius)} m</p>
-              </div>
-
-              {distance == null ? (
-                <p className="text-xs text-text-3">
-                  현재 위치를 확인할 수 없어서 거리를 계산하지 못했어요.
-                </p>
-              ) : (
-                <div className="flex flex-col items-center gap-1">
-                  <p className="text-sm font-medium">
-                    남은 거리:{" "}
-                    {distance >= 1000
-                      ? `${(distance / 1000).toFixed(2)} km`
-                      : `${Math.round(distance)} m`}
-                  </p>
-                  <p className="text-xs text-text-3">
-                    위치 조건: {isLocationUnlocked ? "충족" : "미충족"}
-                  </p>
+              <div className="border border-outline px-6 py-4 rounded-2xl bg-sub text-center space-y-3">
+                <div className="text-xs text-text-3 flex flex-col items-center gap-1">
+                  <p>장소 이름: {locationName}</p>
                 </div>
-              )}
+
+                {distance == null ? (
+                  <p className="text-xs text-text-3">
+                    현재 위치를 확인할 수 없어서 거리를 계산하지 못했어요.
+                  </p>
+                ) : (
+                  <div className="flex flex-col items-center gap-1">
+                    <p className="text-sm font-medium">
+                      남은 거리:{" "}
+                      {distance >= 1000
+                        ? `${(distance / 1000).toFixed(2)} km`
+                        : `${Math.round(distance)} m`}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           ) : null}
+
+          <div className="text-center">
+            {msg.status.length > 0 ? (
+              <ul className="space-y-1 text-xs text-text-2">
+                {msg.status.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
 
           {isPublic ? (
             <div className="flex gap-3 mt-4">
