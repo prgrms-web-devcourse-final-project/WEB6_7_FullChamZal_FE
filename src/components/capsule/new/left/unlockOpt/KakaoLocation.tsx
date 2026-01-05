@@ -369,7 +369,7 @@ const KakaoLocation = forwardRef<KakaoLocationHandle, KakaoLocationProps>(
         {isSearching ? (
           <div className="text-xs text-text-4">검색 중...</div>
         ) : null}
-        {error ? <div className="text-xs text-red-500">{error}</div> : null}
+        {error ? <div className="text-xs text-error">{error}</div> : null}
 
         {results.length ? (
           <div className="max-h-44 overflow-auto rounded-lg border border-outline bg-bg">

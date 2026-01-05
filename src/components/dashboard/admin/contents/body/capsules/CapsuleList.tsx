@@ -277,7 +277,7 @@ export default function CapsuleList({
             ) : (
               <button
                 onClick={() => openDeleteModal(c.id, c.deleted)}
-                className="cursor-pointer inline-flex items-center gap-1 rounded-lg bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                className="cursor-pointer inline-flex items-center gap-1 rounded-lg bg-error px-3 py-1 text-white hover:bg-red-600"
               >
                 <Trash2 size={14} />
                 삭제

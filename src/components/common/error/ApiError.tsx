@@ -17,7 +17,7 @@ export default function ApiError({
       <div className="w-full max-w-md rounded-2xl border border-outline bg-bg p-8 text-center shadow-sm">
         {/* 아이콘 */}
         <div className="mx-auto mb-4 inline-flex p-3 items-center justify-center rounded-full bg-red-50">
-          <AlertTriangle className="h-6 w-6 text-red-500" />
+          <AlertTriangle className="h-6 w-6 text-error" />
         </div>
 
         {/* 타이틀 */}

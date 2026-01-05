@@ -38,7 +38,7 @@ export function Field({
         <div className="flex gap-2">
           <p
             className={`flex-1 w-full py-3 px-4 border border-outline rounded-xl ${
-              disabled ? "bg-gray-100 text-text-3" : ""
+              disabled ? "bg-sub text-text-3" : ""
             }`}
           >
             {value}

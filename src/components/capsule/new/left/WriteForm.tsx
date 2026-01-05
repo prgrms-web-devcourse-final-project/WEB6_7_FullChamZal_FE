@@ -831,7 +831,7 @@ export default function WriteForm({
             <div
               className={`text-right text-xs ${
                 content.length > MAX_CONTENT_LENGTH * 0.9
-                  ? "text-red-500"
+                  ? "text-error"
                   : "text-text-3"
               }`}
             >
@@ -972,7 +972,7 @@ export default function WriteForm({
               value={unlockType}
               onChange={setUnlockType}
             />
-            <div className="w-full p-4 border border-outline bg-[#F9F9FA] rounded-xl space-y-3">
+            <div className="w-full p-4 border border-outline bg-sub rounded-xl space-y-3">
               {unlockType === "TIME" && (
                 <DayTime
                   visibility={visibility}

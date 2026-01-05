@@ -240,13 +240,15 @@
   --toast-bg: #ffffff;
   --toast-text: #070d19;
   --toast-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
-
-  --toast-border: 2px solid #e5e7eb;
   /* 기본 */
-  --toast-border-success: 2px solid #57b970;
+  --toast-border: 2px solid #e5e7eb;
   /* 성공 */
-  --toast-border-error: 2px solid #ff2600;
+  --toast-border-success: 2px solid #57b970;
   /* 에러 */
+  --toast-border-error: 2px solid #ff2600;
+
+  /* 활동 통계 */
+  --color-activeBg: #ffded8
 }
 
 :root[data-theme="dark"] {
@@ -294,11 +296,12 @@
   --toast-border: 1px solid rgba(255, 255, 255, 0.10);
   --toast-border-success: 1px solid rgba(87, 185, 112, 0.75);
   --toast-border-error: 1px solid rgba(255, 38, 0, 0.75);
+
+  /* 활동 통계 */
+  --color-activeBg: #ff583b
 }
 
-html,
 body {
-  scroll-behavior: smooth;
   font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
   background: var(--color-bg);

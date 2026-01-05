@@ -257,13 +257,11 @@ export default function LetterLockedView({
             ) : null}
 
             {locationErrorMessage ? (
-              <p className="mt-2 text-xs text-red-500">
-                {locationErrorMessage}
-              </p>
+              <p className="mt-2 text-xs text-error">{locationErrorMessage}</p>
             ) : null}
 
             {!Number.isFinite(unlockTime) ? (
-              <p className="mt-2 text-xs text-red-500">
+              <p className="mt-2 text-xs text-error">
                 unlockAt 값이 올바르지 않습니다.
               </p>
             ) : null}

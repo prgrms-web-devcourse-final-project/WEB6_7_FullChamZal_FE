@@ -247,7 +247,7 @@ export default function TrackOverview() {
                   수정
                 </button>
                 <button
-                  className="cursor-pointer justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60"
+                  className="cursor-pointer justify-center bg-error hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60"
                   disabled={isPending || !storytrackId}
                   onClick={() => setIsDeleteOpen(true)}
                 >

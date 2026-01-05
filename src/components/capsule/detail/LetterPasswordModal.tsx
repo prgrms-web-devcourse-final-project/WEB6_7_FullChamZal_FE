@@ -47,7 +47,7 @@ export default function LetterUnlockModal({
             className="w-full rounded-lg border border-outline px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
 
-          {error ? <p className="text-sm text-red-500">{error}</p> : null}
+          {error ? <p className="text-sm text-error">{error}</p> : null}
 
           <Button
             type="submit"

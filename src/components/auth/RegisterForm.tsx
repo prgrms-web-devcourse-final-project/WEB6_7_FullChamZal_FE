@@ -388,7 +388,7 @@ export default function RegisterForm({
           )}
 
           {submitError ? (
-            <p className="text-red-500 text-sm">{submitError}</p>
+            <p className="text-error text-sm">{submitError}</p>
           ) : null}
           {isPhoneVerified ? (
             <p className="text-green-600 text-sm">인증 완료</p>

@@ -997,7 +997,7 @@ export default function LetterDetailModal({
                       <Heart
                         size={16}
                         className={
-                          isLiked ? "text-primary fill-red-500" : "text-primary"
+                          isLiked ? "text-primary fill-error" : "text-primary"
                         }
                       />
                       <span>

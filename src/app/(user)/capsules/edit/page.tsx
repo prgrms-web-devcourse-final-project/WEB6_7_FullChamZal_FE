@@ -218,7 +218,7 @@ export default function CapsuleEditPage() {
                   <div
                     className={`text-right text-xs ${
                       effectiveCharCount > MAX_CONTENT_LENGTH * 0.9
-                        ? "text-red-500"
+                        ? "text-error"
                         : "text-text-3"
                     }`}
                   >

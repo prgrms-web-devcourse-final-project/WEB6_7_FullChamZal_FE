@@ -6,11 +6,10 @@ import Background from "./Background";
 import { useEffect, useState } from "react";
 import Button from "@/components/common/tag/Button";
 import { useRouter } from "next/navigation";
-import { useMe } from "@/lib/hooks/useMe";
+import { authApiClient } from "@/lib/api/auth/auth.client";
 
 export default function MainSection() {
   const router = useRouter();
-  const me = useMe();
 
   const words: string[] = ["You", "Time", "There", "Now", "___"];
 
@@ -62,69 +61,76 @@ export default function MainSection() {
   const currentWord = words[wordIndex];
   const visibleText = currentWord.slice(0, charIndex);
 
-  const handleWrite = () => {
-    if (me.isLoading) return;
+  const handleWrite = async () => {
+    try {
+      const loggedIn = await authApiClient.isLoggedIn();
 
-    if (me.isError) {
+      if (!loggedIn) {
+        router.push(
+          `/auth/login?callback=${encodeURIComponent("/capsules/new")}`
+        );
+        return;
+      }
+
+      router.push("/capsules/new");
+    } catch {
       router.push(
         `/auth/login?callback=${encodeURIComponent("/capsules/new")}`
       );
-      return;
     }
-
-    router.push("/capsules/new");
   };
 
   return (
-    <>
-      <section
-        id="main"
-        className="relative w-full min-h-screen overflow-hidden mb-20 md:mb-60"
-      >
-        <Background />
-        <div className="relative w-full h-screen z-10 flex items-center justify-center">
-          <div className="max-w-430 min-h-100 flex flex-col items-center justify-center">
-            <h2 className="font-paperlogy font-extrabold text-5xl md:text-[112px] md:leading-33 bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
-              Dear.&nbsp;
-              <span>{visibleText}</span>
-              <span className="typing-cursor font-normal">|</span>
-            </h2>
-            <div className="font-paperlogy text-center space-y-4 mt-3 md:mt-7">
-              <p className="font-semibold text-xl md:text-2xl">
-                당신이 도착했을 때 비로소 열리는 편지
-              </p>
-              <p className="text-sm">
-                특정한 시간 또는 장소에 도달하면 펼쳐지는 디지털 편지. <br />
-                기다림이 만든 감동을, 가장 적절한 순간에 전하세요.
-              </p>
-            </div>
-            <div className="text-sm md:text-base font-medium flex gap-4 mt-8 md:mt-20">
-              <Button
-                onClick={handleWrite}
-                className="bg-[#ff2600] py-4 px-5 font-normal space-x-1"
-              >
-                <span>편지 쓰기</span> <ArrowRight size={20} />
-              </Button>
-              <button
-                onClick={() => {
-                  document.getElementById("why")?.scrollIntoView();
-                }}
-                className="cursor-pointer rounded-lg md:rounded-xl border-2 border-[#e7e5e4] px-5 bg-white hover:bg-[#f9f9f9] font-normal"
-              >
-                자세히 보기
-              </button>
-            </div>
+    <section
+      id="main"
+      className="relative w-full min-h-screen overflow-hidden mb-20 md:mb-60"
+    >
+      <Background />
+
+      <div className="relative w-full h-screen z-10 flex items-center justify-center">
+        <div className="max-w-430 min-h-100 flex flex-col items-center justify-center">
+          <h2 className="font-paperlogy font-extrabold text-5xl md:text-[112px] md:leading-33 bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
+            Dear.&nbsp;
+            <span>{visibleText}</span>
+            <span className="typing-cursor font-normal">|</span>
+          </h2>
+
+          <div className="font-paperlogy text-center space-y-4 mt-3 md:mt-7">
+            <p className="font-semibold text-xl md:text-2xl">
+              당신이 도착했을 때 비로소 열리는 편지
+            </p>
+            <p className="text-sm">
+              특정한 시간 또는 장소에 도달하면 펼쳐지는 디지털 편지. <br />
+              기다림이 만든 감동을, 가장 적절한 순간에 전하세요.
+            </p>
+          </div>
+
+          <div className="text-sm md:text-base font-medium flex gap-4 mt-8 md:mt-20">
+            <Button
+              onClick={handleWrite}
+              className="bg-[#ff2600] py-4 px-5 font-normal space-x-1"
+            >
+              <span>편지 쓰기</span> <ArrowRight size={20} />
+            </Button>
+
+            <button
+              onClick={() => document.getElementById("why")?.scrollIntoView()}
+              className="cursor-pointer rounded-lg md:rounded-xl border-2 border-[#e7e5e4] px-5 bg-white hover:bg-[#f9f9f9] font-normal"
+            >
+              자세히 보기
+            </button>
           </div>
         </div>
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-8">
-          <div className="flex flex-col gap-2 w-10 items-center justify-center">
-            <span>Scroll</span>
-            <div className="relative w-6 h-10 rounded-full border-2 border-primary/50">
-              <span className="w-1 h-1.5 absolute left-1/2 -translate-x-1/2 top-2 bg-primary rounded-full bounce-y"></span>
-            </div>
+      </div>
+
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-8">
+        <div className="flex flex-col gap-2 w-10 items-center justify-center">
+          <span>Scroll</span>
+          <div className="relative w-6 h-10 rounded-full border-2 border-primary/50">
+            <span className="w-1 h-1.5 absolute left-1/2 -translate-x-1/2 top-2 bg-primary rounded-full bounce-y" />
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
