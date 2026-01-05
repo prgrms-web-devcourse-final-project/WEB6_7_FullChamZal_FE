@@ -6,7 +6,7 @@ import { Map, Plus, X } from "lucide-react";
 import PublicLetterPicker from "../../common/PublicLetterPicker";
 import SelectedRouteList from "./SelectedRouteList";
 import RouteMap from "./RouteMap";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 
 type Props = {
   order: TrackType;
@@ -20,7 +20,6 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
   const routeItems = value.routeItems;
 
-  // ✅ Set은 props로 넘기지 말고 list로 넘겨서 안전하게 처리
   const selectedIdList = useMemo(
     () => routeItems.map((x) => x.id),
     [routeItems]
@@ -61,7 +60,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => setOpenMap(true)}
-                className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-white px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
+                className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-bg px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
               >
                 <Map size={16} />
                 지도
@@ -71,7 +70,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
             <button
               type="button"
               onClick={() => setOpenPicker(true)}
-              className="cursor-pointer w-full rounded-xl border border-outline bg-white hover:bg-button-hover
+              className="cursor-pointer w-full rounded-xl border border-outline bg-bg hover:bg-button-hover
                          py-3 md:py-4 text-xs md:text-sm lg:text-base flex items-center justify-center gap-2
                          shadow-sm active:scale-[0.99] transition"
             >
@@ -95,8 +94,8 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
         {/* 공개 편지 선택 모달 */}
         <Modal open={openPicker} onClose={() => setOpenPicker(false)}>
-          <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl border border-outline overflow-hidden">
-            <div className="px-5 py-4 border-b border-outline bg-white">
+          <div className="w-full max-w-lg rounded-2xl bg-bg shadow-xl border border-outline overflow-hidden">
+            <div className="px-5 py-4 border-b border-outline bg-bg">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-base font-semibold text-text">
@@ -119,7 +118,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
             <div className="max-h-[70dvh] overflow-y-auto">
               <PublicLetterPicker
-                selectedIds={selectedIdList} // ✅ list로 전달
+                selectedIds={selectedIdList}
                 onSelect={(letter: Letter) => {
                   addLetter(letter);
                   setOpenPicker(false);
@@ -142,7 +141,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
             onClick={() => setOpenMap(false)}
           >
             <div
-              className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl border-t border-outline h-[85dvh] flex flex-col overflow-hidden"
+              className="absolute left-0 right-0 bottom-0 bg-bg rounded-t-2xl border-t border-outline h-[85dvh] flex flex-col overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-outline">

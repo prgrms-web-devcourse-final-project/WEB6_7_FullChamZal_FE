@@ -99,7 +99,7 @@ export default function YearlyLetterOverview() {
 
         <div className="flex items-center gap-4">
           {/* 연도 이전/다음 */}
-          <div className="flex items-center gap-1 rounded-full border border-outline bg-white p-1">
+          <div className="flex items-center gap-1 rounded-full border border-outline bg-bg p-1">
             <button
               type="button"
               disabled={!canGoPrev}
@@ -155,7 +155,7 @@ export default function YearlyLetterOverview() {
           <p className="text-sm">보낸 편지</p>
           <p className="text-2xl">{sendCount}</p>
         </div>
-        <div className="w-full px-4 py-3 bg-primary-5 rounded-[10px] space-y-2">
+        <div className="w-full px-4 py-3 bg-activeBg rounded-[10px] space-y-2">
           <p className="text-sm">받은 편지</p>
           <p className="text-2xl">{receiveCount}</p>
         </div>

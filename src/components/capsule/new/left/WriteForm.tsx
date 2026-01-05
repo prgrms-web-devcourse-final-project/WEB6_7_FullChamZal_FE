@@ -28,9 +28,9 @@ import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import { useRouter, useSearchParams } from "next/navigation";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import CopyTemplate from "../modal/CopyTemplate";
-import ActiveModal from "../../../common/ActiveModal";
+import ActiveModal from "../../../common/modal/ActiveModal";
 import { useMe } from "@/lib/hooks/useMe";
 import {
   buildPrivatePayload,
@@ -824,14 +824,14 @@ export default function WriteForm({
               onCompositionStart={() => (isComposingRef.current = true)}
               onCompositionEnd={handleCompositionEnd}
               maxLength={MAX_CONTENT_LENGTH}
-              className="placeholder:text-sm md:placeholder:text-base w-full h-40 md:h-60 bg-sub-2 p-3 rounded-lg resize-none outline-none border border-white focus:border focus:border-primary-2"
+              className="placeholder:text-sm md:placeholder:text-base w-full h-40 md:h-60 bg-sub-2 p-3 rounded-lg resize-none outline-none border border-outline focus:border focus:border-primary-2"
               placeholder="마음을 담아 편지를 써보세요..."
             />
 
             <div
               className={`text-right text-xs ${
                 content.length > MAX_CONTENT_LENGTH * 0.9
-                  ? "text-red-500"
+                  ? "text-error"
                   : "text-text-3"
               }`}
             >
@@ -858,7 +858,7 @@ export default function WriteForm({
               />
               <label
                 htmlFor="image-upload"
-                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-white text-sm font-medium transition-colors ${
+                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-bg text-sm font-medium transition-colors ${
                   isUploading
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-sub-2 hover:border-primary-2"
@@ -972,7 +972,7 @@ export default function WriteForm({
               value={unlockType}
               onChange={setUnlockType}
             />
-            <div className="w-full p-4 border border-outline bg-[#F9F9FA] rounded-xl space-y-3">
+            <div className="w-full p-4 border border-outline bg-sub rounded-xl space-y-3">
               {unlockType === "TIME" && (
                 <DayTime
                   visibility={visibility}

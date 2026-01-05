@@ -44,7 +44,7 @@ export default function WritePage() {
       </div>
 
       {/* 모바일: 고정 미리보기 버튼 */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/80 backdrop-blur border-t border-outline">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4 bg-bg/80 backdrop-blur border-t border-outline">
         <button
           type="button"
           onClick={() => setIsPreviewOpen(true)}
@@ -62,7 +62,7 @@ export default function WritePage() {
           onMouseDown={() => setIsPreviewOpen(false)}
         >
           <div
-            className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl border-t border-outline
+            className="absolute left-0 right-0 bottom-0 bg-bg rounded-t-2xl border-t border-outline
                        h-[85dvh] flex flex-col overflow-hidden"
             onMouseDown={(e) => e.stopPropagation()}
           >

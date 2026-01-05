@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MapPin, RefreshCw, ChevronUp, ChevronDown } from "lucide-react";
 import PublicLetterPicker from "../common/PublicLetterPicker";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { X } from "lucide-react";
 
 type Props = {
@@ -64,7 +64,7 @@ export default function RouteEditList({
               return (
                 <li
                   key={`${item.id}-${stepOrder}`}
-                  className="border border-outline rounded-xl p-4 bg-white hover:bg-sub-2 transition-colors"
+                  className="border border-outline rounded-xl p-4 bg-bg hover:bg-sub-2 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     {/* 위/아래 이동 버튼 */}
@@ -73,7 +73,7 @@ export default function RouteEditList({
                         type="button"
                         onClick={() => handleMoveUp(index)}
                         disabled={index === 0}
-                        className="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-lg border border-outline bg-white hover:bg-button-hover text-text-3 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-lg border border-outline bg-bg hover:bg-button-hover text-text-3 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         aria-label="위로 이동"
                       >
                         <ChevronUp size={14} />
@@ -83,7 +83,7 @@ export default function RouteEditList({
                         type="button"
                         onClick={() => handleMoveDown(index)}
                         disabled={index === items.length - 1}
-                        className="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-lg border border-outline bg-white hover:bg-button-hover text-text-3 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-lg border border-outline bg-bg hover:bg-button-hover text-text-3 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         aria-label="아래로 이동"
                       >
                         <ChevronDown size={14} />
@@ -114,7 +114,7 @@ export default function RouteEditList({
                     <button
                       type="button"
                       onClick={() => setOpenPicker(stepOrder)}
-                      className="shrink-0 cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline bg-white hover:bg-button-hover text-sm text-text-3 transition-colors"
+                      className="shrink-0 cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline bg-bg hover:bg-button-hover text-sm text-text-3 transition-colors"
                     >
                       <RefreshCw size={14} />
                       교체
@@ -129,8 +129,8 @@ export default function RouteEditList({
 
       {/* 공개 편지 선택 모달 (교체용) */}
       <Modal open={openPicker !== null} onClose={() => setOpenPicker(null)}>
-        <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl border border-outline overflow-hidden">
-          <div className="px-5 py-4 border-b border-outline bg-white">
+        <div className="w-full max-w-lg rounded-2xl bg-bg shadow-xl border border-outline overflow-hidden">
+          <div className="px-5 py-4 border-b border-outline bg-bg">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-base font-semibold text-text">

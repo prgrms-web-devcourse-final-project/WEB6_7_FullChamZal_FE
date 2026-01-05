@@ -1,6 +1,6 @@
 "use client";
 
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { X } from "lucide-react";
 import AccountRecoveryContent from "./AccountRecoveryContent";
 
@@ -19,7 +19,7 @@ export default function AccountRecoveryModal({
 }) {
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-xl rounded-2xl border-2 border-outline bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
+      <div className="w-full max-w-xl rounded-2xl border-2 border-outline bg-bg shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
         <div className="py-4 px-6 flex justify-between items-center border-b border-outline">
           <h4 className="text-lg">
             {initialMode === "FIND_ID" ? "아이디 찾기" : "비밀번호 재설정"}

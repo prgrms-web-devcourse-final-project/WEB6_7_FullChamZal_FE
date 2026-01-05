@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import OverlayModal from "../OverlayModal";
 
 export default function FindIdResultModal({
@@ -20,7 +20,7 @@ export default function FindIdResultModal({
 
   return (
     <OverlayModal open={open} onClose={onClose}>
-      <div className="relative w-[92%] max-w-md rounded-2xl border border-outline bg-white p-6 shadow-2xl">
+      <div className="relative w-[92%] max-w-md rounded-2xl border border-outline bg-bg p-6 shadow-2xl">
         <div className="space-y-2">
           <p className="text-lg font-semibold">아이디 조회 완료</p>
           <p className="text-sm text-text-3">
@@ -35,7 +35,7 @@ export default function FindIdResultModal({
 
         <div className="mt-6 flex gap-2">
           <Button
-            className="w-full py-3 border border-outline bg-white text-text md:font-normal hover:bg-button-hover"
+            className="w-full py-3 border border-outline bg-bg text-text md:font-normal hover:bg-button-hover"
             onClick={onClose}
           >
             닫기

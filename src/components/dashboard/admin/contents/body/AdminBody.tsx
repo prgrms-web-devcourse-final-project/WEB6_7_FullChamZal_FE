@@ -70,7 +70,7 @@ export default function AdminBody({
     <div className="space-y-4 md:space-y-6 lg:space-y-8">
       {/* 검색 */}
       <div className="w-full">
-        <div className="flex items-center gap-3 w-full bg-white/80 border border-outline rounded-xl focus-within:border-primary-2 px-4 py-3 lg:py-4">
+        <div className="flex items-center gap-3 w-full bg-bg/80 border border-outline rounded-xl focus-within:border-primary-2 px-4 py-3 lg:py-4">
           <Search size={20} className="text-text-4 shrink-0" />
           <input
             type="text"

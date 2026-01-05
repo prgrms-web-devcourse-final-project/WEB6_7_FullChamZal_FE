@@ -1,13 +1,13 @@
 "use client";
 
-import Button from "../common/Button";
-import Input from "../common/Input";
+import Button from "../common/tag/Button";
+import Input from "../common/tag/Input";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { ApiError } from "@/lib/api/fetchClient";
 import { authApiClient } from "@/lib/api/auth/auth.client";
-import ActiveModal from "../common/ActiveModal";
+import ActiveModal from "../common/modal/ActiveModal";
 
 export default function RegisterForm({
   agreements,
@@ -388,7 +388,7 @@ export default function RegisterForm({
           )}
 
           {submitError ? (
-            <p className="text-red-500 text-sm">{submitError}</p>
+            <p className="text-error text-sm">{submitError}</p>
           ) : null}
           {isPhoneVerified ? (
             <p className="text-green-600 text-sm">인증 완료</p>
@@ -400,7 +400,7 @@ export default function RegisterForm({
             type="button"
             onClick={onBack}
             disabled={isSubmitting}
-            className="w-full py-3 border border-outline bg-white text-text md:font-normal hover:bg-button-hover"
+            className="w-full py-3 border border-outline bg-bg text-text md:font-normal hover:bg-button-hover"
           >
             뒤로 가기
           </Button>

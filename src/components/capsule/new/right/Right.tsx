@@ -56,11 +56,11 @@ export default function Right({ preview }: { preview: PreviewState }) {
             <div className="h-full min-h-0 flex flex-col justify-between gap-3 lg:gap-6">
               {/* 제목 + Dear (수신자) */}
               <div className="text-lg lg:text-2xl space-x-1">
-                <p className="font-normal lg:font-semibold">
+                <p className="text-[#070d19] font-normal lg:font-semibold">
                   {title || "제목을 입력하세요"}
                 </p>
                 <span className="text-primary font-bold">Dear.</span>
-                <span className="text-text-3">
+                <span className="text-[#6f7786]">
                   {receiverName ||
                     (preview.visibility === "PUBLIC"
                       ? "당신"
@@ -70,17 +70,17 @@ export default function Right({ preview }: { preview: PreviewState }) {
 
               {/* 편지 내용 */}
               <div className="flex-1 min-h-0 overflow-y-auto">
-                <pre className="whitespace-pre-wrap wrap-break-word text-base lg:text-lg leading-7">
+                <pre className="text-[#070d19] whitespace-pre-wrap wrap-break-word text-base lg:text-lg leading-7">
                   {content || "편지 내용을 입력하세요"}
                 </pre>
               </div>
 
               {/* From (발신자) */}
               <div className="shrink-0 flex flex-col items-end gap-1">
-                <span className="text-text-3 text-sm">{todayLabel}</span>
+                <span className="text-[#6f7786] text-sm">{todayLabel}</span>
                 <p className="text-right text-lg lg:text-2xl space-x-1">
                   <span className="text-primary font-bold">From.</span>
-                  <span className="text-text-3">
+                  <span className="text-[#6f7786]">
                     {senderName || "작성자 이름"}
                   </span>
                 </p>
@@ -90,7 +90,7 @@ export default function Right({ preview }: { preview: PreviewState }) {
         </div>
 
         {/* 아래 */}
-        <div className="shrink-0 w-full text-xs text-text-4 p-4 border border-outline rounded-xl bg-white/60 space-y-1">
+        <div className="shrink-0 w-full text-xs text-text-4 p-4 border border-outline rounded-xl bg-bg/60 space-y-1">
           <p>편지 정보</p>
           <ul className="space-y-1">
             <li>• 테마: {themeLabel}</li>

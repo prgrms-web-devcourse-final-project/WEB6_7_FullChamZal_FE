@@ -95,7 +95,7 @@ export default function LetterReadingStatus() {
                   <Label
                     value={`총 ${total}통`}
                     position="center"
-                    fill="#111827"
+                    fill="var(--color-text)"
                     className="text-2xl md:text-3xl font-medium"
                   />
                 </Pie>

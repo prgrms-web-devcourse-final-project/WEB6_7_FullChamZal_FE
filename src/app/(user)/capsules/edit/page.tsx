@@ -8,8 +8,8 @@ import EditHeader from "@/components/capsule/edit/EditHeader";
 import Right from "@/components/capsule/new/right/Right";
 import WriteInput from "@/components/capsule/new/left/WriteInput";
 import WriteDiv from "@/components/capsule/new/left/WriteDiv";
-import Button from "@/components/common/Button";
-import ActiveModal from "@/components/common/ActiveModal";
+import Button from "@/components/common/tag/Button";
+import ActiveModal from "@/components/common/modal/ActiveModal";
 import { CAPTURE_ENVELOPE_PALETTE } from "@/constants/capsulePalette";
 import { updateCapsule, readSendCapsule } from "@/lib/api/capsule/capsule";
 import { Send } from "lucide-react";
@@ -218,7 +218,7 @@ export default function CapsuleEditPage() {
                   <div
                     className={`text-right text-xs ${
                       effectiveCharCount > MAX_CONTENT_LENGTH * 0.9
-                        ? "text-red-500"
+                        ? "text-error"
                         : "text-text-3"
                     }`}
                   >

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { useRouter, useParams } from "next/navigation";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/tag/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -117,9 +117,7 @@ export default function EditStoryTrack() {
     if (!storytrackId) return;
 
     if (!hasChanges) {
-      toast.success("변경사항이 없습니다.", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("변경사항이 없습니다.");
       handleCancel();
       return;
     }
@@ -163,9 +161,7 @@ export default function EditStoryTrack() {
       queryClient.invalidateQueries({ queryKey: ["storyTrackDetail"] });
       queryClient.invalidateQueries({ queryKey: ["mineStoryTrack"] });
 
-      toast.success("스토리트랙 경로 수정이 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("스토리트랙 경로 수정이 완료되었습니다!");
 
       // 상세 페이지로 이동
       router.push(`/dashboard/storyTrack/${storytrackIdNum}`);
@@ -233,7 +229,7 @@ export default function EditStoryTrack() {
                       <button
                         type="button"
                         onClick={() => setOpenMap(true)}
-                        className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-white px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
+                        className="cursor-pointer md:hidden flex-none inline-flex items-center gap-1 rounded-full border border-outline bg-bg px-3 py-2 text-sm text-text-3 hover:bg-button-hover"
                       >
                         <Map size={16} />
                         지도
@@ -260,14 +256,14 @@ export default function EditStoryTrack() {
       </div>
 
       {/* Bottom */}
-      <div className="flex-none border-t border-outline bg-white/95 backdrop-blur">
+      <div className="flex-none border-t border-outline bg-bg/95 backdrop-blur">
         <div className="px-8 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
           <div className="flex justify-between items-center">
             {/* 왼쪽 버튼 */}
             <Button
               type="button"
               onClick={handleCancel}
-              className="md:font-normal py-2 px-8 bg-white border border-outline text-text"
+              className="md:font-normal py-2 px-8 bg-bg border border-outline text-text"
             >
               취소
             </Button>
@@ -292,7 +288,7 @@ export default function EditStoryTrack() {
           onClick={() => setOpenMap(false)}
         >
           <div
-            className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl border-t border-outline h-[85dvh] flex flex-col overflow-hidden"
+            className="absolute left-0 right-0 bottom-0 bg-bg rounded-t-2xl border-t border-outline h-[85dvh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-outline">

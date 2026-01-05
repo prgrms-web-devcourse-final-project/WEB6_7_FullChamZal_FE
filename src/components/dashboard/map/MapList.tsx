@@ -52,7 +52,7 @@ export default function MapList({ listData, onClick, focus }: MapListProps) {
           type="text"
           placeholder="장소, 제목으로 검색..."
           value={keyword}
-          className="w-full p-2 pl-10 bg-white/80 border border-outline rounded-xl outline-none focus:border-primary-2"
+          className="w-full p-2 pl-10 bg-bg/80 border border-outline rounded-xl outline-none focus:border-primary-2"
           onChange={(e) => setKeyword(e.target.value)}
         />
       </div>

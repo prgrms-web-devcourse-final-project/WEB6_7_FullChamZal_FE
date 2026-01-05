@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { oauthSignup } from "@/lib/api/oauth";
 import { getMeDetail } from "@/lib/api/members/members";
@@ -101,9 +101,7 @@ export default function AuthProfilePage() {
         resend: true,
       });
       setCooldown(res.cooldownSeconds ?? 180);
-      toast.success("인증번호 발송을 성공했습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("인증번호 발송을 성공했습니다!");
     } catch (e: unknown) {
       const message =
         e instanceof Error ? e.message : "인증번호 발송에 실패했어요.";
@@ -128,9 +126,7 @@ export default function AuthProfilePage() {
 
       if (res.verified) {
         setIsVerified(true);
-        toast.success("인증번호 확인을 성공했습니다!", {
-          style: { borderColor: "#57b970" },
-        });
+        toast.success("인증번호 확인을 성공했습니다!");
       } else {
         setError("인증에 실패했어요.");
       }
@@ -154,9 +150,7 @@ export default function AuthProfilePage() {
         phoneNumber: phoneDigits,
       });
 
-      toast.success("저장을 성공했습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("저장을 성공했습니다!");
       router.replace("/dashboard");
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "저장에 실패했어요.";
@@ -168,7 +162,7 @@ export default function AuthProfilePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-sub px-4">
-      <div className="w-full max-w-130 rounded-2xl border border-outline bg-white p-8 space-y-6">
+      <div className="w-full max-w-130 rounded-2xl border border-outline bg-bg p-8 space-y-6">
         <div className="space-y-1">
           <h1 className="text-xl font-semibold">프로필 설정</h1>
           <p className="text-sm text-text-3">

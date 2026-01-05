@@ -1,11 +1,11 @@
 "use client";
 
-import Input from "@/components/common/Input";
-import { useEffect, useMemo, useState } from "react";
-import Button from "../common/Button";
+import Input from "@/components/common/tag/Input";
+import { useMemo, useState } from "react";
+import Button from "../common/tag/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApiClient } from "@/lib/api/auth/auth.client";
-import { useMe } from "@/lib/hooks/useMe";
+import { useQueryClient } from "@tanstack/react-query";
 
 function getErrorMessage(err: unknown) {
   if (err instanceof Error) return err.message;
@@ -20,8 +20,8 @@ function getErrorMessage(err: unknown) {
 
 export default function LoginForm() {
   const router = useRouter();
-
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const returnUrl = useMemo(() => {
     const cb = searchParams.get("returnUrl") || searchParams.get("callback");
@@ -32,20 +32,6 @@ export default function LoginForm() {
   const [pw, setPw] = useState("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
-
-  const { data: me, isLoading: meLoading } = useMe();
-
-  useEffect(() => {
-    if (meLoading) return;
-    if (!me) return;
-
-    const isAdmin = me.role === "ADMIN";
-    const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
-    const target = returnUrl ?? fallbackTarget;
-
-    router.replace(target);
-    router.refresh();
-  }, [me, meLoading, returnUrl, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,18 +48,16 @@ export default function LoginForm() {
       // 로그인
       await authApiClient.login({ userId: id.trim(), password: pw });
 
-      // 내 정보 조회
+      // 내 정보 조회 (권한 분기 위해)
       const me = await authApiClient.me();
+
+      queryClient.setQueryData(["me"], me);
+
       const isAdmin = me.role === "ADMIN";
-
-      // 이동 경로 결정
       const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
-
       const target = returnUrl ?? fallbackTarget;
 
-      // 이동
       router.replace(target);
-      router.refresh();
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {

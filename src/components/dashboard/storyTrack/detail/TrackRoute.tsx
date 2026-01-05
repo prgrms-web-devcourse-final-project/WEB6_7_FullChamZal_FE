@@ -83,10 +83,10 @@ export default function TrackRoute({
                         </div>
                         <div className="space-y-2">
                           <div className="flex flex-col items-start text-left">
-                            <p className="text-lg">
+                            <p className="text-lg text-[#070d19]">
                               {item.capsule.capsuleTitle}
                             </p>
-                            <p className="text-sm text-text-2">
+                            <p className="text-sm text-[#3f4756]">
                               {item.capsule.unlock.location.address}
                             </p>
                           </div>
@@ -97,7 +97,7 @@ export default function TrackRoute({
                         disabled
                         className="w-full rounded-xl border border-outline p-6 flex items-start gap-4 bg-button-hover cursor-not-allowed"
                       >
-                        <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
+                        <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-bg">
                           {item.stepOrder}
                         </div>
                         <div className="flex flex-col items-start text-left">
@@ -115,11 +115,11 @@ export default function TrackRoute({
                         }
                       >
                         <div className="flex gap-4">
-                          <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
+                          <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-bg">
                             {storytrackType === "SEQUENTIAL" ? (
                               item.stepOrder
                             ) : (
-                              <Logo className="text-white w-6 h-6" />
+                              <Logo className="text-bg w-6 h-6" />
                             )}
                           </div>
                           <div className="flex flex-col items-start text-left">
@@ -154,11 +154,11 @@ export default function TrackRoute({
                   disabled
                   className="w-full rounded-xl border border-outline p-6 flex items-start gap-4 bg-button-hover opacity-60 cursor-not-allowed"
                 >
-                  <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-white">
+                  <div className="flex-none w-12 h-12 rounded-full flex items-center justify-center bg-text text-bg">
                     {storytrackType === "SEQUENTIAL" ? (
                       item.stepOrder
                     ) : (
-                      <Logo className="text-white w-6 h-6" />
+                      <Logo className="text-bg w-6 h-6" />
                     )}
                   </div>
                   <div className="flex flex-col items-start text-left">

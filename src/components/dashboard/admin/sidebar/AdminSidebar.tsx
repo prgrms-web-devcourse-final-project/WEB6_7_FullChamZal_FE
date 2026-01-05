@@ -8,6 +8,7 @@ import { MemberMeDetail } from "@/lib/api/members/members";
 import { LogOut, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminSidebar({
   mobileOpen = false,
@@ -18,10 +19,23 @@ export default function AdminSidebar({
   onMobileClose?: () => void;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const handleLogout = () => {
-    authApiClient.logout();
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      // 1) 진행 중인 요청 먼저 취소
+      await queryClient.cancelQueries();
+
+      // 2) 서버 세션 종료(쿠키 삭제/만료)
+      await authApiClient.logout();
+    } finally {
+      // 3) 캐시 완전 초기화
+      queryClient.clear();
+
+      // 4) 라우팅 + 서버컴포넌트 갱신
+      router.replace("/");
+      router.refresh();
+    }
   };
 
   // 모바일에서 열렸을 때 스크롤 막기(선택)
@@ -76,7 +90,7 @@ export default function AdminSidebar({
         />
 
         <aside
-          className={`fixed inset-y-0 left-0 z-9999 w-72 bg-white border-r border-outline transition-transform duration-200 ease-out ${
+          className={`fixed inset-y-0 left-0 z-9999 w-72 bg-bg border-r border-outline transition-transform duration-200 ease-out ${
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           aria-hidden={!mobileOpen}
@@ -111,7 +125,7 @@ export default function AdminSidebar({
             </div>
 
             {/* Footer (하단 고정) */}
-            <div className="shrink-0 p-6 border-t border-outline bg-white">
+            <div className="shrink-0 p-6 border-t border-outline bg-bg">
               <button
                 onClick={handleLogout}
                 className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm w-full"

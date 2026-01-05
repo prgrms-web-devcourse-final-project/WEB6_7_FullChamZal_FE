@@ -26,7 +26,7 @@ const EventMarkerContainer = ({
       <div className={`relative flex flex-col items-center`} onClick={onClick}>
         {/* title */}
         <div
-          className={`absolute bottom-full mb-2 p-3 text-sm rounded-lg shadow bg-white ${
+          className={`absolute bottom-full mb-2 p-3 text-sm rounded-lg shadow bg-bg ${
             isVisible || isFocus
               ? "opacity-100 cursor-pointer"
               : "opacity-0 pointer-none pointer-events-none"

@@ -1,5 +1,5 @@
 import { ShieldAlert } from "lucide-react";
-import Button from "../common/Button";
+import Button from "../common/tag/Button";
 import { Checkbox } from "../ui/checkbox";
 
 type Agreements = { terms: boolean; privacy: boolean; marketing: boolean };
@@ -17,7 +17,7 @@ export default function AgreeRegister({
 
   return (
     <div className="space-y-3 md:space-y-8">
-      <div className="p-5 space-y-5 border border-outline rounded-xl bg-white">
+      <div className="p-5 space-y-5 border border-outline rounded-xl bg-bg">
         <div className="flex gap-2">
           <ShieldAlert size={20} />
           <div className="w-87 space-y-4 text-xs md:text-base">

@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { AlertCircle, MessageSquareWarning, X } from "lucide-react";
 import { reportApi } from "@/lib/api/capsule/report";
-import ActiveModal from "@/components/common/ActiveModal";
+import ActiveModal from "@/components/common/modal/ActiveModal";
 
 const REASON_LABEL: Record<ReportReasonType, string> = {
   SPAM: "스팸(광고, 홍보성 내용)",
@@ -119,11 +119,11 @@ export default function ReportModal({
       )}
 
       <Modal open={open} onClose={handleClose}>
-        <div className="max-w-150 w-full rounded-2xl bg-white overflow-hidden">
+        <div className="max-w-150 w-full rounded-2xl bg-bg overflow-hidden">
           {/* Header */}
           <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-outline bg-primary text-white">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-white/15 rounded-full">
+              <div className="p-3 bg-bg/15 rounded-full">
                 <MessageSquareWarning className="text-white" />
               </div>
               <div className="space-y-0.5">
@@ -137,7 +137,7 @@ export default function ReportModal({
             <button
               type="button"
               onClick={handleClose}
-              className="cursor-pointer p-2 rounded-lg hover:bg-white/10 transition"
+              className="cursor-pointer p-2 rounded-lg hover:bg-bg/10 transition"
               aria-label="닫기"
             >
               <X size={20} />
@@ -174,7 +174,7 @@ export default function ReportModal({
                       ${
                         checked
                           ? "border-primary bg-primary/5"
-                          : "border-outline bg-white hover:bg-button-hover"
+                          : "border-outline bg-bg hover:bg-button-hover"
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -237,7 +237,7 @@ export default function ReportModal({
                 placeholder={
                   "신고하려는 내용에 대해 자세히 설명해주세요.\n예: 부적절한 광고성 내용이 포함되어 있습니다."
                 }
-                className={`w-full resize-none border rounded-xl py-3 px-4 bg-white outline-none transition focus:ring-2 focus:ring-primary/60 ${
+                className={`w-full resize-none border rounded-xl py-3 px-4 bg-bg outline-none transition focus:ring-2 focus:ring-primary/60 ${
                   detailError
                     ? "border-primary-2 focus:border-primary/60"
                     : "border-outline focus:border-primary/40"
@@ -255,7 +255,7 @@ export default function ReportModal({
           </div>
 
           {/* Footer Buttons */}
-          <div className="flex gap-2 border-t border-outline px-6 py-4 bg-white">
+          <div className="flex gap-2 border-t border-outline px-6 py-4 bg-bg">
             <button
               type="button"
               onClick={handleClose}

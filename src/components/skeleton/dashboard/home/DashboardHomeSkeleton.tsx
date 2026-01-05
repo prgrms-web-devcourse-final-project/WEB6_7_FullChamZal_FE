@@ -6,7 +6,7 @@ import YearlyLetterSkeleton from "./YearlyLetterSkeleton";
 export default function DashboardHomeSkeleton() {
   return (
     <>
-      <div className="space-y-6 lg:space-y-9">
+      <div className="p-4 lg:p-8 space-y-6 lg:space-y-9">
         {/* 오늘 열람 가능한 편지 */}
         <TodayLettersSkeleton />
 

@@ -21,7 +21,7 @@ export default function SuccessForm({
   return (
     // 화면이 낮을 때를 대비해서: 모바일은 위로 붙이고 스크롤 가능
     <div className="h-full min-h-0 overflow-y-auto flex items-start justify-center lg:items-center lg:p-0">
-      <div className="w-full max-w-2xl max-h-[calc(100dvh-2rem)] lg:max-h-[calc(100dvh-4rem)] overflow-y-auto rounded-xl p-6 lg:p-10 space-y-6 lg:space-y-8 bg-white">
+      <div className="w-full max-w-2xl max-h-[calc(100dvh-2rem)] lg:max-h-[calc(100dvh-4rem)] overflow-y-auto rounded-xl p-6 lg:p-10 space-y-6 lg:space-y-8 bg-bg">
         {/* 성공 메시지 */}
         <div className="flex flex-col items-center text-center gap-1.5 md:gap-3">
           <CheckCircle size={48} className="text-primary-2 w-10 md:w-12" />

@@ -55,7 +55,7 @@ export default function Location({
             type="button"
             onClick={triggerSearch}
             disabled={!canSearch}
-            className="cursor-pointer w-15 px-3 rounded-lg text-sm border border-outline bg-white disabled:opacity-50"
+            className="cursor-pointer w-15 px-3 rounded-lg text-sm border border-outline bg-bg disabled:opacity-50"
           >
             검색
           </button>
@@ -103,7 +103,7 @@ export default function Location({
                 type="button"
                 onClick={() => onChange({ ...value, viewingRadius: r })}
                 className={[
-                  "flex-1 basis-0 min-w-[72px] px-3 py-2 rounded-lg text-sm border-2 transition text-center bg-white",
+                  "flex-1 basis-0 min-w-[72px] px-3 py-2 rounded-lg text-sm border-2 transition text-center bg-bg",
                   selected
                     ? "text-text-2 border-primary"
                     : "text-text-2 border-outline hover:border-primary/50",

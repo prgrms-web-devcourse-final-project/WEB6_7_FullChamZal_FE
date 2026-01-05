@@ -1,7 +1,7 @@
 "use client";
 
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getMeDetail, updateMe } from "@/lib/api/members/members";
@@ -120,9 +120,7 @@ export default function PhoneEditModal({
       setHasSent(true);
       setStep("CODE");
       setCooldown(res.cooldownSeconds ?? 0);
-      toast.success("인증번호 발송을 성공했습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("인증번호 발송을 성공했습니다!");
     } catch (e: unknown) {
       setError(getErrorMessage(e));
     } finally {
@@ -152,9 +150,7 @@ export default function PhoneEditModal({
 
       setIsSaving(true);
       await updateMe({ phoneNumber });
-      toast.success("인증을 성공했습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("인증을 성공했습니다!");
       onClose();
     } catch (e: unknown) {
       setError(getErrorMessage(e));
@@ -172,7 +168,7 @@ export default function PhoneEditModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-bg p-6">
         <div className="flex items-center justify-between">
           <h4 className="text-lg">전화번호 수정</h4>
           <button onClick={onClose} className="cursor-pointer" type="button">
@@ -230,7 +226,7 @@ export default function PhoneEditModal({
 
               <div className="flex gap-2">
                 <Button
-                  className="flex-1 py-3 border border-outline bg-white text-text hover:text-white"
+                  className="flex-1 py-3 border border-outline bg-bg text-text hover:text-white"
                   type="button"
                   onClick={onBackToInput}
                   disabled={isSending || isConfirming || isSaving}
@@ -252,7 +248,7 @@ export default function PhoneEditModal({
               </div>
 
               <Button
-                className="w-full py-3 border border-outline bg-white text-text hover:text-white"
+                className="w-full py-3 border border-outline bg-bg text-text hover:text-white"
                 type="button"
                 onClick={onSend}
                 disabled={!canSend}

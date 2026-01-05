@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { Check } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -45,9 +45,7 @@ ${data?.password ? `비밀번호: ${data.password}` : ""}
   // Clipboard API 사용
   const copyToClipboard = async () => {
     await copyWithClipboardAPI(shareText);
-    toast.success("클립보드 복사에 성공했습니다!", {
-      style: { borderColor: "#57b970" },
-    });
+    toast.success("클립보드 복사에 성공했습니다!");
   };
 
   useEffect(() => {
@@ -58,7 +56,7 @@ ${data?.password ? `비밀번호: ${data.password}` : ""}
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-130 flex flex-col items-center gap-3 md:gap-5 rounded-2xl border-2 border-outline bg-white p-4 md:p-6">
+      <div className="w-full max-w-130 flex flex-col items-center gap-3 md:gap-5 rounded-2xl border-2 border-outline bg-bg p-4 md:p-6">
         <div className="w-20 h-20 rounded-full bg-sub flex items-center justify-center">
           <Check size={40} strokeWidth={1} />
         </div>
@@ -76,7 +74,7 @@ ${data?.password ? `비밀번호: ${data.password}` : ""}
         </div>
         <div className="w-full flex gap-4">
           <Button
-            className="w-full py-1.5 md:py-3 text-text bg-white border-2 border-primary-3 text-sm md:text-base md:font-normal hover:text-white hover:border-primary-2"
+            className="w-full py-1.5 md:py-3 text-text bg-bg border-2 border-primary-3 text-sm md:text-base md:font-normal hover:text-white hover:border-primary-2"
             onClick={copyToClipboard}
           >
             클립보드 복사

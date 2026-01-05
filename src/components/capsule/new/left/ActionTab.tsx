@@ -28,8 +28,8 @@ export default function ActionTab({
             className={`cursor-pointer w-full flex items-center justify-center gap-1 rounded-full py-1 transition
               ${
                 selected
-                  ? "border border-primary bg-white text-primary"
-                  : "text-text-5 hover:text-primary-2 hover:bg-white"
+                  ? "border border-primary bg-bg text-primary"
+                  : "text-text-5 hover:text-primary-2 hover:bg-bg"
               }`}
           >
             {tab.icon}

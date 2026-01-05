@@ -10,13 +10,13 @@ function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
-/** ✅ unlockAt이 UTC로 파싱되도록 보정 (Z/offset 없으면 UTC로 간주하고 Z 붙임) */
+/** unlockAt이 UTC로 파싱되도록 보정 (Z/offset 없으면 UTC로 간주하고 Z 붙임) */
 function toUtcIso(s: string) {
   if (/[zZ]$|[+\-]\d{2}:\d{2}$/.test(s)) return s;
   return s.replace(" ", "T") + "Z";
 }
 
-/** ✅ 화면 표시: KST(+9) 기준 날짜/시간 포맷 */
+/** 화면 표시: KST(+9) 기준 날짜/시간 포맷 */
 function formatKstDate(ms: number) {
   return new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",
@@ -38,7 +38,7 @@ function formatKstDateTime(ms: number) {
   }).format(new Date(ms));
 }
 
-/** ✅ D-day 계산도 KST '자정 기준'으로 */
+/** D-day 계산도 KST '자정 기준'으로 */
 function kstYmd(ms: number) {
   // YYYY-MM-DD 형태로 안정적으로 뽑기
   return new Intl.DateTimeFormat("en-CA", {
@@ -257,13 +257,11 @@ export default function LetterLockedView({
             ) : null}
 
             {locationErrorMessage ? (
-              <p className="mt-2 text-xs text-red-500">
-                {locationErrorMessage}
-              </p>
+              <p className="mt-2 text-xs text-error">{locationErrorMessage}</p>
             ) : null}
 
             {!Number.isFinite(unlockTime) ? (
-              <p className="mt-2 text-xs text-red-500">
+              <p className="mt-2 text-xs text-error">
                 unlockAt 값이 올바르지 않습니다.
               </p>
             ) : null}

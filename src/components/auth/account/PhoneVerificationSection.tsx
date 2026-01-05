@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 
 type Mode = "FIND_ID" | "FIND_PW";
 
@@ -41,7 +41,7 @@ export default function PhoneVerificationSection({
           placeholder="01012345678"
           inputMode="numeric"
           autoComplete="tel"
-          className="w-full p-4 bg-white border border-outline rounded-xl outline-none focus:border-primary-2"
+          className="w-full p-4 bg-bg border border-outline rounded-xl outline-none focus:border-primary-2"
         />
 
         <div className="flex gap-2">
@@ -70,7 +70,7 @@ export default function PhoneVerificationSection({
             placeholder="123456"
             inputMode="numeric"
             autoComplete="one-time-code"
-            className="flex-1 p-4 bg-white border border-outline rounded-xl outline-none focus:border-primary-2"
+            className="flex-1 p-4 bg-bg border border-outline rounded-xl outline-none focus:border-primary-2"
           />
           <Button
             className="px-6 py-3"

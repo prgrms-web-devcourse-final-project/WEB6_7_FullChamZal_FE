@@ -36,8 +36,8 @@ export default function Input({
           onChange={onChange}
           onBlur={onBlur}
           className={`
-            flex-1 border-2 px-3 py-2 md:px-4 md:py-3 rounded-xl bg-white/80 outline-none
-            ${error ? "border-red-500" : "border-outline"}
+            flex-1 border-2 px-3 py-2 md:px-4 md:py-3 rounded-xl bg-bg/80 outline-none
+            ${error ? "border-error" : "border-outline"}
             focus:border-primary-3
           `}
         />
@@ -45,7 +45,7 @@ export default function Input({
       </div>
 
       {/* 에러 메시지 영역 */}
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-error">{error}</p>}
     </div>
   );
 }

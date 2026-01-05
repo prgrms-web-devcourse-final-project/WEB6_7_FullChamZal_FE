@@ -1,5 +1,5 @@
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { Check, X } from "lucide-react";
 
 export default function ActiveModal({
@@ -20,7 +20,7 @@ export default function ActiveModal({
   return (
     <Modal open={open} onClose={onClose} zIndexClassName="z-[20000]">
       <div className="w-full h-full flex flex-col items-center justify-center">
-        <div className="w-full max-w-105 flex flex-col items-center gap-4 rounded-2xl border-2 border-outline bg-white p-6">
+        <div className="w-full max-w-105 flex flex-col items-center gap-4 rounded-2xl border-2 border-outline bg-bg p-6">
           <div className="w-16 h-16 rounded-full bg-sub flex items-center justify-center">
             {active === "fail" ? (
               <X size={32} strokeWidth={1} />

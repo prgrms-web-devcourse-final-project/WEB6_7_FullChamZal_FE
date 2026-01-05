@@ -206,7 +206,7 @@ export default function SummaryBlock({
                 return (
                   <span
                     key={k}
-                    className="rounded-full bg-white border px-2 py-0.5 text-xs"
+                    className="rounded-full bg-bg border px-2 py-0.5 text-xs"
                     title={meta?.desc ?? k}
                   >
                     {meta?.title ?? k}

@@ -1,7 +1,7 @@
 "use client";
 
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { deleteMe } from "@/lib/api/members/members";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -44,7 +44,7 @@ export default function AccountDeleteModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-bg p-6">
         <div className="space-y-2">
           <h4 className="text-lg text-center">
             정말로 계정을 삭제하시겠습니까?
@@ -63,7 +63,7 @@ export default function AccountDeleteModal({
         <div className="mt-6 flex gap-2">
           <Button
             type="button"
-            className="flex-1 py-3 border border-outline bg-white text-text hover:text-white"
+            className="flex-1 py-3 border border-outline bg-bg text-text hover:text-white"
             onClick={onClose}
             disabled={isDeleting}
           >

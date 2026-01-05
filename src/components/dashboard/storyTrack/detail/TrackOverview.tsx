@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import ConfirmModal from "@/components/common/modal/ConfirmModal";
 import toast from "react-hot-toast";
 
 export default function TrackOverview() {
@@ -68,9 +68,7 @@ export default function TrackOverview() {
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
-      toast.success("참여하기가 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("참여하기가 완료되었습니다!");
     },
     onError: () => {
       toast.error("참여하기를 실패했습니다.");
@@ -97,9 +95,7 @@ export default function TrackOverview() {
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
-      toast.success("참여취소가 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("참여취소가 완료되었습니다!");
 
       router.push("/dashboard/storyTrack/joined");
       router.refresh();
@@ -172,7 +168,7 @@ export default function TrackOverview() {
 
               {/* 요약 */}
               <div className="flex gap-2">
-                <div className="bg-primary-5/60 border-2 border-primary-4 rounded-full px-2 py-1 flex items-center gap-1 text-primary-2">
+                <div className="bg-primary-5 border-2 border-primary-4 rounded-full px-2 py-1 flex items-center gap-1 text-primary-2">
                   {trackData?.data.storytrackType === "SEQUENTIAL" ? (
                     <>
                       <ListOrdered size={16} />
@@ -215,7 +211,7 @@ export default function TrackOverview() {
 
               {/* 작성자 */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white">
+                <div className="w-10 h-10 rounded-full bg-text flex items-center justify-center text-bg">
                   {trackData?.data.createrNickname?.slice(0, 1)}
                 </div>
                 <div className="flex flex-col">
@@ -251,7 +247,7 @@ export default function TrackOverview() {
                   수정
                 </button>
                 <button
-                  className="cursor-pointer justify-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60"
+                  className="cursor-pointer justify-center bg-error hover:bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-60"
                   disabled={isPending || !storytrackId}
                   onClick={() => setIsDeleteOpen(true)}
                 >

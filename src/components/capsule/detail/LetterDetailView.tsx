@@ -215,7 +215,7 @@ export default function LetterDetailView({
   if (shouldShowLocationPermissionGate) {
     return (
       <div className="h-full w-full flex items-center justify-center p-0 md:p-8">
-        <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-4 md:p-6 space-y-5">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-bg p-4 md:p-6 space-y-5">
           {/* 헤더 */}
           <div className="space-y-2">
             <h2 className="text-lg font-medium text-text">
@@ -299,7 +299,7 @@ export default function LetterDetailView({
     if (e.message === "인증이 필요합니다." || e.code === "AUTH001") {
       return (
         <div className="w-full min-h-full flex items-center justify-center p-8">
-          <div className="w-full max-w-md rounded-2xl border border-outline bg-white p-6 text-center space-y-4">
+          <div className="w-full max-w-md rounded-2xl border border-outline bg-bg p-6 text-center space-y-4">
             <div className="text-lg font-medium">권한이 없습니다.</div>
             <p className="text-sm text-text-2 whitespace-pre-line">
               이 편지는 인증된 사용자에게만 공개됩니다.

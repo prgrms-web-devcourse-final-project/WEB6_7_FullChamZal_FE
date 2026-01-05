@@ -90,7 +90,7 @@ export default function AdminProcessSection({
           <select
             className={[
               "w-full appearance-none rounded-xl border px-3 py-3 pr-10 text-sm outline-none transition",
-              "bg-white",
+              "bg-bg",
               !actionable || isMutating
                 ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
                 : "border-outline hover:border-admin/40 focus:border-admin focus:ring-4 focus:ring-admin/15",

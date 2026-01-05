@@ -13,7 +13,7 @@ import {
 import DataTable from "../DataTable";
 import Pagination from "@/components/common/Pagination";
 import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import ConfirmModal from "@/components/common/modal/ConfirmModal";
 
 export default function UserList({
   tab,

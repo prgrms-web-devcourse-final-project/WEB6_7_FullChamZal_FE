@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { X } from "lucide-react";
 import { updateMe } from "@/lib/api/members/members";
 import toast from "react-hot-toast";
@@ -64,9 +64,7 @@ export default function PasswordEditModal({
         currentPassword,
         newPassword,
       });
-      toast.success("비밀번호가 변경되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("비밀번호가 변경되었습니다!");
       onClose();
     } catch (e: unknown) {
       setError(getErrorMessage(e));
@@ -77,7 +75,7 @@ export default function PasswordEditModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-full max-w-105 rounded-2xl border border-outline bg-white p-6">
+      <div className="w-full max-w-105 rounded-2xl border border-outline bg-bg p-6">
         <div className="flex items-center justify-between">
           <h4 className="text-lg">비밀번호 변경</h4>
           <button onClick={onClose} className="cursor-pointer" type="button">

@@ -84,7 +84,7 @@ export default function TrackMap({
                           )}
                         </div>
                         {/* 제목 툴팁 (호버 시) */}
-                        <div className="absolute bottom-full mb-2 p-3 text-sm rounded-lg shadow bg-white opacity-0 peer-hover:z-100 peer-hover:opacity-100 transition-opacity">
+                        <div className="absolute bottom-full mb-2 p-3 text-sm rounded-lg shadow bg-bg opacity-0 peer-hover:z-100 peer-hover:opacity-100 transition-opacity">
                           {item.capsule.capsuleTitle}
                         </div>
                       </div>

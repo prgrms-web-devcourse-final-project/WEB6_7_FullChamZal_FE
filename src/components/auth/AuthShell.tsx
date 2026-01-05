@@ -17,7 +17,7 @@ export default function AuthShell({
   title,
   description,
   children,
-  showSocial = true, // 기본값: 기존 페이지 영향 최소화 (원하면 false로 바꿔도 됨)
+  showSocial = true,
 }: AuthShellProps) {
   return (
     <section className="w-full max-w-xl min-h-180 py-20 px-8">

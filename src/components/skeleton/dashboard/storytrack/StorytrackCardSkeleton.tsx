@@ -9,13 +9,13 @@ export default function StorytrackCardSkeleton({
         {Array.from({ length: count }).map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-outline bg-white space-y-3"
+            className="rounded-2xl border border-outline bg-bg space-y-3"
           >
-            <div className="h-36 rounded-t-2xl bg-gray-200" />
+            <div className="h-36 rounded-t-2xl bg-outline" />
             <div className="p-4 space-y-3">
-              <div className="h-5 w-2/3 rounded-md bg-gray-200" />
-              <div className="h-4 w-1/2 rounded-md bg-gray-200" />
-              <div className="h-16 w-full rounded-xl bg-gray-200" />
+              <div className="h-5 w-2/3 rounded-md bg-outline" />
+              <div className="h-4 w-1/2 rounded-md bg-outline" />
+              <div className="h-16 w-full rounded-xl bg-outline" />
             </div>
           </div>
         ))}

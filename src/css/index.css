@@ -5,8 +5,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2") format("woff2");
   font-weight: 100;
   font-style: normal;
   font-display: swap;
@@ -14,8 +13,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2") format("woff2");
   font-weight: 200;
   font-style: normal;
   font-display: swap;
@@ -23,8 +21,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -32,8 +29,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -41,8 +37,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -50,8 +45,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -59,8 +53,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -68,8 +61,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2") format("woff2");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -77,22 +69,10 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2") format("woff2");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body,
-pre {
-  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-  color: #070d19;
 }
 
 * {
@@ -101,72 +81,63 @@ pre {
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-1Thin.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-1Thin.woff2") format("woff2");
   font-weight: 100;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-2ExtraLight.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-2ExtraLight.woff2") format("woff2");
   font-weight: 200;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-3Light.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-3Light.woff2") format("woff2");
   font-weight: 300;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-4Regular.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2") format("woff2");
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-7Bold.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-7Bold.woff2") format("woff2");
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2") format("woff2");
   font-weight: 800;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Paperlogy";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-9Black.woff2")
-    format("woff2");
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-9Black.woff2") format("woff2");
   font-weight: 900;
   font-display: swap;
 }
@@ -185,6 +156,7 @@ pre {
 }
 
 @keyframes cursor-blink {
+
   0%,
   49% {
     opacity: 1;
@@ -201,6 +173,7 @@ pre {
 }
 
 @keyframes bounceY {
+
   0%,
   100% {
     transform: translateY(0);
@@ -250,6 +223,94 @@ pre {
 
   --color-accent: #f9f9f9;
   --color-accent-foreground: #070d19;
+
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-2: #f8f8f8;
+
+  --color-glass: rgba(255, 255, 255, 0.80);
+  --color-dim: rgba(0, 0, 0, 0.15);
+
+  --color-error: #ef4444;
+
+  /* shadow */
+  --shadow-glow: 20px 100px 10px 5px rgba(238, 238, 238, 1);
+
+  /* Toast */
+  --toast-bg: #ffffff;
+  --toast-text: #070d19;
+  --toast-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+  /* 기본 */
+  --toast-border: 2px solid #e5e7eb;
+  /* 성공 */
+  --toast-border-success: 2px solid #57b970;
+  /* 에러 */
+  --toast-border-error: 2px solid #ff2600;
+
+  /* 활동 통계 */
+  --color-activeBg: #ffded8
+}
+
+:root[data-theme="dark"] {
+  --color-primary: #ff3b1f;
+  --color-primary-2: #ff6a54;
+  --color-primary-3: #ff9a8c;
+  --color-primary-4: #ffc2ba;
+  --color-primary-5: #ffe1dd;
+
+  --color-admin: #cfd9ff;
+
+  --color-button-hover: rgba(255, 255, 255, 0.06);
+
+  --color-outline: #243044;
+
+  --color-text: #e9eef8;
+  --color-text-2: #c7d0e1;
+  --color-text-3: #9aa6bf;
+  --color-text-4: #7884a0;
+  --color-text-5: #4a556f;
+  --color-text-6: #2b3447;
+
+  --color-sub: #1f2227;
+  --color-sub-2: #0f1624;
+
+  --color-accent: rgba(255, 255, 255, 0.06);
+  --color-accent-foreground: #e9eef8;
+
+  --color-bg: #0b0f17;
+  --color-surface: #0f1624;
+  --color-surface-2: #121a2a;
+
+  --color-glass: rgba(15, 22, 36, 0.78);
+  --color-dim: rgba(0, 0, 0, 0.30);
+
+  --color-error: #ff5050;
+
+  --shadow-glow: 20px 100px 10px 5px rgba(238, 238, 243, 0.5);
+
+  /* Toast */
+  --toast-bg: rgba(20, 22, 28, 0.92);
+  --toast-text: #f5f7fa;
+  --toast-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  --toast-border: 1px solid rgba(255, 255, 255, 0.10);
+  --toast-border-success: 1px solid rgba(87, 185, 112, 0.75);
+  --toast-border-error: 1px solid rgba(255, 38, 0, 0.75);
+
+  /* 활동 통계 */
+  --color-activeBg: #ff583b
+}
+
+body {
+  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+pre {
+  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
 }
 
 /* Radix UI 드롭다운/팝오버 transition 비활성화 */
