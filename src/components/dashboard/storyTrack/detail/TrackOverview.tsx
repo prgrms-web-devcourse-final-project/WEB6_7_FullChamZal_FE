@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import ConfirmModal from "@/components/common/modal/ConfirmModal";
 import toast from "react-hot-toast";
 
 export default function TrackOverview() {

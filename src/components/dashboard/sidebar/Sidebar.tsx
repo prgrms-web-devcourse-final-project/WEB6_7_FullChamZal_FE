@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import ProfileModal from "./profile/ProfileModal";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import type { MemberMeDetail } from "@/lib/api/members/members";
-import { useDashboardTheme } from "@/components/common/ThemeProvider";
+import { useDashboardTheme } from "@/components/common/theme/ThemeProvider";
 
 export default function Sidebar({
   me,

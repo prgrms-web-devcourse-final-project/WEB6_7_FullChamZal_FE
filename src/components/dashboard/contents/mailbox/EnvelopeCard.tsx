@@ -8,6 +8,7 @@ import { Clock, Lock, MapPin, Unlock, Pencil, PencilOff } from "lucide-react";
 import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
 import { useRouter } from "next/navigation";
 import { distanceMeters } from "@/lib/hooks/distanceMeters";
+import Stamp from "@/components/common/stamp/Stamp";
 
 type LatLng = { lat: number; lng: number };
 
@@ -122,6 +123,7 @@ function getEnvelopeStatus(
 
   return {
     mode: "unlock" as const,
+    unlockType,
     isTime: needsTime,
     conditionLabel,
     isUnlocked,
@@ -187,6 +189,8 @@ export default function EnvelopeCard({
     () => getEnvelopeStatus(capsule, type, currentPos),
     [capsule, type, currentPos]
   );
+
+  console.log(capsule);
 
   const href = `/dashboard/${type}?id=${capsule.capsuleId}`;
 
@@ -347,22 +351,38 @@ export default function EnvelopeCard({
             </div>
 
             <div className="absolute top-0 right-0">
-              <div className="text-primary p-4 space-y-2">
+              <div className="text-primary p-2 space-y-2">
                 {type === "send" ? (
                   status.mode === "send" && status.canEdit ? (
                     <Pencil size={16} />
                   ) : (
                     <PencilOff size={16} />
                   )
-                ) : status.mode === "unlock" && status.isTime ? (
-                  <Clock size={16} />
-                ) : (
-                  <MapPin size={16} />
-                )}
+                ) : status.mode === "unlock" ? (
+                  status.unlockType === "TIME_AND_LOCATION" ? (
+                    <>
+                      {/* time: 왼쪽으로 15도 => -15deg */}
+                      <Stamp
+                        type="time"
+                        className="transform -rotate-20 -translate-x-4"
+                      />
+
+                      {/* location: 오른쪽으로 25도 => +25deg */}
+                      <Stamp type="location" className="transform rotate-15" />
+                    </>
+                  ) : status.unlockType === "TIME" ? (
+                    <Stamp
+                      type="time"
+                      className="transform -rotate-20 -translate-x-4"
+                    />
+                  ) : status.unlockType === "LOCATION" ? (
+                    <Stamp type="location" className="transform rotate-15" />
+                  ) : null
+                ) : null}
               </div>
             </div>
 
-            <div className="absolute bottom-3 left-3 text-white">
+            <div className="absolute bottom-3 left-3 text-primary">
               <Logo className="w-5" />
             </div>
           </div>

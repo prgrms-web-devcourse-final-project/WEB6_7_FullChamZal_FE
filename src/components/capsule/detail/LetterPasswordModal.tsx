@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import Logo from "@/components/common/Logo";
 
 export default function LetterUnlockModal({

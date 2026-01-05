@@ -15,7 +15,7 @@ import Pagination from "@/components/common/Pagination";
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import ConfirmModal from "@/components/common/modal/ConfirmModal";
 import toast from "react-hot-toast";
 
 export default function CapsuleList({

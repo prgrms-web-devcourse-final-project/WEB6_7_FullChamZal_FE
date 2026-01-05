@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { oauthSignup } from "@/lib/api/oauth";
 import { getMeDetail } from "@/lib/api/members/members";

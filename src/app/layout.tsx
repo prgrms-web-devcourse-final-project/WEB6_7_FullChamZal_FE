@@ -2,7 +2,7 @@ import "@/css/index.css";
 import Script from "next/script";
 import Providers from "./providers";
 import { Toaster } from "react-hot-toast";
-import ThemeProvider from "@/components/common/ThemeProvider";
+import ThemeProvider from "@/components/common/theme/ThemeProvider";
 
 export const metadata = {
   title: "Dear.___",

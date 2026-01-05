@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MapPin, RefreshCw, ChevronUp, ChevronDown } from "lucide-react";
 import PublicLetterPicker from "../common/PublicLetterPicker";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { X } from "lucide-react";
 
 type Props = {

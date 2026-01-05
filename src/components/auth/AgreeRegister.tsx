@@ -1,5 +1,5 @@
 import { ShieldAlert } from "lucide-react";
-import Button from "../common/Button";
+import Button from "../common/tag/Button";
 import { Checkbox } from "../ui/checkbox";
 
 type Agreements = { terms: boolean; privacy: boolean; marketing: boolean };

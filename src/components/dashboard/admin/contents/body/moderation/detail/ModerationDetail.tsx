@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
 "use client";
 
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { AdminModerationApi } from "@/lib/api/admin/moderation/adminModeration";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";

@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { Map, Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 

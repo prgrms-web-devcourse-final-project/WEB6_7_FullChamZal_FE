@@ -3,8 +3,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { oauthSignup } from "@/lib/api/auth/oauth";
 

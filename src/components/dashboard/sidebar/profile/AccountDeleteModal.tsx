@@ -1,7 +1,7 @@
 "use client";
 
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { deleteMe } from "@/lib/api/members/members";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import Button from "../../common/Button";
+import Button from "../../common/tag/Button";
 import { useRouter } from "next/navigation";
 import { useMe } from "@/lib/hooks/useMe";
 

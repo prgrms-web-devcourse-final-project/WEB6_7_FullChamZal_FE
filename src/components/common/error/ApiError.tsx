@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { AlertTriangle } from "lucide-react";
 
 export default function ApiError({

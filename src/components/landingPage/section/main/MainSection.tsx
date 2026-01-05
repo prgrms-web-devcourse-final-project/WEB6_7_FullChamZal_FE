@@ -4,7 +4,7 @@
 import { ArrowRight } from "lucide-react";
 import Background from "./Background";
 import { useEffect, useState } from "react";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { useRouter } from "next/navigation";
 import { useMe } from "@/lib/hooks/useMe";
 

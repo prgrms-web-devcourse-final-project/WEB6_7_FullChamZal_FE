@@ -1,6 +1,6 @@
 "use client";
 
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { X } from "lucide-react";
 import AccountRecoveryContent from "./AccountRecoveryContent";
 

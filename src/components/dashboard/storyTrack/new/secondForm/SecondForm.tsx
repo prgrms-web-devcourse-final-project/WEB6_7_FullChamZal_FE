@@ -6,7 +6,7 @@ import { Map, Plus, X } from "lucide-react";
 import PublicLetterPicker from "../../common/PublicLetterPicker";
 import SelectedRouteList from "./SelectedRouteList";
 import RouteMap from "./RouteMap";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 
 type Props = {
   order: TrackType;

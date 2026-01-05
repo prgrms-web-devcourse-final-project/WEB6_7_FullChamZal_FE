@@ -1,5 +1,5 @@
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { Check, X } from "lucide-react";
 
 export default function ConfirmModal({

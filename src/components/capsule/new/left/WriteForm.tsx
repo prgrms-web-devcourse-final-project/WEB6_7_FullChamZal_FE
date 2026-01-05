@@ -28,9 +28,9 @@ import DayTime from "./unlockOpt/DayTime";
 import Location from "./unlockOpt/Location";
 import DayLocation from "./unlockOpt/DayLocation";
 import { useRouter, useSearchParams } from "next/navigation";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import CopyTemplate from "../modal/CopyTemplate";
-import ActiveModal from "../../../common/ActiveModal";
+import ActiveModal from "../../../common/modal/ActiveModal";
 import { useMe } from "@/lib/hooks/useMe";
 import {
   buildPrivatePayload,

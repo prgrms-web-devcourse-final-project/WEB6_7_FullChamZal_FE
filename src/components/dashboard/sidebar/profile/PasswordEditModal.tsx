@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Modal from "@/components/common/Modal";
-import Button from "@/components/common/Button";
+import Modal from "@/components/common/modal/Modal";
+import Button from "@/components/common/tag/Button";
 import { X } from "lucide-react";
 import { updateMe } from "@/lib/api/members/members";
 import toast from "react-hot-toast";

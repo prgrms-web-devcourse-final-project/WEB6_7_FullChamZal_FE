@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { useRouter, useParams } from "next/navigation";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/tag/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";

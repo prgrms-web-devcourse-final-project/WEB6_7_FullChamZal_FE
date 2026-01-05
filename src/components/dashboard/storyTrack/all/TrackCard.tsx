@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import ConfirmModal from "@/components/common/modal/ConfirmModal";
 
 export default function TrackCard({ track }: { track: StoryTrackItem }) {
   const router = useRouter();

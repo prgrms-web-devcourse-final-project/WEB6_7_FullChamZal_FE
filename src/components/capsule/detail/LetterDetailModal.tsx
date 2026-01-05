@@ -31,8 +31,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ActiveModal from "@/components/common/ActiveModal";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import ActiveModal from "@/components/common/modal/ActiveModal";
+import ConfirmModal from "@/components/common/modal/ConfirmModal";
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";

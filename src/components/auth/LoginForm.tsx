@@ -1,8 +1,8 @@
 "use client";
 
-import Input from "@/components/common/Input";
+import Input from "@/components/common/tag/Input";
 import { useEffect, useMemo, useRef, useState } from "react";
-import Button from "../common/Button";
+import Button from "../common/tag/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { useMe } from "@/lib/hooks/useMe";

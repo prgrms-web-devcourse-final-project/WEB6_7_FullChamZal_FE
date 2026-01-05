@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { useRouter } from "next/navigation";
 import SecondForm from "./secondForm/SecondForm";
 import SuccessForm from "./SuccessForm";
 import FirstForm from "./FirstForm";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/tag/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import BackButton from "@/components/common/BackButton";
+import BackButton from "@/components/common/tag/BackButton";
 import TrackHeader from "./TrackHeader";
 import TrackOverview from "./TrackOverview";
 import TrackProgress from "./TrackProgress";
@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "next/navigation";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
-import ActiveModal from "@/components/common/ActiveModal";
+import ActiveModal from "@/components/common/modal/ActiveModal";
 import TrackDetailSkeleton from "@/components/skeleton/dashboard/storytrack/TrackDetailSkeleton";
 import ApiError from "@/components/common/error/ApiError";
 

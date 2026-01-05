@@ -1,13 +1,13 @@
 "use client";
 
-import Button from "../common/Button";
-import Input from "../common/Input";
+import Button from "../common/tag/Button";
+import Input from "../common/tag/Input";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { phoneVerificationApi } from "@/lib/api/phoneVerification";
 import { ApiError } from "@/lib/api/fetchClient";
 import { authApiClient } from "@/lib/api/auth/auth.client";
-import ActiveModal from "../common/ActiveModal";
+import ActiveModal from "../common/modal/ActiveModal";
 
 export default function RegisterForm({
   agreements,

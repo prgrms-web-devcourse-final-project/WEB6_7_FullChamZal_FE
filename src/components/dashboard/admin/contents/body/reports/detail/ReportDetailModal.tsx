@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { adminReportApi } from "@/lib/api/admin/reports/adminReports";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock5, Flag, ShieldAlert, User } from "lucide-react";

@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Modal from "@/components/common/Modal";
+import Modal from "@/components/common/modal/Modal";
 import { AlertCircle, MessageSquareWarning, X } from "lucide-react";
 import { reportApi } from "@/lib/api/capsule/report";
-import ActiveModal from "@/components/common/ActiveModal";
+import ActiveModal from "@/components/common/modal/ActiveModal";
 
 const REASON_LABEL: Record<ReportReasonType, string> = {
   SPAM: "스팸(광고, 홍보성 내용)",

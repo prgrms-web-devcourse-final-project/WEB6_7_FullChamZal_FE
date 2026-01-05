@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/common/Button";
+import Button from "@/components/common/tag/Button";
 import { useRouter } from "next/navigation";
 import { useDeleteStorytrack } from "./useDeleteStoryTrack";
 
@@ -17,7 +17,9 @@ export default function DeleteStorytrackButton({
   const { mutate, isPending } = useDeleteStorytrack();
 
   const onClickDelete = () => {
-    const ok = window.confirm("스토리트랙을 삭제할까요? 삭제하면 되돌릴 수 없습니다.");
+    const ok = window.confirm(
+      "스토리트랙을 삭제할까요? 삭제하면 되돌릴 수 없습니다."
+    );
     if (!ok) return;
 
     mutate(storytrackId, {
