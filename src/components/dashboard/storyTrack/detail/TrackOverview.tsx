@@ -172,7 +172,7 @@ export default function TrackOverview() {
 
               {/* 요약 */}
               <div className="flex gap-2">
-                <div className="bg-primary-5/60 border-2 border-primary-4 rounded-full px-2 py-1 flex items-center gap-1 text-primary-2">
+                <div className="bg-primary-5 border-2 border-primary-4 rounded-full px-2 py-1 flex items-center gap-1 text-primary-2">
                   {trackData?.data.storytrackType === "SEQUENTIAL" ? (
                     <>
                       <ListOrdered size={16} />
@@ -215,7 +215,7 @@ export default function TrackOverview() {
 
               {/* 작성자 */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white">
+                <div className="w-10 h-10 rounded-full bg-text flex items-center justify-center text-bg">
                   {trackData?.data.createrNickname?.slice(0, 1)}
                 </div>
                 <div className="flex flex-col">

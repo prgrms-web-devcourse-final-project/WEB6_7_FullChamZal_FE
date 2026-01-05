@@ -271,6 +271,25 @@ export default function EnvelopeCard({
   const backShade2 = shiftColor(backBase, -5); // 아래 삼각
   const backShade3 = shiftColor(backBase, +5); // 위 삼각 (조금 밝게)
 
+  const FrontStatusBadge = () => {
+    // send 타입에서는 아예 표시 안 함
+    if (type === "send") return null;
+
+    // unlock 모드가 아니면 표시 안 함
+    if (status.mode !== "unlock") return null;
+
+    // 이미 해제된 상태면 표시 안 함
+    if (status.isUnlocked) return null;
+
+    return (
+      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-white/80 shadow-md backdrop-blur">
+          <Lock size={24} className="text-[#3f4756]" />
+        </div>
+      </div>
+    );
+  };
+
   const CardInner = () => (
     <div
       ref={cardRef}
@@ -290,6 +309,7 @@ export default function EnvelopeCard({
             className="relative w-full h-full p-3"
             style={{ backgroundColor: backBase }}
           >
+            <FrontStatusBadge />
             <div className="flex justify-between h-full text-sm">
               <div className="w-2/5">
                 <p className="line-clamp-1">
@@ -391,7 +411,7 @@ export default function EnvelopeCard({
                   </svg>
                 </div>
 
-                <div className="relative text-text-2 flex flex-col items-center justify-center gap-2">
+                <div className="relative text-[#3f4756] flex flex-col items-center justify-center gap-2">
                   <span>읽음</span>
                 </div>
               </div>
@@ -415,7 +435,7 @@ export default function EnvelopeCard({
                   </svg>
                 </div>
 
-                <div className="relative text-text-2 flex flex-col items-center justify-center gap-2">
+                <div className="relative text-[#3f4756] flex flex-col items-center justify-center gap-2">
                   {type === "send" && status.mode === "send" ? (
                     <>
                       <span className="font-medium">{status.statusText}</span>
@@ -433,7 +453,7 @@ export default function EnvelopeCard({
                       {status.canEdit ? (
                         <span className="text-xs">클릭하여 확인/수정</span>
                       ) : (
-                        <span className="text-xs text-text-3">
+                        <span className="text-xs text-[#6f7786]">
                           열람 후에는 수정할 수 없어요
                         </span>
                       )}
@@ -462,7 +482,7 @@ export default function EnvelopeCard({
                             </span>
                           </div>
 
-                          <span className="text-xs text-text-3">
+                          <span className="text-xs text-[#6f7786]">
                             {status.locationHint ?? "해제 후 열람 가능"}
                           </span>
                         </>
@@ -489,7 +509,7 @@ export default function EnvelopeCard({
       tabIndex={0}
       className={[
         "block",
-        canOpenDetail ? "cursor-pointer" : "cursor-not-allowed opacity-80",
+        canOpenDetail ? "cursor-pointer" : "cursor-not-allowed",
       ].join(" ")}
       aria-disabled={!canOpenDetail}
       onClick={handleClick}

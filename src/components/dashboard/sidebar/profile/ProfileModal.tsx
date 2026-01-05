@@ -239,8 +239,8 @@ export default function ProfileModal({
   return (
     <>
       <Modal open={open} onClose={handleClose}>
-        <div className="w-full max-w-125 rounded-2xl border-2 border-outline bg-bg shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
-          <div className="py-4 px-6 flex justify-between items-center border-b border-outline">
+        <div className="w-full max-w-125 rounded-2xl border-2 border-outline bg-bg shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex max-h-[calc(100dvh-48px)] flex-col">
+          <div className="sticky top-0 z-10 py-4 px-6 flex justify-between items-center border-b border-outline">
             <h4 className="text-lg">내 프로필</h4>
 
             {/* 구글 유저도 닫기는 허용(원하면 막을 수도 있음) */}
@@ -253,7 +253,7 @@ export default function ProfileModal({
             </button>
           </div>
 
-          <div className="space-y-8 p-6">
+          <div className="flex-1 space-y-8 p-6 overflow-y-auto overscroll-contain">
             {error ? (
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
@@ -390,10 +390,10 @@ export default function ProfileModal({
             )}
           </div>
 
-          <div className="py-6 px-6 flex flex-col gap-3 border-t border-outline">
+          <div className="sticky bottom-0 z-10 py-6 px-6 flex flex-col gap-3 border-t border-outline">
             {!isVerified && !isOAuthGoogle ? (
               <Button
-                className="w-full py-3 border border-outline bg-bg text-text hover:text-white"
+                className="w-full py-3 border border-outline bg-bg text-text hover:bg-button-hover"
                 onClick={handleClose}
               >
                 닫기
