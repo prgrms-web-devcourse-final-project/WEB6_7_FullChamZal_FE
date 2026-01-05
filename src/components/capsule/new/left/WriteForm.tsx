@@ -892,33 +892,50 @@ export default function WriteForm({
         <WriteDiv title="이미지 첨부 (선택사항)">
           <div className="space-y-3">
             {/* 파일 선택 버튼 */}
-            <div className="flex items-center gap-3">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-                id="image-upload"
-                disabled={isUploading}
-              />
-              <label
-                htmlFor="image-upload"
-                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-bg text-sm font-medium transition-colors ${
-                  isUploading
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-sub-2 hover:border-primary-2"
-                }`}
-              >
-                <ImageIcon size={16} />
-                {isUploading ? "업로드 중..." : "파일 선택"}
-              </label>
-              {isUploading && (
-                <span className="text-sm text-text-3">
-                  이미지를 업로드하는 중...
-                </span>
-              )}
-            </div>
+            {(() => {
+              // 필터링 완료되지 않은 이미지가 있는지 확인
+              const hasPendingOrUploading = uploadedAttachments.some(
+                (a) => a.status === "PENDING" || a.status === "UPLOADING"
+              );
+              const isButtonDisabled = isUploading || hasPendingOrUploading;
+              const statusText = hasPendingOrUploading
+                ? "검토 중..."
+                : isUploading
+                ? "업로드 중..."
+                : "파일 선택";
+
+              return (
+                <div className="flex items-center gap-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="image-upload"
+                    disabled={isButtonDisabled}
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-bg text-sm font-medium transition-colors ${
+                      isButtonDisabled
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-sub-2 hover:border-primary-2"
+                    }`}
+                  >
+                    <ImageIcon size={16} />
+                    {statusText}
+                  </label>
+                  {isButtonDisabled && (
+                    <span className="text-sm text-text-3">
+                      {hasPendingOrUploading
+                        ? "이미지 검토가 완료될 때까지 기다려주세요..."
+                        : "이미지를 업로드하는 중..."}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* 업로드된 이미지 목록 */}
             {uploadedAttachments.length > 0 && (
