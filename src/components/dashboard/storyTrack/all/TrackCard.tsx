@@ -80,9 +80,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["allStoryTrack"] });
       await queryClient.invalidateQueries({ queryKey: ["joinedStoryTrack"] });
-      toast.success("참여하기가 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("참여하기가 완료되었습니다!");
     },
   });
 
@@ -100,9 +98,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["allStoryTrack"] });
       await queryClient.invalidateQueries({ queryKey: ["joinedStoryTrack"] });
-      toast.success("참여취소가 완료되었습니다.", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("참여취소가 완료되었습니다.");
     },
   });
 

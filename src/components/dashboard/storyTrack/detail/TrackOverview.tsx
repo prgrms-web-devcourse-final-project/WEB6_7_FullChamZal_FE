@@ -68,9 +68,7 @@ export default function TrackOverview() {
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
-      toast.success("참여하기가 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("참여하기가 완료되었습니다!");
     },
     onError: () => {
       toast.error("참여하기를 실패했습니다.");
@@ -97,9 +95,7 @@ export default function TrackOverview() {
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "joinedStoryTrack",
       });
-      toast.success("참여취소가 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("참여취소가 완료되었습니다!");
 
       router.push("/dashboard/storyTrack/joined");
       router.refresh();

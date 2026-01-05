@@ -233,7 +233,20 @@
 
   --color-error: #ef4444;
 
+  /* shadow */
   --shadow-glow: 20px 100px 10px 5px rgba(238, 238, 238, 1);
+
+  /* Toast */
+  --toast-bg: #ffffff;
+  --toast-text: #070d19;
+  --toast-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+
+  --toast-border: 2px solid #e5e7eb;
+  /* 기본 */
+  --toast-border-success: 2px solid #57b970;
+  /* 성공 */
+  --toast-border-error: 2px solid #ff2600;
+  /* 에러 */
 }
 
 :root[data-theme="dark"] {
@@ -272,6 +285,15 @@
   --color-error: #ff5050;
 
   --shadow-glow: 20px 100px 10px 5px rgba(238, 238, 243, 0.5);
+
+  /* Toast */
+  --toast-bg: rgba(20, 22, 28, 0.92);
+  --toast-text: #f5f7fa;
+  --toast-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  --toast-border: 1px solid rgba(255, 255, 255, 0.10);
+  --toast-border-success: 1px solid rgba(87, 185, 112, 0.75);
+  --toast-border-error: 1px solid rgba(255, 38, 0, 0.75);
 }
 
 html {

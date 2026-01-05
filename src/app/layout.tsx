@@ -21,15 +21,15 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-(function () {
-  try {
-    const key = "dashboard-theme";
-    const saved = localStorage.getItem(key);
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const theme = saved || (prefersDark ? "dark" : "light");
-    document.documentElement.setAttribute("data-theme", theme);
-  } catch (e) {}
-})();
+              (function () {
+                try {
+                  const key = "dashboard-theme";
+                  const saved = localStorage.getItem(key);
+                  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                  const theme = saved || (prefersDark ? "dark" : "light");
+                  document.documentElement.setAttribute("data-theme", theme);
+                } catch (e) {}
+              })();
             `,
           }}
         />
@@ -42,15 +42,31 @@ export default function RootLayout({
             position="top-center"
             toastOptions={{
               duration: 2500,
+
+              // 기본(기본 toast / loading 등)
               style: {
                 borderRadius: "12px",
-                border: "2px solid #ff2600",
-                background: "rgb(255,255,255)",
+                border: "var(--toast-border)",
+                background: "var(--toast-bg)",
+                color: "var(--toast-text)",
                 backdropFilter: "blur(8px)",
-                color: "#070d19",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.10)",
+                boxShadow: "var(--toast-shadow)",
                 fontSize: "16px",
                 padding: "12px 16px",
+              },
+
+              // 성공 toast
+              success: {
+                style: {
+                  border: "var(--toast-border-success)",
+                },
+              },
+
+              // 에러 toast
+              error: {
+                style: {
+                  border: "var(--toast-border-error)",
+                },
               },
             }}
           />

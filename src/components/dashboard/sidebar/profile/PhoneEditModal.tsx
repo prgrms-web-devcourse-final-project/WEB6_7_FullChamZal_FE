@@ -120,9 +120,7 @@ export default function PhoneEditModal({
       setHasSent(true);
       setStep("CODE");
       setCooldown(res.cooldownSeconds ?? 0);
-      toast.success("인증번호 발송을 성공했습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("인증번호 발송을 성공했습니다!");
     } catch (e: unknown) {
       setError(getErrorMessage(e));
     } finally {
@@ -152,9 +150,7 @@ export default function PhoneEditModal({
 
       setIsSaving(true);
       await updateMe({ phoneNumber });
-      toast.success("인증을 성공했습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("인증을 성공했습니다!");
       onClose();
     } catch (e: unknown) {
       setError(getErrorMessage(e));

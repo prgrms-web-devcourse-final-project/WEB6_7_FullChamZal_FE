@@ -117,9 +117,7 @@ export default function EditStoryTrack() {
     if (!storytrackId) return;
 
     if (!hasChanges) {
-      toast.success("변경사항이 없습니다.", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("변경사항이 없습니다.");
       handleCancel();
       return;
     }
@@ -163,9 +161,7 @@ export default function EditStoryTrack() {
       queryClient.invalidateQueries({ queryKey: ["storyTrackDetail"] });
       queryClient.invalidateQueries({ queryKey: ["mineStoryTrack"] });
 
-      toast.success("스토리트랙 경로 수정이 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("스토리트랙 경로 수정이 완료되었습니다!");
 
       // 상세 페이지로 이동
       router.push(`/dashboard/storyTrack/${storytrackIdNum}`);

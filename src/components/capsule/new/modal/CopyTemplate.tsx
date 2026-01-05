@@ -45,9 +45,7 @@ ${data?.password ? `비밀번호: ${data.password}` : ""}
   // Clipboard API 사용
   const copyToClipboard = async () => {
     await copyWithClipboardAPI(shareText);
-    toast.success("클립보드 복사에 성공했습니다!", {
-      style: { borderColor: "#57b970" },
-    });
+    toast.success("클립보드 복사에 성공했습니다!");
   };
 
   useEffect(() => {

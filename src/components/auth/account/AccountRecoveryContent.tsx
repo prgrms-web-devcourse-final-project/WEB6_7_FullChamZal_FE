@@ -20,7 +20,7 @@ import FindIdSection from "./id/FindIdSection";
 
 type Mode = "FIND_ID" | "FIND_PW";
 
-// ✅ 핵심: 외부에서 mode를 주입 가능하게
+// 핵심: 외부에서 mode를 주입 가능하게
 export default function AccountRecoveryContent({
   initialMode = "FIND_ID",
   initialUserId,
@@ -85,9 +85,7 @@ export default function AccountRecoveryContent({
       accountRecoveryApi.sendVerificationCode(payload),
     onSuccess: () => {
       setHasSentCode(true);
-      toast.success("인증번호를 발송했습니다.", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("인증번호를 발송했습니다.");
     },
     onError: () => toast.error("인증번호 발송에 실패했습니다."),
   });
@@ -98,9 +96,7 @@ export default function AccountRecoveryContent({
     onSuccess: (res) => {
       if (res.data.verified) {
         setVerified(true);
-        toast.success("인증이 완료되었습니다.", {
-          style: { borderColor: "#57b970" },
-        });
+        toast.success("인증이 완료되었습니다.");
       } else {
         setVerified(false);
         toast.error("인증번호가 올바르지 않습니다.");
@@ -132,10 +128,8 @@ export default function AccountRecoveryContent({
     mutationFn: (payload: FindPasswordRequest) =>
       accountRecoveryApi.findPassword(payload),
     onSuccess: () => {
-      toast.success("비밀번호가 변경되었습니다.", {
-        style: { borderColor: "#57b970" },
-      });
-      onDone?.(); // ✅ 완료시 부모가 닫을 수 있게
+      toast.success("비밀번호가 변경되었습니다.");
+      onDone?.();
     },
     onError: () => toast.error("비밀번호 변경에 실패했습니다."),
   });

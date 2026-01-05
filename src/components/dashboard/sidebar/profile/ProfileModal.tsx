@@ -189,9 +189,7 @@ export default function ProfileModal({
       if (res?.nextNicknameChangeDate) {
         setNextNicknameChangeDate(res.nextNicknameChangeDate);
       }
-      toast.success("프로필 수정이 완료되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("프로필 수정이 완료되었습니다!");
     } catch (e: unknown) {
       setError(getErrorMessage(e));
     } finally {

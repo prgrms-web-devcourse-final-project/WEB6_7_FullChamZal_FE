@@ -20,7 +20,6 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
   const routeItems = value.routeItems;
 
-  // ✅ Set은 props로 넘기지 말고 list로 넘겨서 안전하게 처리
   const selectedIdList = useMemo(
     () => routeItems.map((x) => x.id),
     [routeItems]
@@ -119,7 +118,7 @@ export default function SecondForm({ order, value, onChange }: Props) {
 
             <div className="max-h-[70dvh] overflow-y-auto">
               <PublicLetterPicker
-                selectedIds={selectedIdList} // ✅ list로 전달
+                selectedIds={selectedIdList}
                 onSelect={(letter: Letter) => {
                   addLetter(letter);
                   setOpenPicker(false);

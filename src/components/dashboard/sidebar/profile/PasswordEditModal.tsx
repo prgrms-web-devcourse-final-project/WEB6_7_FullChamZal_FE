@@ -64,9 +64,7 @@ export default function PasswordEditModal({
         currentPassword,
         newPassword,
       });
-      toast.success("비밀번호가 변경되었습니다!", {
-        style: { borderColor: "#57b970" },
-      });
+      toast.success("비밀번호가 변경되었습니다!");
       onClose();
     } catch (e: unknown) {
       setError(getErrorMessage(e));
