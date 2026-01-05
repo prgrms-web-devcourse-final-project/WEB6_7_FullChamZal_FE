@@ -803,33 +803,25 @@ export default function LetterDetailModal({
           {/* Header */}
           <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
             <div className="flex justify-between items-center gap-2 md:gap-4">
-              <div className="block md:flex md:flex-2">
-                <div className="flex-none md:flex-1 truncate font-medium text-base md:text-lg lg:text-xl">
-                  제목: {capsule.title}
-                </div>
+              <div className="flex-none font-medium text-base md:text-lg lg:text-xl">
+                제목: {capsule.title}
+              </div>
 
-                <div
-                  className={`flex items-center gap-1 text-xs md:text-sm lg:text-base ${
-                    isProtected ? "justify-end" : "justify-center"
-                  }`}
-                >
-                  <span className="hidden md:block text-text-2">
-                    해제 조건:
-                  </span>
-                  <div className="flex items-center gap-1 text-text-3">
-                    <div className="flex-none">
-                      {isTime ? (
-                        <Clock className="w-3 md:w-4 " />
-                      ) : (
-                        <MapPin className="w-3 md:w-4" />
-                      )}
-                    </div>
-                    <span className="line-clamp-1">{unlockLabel}</span>
+              <div className="flex-1 flex items-center gap-1 text-xs md:text-sm lg:text-base justify-center">
+                <span className="hidden md:block text-text-2">해제 조건:</span>
+                <div className="flex items-center gap-1 text-text-3">
+                  <div className="flex-none">
+                    {isTime ? (
+                      <Clock className="w-3 md:w-4 " />
+                    ) : (
+                      <MapPin className="w-3 md:w-4" />
+                    )}
                   </div>
+                  <span className="line-clamp-1">{unlockLabel}</span>
                 </div>
               </div>
 
-              <div className="md:flex-1 flex justify-end items-center gap-2">
+              <div className="flex justify-end items-center gap-2">
                 {isSender || isReceiver ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -861,20 +853,19 @@ export default function LetterDetailModal({
                               : "백업하기"}
                           </DropdownMenuItem>
                         )}
-                        {isSender ||
-                          (capsule.viewStatus && (
-                            <DropdownMenuItem
-                              className="hover:bg-button-hover"
-                              onClick={() => {
-                                router.push(
-                                  `/capsules/edit?capsuleId=${capsuleId}`
-                                );
-                              }}
-                            >
-                              <PencilLine className="text-primary" />
-                              수정하기
-                            </DropdownMenuItem>
-                          ))}
+                        {isSender && !capsule.viewStatus && (
+                          <DropdownMenuItem
+                            className="hover:bg-button-hover"
+                            onClick={() => {
+                              router.push(
+                                `/capsules/edit?capsuleId=${capsuleId}`
+                              );
+                            }}
+                          >
+                            <PencilLine className="text-primary" />
+                            수정하기
+                          </DropdownMenuItem>
+                        )}
                         {(isSender || isReceiver) && (
                           <DropdownMenuItem
                             className="hover:bg-button-hover"
@@ -960,7 +951,7 @@ export default function LetterDetailModal({
           <div className="shrink-0 border-t border-outline p-5">
             {role === "ADMIN" ? null : (
               <div className="flex-1 flex items-center justify-center">
-                {isReceiver && (
+                {!isSender && (
                   <div className="flex-1 flex items-center justify-center">
                     <button
                       type="button"
