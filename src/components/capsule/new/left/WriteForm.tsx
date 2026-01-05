@@ -326,8 +326,10 @@ export default function WriteForm({
     const MAX_FILES = 3; // 최대 3개까지
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-    // 기존 파일 수 확인
-    const currentCount = uploadedAttachments.length;
+    // 기존 파일 수 확인 (DELETED 상태인 이미지는 제외)
+    const currentCount = uploadedAttachments.filter(
+      (a) => a.status !== "DELETED"
+    ).length;
     if (currentCount + files.length > MAX_FILES) {
       toast.error(`이미지는 최대 ${MAX_FILES}개까지 업로드할 수 있습니다.`);
       // input 초기화
