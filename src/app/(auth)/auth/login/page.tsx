@@ -1,8 +1,26 @@
 import AuthShell from "@/components/auth/AuthShell";
 import LoginForm from "@/components/auth/LoginForm";
 import { Suspense } from "react";
+import { authApiServer } from "@/lib/api/auth/auth.server";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: { returnUrl?: string; callback?: string };
+}) {
+  const sp = await searchParams;
+
+  const cb = sp.returnUrl ?? sp.callback;
+  const returnUrl = cb && cb.startsWith("/") ? cb : null;
+
+  try {
+    const me = await authApiServer.me();
+    const isAdmin = me.role === "ADMIN";
+    const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
+    redirect(returnUrl ?? fallbackTarget);
+  } catch {}
+
   return (
     <Suspense
       fallback={

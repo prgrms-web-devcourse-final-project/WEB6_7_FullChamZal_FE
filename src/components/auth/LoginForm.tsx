@@ -1,11 +1,11 @@
 "use client";
 
 import Input from "@/components/common/tag/Input";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "../common/tag/Button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApiClient } from "@/lib/api/auth/auth.client";
-import { useMe } from "@/lib/hooks/useMe";
+import { useQueryClient } from "@tanstack/react-query";
 
 function getErrorMessage(err: unknown) {
   if (err instanceof Error) return err.message;
@@ -21,6 +21,7 @@ function getErrorMessage(err: unknown) {
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   const returnUrl = useMemo(() => {
     const cb = searchParams.get("returnUrl") || searchParams.get("callback");
@@ -31,24 +32,6 @@ export default function LoginForm() {
   const [pw, setPw] = useState("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
-
-  const { data: me, isLoading: meLoading } = useMe();
-
-  const redirectedRef = useRef(false);
-
-  useEffect(() => {
-    if (redirectedRef.current) return;
-    if (meLoading) return;
-    if (!me) return;
-
-    redirectedRef.current = true;
-
-    const isAdmin = me.role === "ADMIN";
-    const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
-    const target = returnUrl ?? fallbackTarget;
-
-    router.replace(target);
-  }, [me, meLoading, returnUrl, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,14 +48,14 @@ export default function LoginForm() {
       // 로그인
       await authApiClient.login({ userId: id.trim(), password: pw });
 
-      // 내 정보 조회
+      // 내 정보 조회 (권한 분기 위해)
       const me = await authApiClient.me();
-      const isAdmin = me.role === "ADMIN";
 
+      queryClient.setQueryData(["me"], me);
+
+      const isAdmin = me.role === "ADMIN";
       const fallbackTarget = isAdmin ? "/admin/dashboard/users" : "/dashboard";
       const target = returnUrl ?? fallbackTarget;
-
-      redirectedRef.current = true;
 
       router.replace(target);
     } catch (err) {
@@ -81,28 +64,6 @@ export default function LoginForm() {
       setLoading(false);
     }
   };
-
-  if (meLoading) {
-    return (
-      <div className="space-y-4 md:space-y-6 animate-pulse">
-        <div className="space-y-3 md:space-y-5">
-          <div className="space-y-2">
-            <div className="w-20 h-6 rounded-lg bg-outline"></div>
-            <div className="h-13 rounded-xl bg-outline"></div>
-          </div>
-          <div className="space-y-2">
-            <div className="w-20 h-6 rounded-lg bg-outline"></div>
-            <div className="h-13 rounded-xl bg-outline"></div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <div className="h-4 w-16 rounded bg-outline"></div>
-            <div className="h-4 w-16 rounded bg-outline"></div>
-          </div>
-        </div>
-        <div className="h-12 rounded-xl bg-outline animate-pulse" />
-      </div>
-    );
-  }
 
   return (
     <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
