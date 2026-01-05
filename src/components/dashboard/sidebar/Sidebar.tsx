@@ -28,9 +28,20 @@ export default function Sidebar({
   const { theme, toggleTheme } = useDashboardTheme();
 
   const handleLogout = async () => {
-    await authApiClient.logout();
-    queryClient.removeQueries({ queryKey: ["me"] });
-    router.push("/");
+    try {
+      // 1) 진행 중인 요청 먼저 취소
+      await queryClient.cancelQueries();
+
+      // 2) 서버 세션 종료(쿠키 삭제/만료)
+      await authApiClient.logout();
+    } finally {
+      // 3) 캐시 완전 초기화
+      queryClient.clear();
+
+      // 4) 라우팅 + 서버컴포넌트 갱신
+      router.replace("/");
+      router.refresh();
+    }
   };
 
   // 모바일에서 열렸을 때 스크롤 막기(선택)
