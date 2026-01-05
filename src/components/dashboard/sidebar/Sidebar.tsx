@@ -11,6 +11,7 @@ import ProfileModal from "./profile/ProfileModal";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import type { MemberMeDetail } from "@/lib/api/members/members";
 import { useDashboardTheme } from "@/components/common/theme/ThemeProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Sidebar({
   me,
@@ -22,11 +23,13 @@ export default function Sidebar({
   onMobileClose?: () => void;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { theme, toggleTheme } = useDashboardTheme();
 
-  const handleLogout = () => {
-    authApiClient.logout();
+  const handleLogout = async () => {
+    await authApiClient.logout();
+    queryClient.removeQueries({ queryKey: ["me"] });
     router.push("/");
   };
 

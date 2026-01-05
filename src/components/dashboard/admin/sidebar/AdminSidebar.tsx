@@ -8,6 +8,7 @@ import { MemberMeDetail } from "@/lib/api/members/members";
 import { LogOut, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminSidebar({
   mobileOpen = false,
@@ -18,9 +19,11 @@ export default function AdminSidebar({
   onMobileClose?: () => void;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const handleLogout = () => {
-    authApiClient.logout();
+  const handleLogout = async () => {
+    await authApiClient.logout();
+    queryClient.removeQueries({ queryKey: ["me"] });
     router.push("/");
   };
 
