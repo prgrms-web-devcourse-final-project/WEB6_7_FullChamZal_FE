@@ -20,6 +20,24 @@ export type CapsuleAttachmentUploadRequest = {
 };
 
 /**
+ * 파일 업로드 상태 타입
+ */
+export type CapsuleAttachmentStatus =
+  | "UPLOADING" // 업로드 중
+  | "PENDING" // 이미지 필터링 중
+  | "TEMP" // 임시 저장 완료 (필터링 성공)
+  | "DELETED" // 삭제 또는 필터링 실패
+  | "USED"; // 캡슐에 첨부됨
+
+/**
+ * 상태 조회 응답 DTO
+ */
+export type CapsuleAttachmentStatusResponse = {
+  attachmentId: number;
+  status: CapsuleAttachmentStatus;
+};
+
+/**
  * 파일 업로드 API
  */
 export const attachmentApi = {
@@ -107,6 +125,45 @@ export const attachmentApi = {
   },
 
   /**
+   * 업로드 완료 요청
+   * - S3 업로드 완료 후 서버에 알림
+   * - 서버에서 이미지 필터링 시작 (비동기)
+   */
+  completeUpload: async (
+    attachmentId: number,
+    signal?: AbortSignal
+  ): Promise<void> => {
+    await apiFetchRaw<{
+      code: string;
+      message: string;
+      data: Record<string, never>;
+    }>(`/api/v1/capsule/upload/presign/${attachmentId}`, {
+      method: "POST",
+      signal,
+    });
+  },
+
+  /**
+   * 업로드 상태 조회
+   * - 이미지 필터링 상태 확인용
+   */
+  getStatus: async (
+    attachmentId: number,
+    signal?: AbortSignal
+  ): Promise<CapsuleAttachmentStatusResponse> => {
+    const response = await apiFetchRaw<{
+      code: string;
+      message: string;
+      data: CapsuleAttachmentStatusResponse;
+    }>(`/api/v1/capsule/upload/presign/${attachmentId}`, {
+      method: "GET",
+      signal,
+    });
+
+    return response.data;
+  },
+
+  /**
    * 임시 파일 삭제
    */
   deleteTemp: async (
@@ -123,4 +180,3 @@ export const attachmentApi = {
     });
   },
 };
-
