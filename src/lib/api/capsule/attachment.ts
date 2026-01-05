@@ -73,6 +73,7 @@ export const attachmentApi = {
    * Presigned URL 업로드 방식
    * - 1단계: 메타데이터만 서버에 전송하여 presignedUrl 받기
    * - 2단계: 받은 presignedUrl로 S3에 직접 업로드
+   * - 3단계: S3 업로드 완료 후 서버에 완료 알림
    * - 응답: attachmentId + s3Key + presignedUrl + expireAt
    */
   uploadByPresignedUrl: async (
@@ -115,6 +116,9 @@ export const attachmentApi = {
     if (!uploadResponse.ok) {
       throw new Error("S3 업로드에 실패했습니다.");
     }
+
+    // 3단계: 서버에 업로드 완료 알림
+    await attachmentApi.completeUpload(attachmentId, signal);
 
     return {
       attachmentId,
