@@ -296,7 +296,8 @@
   --toast-border-error: 1px solid rgba(255, 38, 0, 0.75);
 }
 
-html {
+html,
+body {
   scroll-behavior: smooth;
   font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;

@@ -82,14 +82,14 @@ export default function MainSection() {
         className="relative w-full min-h-screen overflow-hidden mb-20 md:mb-60"
       >
         <Background />
-        <div className="relative w-full h-screen z-10 flex items-center justify-center font-paperlogy">
+        <div className="relative w-full h-screen z-10 flex items-center justify-center">
           <div className="max-w-430 min-h-100 flex flex-col items-center justify-center">
-            <h2 className="font-extrabold text-5xl md:text-[112px] md:leading-33 bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
+            <h2 className="font-paperlogy font-extrabold text-5xl md:text-[112px] md:leading-33 bg-[linear-gradient(91.61deg,#FF2600_37.12%,#C9290C_77.33%)] text-transparent bg-clip-text">
               Dear.&nbsp;
               <span>{visibleText}</span>
               <span className="typing-cursor font-normal">|</span>
             </h2>
-            <div className="text-center space-y-4 mt-3 md:mt-7">
+            <div className="font-paperlogy text-center space-y-4 mt-3 md:mt-7">
               <p className="font-semibold text-xl md:text-2xl">
                 당신이 도착했을 때 비로소 열리는 편지
               </p>
@@ -109,7 +109,7 @@ export default function MainSection() {
                 onClick={() => {
                   document.getElementById("why")?.scrollIntoView();
                 }}
-                className="cursor-pointer rounded-lg md:rounded-xl border border-[#e7e5e4] px-5 bg-white hover:bg-[#f9f9f9] font-normal"
+                className="cursor-pointer rounded-lg md:rounded-xl border-2 border-[#e7e5e4] px-5 bg-white hover:bg-[#f9f9f9] font-normal"
               >
                 자세히 보기
               </button>
