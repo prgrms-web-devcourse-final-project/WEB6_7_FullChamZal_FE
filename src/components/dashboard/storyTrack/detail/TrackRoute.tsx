@@ -83,10 +83,10 @@ export default function TrackRoute({
                         </div>
                         <div className="space-y-2">
                           <div className="flex flex-col items-start text-left">
-                            <p className="text-lg">
+                            <p className="text-lg text-[#070d19]">
                               {item.capsule.capsuleTitle}
                             </p>
-                            <p className="text-sm text-text-2">
+                            <p className="text-sm text-[#3f4756]">
                               {item.capsule.unlock.location.address}
                             </p>
                           </div>
