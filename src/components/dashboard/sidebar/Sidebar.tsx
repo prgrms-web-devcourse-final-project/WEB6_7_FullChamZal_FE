@@ -60,7 +60,7 @@ export default function Sidebar({
       <aside className="w-72 border-r border-outline hidden lg:flex flex-col h-dvh">
         {/* 상단(스크롤 영역) */}
         <div className="flex-1 min-h-0 overflow-y-auto p-6">
-          <div className="space-y-9">
+          <div className="space-y-7">
             <div className="flex items-center justify-between gap-2">
               {/* Logo */}
               <div className="flex items-center gap-2 text-primary">
