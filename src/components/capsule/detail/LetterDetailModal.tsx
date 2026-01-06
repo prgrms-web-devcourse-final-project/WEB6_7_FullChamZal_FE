@@ -35,7 +35,7 @@ import ActiveModal from "@/components/common/modal/ActiveModal";
 import ConfirmModal from "@/components/common/modal/ConfirmModal";
 import { adminCapsulesApi } from "@/lib/api/admin/capsules/adminCapsules";
 import { authApiClient } from "@/lib/api/auth/auth.client";
-import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import { guestCapsuleApi } from "@/lib/api/capsule/readCapsule";
 import {
   backupCapsule,
   deleteCapsuleAsReceiver,
@@ -560,6 +560,8 @@ export default function LetterDetailModal({
         signal
       );
 
+      console.log(u);
+
       return {
         capsuleColor: u.capsuleColor ?? null,
         title: u.title,
@@ -577,6 +579,9 @@ export default function LetterDetailModal({
         viewStatus: !!u.viewStatus,
         isBookmarked: !!u.isBookmarked,
         attachments: u.attachments,
+
+        maxViewCount: u.maxViewCount,
+        currentViewCount: u.currentViewCount,
       };
     },
   });
@@ -704,6 +709,11 @@ export default function LetterDetailModal({
   const isBookmarkMode = !isAdmin && !!isProtected && canBookmarkOrSave;
 
   const bookmarkButtonDisabled = bookmarkMutation.isPending;
+  // 선착순 마감 여부 계산
+  const isFirstComeFull =
+    capsule.maxViewCount != null &&
+    capsule.maxViewCount > 0 &&
+    (capsule.currentViewCount ?? 0) >= capsule.maxViewCount;
 
   return (
     <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
@@ -857,13 +867,21 @@ export default function LetterDetailModal({
               <div className="flex gap-2">
                 {/* 선착순 카운트 (maxViewCount > 0 일 때만 표시) */}
                 {capsule.maxViewCount != null && capsule.maxViewCount > 0 && (
-                  <div className="flex items-center gap-1 text-xs md:text-sm text-text-2">
-                    <span className="font-medium">
-                      현재 {capsule.currentViewCount}명 열람
-                    </span>
+                  <div
+                    className={`flex items-center gap-1 text-xs md:text-sm font-medium ${
+                      isFirstComeFull ? "text-error" : "text-text-2"
+                    }`}
+                  >
+                    <span>현재 {capsule.currentViewCount}명 열람</span>
                     <span>/</span>
-                    <span className="text-primary">
-                      선착순 {capsule.maxViewCount}명까지 열람 가능
+                    <span
+                      className={
+                        isFirstComeFull ? "text-error" : "text-primary"
+                      }
+                    >
+                      {isFirstComeFull
+                        ? "선착순 마감"
+                        : `선착순 ${capsule.maxViewCount}명까지 열람 가능`}
                     </span>
                   </div>
                 )}
@@ -974,10 +992,11 @@ export default function LetterDetailModal({
                           key={attachment.attachmentId}
                           className="relative w-full max-h-96"
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
+                          <Image
                             src={attachment.presignedUrl}
                             alt={`첨부 이미지 ${attachment.attachmentId}`}
+                            width={800}
+                            height={800}
                             className="max-h-96 w-auto h-auto object-contain rounded-lg"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -991,7 +1010,7 @@ export default function LetterDetailModal({
                 </div>
 
                 <div className="shrink-0 flex flex-col items-end gap-1 lg:gap-2">
-                  <span className="text-xs md:text-sm lg:text-base text-[#6f7786]">
+                  <span className="text-xs md:text-sm lg:text-base text-gray-500">
                     {formatDate(capsule.createdAt)}
                   </span>
                   <div className="text-base md:text-xl lg:text-2xl space-x-1">

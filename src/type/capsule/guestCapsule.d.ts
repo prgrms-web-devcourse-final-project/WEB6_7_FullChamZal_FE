@@ -40,6 +40,8 @@ type CapsuleReadData = {
   locationName?: string;
   locationLat?: number;
   locationLng?: number;
+  maxViewCount: number;
+  currentViewCount: number;
   isBookmarked: boolean;
   result: string;
   attachments?: CapsuleAttachmentViewResponse[];

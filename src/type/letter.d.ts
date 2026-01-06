@@ -20,19 +20,30 @@ interface Capsule {
   sharePath: string; // 공개 링크
 }
 
-interface PublicCapsule {
+type PublicCapsule = {
   capsuleId: number;
   capsuleLocationName: string;
+
   writerNickname: string;
   title: string;
   content: string;
+
   capsuleCreatedAt: string;
-  capsuleUnlockType: string;
+  capsuleUnlockType: CapsuleUnlockType;
+
   capsuleLatitude: number;
   capsuleLongitude: number;
+
+  capsuleUnlockAt: string | null;
+  capsuleUnlockUntil: string | null;
+
+  maxViewCount: number;
+  currentViewCount: number;
+
   distanceToCapsule: number;
   isViewed: boolean;
   isUnlockable: boolean;
+
   likeCount: number;
   isLiked: boolean;
-}
+};

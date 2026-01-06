@@ -52,6 +52,28 @@ export default function Card({ data, keyword }: CardProps) {
               {Math.floor(data.distanceToCapsule)}m
             </span>
           </div>
+
+          {/* 선착순 카운트 */}
+          {data.maxViewCount > 0 && (
+            <div
+              className={`text-xs flex items-center gap-1 ${
+                data.currentViewCount >= data.maxViewCount
+                  ? "text-error"
+                  : "text-text-2"
+              }`}
+            >
+              {data.currentViewCount >= data.maxViewCount ? (
+                <span className="font-medium">선착순 마감</span>
+              ) : (
+                <>
+                  <span>선착순</span>
+                  <span className="font-medium">
+                    {data.currentViewCount}/{data.maxViewCount}
+                  </span>
+                </>
+              )}
+            </div>
+          )}
         </div>
         {/* <div className="text-sm">
           <p>벚꽃이 피는 이 거리에서 당신을 떠올립니다...</p>

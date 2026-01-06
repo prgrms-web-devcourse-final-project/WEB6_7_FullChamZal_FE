@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useCallback, RefObject } from "react";
 
 type Attachment = {
@@ -26,17 +27,10 @@ export function useCleanupStorytrackTempFile(
    * useCallback으로 메모이제이션하여 의존성 문제 해결
    */
   const cleanupFile = useCallback(
-    (attachment: Attachment | null, reason: string) => {
+    (attachment: Attachment | null) => {
       if (!attachment) {
-        console.log("[Cleanup] 파일이 없어 cleanup 스킵");
         return;
       }
-
-      console.log(`[Cleanup] 임시 파일 삭제 시도:`, {
-        attachmentId: attachment.attachmentId,
-        fileName: attachment.fileName,
-        reason,
-      });
 
       // 로컬 개발 환경 체크 (API_BASE_URL이 없거나 localhost일 때)
       const isLocalDev =
@@ -45,13 +39,9 @@ export function useCleanupStorytrackTempFile(
         API_BASE.includes("127.0.0.1");
 
       if (isLocalDev) {
-        console.log(
-          "[Cleanup] 로컬 개발 모드: 실제 API 호출 스킵 (시뮬레이션)"
-        );
         // 미리보기 URL만 정리
         if (attachment.previewUrl) {
           URL.revokeObjectURL(attachment.previewUrl);
-          console.log("[Cleanup] 미리보기 URL 정리 완료");
         }
         return;
       }
@@ -66,30 +56,17 @@ export function useCleanupStorytrackTempFile(
             credentials: "include", // 쿠키 기반 인증을 위해 필요
           }
         )
-          .then(() => {
-            console.log(
-              `[Cleanup] 임시 파일 삭제 성공: attachmentId=${attachment.attachmentId}`
-            );
-          })
-          .catch((error) => {
-            console.log(
-              `[Cleanup] 임시 파일 삭제 실패: attachmentId=${attachment.attachmentId}`,
-              error
-            );
+          .then(() => {})
+          .catch(() => {
             // 실패해도 무시 (서버 스케줄러가 처리)
           });
-      } catch (error) {
-        console.log(
-          `[Cleanup] 임시 파일 삭제 예외 발생: attachmentId=${attachment.attachmentId}`,
-          error
-        );
+      } catch (e) {
         // 무시
       }
 
       // 미리보기 URL 정리
       if (attachment.previewUrl) {
         URL.revokeObjectURL(attachment.previewUrl);
-        console.log("[Cleanup] 미리보기 URL 정리 완료");
       }
     },
     [API_BASE]
@@ -105,15 +82,12 @@ export function useCleanupStorytrackTempFile(
       // beforeunload 시점에 최신 ref 값을 읽어야 하므로 ref.current 직접 사용
       const shouldSkip = skipCleanupRef?.current;
       if (shouldSkip) {
-        console.log(
-          "[Cleanup] beforeunload: skipCleanupRef가 true이므로 cleanup 스킵"
-        );
         return;
       }
 
       // beforeunload 시점에 최신 ref 값을 읽어야 하므로 ref.current 직접 사용
       const attachment = uploadedAttachmentRef.current;
-      cleanupFile(attachment, "beforeunload (페이지 이탈)");
+      cleanupFile(attachment);
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -132,15 +106,12 @@ export function useCleanupStorytrackTempFile(
       // ref는 변경 가능한 값이므로 cleanup 시점의 최신 값을 읽는 것이 올바름
       // eslint-disable-next-line react-hooks/exhaustive-deps
       if (skipCleanupRef?.current) {
-        console.log(
-          "[Cleanup] 컴포넌트 언마운트: skipCleanupRef가 true이므로 cleanup 스킵 (다음 단계 진행 중)"
-        );
         return;
       }
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const attachment = uploadedAttachmentRef.current;
-      cleanupFile(attachment, "컴포넌트 언마운트");
+      cleanupFile(attachment);
     };
   }, [uploadedAttachmentRef, skipCleanupRef, cleanupFile]);
 }

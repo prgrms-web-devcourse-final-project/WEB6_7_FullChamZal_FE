@@ -5,7 +5,7 @@
 
 <br/>
 
-<img src="https://img.shields.io/badge/프로젝트 기간-2025.12.14 ~ 2026.01.13-fab2ac?style=flat&logo=&logoColor=white" />
+<img src="https://img.shields.io/badge/프로젝트 기간-2025.12.04 ~ 2026.01.13-fab2ac?style=flat&logo=&logoColor=white" />
 
 </div>
 

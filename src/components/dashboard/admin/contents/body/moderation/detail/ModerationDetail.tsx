@@ -49,8 +49,6 @@ export default function ModerationDetail({ open, id, onClose }: Props) {
     }
   }, [detail?.rawResponseJson]);
 
-  console.log(raw);
-
   if (!open) return null;
 
   return (
