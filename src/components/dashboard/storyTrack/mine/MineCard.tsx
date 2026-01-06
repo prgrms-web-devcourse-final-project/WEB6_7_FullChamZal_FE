@@ -2,7 +2,12 @@ import { ListOrdered, MapPin, Shuffle, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const DEFAULT_THUMBNAIL =
+  "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg";
+
 export default function MineCard({ track }: { track: StoryTrackMineItem }) {
+  const thumbnailUrl = track.imageUrl || DEFAULT_THUMBNAIL;
+
   return (
     <Link
       href={`/dashboard/storyTrack/${track.storytrackId}`}
@@ -10,7 +15,7 @@ export default function MineCard({ track }: { track: StoryTrackMineItem }) {
     >
       {/* Top */}
       <Image
-        src="https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"
+        src={thumbnailUrl}
         alt={track.title}
         width={800}
         height={200}

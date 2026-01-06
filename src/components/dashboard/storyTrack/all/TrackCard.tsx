@@ -170,7 +170,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         onClick={handleCardClick}
       >
         <Image
-          src="https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"
+          src={track.imageUrl || "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"}
           alt={track.title}
           width={800}
           height={200}

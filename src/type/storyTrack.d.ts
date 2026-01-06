@@ -32,6 +32,7 @@ type StoryTrackItem = {
   createdAt: string;
   totalMemberCount: number;
   memberType: MemberType;
+  imageUrl?: string | null; // 썸네일 이미지 URL
 };
 
 type StoryTrackListPage = {
@@ -114,6 +115,7 @@ type StoryTrackJoinedItem = {
   completedAt: string | null;
   createdAt: string;
   totalMemberCount: number;
+  imageUrl?: string | null; // 썸네일 이미지 URL
 };
 
 type StoryTrackJoinedListPage = {
@@ -138,6 +140,7 @@ type StoryTrackMineItem = {
   totalSteps: number;
   createdAt: string;
   totalMemberCount: number;
+  imageUrl?: string | null; // 썸네일 이미지 URL
 };
 
 type StoryTrackMineListPage = {
@@ -166,6 +169,7 @@ type StoryTrackDetailItem = {
   memberType: MemberType;
   paths: StoryTrackPaths;
   completedCapsuleId: number[];
+  imageUrl?: string | null; // 썸네일 이미지 URL
 };
 
 type StoryTrackPaths = {
@@ -207,6 +211,7 @@ type StoryTrackProgressItem = {
   lastCompletedStep: number;
   completedAt: string;
   createdAt: string;
+  imageUrl?: string | null; // 썸네일 이미지 URL
 };
 
 type StoryTrackProgressResponse = ApiEnvelope<StoryTrackProgressItem>;
