@@ -18,7 +18,8 @@ type FormState = {
   title: string;
   description: string;
   order: TrackType;
-  imageFile: File | null;
+  thumbnailAttachmentId: number | undefined; // 필수 (초기값은 undefined)
+  thumbnailStatus?: "UPLOADING" | "PENDING" | "TEMP" | "DELETED" | "USED"; // 썸네일 상태
 
   // step2
   routeLetterIds: string[];
@@ -32,7 +33,8 @@ const initialState: FormState = {
   title: "",
   description: "",
   order: "SEQUENTIAL",
-  imageFile: null,
+  thumbnailAttachmentId: undefined,
+  thumbnailStatus: undefined,
   routeLetterIds: [],
 };
 
@@ -52,9 +54,15 @@ export default function CreateStoryTrack() {
     return (
       form.title.trim().length > 0 &&
       form.description.trim().length > 0 &&
-      form.imageFile !== null
+      form.thumbnailAttachmentId !== undefined &&
+      form.thumbnailStatus === "TEMP" // TEMP 상태(필터링 완료)일 때만 다음 단계 가능
     );
-  }, [form.title, form.description, form.imageFile]);
+  }, [
+    form.title,
+    form.description,
+    form.thumbnailAttachmentId,
+    form.thumbnailStatus,
+  ]);
 
   // step2 검증: 최소 2개 이상 선택해야 제출 가능
   const canSubmitFromStep2 = useMemo(() => {
@@ -77,7 +85,8 @@ export default function CreateStoryTrack() {
     try {
       setIsSubmitting(true);
 
-      // FormState → CreateStorytrackRequest 변환
+      // FormState -> CreateStorytrackRequest 변환
+      // canSubmitFromStep2와 canGoNextFromStep1 검증을 통과했으므로 thumbnailAttachmentId는 반드시 존재
       const payload: CreateStorytrackRequest = {
         title: form.title.trim(),
         description: form.description.trim(),
@@ -85,6 +94,7 @@ export default function CreateStoryTrack() {
         isPublic: 1, // 기본값: 공개
         price: 0, // 기본값: 무료
         capsuleList: form.routeLetterIds.map((id) => Number(id)), // string[] → number[]
+        attachmentId: form.thumbnailAttachmentId!, // 썸네일 attachmentId (필수, 검증 완료)
       };
 
       // API 호출
@@ -142,7 +152,8 @@ export default function CreateStoryTrack() {
                   title: form.title,
                   description: form.description,
                   order: form.order,
-                  imageFile: form.imageFile,
+                  thumbnailAttachmentId: form.thumbnailAttachmentId,
+                  thumbnailStatus: form.thumbnailStatus,
                 }}
                 onChange={(patch: Partial<FirstFormValue>) =>
                   setForm((prev) => ({ ...prev, ...patch }))
