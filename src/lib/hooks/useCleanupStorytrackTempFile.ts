@@ -13,9 +13,11 @@ type Attachment = {
  * - 컴포넌트 언마운트 (뒤로가기, 페이지 이동 등)
  *
  * @param uploadedAttachmentRef 업로드된 파일을 담고 있는 ref (단일 객체 또는 null)
+ * @param skipCleanupRef cleanup을 스킵할지 여부를 담고 있는 ref (다음 단계 진행 중일 때 true)
  */
 export function useCleanupStorytrackTempFile(
-  uploadedAttachmentRef: RefObject<Attachment | null>
+  uploadedAttachmentRef: RefObject<Attachment | null>,
+  skipCleanupRef?: RefObject<boolean>
 ) {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -54,9 +56,18 @@ export function useCleanupStorytrackTempFile(
   // 브라우저 탭 나가기 시 임시 파일 삭제 (beforeunload)
   // 참고: beforeunload에서는 비동기 작업이 완료되지 않을 수 있으므로,
   // fetch with keepalive 옵션 사용하여 페이지 이탈 후에도 요청이 전송되도록 함
+  // 단, skipCleanupRef가 true인 경우 (다음 단계 진행 중)에는 cleanup을 스킵
   useEffect(() => {
     const handleBeforeUnload = () => {
+      // 다음 단계로 진행하는 경우 cleanup을 스킵
       // beforeunload 시점에 최신 ref 값을 읽어야 하므로 ref.current 직접 사용
+
+      if (skipCleanupRef?.current) {
+        return;
+      }
+
+      // beforeunload 시점에 최신 ref 값을 읽어야 하므로 ref.current 직접 사용
+
       const attachment = uploadedAttachmentRef.current;
       cleanupFile(attachment);
     };
@@ -66,17 +77,41 @@ export function useCleanupStorytrackTempFile(
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [uploadedAttachmentRef, cleanupFile]);
+  }, [uploadedAttachmentRef, skipCleanupRef, cleanupFile]);
 
   // 컴포넌트 언마운트 시 (뒤로가기, 페이지 이동, 취소 버튼 클릭 등) 임시 파일 삭제
+  // 단, skipCleanupRef가 true인 경우 (다음 단계 진행 중)에는 cleanup을 스킵
   useEffect(() => {
     return () => {
       // cleanup 함수는 언마운트 시점에 실행되며, 이 시점의 최신 ref 값을 읽어야 함
       // cleanup 시점에 ref.current를 읽는 것은 의도적인 동작 (최신 값을 읽기 위해)
+      // ref는 변경 가능한 값이므로 cleanup 시점의 최신 값을 읽는 것이 올바름
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      if (skipCleanupRef?.current) {
+        return;
+      }
+
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const attachment = uploadedAttachmentRef.current;
       cleanupFile(attachment);
     };
-  }, [uploadedAttachmentRef, cleanupFile]);
+  }, [uploadedAttachmentRef, skipCleanupRef, cleanupFile]);
 }
 
+/**
+ * 스토리트랙 썸네일 임시 파일을 수동으로 정리하는 함수
+ * 스토리트랙 생성 성공 후 호출
+ */
+export function cleanupStorytrackTempFile(attachmentId: number) {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+  try {
+    fetch(`${API_BASE}/api/v1/storytrack/upload/${attachmentId}`, {
+      method: "DELETE",
+      credentials: "include",
+    }).catch(() => {
+      // 실패해도 무시 (서버 스케줄러가 처리)
+    });
+  } catch {
+    // 무시
+  }
+}

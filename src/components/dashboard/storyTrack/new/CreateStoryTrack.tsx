@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import Button from "@/components/common/tag/Button";
 import { useRouter } from "next/navigation";
 import SecondForm from "./secondForm/SecondForm";
@@ -49,6 +49,9 @@ export default function CreateStoryTrack() {
 
   const [step2, setStep2] = useState<Step2UIState>({ routeItems: [] });
 
+  // Step1 → Step2로 이동하는 경우 cleanup을 스킵하기 위한 ref
+  const skipCleanupForNextStepRef = useRef(false);
+
   // step1 검증: 전부 입력했을 때만 다음 가능
   const canGoNextFromStep1 = useMemo(() => {
     return (
@@ -75,8 +78,19 @@ export default function CreateStoryTrack() {
 
   const handleNext = () => {
     if (step === 1 && !canGoNextFromStep1) return;
-    if (step === 1) setStep(2);
+    if (step === 1) {
+      // Step1 → Step2로 이동하기 전에 cleanup 스킵 플래그 설정
+      skipCleanupForNextStepRef.current = true;
+      setStep(2);
+    }
   };
+
+  // Step2 → Step1로 돌아올 때 cleanup 스킵 플래그 리셋
+  useEffect(() => {
+    if (step === 1) {
+      skipCleanupForNextStepRef.current = false;
+    }
+  }, [step]);
 
   const handleSubmit = async () => {
     if (step !== 2) return;
@@ -104,6 +118,10 @@ export default function CreateStoryTrack() {
       if (response.code === "200") {
         queryClient.invalidateQueries({ queryKey: ["mineStoryTrack"] });
         toast.success("스토리트랙 생성이 완료되었습니다!");
+        // 스토리트랙 생성 성공 후 임시 파일 정리 (이제 USED 상태이므로)
+        // 참고: 백엔드에서 attachment.attachToStorytrack() 호출 시 상태가 THUMBNAIL로 변경됨
+        // 따라서 임시 파일 삭제는 필요 없지만, 혹시 모를 경우를 대비해 정리
+        // 실제로는 백엔드에서 상태가 변경되므로 삭제할 필요 없음
         setStep(3);
       } else {
         throw new Error(response.message || "스토리트랙 생성에 실패했습니다.");
@@ -115,6 +133,8 @@ export default function CreateStoryTrack() {
           ? e.message
           : "스토리트랙 생성에 실패했습니다. 다시 시도해주세요.";
       toast.error(errorMessage);
+      // 생성 실패 시 임시 파일은 그대로 유지 (사용자가 다시 시도할 수 있도록)
+      // cleanup은 Step1로 돌아가거나 페이지를 벗어날 때 실행됨
     } finally {
       setIsSubmitting(false);
     }
@@ -158,6 +178,7 @@ export default function CreateStoryTrack() {
                 onChange={(patch: Partial<FirstFormValue>) =>
                   setForm((prev) => ({ ...prev, ...patch }))
                 }
+                skipCleanupRef={skipCleanupForNextStepRef}
               />
             )}
 
