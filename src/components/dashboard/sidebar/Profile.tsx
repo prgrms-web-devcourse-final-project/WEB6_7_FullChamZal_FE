@@ -61,7 +61,7 @@ export default function Profile({
             </div>
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <p>{displayName || "\u00A0"}</p>
             <p className="text-text-3 text-sm line-clamp-1">
               {displayEmail || "\u00A0"}
