@@ -201,9 +201,6 @@ export default function EnvelopeCard({
   // 모바일 1탭 플립 상태
   const [flipped, setFlipped] = useState(false);
 
-  const [animating, setAnimating] = useState(false);
-  const FLIP_MS = 700; // transition duration과 맞춤
-
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   const canHover = useMemo(() => {
@@ -237,9 +234,7 @@ export default function EnvelopeCard({
     };
   }, [flipped]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (animating) return;
-
+  const handleClick = () => {
     // 데스크탑(hover 가능)에서는 "열 수 있는 편지"만 바로 이동
     if (canHover) {
       if (!canOpenDetail) return;
@@ -247,17 +242,6 @@ export default function EnvelopeCard({
       return;
     }
 
-    // 모바일(hover 불가): 1번 탭 => 뒤집기 (잠겨 있어도 OK)
-    if (!flipped) {
-      e.preventDefault();
-      setAnimating(true);
-      requestAnimationFrame(() => setFlipped(true));
-      window.setTimeout(() => setAnimating(false), FLIP_MS);
-      return;
-    }
-
-    // 모바일 2번 탭 => 열 수 있을 때만 이동
-    if (!canOpenDetail) return;
     router.push(href, { scroll: false });
   };
 
