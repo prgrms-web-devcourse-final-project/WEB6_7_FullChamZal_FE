@@ -179,7 +179,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         />
 
         <div
-          className={`absolute inset-0 z-30 bg-text/60 flex items-center justify-center gap-3 transition-opacity duration-200 md:opacity-0 md:pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:transition-opacity md:duration-200 md:flex md:items-center md:justify-center
+          className={`absolute inset-0 z-30 bg-text/60 flex items-center justify-center gap-3 transition-opacity duration-200 lg:opacity-0 lg:pointer-events-none lg:group-hover:opacity-100 lg:group-hover:pointer-events-auto lg:transition-opacity lg:duration-200 lg:flex lg:items-center lg:justify-center
           ${overlayClassMobile}`}
           onClick={(e) => e.stopPropagation()}
         >
