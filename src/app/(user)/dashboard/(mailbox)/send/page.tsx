@@ -1,9 +1,9 @@
 import LetterDetailModal from "@/components/capsule/detail/LetterDetailModal";
 import MailboxPage from "@/components/dashboard/contents/mailbox/MailboxPage";
-import MailboxSkeleton from "@/components/skeleton/MailboxSkeleton";
+import MailboxSkeleton from "@/components/ui/skeleton/MailboxSkeleton";
 import { Suspense } from "react";
 
-export default async function BookmarkPage({
+export default async function SendPage({
   searchParams,
 }: {
   searchParams: Promise<{ id?: string }>;
@@ -14,11 +14,11 @@ export default async function BookmarkPage({
   return (
     <>
       <Suspense fallback={<MailboxSkeleton />}>
-        <MailboxPage type="bookmark" />
+        <MailboxPage type="send" />
         {capsuleId ? (
           <LetterDetailModal
             capsuleId={capsuleId}
-            closeHref="/dashboard/bookmark"
+            closeHref="/dashboard/send"
             role="USER"
           />
         ) : null}

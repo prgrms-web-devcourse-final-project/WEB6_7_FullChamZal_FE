@@ -17,7 +17,7 @@ import {
 import {
   CAPTURE_ENVELOPE_PALETTE,
   type CapsuleColor,
-} from "@/constants/capsulePalette";
+} from "@/lib/constants/capsulePalette";
 import WriteDiv from "./WriteDiv";
 import ActionTab from "./ActionTab";
 import VisibilityOpt from "./VisibilityOpt";

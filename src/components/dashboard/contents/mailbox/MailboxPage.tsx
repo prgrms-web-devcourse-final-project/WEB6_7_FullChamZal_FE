@@ -7,7 +7,7 @@ import DivBox from "../../DivBox";
 import EnvelopeCard from "./EnvelopeCard";
 import { Bookmark, Inbox, Send } from "lucide-react";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
-import MailboxSkeleton from "@/components/skeleton/MailboxSkeleton";
+import MailboxSkeleton from "@/components/ui/skeleton/MailboxSkeleton";
 
 type LatLng = { lat: number; lng: number };
 

@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { useQuery } from "@tanstack/react-query";
-import YearlyLetterSkeleton from "@/components/skeleton/dashboard/home/YearlyLetterSkeleton";
+import YearlyLetterSkeleton from "@/components/ui/skeleton/dashboard/home/YearlyLetterSkeleton";
 import ApiError from "@/components/common/error/ApiError";
 
 type YearLettersItem = {
@@ -155,7 +155,7 @@ export default function YearlyLetterOverview() {
           <p className="text-sm">보낸 편지</p>
           <p className="text-2xl">{sendCount}</p>
         </div>
-        <div className="w-full px-4 py-3 bg-activeBg rounded-[10px] space-y-2">
+        <div className="w-full px-4 py-3 bg-activeBg/50 rounded-[10px] space-y-2">
           <p className="text-sm">받은 편지</p>
           <p className="text-2xl">{receiveCount}</p>
         </div>

@@ -13,7 +13,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
 import ActiveModal from "@/components/common/modal/ActiveModal";
-import TrackDetailSkeleton from "@/components/skeleton/dashboard/storytrack/TrackDetailSkeleton";
+import TrackDetailSkeleton from "@/components/ui/skeleton/dashboard/storytrack/TrackDetailSkeleton";
 import ApiError from "@/components/common/error/ApiError";
 
 type TabType = "route" | "map";
@@ -173,7 +173,7 @@ export default function TrackDetailPage() {
               <div className="border border-outline rounded-2xl overflow-hidden flex flex-col lg:flex-1 lg:min-h-0">
                 <TrackTabMenu activeTab={tab} onChange={setTab} />
 
-                <div className="overflow-visible lg:overflow-auto lg:flex-1 lg:min-h-0">
+                <div className="overflow-visible h-screen lg:overflow-auto lg:flex-1 lg:min-h-0">
                   {tab === "map" && (
                     <TrackMap
                       storytrackType={data?.data.storytrackType}

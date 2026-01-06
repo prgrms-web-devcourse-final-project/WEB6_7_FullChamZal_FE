@@ -8,7 +8,7 @@ import StoryMenuTab from "../common/StoryMenuTab";
 import JoinedCard from "./JoinedCard";
 
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
-import StorytrackCardSkeleton from "@/components/skeleton/dashboard/storytrack/StorytrackCardSkeleton";
+import StorytrackCardSkeleton from "@/components/ui/skeleton/dashboard/storytrack/StorytrackCardSkeleton";
 
 /* 무한스크롤 */
 function useInfiniteScroll(

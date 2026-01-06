@@ -47,7 +47,7 @@ import {
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
-import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
+import { CAPTURE_COLOR_MAP } from "@/lib/constants/capsulePalette";
 import ReportModal from "../report/ReportModal";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -663,6 +663,9 @@ export default function LetterDetailModal({
           capsule.unlockAt ? formatDateTime(capsule.unlockAt) : "시간 조건 없음"
         } · ${capsule.locationName ?? "위치 조건 없음"}`;
 
+  const unlockUntilLabel =
+    capsule.unlockUntil != null ? formatDateTime(capsule.unlockUntil) : null;
+
   const DEFAULT_HEX = CAPTURE_COLOR_MAP.BEIGE ?? "#FFDED8";
 
   const detailKey = (capsule.capsuleColor ?? "BEIGE")
@@ -807,18 +810,28 @@ export default function LetterDetailModal({
                 제목: {capsule.title}
               </div>
 
-              <div className="flex-1 flex items-center gap-1 text-xs md:text-sm lg:text-base justify-center">
-                <span className="hidden md:block text-text-2">해제 조건:</span>
-                <div className="flex items-center gap-1 text-text-3">
-                  <div className="flex-none">
-                    {isTime ? (
-                      <Clock className="w-3 md:w-4 " />
-                    ) : (
-                      <MapPin className="w-3 md:w-4" />
-                    )}
+              <div className="flex-1 flex flex-col items-center gap-0.5 text-xs md:text-sm lg:text-base justify-center">
+                <div className="flex flex-row gap-1">
+                  <span className="hidden md:block text-text-2">
+                    해제 조건:
+                  </span>
+                  <div className="flex items-center gap-1 text-text-3">
+                    <div className="flex-none">
+                      {isTime ? (
+                        <Clock className="w-3 md:w-4 " />
+                      ) : (
+                        <MapPin className="w-3 md:w-4" />
+                      )}
+                    </div>
+                    <span className="line-clamp-1">{unlockLabel}</span>
                   </div>
-                  <span className="line-clamp-1">{unlockLabel}</span>
                 </div>
+
+                {unlockUntilLabel && (
+                  <span className="text-xs md:text-xs text-text-3">
+                    열람 가능 기한: {unlockUntilLabel} 까지
+                  </span>
+                )}
               </div>
 
               <div className="flex justify-end items-center gap-2">

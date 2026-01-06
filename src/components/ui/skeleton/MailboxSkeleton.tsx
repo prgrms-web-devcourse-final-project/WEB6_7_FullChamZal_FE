@@ -1,4 +1,4 @@
-import DivBox from "../dashboard/DivBox";
+import DivBox from "../../dashboard/DivBox";
 
 export default function MailboxSkeleton() {
   return (

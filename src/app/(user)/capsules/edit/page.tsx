@@ -10,7 +10,7 @@ import WriteInput from "@/components/capsule/new/left/WriteInput";
 import WriteDiv from "@/components/capsule/new/left/WriteDiv";
 import Button from "@/components/common/tag/Button";
 import ActiveModal from "@/components/common/modal/ActiveModal";
-import { CAPTURE_ENVELOPE_PALETTE } from "@/constants/capsulePalette";
+import { CAPTURE_ENVELOPE_PALETTE } from "@/lib/constants/capsulePalette";
 import { updateCapsule, readSendCapsule } from "@/lib/api/capsule/capsule";
 import { Send } from "lucide-react";
 

@@ -5,7 +5,7 @@ import AdminHeader from "../AdminHeader";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
 import { adminUsersApi } from "@/lib/api/admin/users/adminUsers";
-import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
+import AdminDashboardPageSkeleton from "@/components/ui/skeleton/admin/AdminDashboardPageSkeleton";
 import ApiError from "@/components/common/error/ApiError";
 
 const USER_TABS = [

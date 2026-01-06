@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import Logo from "@/components/common/Logo";
 import { Clock, Lock, MapPin, Unlock, Pencil, PencilOff } from "lucide-react";
-import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
+import { CAPTURE_COLOR_MAP } from "@/lib/constants/capsulePalette";
 import { useRouter } from "next/navigation";
 import { distanceMeters } from "@/lib/hooks/distanceMeters";
 import Stamp from "@/components/common/stamp/Stamp";
