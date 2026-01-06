@@ -44,7 +44,7 @@ export default function Sidebar({
     }
   };
 
-  // 모바일에서 열렸을 때 스크롤 막기(선택)
+  // 모바일에서 열렸을 때 스크롤 막기
   useEffect(() => {
     if (!mobileOpen) return;
     const prev = document.body.style.overflow;

@@ -5,10 +5,11 @@ import MenuTab from "@/components/dashboard/sidebar/menu/MenuTab";
 import Profile from "@/components/dashboard/sidebar/Profile";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { MemberMeDetail } from "@/lib/api/members/members";
-import { LogOut, X } from "lucide-react";
+import { LogOut, Moon, Sun, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDashboardTheme } from "@/components/common/theme/ThemeProvider";
 
 export default function AdminSidebar({
   mobileOpen = false,
@@ -20,6 +21,7 @@ export default function AdminSidebar({
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { theme, toggleTheme } = useDashboardTheme();
 
   const handleLogout = async () => {
     try {
@@ -38,7 +40,7 @@ export default function AdminSidebar({
     }
   };
 
-  // 모바일에서 열렸을 때 스크롤 막기(선택)
+  // 모바일에서 열렸을 때 스크롤 막기
   useEffect(() => {
     if (!mobileOpen) return;
     const prev = document.body.style.overflow;
@@ -55,11 +57,26 @@ export default function AdminSidebar({
         {/* 상단(스크롤 영역) */}
         <div className="flex-1 min-h-0 overflow-y-auto p-6">
           <div className="space-y-9">
-            <div className="flex items-center gap-2 text-primary">
-              <Logo className="w-9" />
-              <span className="text-2xl font-paperozi font-extrabold">
-                Dear. ___
-              </span>
+            <div className="flex items-center justify-between gap-2">
+              {/* Logo */}
+              <div className="flex items-center gap-2 text-primary">
+                <Logo className="w-9" />
+                <span className="text-2xl font-paperozi font-extrabold">
+                  Dear. ___
+                </span>
+              </div>
+
+              {/* 다크모드 버튼 */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="cursor-pointer inline-flex items-center gap-2 rounded-xl border border-outline bg-(--color-surface) px-3 py-2 text-sm hover:bg-button-hover"
+                aria-label="테마 전환"
+              >
+                <span className="text-(--color-text)">
+                  {theme === "dark" ? <Moon /> : <Sun />}
+                </span>
+              </button>
             </div>
 
             <Profile mode="admin" />
