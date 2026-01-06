@@ -1,8 +1,8 @@
 import { ListOrdered, MapPin, Shuffle, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
-const DEFAULT_THUMBNAIL =
-  "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg";
+const DEFAULT_THUMBNAIL = "/img/basicImg.png";
 
 export default function MineCard({ track }: { track: StoryTrackMineItem }) {
   const thumbnailUrl = track.imageUrl || DEFAULT_THUMBNAIL;
@@ -13,10 +13,11 @@ export default function MineCard({ track }: { track: StoryTrackMineItem }) {
       className="block border border-outline rounded-xl hover:shadow-md transition"
     >
       {/* Top */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={thumbnailUrl}
         alt={track.title}
+        width={800}
+        height={800}
         className="w-full h-40 object-cover rounded-t-xl"
       />
 

@@ -1,10 +1,10 @@
 "use client";
 
 import { ListOrdered, MapPin, Shuffle, TrendingUp, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
-const DEFAULT_THUMBNAIL =
-  "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg";
+const DEFAULT_THUMBNAIL = "/img/basicImg.png";
 
 export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
   // 진행률 계산
@@ -20,10 +20,11 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
     >
       <div className="relative">
         {/* Top */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={thumbnailUrl}
           alt={track.title}
+          width={800}
+          height={800}
           className="w-full h-40 object-cover rounded-t-xl"
         />
 

@@ -52,7 +52,7 @@ export default function CreateStoryTrack() {
 
   // Step 3에서 사용할 썸네일 이미지 URL
   const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
-    null
+    "/img/basicImg.png"
   );
 
   // Step1 → Step2로 이동하는 경우 cleanup을 스킵하기 위한 ref
