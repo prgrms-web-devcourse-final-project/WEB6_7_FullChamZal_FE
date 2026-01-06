@@ -12,6 +12,7 @@ import { useCleanupStorytrackTempFile } from "@/lib/hooks/useCleanupStorytrackTe
 type Props = {
   value: FirstFormValue;
   onChange: (patch: Partial<FirstFormValue>) => void;
+  skipCleanupRef?: React.RefObject<boolean>; // Step1 → Step2로 이동하는 경우 true로 설정된 ref
 };
 
 function getErrorMessage(err: unknown) {
@@ -38,7 +39,11 @@ function getErrorMessage(err: unknown) {
   return "이미지 업로드에 실패했습니다.";
 }
 
-export default function FirstForm({ value, onChange }: Props) {
+export default function FirstForm({
+  value,
+  onChange,
+  skipCleanupRef: externalSkipCleanupRef,
+}: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadedAttachment, setUploadedAttachment] = useState<{
     attachmentId: number;
@@ -50,6 +55,8 @@ export default function FirstForm({ value, onChange }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const uploadedAttachmentRef = useRef(uploadedAttachment);
+  // 다음 단계로 진행 중일 때 cleanup을 스킵하기 위한 ref
+  const skipCleanupRef = useRef(false);
 
   // 파일 프리뷰 URL 생성/해제
   useEffect(() => {
@@ -124,6 +131,21 @@ export default function FirstForm({ value, onChange }: Props) {
       return;
     }
 
+    // 기존 이미지가 있으면 먼저 삭제 (새 이미지로 교체)
+    const previousAttachment = uploadedAttachment;
+    if (previousAttachment) {
+      try {
+        await storytrackAttachmentApi.deleteTemp(
+          previousAttachment.attachmentId
+        );
+        if (previousAttachment.previewUrl) {
+          URL.revokeObjectURL(previousAttachment.previewUrl);
+        }
+      } catch {
+        // 삭제 실패해도 계속 진행 (서버 스케줄러가 처리)
+      }
+    }
+
     setIsUploading(true);
     try {
       // 미리보기 URL 생성 (로컬)
@@ -184,11 +206,12 @@ export default function FirstForm({ value, onChange }: Props) {
       toast.success("이미지 업로드를 시작했습니다!");
     } catch (error) {
       toast.error(getErrorMessage(error));
-    } finally {
-      setIsUploading(false);
+      // 에러 발생 시에만 input 초기화
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -216,10 +239,16 @@ export default function FirstForm({ value, onChange }: Props) {
     uploadedAttachmentRef.current = uploadedAttachment;
   }, [uploadedAttachment]);
 
+  // 외부에서 전달받은 skipCleanupRef가 있으면 우선 사용, 없으면 내부 skipCleanupRef 사용
+  // Step1 → Step2로 이동하는 경우에만 cleanup을 스킵
+  // 단순히 "다음 단계 진행 가능 상태"가 아닌, 실제로 다음 단계로 이동하는 경우에만 스킵
+  const actualSkipCleanupRef = externalSkipCleanupRef || skipCleanupRef;
+
   // 임시 파일 자동 정리 훅 사용
   // ㄴ 브라우저 탭 나가기 (beforeunload)
   // ㄴ 컴포넌트 언마운트 (뒤로가기, 페이지 이동 등)
-  useCleanupStorytrackTempFile(uploadedAttachmentRef);
+  // 단, 다음 단계로 진행하는 경우 cleanup을 스킵 (스토리트랙 생성 성공 후 수동 cleanup)
+  useCleanupStorytrackTempFile(uploadedAttachmentRef, actualSkipCleanupRef);
 
   // 컴포넌트 언마운트 시 폴링 정리
   useEffect(() => {
@@ -323,6 +352,12 @@ export default function FirstForm({ value, onChange }: Props) {
                   }
                   className="w-full cursor-pointer border border-outline rounded-lg py-2 px-4 outline-none file:mr-4 file:rounded-md file:border-0 file:bg-button-hover file:px-3 file:py-1.5 file:text-sm file:text-text hover:file:bg-outline/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
+                {/* 파일 이름 표시 */}
+                {uploadedAttachment?.fileName && (
+                  <span className="text-sm text-text-2">
+                    선택된 파일: {uploadedAttachment.fileName}
+                  </span>
+                )}
                 {(isUploading ||
                   uploadedAttachment?.status === "PENDING" ||
                   uploadedAttachment?.status === "UPLOADING") && (
