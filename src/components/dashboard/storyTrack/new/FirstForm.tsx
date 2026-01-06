@@ -184,11 +184,12 @@ export default function FirstForm({ value, onChange }: Props) {
       toast.success("이미지 업로드를 시작했습니다!");
     } catch (error) {
       toast.error(getErrorMessage(error));
-    } finally {
-      setIsUploading(false);
+      // 에러 발생 시에만 input 초기화
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -323,6 +324,12 @@ export default function FirstForm({ value, onChange }: Props) {
                   }
                   className="w-full cursor-pointer border border-outline rounded-lg py-2 px-4 outline-none file:mr-4 file:rounded-md file:border-0 file:bg-button-hover file:px-3 file:py-1.5 file:text-sm file:text-text hover:file:bg-outline/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
+                {/* 파일 이름 표시 */}
+                {uploadedAttachment?.fileName && (
+                  <span className="text-sm text-text-2">
+                    선택된 파일: {uploadedAttachment.fileName}
+                  </span>
+                )}
                 {(isUploading ||
                   uploadedAttachment?.status === "PENDING" ||
                   uploadedAttachment?.status === "UPLOADING") && (
