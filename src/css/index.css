@@ -343,7 +343,7 @@ pre {
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(10deg);
+  filter: invert(0);
   cursor: pointer;
 }
 
@@ -352,7 +352,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(48%) sepia(91%) saturate(4260%) hue-rotate(6deg) brightness(95%) contrast(105%);
+  filter: invert(0);
   cursor: pointer;
 }
 
