@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
+import { Loader2, X } from "lucide-react";
 import {
   storytrackAttachmentApi,
   type StorytrackAttachmentStatus,
@@ -285,26 +285,87 @@ export default function FirstForm({ value, onChange }: Props) {
                 대표 이미지
               </label>
 
-              <input
-                ref={fileInputRef}
-                id="img"
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                disabled={isUploading}
-                className="cursor-pointer border border-outline rounded-lg py-2 px-4 outline-none file:mr-4 file:rounded-md file:border-0 file:bg-button-hover file:px-3 file:py-1.5 file:text-sm file:text-text hover:file:bg-outline/40 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
+              <div className="flex flex-col gap-2">
+                <input
+                  ref={fileInputRef}
+                  id="img"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  disabled={
+                    isUploading ||
+                    uploadedAttachment?.status === "PENDING" ||
+                    uploadedAttachment?.status === "UPLOADING"
+                  }
+                  className="w-full cursor-pointer border border-outline rounded-lg py-2 px-4 outline-none file:mr-4 file:rounded-md file:border-0 file:bg-button-hover file:px-3 file:py-1.5 file:text-sm file:text-text hover:file:bg-outline/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+                {(isUploading ||
+                  uploadedAttachment?.status === "PENDING" ||
+                  uploadedAttachment?.status === "UPLOADING") && (
+                  <span className="text-sm text-text-3">
+                    {uploadedAttachment?.status === "PENDING" ||
+                    uploadedAttachment?.status === "UPLOADING"
+                      ? "이미지 검토가 완료될 때까지 기다려주세요..."
+                      : "이미지를 업로드하는 중..."}
+                  </span>
+                )}
+              </div>
             </div>
 
+            {/* 모바일 미리보기 (상태 오버레이 포함) */}
             <div className="block md:hidden">
               {previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="대표 이미지 미리보기"
-                  width={800}
-                  height={800}
-                  className="max-w-full max-h-full object-contain rounded-lg"
-                />
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-outline bg-sub-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={previewUrl}
+                    alt={uploadedAttachment?.fileName || "대표 이미지 미리보기"}
+                    className={`w-full h-full object-cover ${
+                      uploadedAttachment?.status === "DELETED"
+                        ? "opacity-50"
+                        : ""
+                    }`}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                    }}
+                  />
+
+                  {/* 상태 오버레이 */}
+                  {(uploadedAttachment?.status === "UPLOADING" ||
+                    uploadedAttachment?.status === "PENDING") && (
+                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white z-20">
+                      <Loader2 className="animate-spin mb-2" size={24} />
+                      <span className="text-xs">
+                        {uploadedAttachment.status === "UPLOADING"
+                          ? "업로드 중..."
+                          : "검토 중..."}
+                      </span>
+                    </div>
+                  )}
+
+                  {uploadedAttachment?.status === "DELETED" && (
+                    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-20">
+                      <X className="mb-2 text-red-400" size={24} />
+                      <span className="text-xs text-center px-2">
+                        필터링 실패
+                      </span>
+                    </div>
+                  )}
+
+                  {/* 삭제 버튼 */}
+                  {uploadedAttachment &&
+                    uploadedAttachment.status !== "DELETED" && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveAttachment}
+                        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white z-30"
+                        aria-label="이미지 삭제"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                </div>
               ) : (
                 <div className="text-center space-y-2">
                   <div className="text-base text-text-3">이미지 미리보기</div>
@@ -317,16 +378,56 @@ export default function FirstForm({ value, onChange }: Props) {
           </div>
         </div>
 
-        {/* Right - 이미지 미리보기 */}
-        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 hidden md:flex items-center justify-center text-text-4 overflow-hidden">
+        {/* Right - 이미지 미리보기 (데스크톱, 상태 오버레이 포함) */}
+        <div className="flex-1 h-full min-h-0 border border-outline rounded-xl p-8 hidden md:flex items-center justify-center text-text-4 overflow-hidden relative">
           {previewUrl ? (
-            <Image
-              src={previewUrl}
-              alt="대표 이미지 미리보기"
-              width={800}
-              height={800}
-              className="max-w-full max-h-full object-contain rounded-lg"
-            />
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={previewUrl}
+                alt={uploadedAttachment?.fileName || "대표 이미지 미리보기"}
+                className={`max-w-full max-h-full object-contain rounded-lg ${
+                  uploadedAttachment?.status === "DELETED" ? "opacity-50" : ""
+                }`}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                }}
+              />
+
+              {/* 상태 오버레이 */}
+              {(uploadedAttachment?.status === "UPLOADING" ||
+                uploadedAttachment?.status === "PENDING") && (
+                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white z-20 rounded-lg">
+                  <Loader2 className="animate-spin mb-2" size={24} />
+                  <span className="text-xs">
+                    {uploadedAttachment.status === "UPLOADING"
+                      ? "업로드 중..."
+                      : "검토 중..."}
+                  </span>
+                </div>
+              )}
+
+              {uploadedAttachment?.status === "DELETED" && (
+                <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-20 rounded-lg">
+                  <X className="mb-2 text-red-400" size={24} />
+                  <span className="text-xs text-center px-2">필터링 실패</span>
+                </div>
+              )}
+
+              {/* 삭제 버튼 */}
+              {uploadedAttachment &&
+                uploadedAttachment.status !== "DELETED" && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAttachment}
+                    className="absolute top-4 right-4 p-2 bg-black/60 hover:bg-black/80 rounded-full text-white z-30"
+                    aria-label="이미지 삭제"
+                  >
+                    <X size={20} />
+                  </button>
+                )}
+            </div>
           ) : (
             <div className="text-center space-y-2">
               <div className="text-base text-text-3">이미지 미리보기</div>
