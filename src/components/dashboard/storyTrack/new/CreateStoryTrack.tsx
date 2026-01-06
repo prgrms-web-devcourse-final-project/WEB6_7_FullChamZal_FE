@@ -10,6 +10,7 @@ import BackButton from "@/components/common/tag/BackButton";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { cleanupStorytrackTempFile } from "@/lib/hooks/useCleanupStorytrackTempFile";
 
 type Step = 1 | 2 | 3;
 
@@ -73,24 +74,112 @@ export default function CreateStoryTrack() {
   }, [form.routeLetterIds.length]);
 
   const handleCancel = () => {
+    // 취소 시 cleanup 스킵 플래그를 false로 리셋하여 cleanup이 실행되도록 함
+    skipCleanupForNextStepRef.current = false;
+
+    // Step1, Step2 모두에서 취소 시 cleanup 실행
+    if (form.thumbnailAttachmentId) {
+      console.log("[CreateStoryTrack] 취소 버튼 클릭: 임시 파일 정리", {
+        step,
+        thumbnailAttachmentId: form.thumbnailAttachmentId,
+      });
+      cleanupStorytrackTempFile(form.thumbnailAttachmentId);
+    }
+
     router.push("/dashboard/storyTrack/joined");
   };
 
   const handleNext = () => {
     if (step === 1 && !canGoNextFromStep1) return;
     if (step === 1) {
-      // Step1 → Step2로 이동하기 전에 cleanup 스킵 플래그 설정
+      // Step1 -> Step2로 이동하기 전에 cleanup 스킵 플래그 설정
+      console.log(
+        "[CreateStoryTrack] Step1 -> Step2: cleanup 스킵 플래그 설정"
+      );
       skipCleanupForNextStepRef.current = true;
       setStep(2);
     }
   };
 
-  // Step2 → Step1로 돌아올 때 cleanup 스킵 플래그 리셋
-  useEffect(() => {
-    if (step === 1) {
-      skipCleanupForNextStepRef.current = false;
+  // Step2 0< Step1로 돌아올 때 cleanup 스킵 플래그 설정
+  const handleBack = () => {
+    if (step === 2) {
+      // Step2 → Step1로 돌아가기 전에 cleanup 스킵 플래그 설정
+      console.log(
+        "[CreateStoryTrack] Step2 -> Step1: cleanup 스킵 플래그 설정"
+      );
+      skipCleanupForNextStepRef.current = true;
+      setStep(1);
     }
+  };
+
+  // Step 간 이동 완료 후 cleanup 스킵 플래그 리셋
+  useEffect(() => {
+    // Step 변경 후 약간의 지연을 두고 플래그 리셋
+    // (언마운트 cleanup이 실행된 후 리셋되도록)
+    const timeoutId = setTimeout(() => {
+      if (skipCleanupForNextStepRef.current) {
+        console.log(
+          "[CreateStoryTrack] Step 간 이동 완료: cleanup 스킵 플래그 리셋"
+        );
+        skipCleanupForNextStepRef.current = false;
+      }
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [step]);
+
+  // 페이지 이탈 시 cleanup 실행 (Step1, Step2 모두)
+  // Step1 → Step2, Step2 → Step1 이동 시에만 cleanup 스킵
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Step 간 이동 중이면 cleanup 스킵
+      if (skipCleanupForNextStepRef.current) {
+        console.log(
+          "[CreateStoryTrack] beforeunload: Step 간 이동 중이므로 cleanup 스킵"
+        );
+        return;
+      }
+
+      // 그 외 모든 경우 (취소, 탭 닫기, 뒤로가기 등): cleanup 실행
+      if (form.thumbnailAttachmentId) {
+        console.log("[CreateStoryTrack] beforeunload: 임시 파일 정리", {
+          step,
+          thumbnailAttachmentId: form.thumbnailAttachmentId,
+        });
+        cleanupStorytrackTempFile(form.thumbnailAttachmentId);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [step, form.thumbnailAttachmentId]);
+
+  // 컴포넌트 언마운트 시 cleanup 실행 (Step1, Step2 모두)
+  // Step1 → Step2, Step2 → Step1 이동 시에만 cleanup 스킵
+  useEffect(() => {
+    return () => {
+      // Step 간 이동 중이면 cleanup 스킵
+      if (skipCleanupForNextStepRef.current) {
+        console.log(
+          "[CreateStoryTrack] 언마운트: Step 간 이동 중이므로 cleanup 스킵"
+        );
+        return;
+      }
+
+      // 그 외 모든 경우 (취소, 뒤로가기 등): cleanup 실행
+      if (form.thumbnailAttachmentId) {
+        console.log("[CreateStoryTrack] 언마운트: 임시 파일 정리", {
+          step,
+          thumbnailAttachmentId: form.thumbnailAttachmentId,
+        });
+        cleanupStorytrackTempFile(form.thumbnailAttachmentId);
+      }
+    };
+  }, [step, form.thumbnailAttachmentId]);
 
   const handleSubmit = async () => {
     if (step !== 2) return;
@@ -118,10 +207,6 @@ export default function CreateStoryTrack() {
       if (response.code === "200") {
         queryClient.invalidateQueries({ queryKey: ["mineStoryTrack"] });
         toast.success("스토리트랙 생성이 완료되었습니다!");
-        // 스토리트랙 생성 성공 후 임시 파일 정리 (이제 USED 상태이므로)
-        // 참고: 백엔드에서 attachment.attachToStorytrack() 호출 시 상태가 THUMBNAIL로 변경됨
-        // 따라서 임시 파일 삭제는 필요 없지만, 혹시 모를 경우를 대비해 정리
-        // 실제로는 백엔드에서 상태가 변경되므로 삭제할 필요 없음
         setStep(3);
       } else {
         throw new Error(response.message || "스토리트랙 생성에 실패했습니다.");
@@ -231,7 +316,7 @@ export default function CreateStoryTrack() {
             ) : (
               <Button
                 type="button"
-                onClick={() => setStep((s) => (s === 2 ? 1 : s))}
+                onClick={handleBack}
                 className="md:font-normal py-2 px-8 bg-bg border border-outline text-text hover:bg-button-hover"
               >
                 이전
