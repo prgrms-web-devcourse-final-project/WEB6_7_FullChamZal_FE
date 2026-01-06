@@ -50,6 +50,11 @@ export default function CreateStoryTrack() {
 
   const [step2, setStep2] = useState<Step2UIState>({ routeItems: [] });
 
+  // Step 3에서 사용할 썸네일 이미지 URL
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
+    null
+  );
+
   // Step1 → Step2로 이동하는 경우 cleanup을 스킵하기 위한 ref
   const skipCleanupForNextStepRef = useRef(false);
 
@@ -206,6 +211,20 @@ export default function CreateStoryTrack() {
       // 성공 시 Step 3으로 이동
       if (response.code === "200") {
         queryClient.invalidateQueries({ queryKey: ["mineStoryTrack"] });
+
+        // 스토리트랙 상세 조회로 썸네일 이미지 URL 가져오기
+        try {
+          const detailResponse = await storyTrackApi.storyTrackDetail({
+            storytrackId: String(response.data.storytrackId),
+          });
+          if (detailResponse.code === "200" && detailResponse.data.imageUrl) {
+            setThumbnailImageUrl(detailResponse.data.imageUrl);
+          }
+        } catch (error) {
+          console.error("썸네일 이미지 URL 조회 실패:", error);
+          // 이미지 URL 조회 실패는 무시 (이미지 없이 표시)
+        }
+
         toast.success("스토리트랙 생성이 완료되었습니다!");
         setStep(3);
       } else {
@@ -294,6 +313,7 @@ export default function CreateStoryTrack() {
                 title={form.title}
                 order={form.order}
                 routeCount={form.routeLetterIds.length}
+                imageUrl={thumbnailImageUrl || undefined}
               />
             )}
           </form>
