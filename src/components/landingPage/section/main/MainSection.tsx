@@ -113,12 +113,12 @@ export default function MainSection() {
               <span>편지 쓰기</span> <ArrowRight size={20} />
             </Button>
 
-            <button
+            <Button
               onClick={() => document.getElementById("why")?.scrollIntoView()}
-              className="cursor-pointer rounded-lg md:rounded-xl border-2 border-[#e7e5e4] px-5 bg-white hover:bg-[#f9f9f9] font-normal"
+              className="border border-outline py-4 px-5 bg-white hover:bg-button-hover text-[#070d19]"
             >
               자세히 보기
-            </button>
+            </Button>
           </div>
         </div>
       </div>

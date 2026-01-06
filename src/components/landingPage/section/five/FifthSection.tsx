@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const items = [
   {
     id: "love",
-    img: "/img/couple.jpg",
+    img: "/img/section5/couple.jpg",
     title: "Love & Moments",
     step: "1. 커플",
     desc: "여행 코스나 기념일에 딱 맞춰 열리는 감성 편지.\n같이 걸어온 길 위에 작은 서프라이즈를 남겨보세요.\n두 사람만의 순간이 하나의 이야기로 이어집니다.",
@@ -14,7 +14,7 @@ const items = [
   },
   {
     id: "people",
-    img: "/img/family.jpg",
+    img: "/img/section5/family.jpg",
     title: "People & Memories",
     step: "2. 친구·가족",
     desc: "생일 1년 전에 미리 써두는 편지.\n함께 걸었던 장소에서 열리는 메시지.\n따뜻한 마음이 시간 속에서 다시 살아납니다.",
@@ -22,7 +22,7 @@ const items = [
   },
   {
     id: "goals",
-    img: "/img/me.jpg",
+    img: "/img/section5/me.jpg",
     title: "Goals & Growth",
     step: "3. 미래의 나에게",
     desc: "지금의 다짐을 미래의 나에게 보내보세요.\n3개월 뒤, 1년 뒤 도착하는 편지가 회고와 성장을 이어줍니다.",
@@ -30,7 +30,7 @@ const items = [
   },
   {
     id: "places",
-    img: "/img/places.jpg",
+    img: "/img/section5/places.jpg",
     title: "Places & Stories",
     step: "4. 여행자·크리에이터",
     desc: "여행지, 전시, 공연 같은 장소에 이야기를 남겨보세요.\n시간이 지나 다시 찾았을 때, 그 순간의 기록이 기다리고 있습니다.",

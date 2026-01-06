@@ -1,22 +1,13 @@
-import { authApiServer } from "@/lib/api/auth/auth.server";
+import { requireCapsuleUser } from "@/lib/hooks/guards";
 import DashboardShell from "../../../components/dashboard/DashboardShell";
-import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  let me: MemberMe;
-  try {
-    me = await authApiServer.me();
-  } catch {
-    redirect("/auth/login");
-  }
-
-  if (me.role !== "USER") redirect("/auth/login");
-
-  if (me.status === "STOP") redirect("/auth/login");
+  // 가드 훅
+  const me = await requireCapsuleUser();
 
   return <DashboardShell me={me}>{children}</DashboardShell>;
 }
