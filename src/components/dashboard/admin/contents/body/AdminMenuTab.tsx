@@ -22,7 +22,7 @@ export default function AdminMenuTab({
                 onClick={() => onChange(t.key)}
                 className={`cursor-pointer py-2 px-3 md:px-4 rounded-lg border text-xs md:text-base ${
                   isActive
-                    ? "bg-admin text-white border-admin"
+                    ? "bg-admin text-bg border-admin font-medium"
                     : "border-outline hover:bg-sub"
                 }`}
               >

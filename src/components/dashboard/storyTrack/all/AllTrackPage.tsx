@@ -59,6 +59,8 @@ export default function AllTrackPage() {
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
+  const [sortOpen, setSortOpen] = useState(false);
+
   const {
     data,
     isLoading,
@@ -230,32 +232,62 @@ export default function AllTrackPage() {
 
         <div className="flex-1" />
 
-        <div className="relative">
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortOption)}
-            className="cursor-pointer appearance-none py-2 pl-4 pr-10 rounded-xl border border-outline bg-bg/80 text-text-2 outline-none transition hover:bg-bg hover:border-primary-2 focus:border-primary"
+        <div className="flex flex-row gap-2">
+          <div className="relative">
+            {/* Trigger */}
+            <button
+              type="button"
+              onClick={() => setSortOpen((v) => !v)}
+              className="cursor-pointer flex items-center text-text-2 gap-2 px-3 py-2 rounded-xl border border-outline hover:bg-button-hover focus:outline-none focus:border-primary"
+            >
+              {sort === "newest" ? "최신순" : "인기순"}
+              <ChevronDown
+                size={18}
+                className={`transition-transform ${
+                  sortOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {/* Dropdown */}
+            {sortOpen && (
+              <div className="absolute right-0 mt-2 w-full rounded-xl border border-outline bg-bg shadow-lg overflow-hidden z-20">
+                {[
+                  { key: "newest", label: "최신순" },
+                  { key: "popular", label: "인기순" },
+                ].map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => {
+                      setSort(opt.key as SortOption);
+                      setSortOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-xs md:text-sm transition hover:bg-button-hover
+                      ${
+                        sort === opt.key
+                          ? "bg-primary-2/10 text-primary font-medium"
+                          : "text-text"
+                      }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => {
+              setSearch("");
+              setStatus("all");
+              setSort("newest");
+            }}
+            className="cursor-pointer px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-button-hover"
           >
-            <option value="newest">최신순</option>
-            <option value="popular">인기순</option>
-          </select>
-
-          <ChevronDown
-            size={18}
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-4"
-          />
+            초기화
+          </button>
         </div>
-
-        <button
-          onClick={() => {
-            setSearch("");
-            setStatus("all");
-            setSort("newest");
-          }}
-          className="cursor-pointer px-3 py-2 rounded-xl border border-outline text-text-2 hover:bg-button-hover"
-        >
-          초기화
-        </button>
       </div>
 
       {/* 에러 */}

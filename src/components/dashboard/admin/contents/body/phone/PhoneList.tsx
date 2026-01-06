@@ -57,7 +57,7 @@ export default function PhoneList({
   query: string;
 }) {
   const [page, setPage] = useState(0);
-  const [size] = useState(10);
+  const [size] = useState(8);
   const queryClient = useQueryClient();
 
   const listQueryKey = (p: number) =>

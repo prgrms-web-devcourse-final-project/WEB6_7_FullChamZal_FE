@@ -2,13 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import {
-  FileWarning,
   Home,
   Map,
   Users,
   Phone,
   History,
   Route,
+  MailWarning,
+  Mail,
 } from "lucide-react";
 import { MenuItemCard } from "./MenuItemCard";
 
@@ -25,14 +26,14 @@ const ADMIN_ITEMS: MenuItem[] = [
     activePrefix: "/admin/dashboard/capsules",
     title: "편지 관리",
     desc: "전체 편지 관리",
-    icon: Map,
+    icon: Mail,
   },
   {
     href: "/admin/dashboard/reports",
     activePrefix: "/admin/dashboard/reports",
     title: "신고 관리",
     desc: "신고 내역",
-    icon: FileWarning,
+    icon: MailWarning,
   },
   {
     href: "/admin/dashboard/phone-verifications",

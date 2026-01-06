@@ -931,7 +931,7 @@ export default function LetterDetailModal({
               className="w-full h-full p-4 md:p-6 lg:p-10"
               style={{ backgroundColor: detailHex }}
             >
-              <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8">
+              <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8 text-[#070d19]">
                 <div className="space-y-2 text-base md:text-xl lg:text-2xl space-x-1">
                   <div className="font-medium text-base md:text-lg lg:text-xl">
                     {capsule.title}
@@ -939,12 +939,12 @@ export default function LetterDetailModal({
 
                   <div className="space-x-1">
                     <span className="text-primary font-bold">Dear.</span>
-                    <span className="text-[#070d19]">{dearName}</span>
+                    <span>{dearName}</span>
                   </div>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto space-y-4">
-                  <pre className="text-[#070d19] whitespace-pre-wrap wrap-break-word text-lg">
+                  <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
                   </pre>
 
@@ -975,9 +975,7 @@ export default function LetterDetailModal({
                   </span>
                   <div className="text-base md:text-xl lg:text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
-                    <span className="text-[#070d19]">
-                      {capsule.writerNickname}
-                    </span>
+                    <span>{capsule.writerNickname}</span>
                   </div>
                 </div>
               </div>
