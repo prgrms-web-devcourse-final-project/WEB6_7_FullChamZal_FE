@@ -18,7 +18,7 @@ type FormState = {
   title: string;
   description: string;
   order: TrackType;
-  imageFile: File | null;
+  thumbnailAttachmentId?: number;
 
   // step2
   routeLetterIds: string[];
@@ -32,7 +32,7 @@ const initialState: FormState = {
   title: "",
   description: "",
   order: "SEQUENTIAL",
-  imageFile: null,
+  thumbnailAttachmentId: undefined,
   routeLetterIds: [],
 };
 
@@ -52,9 +52,9 @@ export default function CreateStoryTrack() {
     return (
       form.title.trim().length > 0 &&
       form.description.trim().length > 0 &&
-      form.imageFile !== null
+      form.thumbnailAttachmentId !== undefined
     );
-  }, [form.title, form.description, form.imageFile]);
+  }, [form.title, form.description, form.thumbnailAttachmentId]);
 
   // step2 검증: 최소 2개 이상 선택해야 제출 가능
   const canSubmitFromStep2 = useMemo(() => {
@@ -85,6 +85,7 @@ export default function CreateStoryTrack() {
         isPublic: 1, // 기본값: 공개
         price: 0, // 기본값: 무료
         capsuleList: form.routeLetterIds.map((id) => Number(id)), // string[] → number[]
+        attachmentId: form.thumbnailAttachmentId, // 썸네일 attachmentId
       };
 
       // API 호출
@@ -142,7 +143,7 @@ export default function CreateStoryTrack() {
                   title: form.title,
                   description: form.description,
                   order: form.order,
-                  imageFile: form.imageFile,
+                  thumbnailAttachmentId: form.thumbnailAttachmentId,
                 }}
                 onChange={(patch: Partial<FirstFormValue>) =>
                   setForm((prev) => ({ ...prev, ...patch }))
