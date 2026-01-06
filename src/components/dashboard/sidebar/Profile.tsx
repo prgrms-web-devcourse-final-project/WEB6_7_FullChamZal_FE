@@ -44,7 +44,7 @@ export default function Profile({
   const isAdmin = mode === "admin";
 
   const displayName = isAdmin ? "관리자" : me?.name ?? "";
-  const displayEmail = isAdmin ? "admin@dear.com" : me?.userId ?? "";
+  const displayNick = isAdmin ? "admin@dear.com" : me?.nickname ?? "";
   const firstChar = isAdmin ? "A" : me?.name?.[0] ?? "";
 
   return (
@@ -64,7 +64,7 @@ export default function Profile({
           <div className="flex-1 min-w-0">
             <p>{displayName || "\u00A0"}</p>
             <p className="text-text-3 text-sm line-clamp-1">
-              {displayEmail || "\u00A0"}
+              {displayNick || "\u00A0"}
             </p>
           </div>
         </div>
