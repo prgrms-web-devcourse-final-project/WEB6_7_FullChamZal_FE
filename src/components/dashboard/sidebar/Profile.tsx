@@ -44,7 +44,7 @@ export default function Profile({
   const isAdmin = mode === "admin";
 
   const displayName = isAdmin ? "관리자" : me?.name ?? "";
-  const displayEmail = isAdmin ? "admin@dear.com" : me?.userId ?? "";
+  const displayNick = isAdmin ? "admin@dear.com" : me?.userId ?? "";
   const firstChar = isAdmin ? "A" : me?.name?.[0] ?? "";
 
   return (
@@ -53,18 +53,20 @@ export default function Profile({
       onClick={onClick}
       className={`${isAdmin ?? "cursor-pointer"} w-full text-left`}
     >
-      <DivBox className="p-4 lg:p-6 border-2">
-        <div className="flex items-center gap-3">
-          <div className="flex-none bg-text w-14 h-14 rounded-full">
-            <div className="text-bg text-xl h-full flex items-center justify-center">
+      <DivBox className="py-5 px-6 border-2">
+        <div className="flex items-start gap-3">
+          <div className="flex-none bg-text w-10 h-10 rounded-full">
+            <div className="text-bg text-sm h-full flex items-center justify-center">
               {firstChar || " "}
             </div>
           </div>
 
-          <div className="flex-1">
-            <p>{displayName || "\u00A0"}</p>
-            <p className="text-text-3 text-sm line-clamp-1">
-              {displayEmail || "\u00A0"}
+          <div className="flex-1 -space-y-0.5 min-w-0">
+            <p className="wrap-break-word line-clamp-1">
+              {displayName || "\u00A0"}
+            </p>
+            <p className="text-text-3 text-sm wrap-break-word overflow-wrap-anywhere">
+              {displayNick ?? ""}
             </p>
           </div>
         </div>

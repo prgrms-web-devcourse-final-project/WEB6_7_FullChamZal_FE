@@ -68,30 +68,34 @@ export default function AdminBody({
 
   return (
     <div className="space-y-4 md:space-y-6 lg:space-y-8">
-      {/* 검색 */}
-      <div className="w-full">
-        <div className="flex items-center gap-3 w-full bg-bg/80 border border-outline rounded-xl focus-within:border-primary-2 px-4 py-3 lg:py-4">
-          <Search size={20} className="text-text-4 shrink-0" />
-          <input
-            type="text"
-            placeholder={searchPlaceholder}
-            className="w-full bg-transparent outline-none text-xs md:text-base"
-            value={keywordInput}
-            onChange={(e) => setKeywordInput(e.target.value)}
-            onBlur={commitKeyword} // 포커스 빠질 때 검색 적용
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                commitKeyword(); // Enter로 검색 적용
-              }
-              if (e.key === "Escape") {
-                e.preventDefault();
-                cancelKeyword(); // ESC로 입력 취소
-              }
-            }}
-          />
-        </div>
-      </div>
+      {section === "reports" || section === "phone" ? null : (
+        <>
+          {/* 검색 */}
+          <div className="w-full">
+            <div className="flex items-center gap-3 w-full bg-bg/80 border border-outline rounded-xl focus-within:border-primary-2 px-4 py-3 lg:py-4">
+              <Search size={20} className="text-text-4 shrink-0" />
+              <input
+                type="text"
+                placeholder={searchPlaceholder}
+                className="w-full bg-transparent outline-none text-xs md:text-base"
+                value={keywordInput}
+                onChange={(e) => setKeywordInput(e.target.value)}
+                onBlur={commitKeyword} // 포커스 빠질 때 검색 적용
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitKeyword(); // Enter로 검색 적용
+                  }
+                  if (e.key === "Escape") {
+                    e.preventDefault();
+                    cancelKeyword(); // ESC로 입력 취소
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 메뉴 탭 */}
       <AdminMenuTab tabs={tabs} value={tab} onChange={setTab} />

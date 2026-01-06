@@ -6,7 +6,7 @@ export default function DashboardPage() {
   return (
     <>
       <Suspense fallback={<DashboardHomeSkeleton />}>
-        <div className="p-4 lg:p-8">
+        <div className="pt-8 p-4 lg:p-8">
           <DashBoardMain />
         </div>
       </Suspense>

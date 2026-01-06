@@ -13,10 +13,10 @@ export function MenuItemCard({
   onClick?: () => void;
 }) {
   const baseBoxClass = "px-5 py-3 rounded-[10px]";
-  const activeBoxClass = `text-white shadow-md ${
+  const activeBoxClass = `shadow-md ${
     mode === "admin"
-      ? "bg-admin border-admin/0 hover:bg-admin"
-      : "bg-primary-2 border-primary-2/0 hover:bg-primary-2"
+      ? "bg-admin border-admin/0 hover:bg-admin text-bg"
+      : "bg-primary-2 border-primary-2/0 hover:bg-primary-2 text-white"
   }`;
   const Icon = item.icon;
 
@@ -26,24 +26,19 @@ export function MenuItemCard({
         <div className="flex items-center gap-3">
           <Icon
             className={
-              isActive
+              mode === "admin"
+                ? isActive
+                  ? "text-bg"
+                  : "text-[#172c51]"
+                : isActive
                 ? "text-white"
-                : mode === "admin"
-                ? "text-admin"
                 : "text-primary"
             }
           />
+
           <div>
-            <p
-              className={`font-semibold text-sm ${
-                isActive ? "text-white" : ""
-              }`}
-            >
-              {item.title}
-            </p>
-            <p className={`text-xs ${isActive ? "text-white" : ""}`}>
-              {item.desc}
-            </p>
+            <p className={`font-semibold text-sm `}>{item.title}</p>
+            <p className={`text-xs`}>{item.desc}</p>
           </div>
         </div>
       </DivBox>

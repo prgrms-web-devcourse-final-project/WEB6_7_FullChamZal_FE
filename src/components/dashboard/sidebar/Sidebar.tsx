@@ -44,7 +44,7 @@ export default function Sidebar({
     }
   };
 
-  // 모바일에서 열렸을 때 스크롤 막기(선택)
+  // 모바일에서 열렸을 때 스크롤 막기
   useEffect(() => {
     if (!mobileOpen) return;
     const prev = document.body.style.overflow;
@@ -60,7 +60,7 @@ export default function Sidebar({
       <aside className="w-72 border-r border-outline hidden lg:flex flex-col h-dvh">
         {/* 상단(스크롤 영역) */}
         <div className="flex-1 min-h-0 overflow-y-auto p-6">
-          <div className="space-y-9">
+          <div className="space-y-7">
             <div className="flex items-center justify-between gap-2">
               {/* Logo */}
               <div className="flex items-center gap-2 text-primary">
@@ -94,7 +94,7 @@ export default function Sidebar({
         </div>
 
         {/* 하단(고정) */}
-        <div className="p-6 border-t border-outline">
+        <div className="border-t border-outline flex items-center justify-center h-15 md:h-18">
           <button
             onClick={handleLogout}
             className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm w-full"

@@ -53,7 +53,7 @@ function normalizeApiError(err: any): {
 } {
   if (!err) return { message: "알 수 없는 오류가 발생했습니다." };
 
-  // fetch/axios 류
+  // axios
   const data =
     err?.response?.data ??
     err?.data ??
@@ -426,7 +426,7 @@ export default function LetterDetailView({
         <LetterLockedView
           isPublic={isPublic}
           unlockAt={capsule.unlockAt ?? new Date().toISOString()}
-          unlockUntil={capsule.unlockUntil ?? new Date().toISOString()}
+          unlockUntil={capsule.unlockUntil}
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
           targetLocation={targetLocation}

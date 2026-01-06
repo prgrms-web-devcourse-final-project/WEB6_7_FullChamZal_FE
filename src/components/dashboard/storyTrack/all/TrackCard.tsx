@@ -127,7 +127,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         show: true,
         label: isPending ? "처리 중..." : "참여취소",
         disabled: isPending,
-        className: "bg-text text-bg",
+        className: "bg-bg",
         onClick: () => setIsCancelConfirmOpen(true),
       };
     }
@@ -135,7 +135,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
       show: true,
       label: isPending ? "처리 중..." : "참여하기",
       disabled: isPending,
-      className: "bg-primary text-text",
+      className: "bg-primary-2 text-white hover:bg-primary",
       onClick: () => {
         joinMutation.mutate();
       },
@@ -186,7 +186,7 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         >
           <button
             type="button"
-            className="cursor-pointer px-4 py-2 rounded-xl bg-bg text-sm font-medium"
+            className="cursor-pointer px-4 py-2 rounded-xl bg-bg text-sm font-medium hover:bg-sub"
             onClick={(e) => {
               e.stopPropagation();
               setOverlayOpen(false);

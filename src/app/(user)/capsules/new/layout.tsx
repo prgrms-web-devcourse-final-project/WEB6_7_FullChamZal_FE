@@ -14,8 +14,8 @@ export default async function CapsulesNewLayout({
   }
 
   if (me.role !== "USER") redirect("/auth/login");
-
   if (me.status === "STOP") redirect("/auth/login");
+  if (!me.nickname || !me.phoneNumber) redirect("/dashboard");
 
   return <>{children}</>;
 }

@@ -299,7 +299,7 @@ export default function CreateStoryTrack() {
       </div>
 
       {/* Bottom */}
-      <div className="flex-none border-t border-outline bg-bg/95 backdrop-blur">
+      <div className="flex-none h-15 md:h-18 border-t border-outline bg-bg/95 backdrop-blur">
         <div className="px-8 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
           <div className="flex justify-between items-center">
             {/* 왼쪽 버튼 */}

@@ -113,7 +113,7 @@ export default function TodayLetters() {
         <h2 className="text-2xl lg:text-4xl font-medium">
           안녕하세요, {me?.name}님<span className="text-primary px-1">_</span>
         </h2>
-        <p className="text-text-2 text-base lg:text-lg">
+        <p className="text-text-2 text-base lg:text-lg break-keep">
           오늘은 {todayText}, 오늘 당신을 기다리는 편지가{" "}
           <span className="text-primary font-semibold">{list.length}통</span>{" "}
           있습니다.

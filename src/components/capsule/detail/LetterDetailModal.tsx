@@ -79,6 +79,9 @@ export type UICapsule = {
     presignedUrl: string;
     attachmentId: number;
   }>;
+
+  maxViewCount?: number;
+  currentViewCount?: number;
 };
 
 type PostLoginAction =
@@ -533,6 +536,9 @@ export default function LetterDetailModal({
           viewStatus: !!s.viewStatus,
           isBookmarked: !!s.isBookmarked,
           attachments: s.attachments,
+
+          maxViewCount: s.maxViewCount,
+          currentViewCount: s.currentViewCount,
         };
       }
 
@@ -643,6 +649,25 @@ export default function LetterDetailModal({
       </div>
     );
   }
+  // 해제 조건 달성 판단 기준
+  const isUnlocked =
+    capsule.unlockType === "TIME"
+      ? capsule.unlockAt != null &&
+        new Date(capsule.unlockAt).getTime() <= Date.now()
+      : capsule.unlockType === "LOCATION"
+      ? true // sender는 위치 조건 검증 대상 아님
+      : capsule.unlockType === "TIME_AND_LOCATION"
+      ? capsule.unlockAt != null &&
+        new Date(capsule.unlockAt).getTime() <= Date.now()
+      : false;
+
+  // 북마크 가능 여부
+  const canBookmarkOrSave =
+    !isAdmin &&
+    // 받는 사람 / 공개 편지는 기존 로직 유지
+    (!isSender ||
+      // sender일 경우: 해제 조건 달성 시만 가능
+      (isSender && isUnlocked));
 
   // 공개 편지이면 보는 사람 이름, 비공개 편지일 경우 받는 사람 이름, 그냥 빈 데이터이면 당신
   const dearName = isPublic
@@ -675,10 +700,8 @@ export default function LetterDetailModal({
 
   const detailHex = CAPTURE_COLOR_MAP[detailKey] ?? DEFAULT_HEX;
 
-  // Footer에서 북마크 버튼을 보여줄지:
-  // - 관리자면 없음
   // - 보호편지(= 북마크 모드)일 때는 북마크 토글
-  const isBookmarkMode = !isAdmin && !!isProtected;
+  const isBookmarkMode = !isAdmin && !!isProtected && canBookmarkOrSave;
 
   const bookmarkButtonDisabled = bookmarkMutation.isPending;
 
@@ -806,11 +829,8 @@ export default function LetterDetailModal({
           {/* Header */}
           <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
             <div className="flex justify-between items-center gap-2 md:gap-4">
-              <div className="flex-none font-medium text-base md:text-lg lg:text-xl">
-                제목: {capsule.title}
-              </div>
-
-              <div className="flex-1 flex flex-col items-center gap-0.5 text-xs md:text-sm lg:text-base justify-center">
+              {/* 해제 조건 */}
+              <div className="flex flex-col gap-0.5 text-xs md:text-sm lg:text-base justify-center">
                 <div className="flex flex-row gap-1">
                   <span className="hidden md:block text-text-2">
                     해제 조건:
@@ -828,81 +848,97 @@ export default function LetterDetailModal({
                 </div>
 
                 {unlockUntilLabel && (
-                  <span className="text-xs md:text-xs text-text-3">
-                    열람 가능 기한: {unlockUntilLabel} 까지
+                  <span className="text-xs md:text-xs text-text-3 line-clamp-1">
+                    열람 가능 기한: {unlockUntilLabel} 까지 열람 가능
                   </span>
                 )}
               </div>
 
-              <div className="flex justify-end items-center gap-2">
-                {isSender || isReceiver ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        className="cursor-pointer text-primary"
-                        aria-label="더보기"
-                      >
-                        <MoreHorizontal size={18} />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="w-44 z-10000 bg-bg shadow-lg border border-outline"
-                    >
-                      <DropdownMenuLabel>관리</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        {isReceiver && (
-                          <DropdownMenuItem
-                            className="hover:bg-button-hover"
-                            onClick={() => backupMutation.mutate(capsuleId)}
-                          >
-                            <Download className="text-primary" />
-                            {backupMutation.isPending
-                              ? "백업 중..."
-                              : "백업하기"}
-                          </DropdownMenuItem>
-                        )}
-                        {isSender && !capsule.viewStatus && (
-                          <DropdownMenuItem
-                            className="hover:bg-button-hover"
-                            onClick={() => {
-                              router.push(
-                                `/capsules/edit?capsuleId=${capsuleId}`
-                              );
-                            }}
-                          >
-                            <PencilLine className="text-primary" />
-                            수정하기
-                          </DropdownMenuItem>
-                        )}
-                        {(isSender || isReceiver) && (
-                          <DropdownMenuItem
-                            className="hover:bg-button-hover"
-                            variant="destructive"
-                            disabled={deleteMutation.isPending}
-                            onClick={() => setIsDeleteConfirmOpen(true)}
-                          >
-                            <Trash2 className="text-primary" />
-                            삭제하기
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : null}
+              <div className="flex gap-2">
+                {/* 선착순 카운트 (maxViewCount > 0 일 때만 표시) */}
+                {capsule.maxViewCount != null && capsule.maxViewCount > 0 && (
+                  <div className="flex items-center gap-1 text-xs md:text-sm text-text-2">
+                    <span className="font-medium">
+                      현재 {capsule.currentViewCount}명 열람
+                    </span>
+                    <span>/</span>
+                    <span className="text-primary">
+                      선착순 {capsule.maxViewCount}명까지 열람 가능
+                    </span>
+                  </div>
+                )}
 
-                <button
-                  type="button"
-                  className="cursor-pointer text-primary p-1 rounded-md hover:bg-button-hover"
-                  onClick={close}
-                  aria-label="닫기"
-                >
-                  <X size={24} />
-                </button>
+                {/* 버튼 */}
+                <div className="flex justify-end items-center gap-2">
+                  {isSender || isReceiver ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="cursor-pointer text-primary"
+                          aria-label="더보기"
+                        >
+                          <MoreHorizontal size={18} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-44 z-10000 bg-bg shadow-lg border border-outline"
+                      >
+                        <DropdownMenuLabel>관리</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          {isReceiver && (
+                            <DropdownMenuItem
+                              className="hover:bg-button-hover"
+                              onClick={() => backupMutation.mutate(capsuleId)}
+                            >
+                              <Download className="text-primary" />
+                              {backupMutation.isPending
+                                ? "백업 중..."
+                                : "백업하기"}
+                            </DropdownMenuItem>
+                          )}
+                          {isSender && !capsule.viewStatus && (
+                            <DropdownMenuItem
+                              className="hover:bg-button-hover"
+                              onClick={() => {
+                                router.push(
+                                  `/capsules/edit?capsuleId=${capsuleId}`
+                                );
+                              }}
+                            >
+                              <PencilLine className="text-primary" />
+                              수정하기
+                            </DropdownMenuItem>
+                          )}
+                          {(isSender || isReceiver) && (
+                            <DropdownMenuItem
+                              className="hover:bg-button-hover"
+                              variant="destructive"
+                              disabled={deleteMutation.isPending}
+                              onClick={() => setIsDeleteConfirmOpen(true)}
+                            >
+                              <Trash2 className="text-primary" />
+                              삭제하기
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    className="cursor-pointer text-primary p-1 rounded-md hover:bg-button-hover"
+                    onClick={close}
+                    aria-label="닫기"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -910,17 +946,23 @@ export default function LetterDetailModal({
           {/* Body */}
           <div className="flex-1 overflow-hidden">
             <div
-              className="w-full h-full p-4 md:p-6 lg:p-12"
+              className="w-full h-full p-4 md:p-6 lg:p-10"
               style={{ backgroundColor: detailHex }}
             >
-              <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8">
-                <div className="text-base md:text-xl lg:text-2xl space-x-1">
-                  <span className="text-primary font-bold">Dear.</span>
-                  <span className="text-[#070d19]">{dearName}</span>
+              <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8 text-[#070d19]">
+                <div className="space-y-2 text-base md:text-xl lg:text-2xl space-x-1">
+                  <div className="font-medium text-lg lg:text-xl">
+                    {capsule.title}
+                  </div>
+
+                  <div className="space-x-1">
+                    <span className="text-primary font-bold">Dear.</span>
+                    <span>{dearName}</span>
+                  </div>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto space-y-4">
-                  <pre className="text-[#070d19] whitespace-pre-wrap wrap-break-word text-lg">
+                  <pre className="whitespace-pre-wrap wrap-break-word text-lg">
                     {capsule.content}
                   </pre>
 
@@ -954,9 +996,7 @@ export default function LetterDetailModal({
                   </span>
                   <div className="text-base md:text-xl lg:text-2xl space-x-1">
                     <span className="text-primary font-bold">From.</span>
-                    <span className="text-[#070d19]">
-                      {capsule.writerNickname}
-                    </span>
+                    <span>{capsule.writerNickname}</span>
                   </div>
                 </div>
               </div>
@@ -964,7 +1004,7 @@ export default function LetterDetailModal({
           </div>
 
           {/* Footer */}
-          <div className="shrink-0 border-t border-outline p-5">
+          <div className="shrink-0 border-t border-outline p-5 min-h-16">
             {role === "ADMIN" ? null : (
               <div className="flex-1 flex items-center justify-center">
                 {!isSender && (
@@ -1016,7 +1056,7 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
-                {!isPublic && (
+                {!isPublic && !isSender && (
                   <div className="flex-1 flex items-center justify-center">
                     <Link
                       href={"/capsules/new"}
@@ -1028,45 +1068,46 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
-                {/* 저장하기(공개) vs 북마크(보호) 분기 */}
-                <div className="flex-1 flex items-center justify-center">
-                  {isBookmarkMode ? (
-                    <button
-                      onClick={handleToggleBookmark}
-                      type="button"
-                      className="cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
-                      disabled={bookmarkButtonDisabled}
-                    >
-                      <Bookmark
-                        size={16}
-                        className={
-                          isBookmarked
-                            ? "text-primary fill-primary"
-                            : "text-primary"
-                        }
-                      />
-                      <span>
-                        {bookmarkButtonDisabled
-                          ? "처리 중..."
-                          : isBookmarked
-                          ? "북마크 해제"
-                          : "북마크"}
-                      </span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleSave}
-                      type="button"
-                      className="cursor-pointer flex items-center justify-center gap-2"
-                      disabled={saveMutation.isPending}
-                    >
-                      <Archive size={16} className="text-primary" />
-                      <span>
-                        {saveMutation.isPending ? "저장 중..." : "저장하기"}
-                      </span>
-                    </button>
-                  )}
-                </div>
+                {canBookmarkOrSave && (
+                  <div className="flex-1 flex items-center justify-center">
+                    {isBookmarkMode ? (
+                      <button
+                        onClick={handleToggleBookmark}
+                        type="button"
+                        className="cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                        disabled={bookmarkButtonDisabled}
+                      >
+                        <Bookmark
+                          size={16}
+                          className={
+                            isBookmarked
+                              ? "text-primary fill-primary"
+                              : "text-primary"
+                          }
+                        />
+                        <span>
+                          {bookmarkButtonDisabled
+                            ? "처리 중..."
+                            : isBookmarked
+                            ? "북마크 해제"
+                            : "북마크"}
+                        </span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleSave}
+                        type="button"
+                        className="cursor-pointer flex items-center justify-center gap-2"
+                        disabled={saveMutation.isPending}
+                      >
+                        <Archive size={16} className="text-primary" />
+                        <span>
+                          {saveMutation.isPending ? "저장 중..." : "저장하기"}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

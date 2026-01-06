@@ -67,7 +67,9 @@ export default function StatsOverview({
             <p className={["text-xs md:text-sm", style.text].join(" ")}>
               {label}
             </p>
-            <p className="text-xl md:text-2xl lg:text-3xl">{value}</p>
+            <p className="text-xl md:text-2xl lg:text-3xl text-[#070d19]">
+              {value}
+            </p>
           </div>
         );
       })}

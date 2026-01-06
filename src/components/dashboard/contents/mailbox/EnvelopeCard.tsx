@@ -201,9 +201,6 @@ export default function EnvelopeCard({
   // 모바일 1탭 플립 상태
   const [flipped, setFlipped] = useState(false);
 
-  const [animating, setAnimating] = useState(false);
-  const FLIP_MS = 700; // transition duration과 맞춤
-
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   const canHover = useMemo(() => {
@@ -237,9 +234,7 @@ export default function EnvelopeCard({
     };
   }, [flipped]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (animating) return;
-
+  const handleClick = () => {
     // 데스크탑(hover 가능)에서는 "열 수 있는 편지"만 바로 이동
     if (canHover) {
       if (!canOpenDetail) return;
@@ -247,17 +242,6 @@ export default function EnvelopeCard({
       return;
     }
 
-    // 모바일(hover 불가): 1번 탭 => 뒤집기 (잠겨 있어도 OK)
-    if (!flipped) {
-      e.preventDefault();
-      setAnimating(true);
-      requestAnimationFrame(() => setFlipped(true));
-      window.setTimeout(() => setAnimating(false), FLIP_MS);
-      return;
-    }
-
-    // 모바일 2번 탭 => 열 수 있을 때만 이동
-    if (!canOpenDetail) return;
     router.push(href, { scroll: false });
   };
 
@@ -302,7 +286,7 @@ export default function EnvelopeCard({
     >
       <div
         className={[
-          "relative w-full md:w-70 h-45 transform-3d will-change-transform",
+          "relative w-70 h-45 transform-3d will-change-transform",
           "transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
           rotateClass,
         ].join(" ")}
@@ -352,32 +336,24 @@ export default function EnvelopeCard({
 
             <div className="absolute top-0 right-0">
               <div className="text-primary p-2 space-y-2">
-                {type === "send" ? (
-                  status.mode === "send" && status.canEdit ? (
-                    <Pencil size={16} />
-                  ) : (
-                    <PencilOff size={16} />
-                  )
-                ) : status.mode === "unlock" ? (
-                  status.unlockType === "TIME_AND_LOCATION" ? (
-                    <>
-                      {/* time: 왼쪽으로 15도 => -15deg */}
-                      <Stamp
-                        type="time"
-                        className="transform -rotate-20 -translate-x-4"
-                      />
-
-                      {/* location: 오른쪽으로 25도 => +25deg */}
-                      <Stamp type="location" className="transform rotate-15" />
-                    </>
-                  ) : status.unlockType === "TIME" ? (
+                {status.unlockType === "TIME_AND_LOCATION" ? (
+                  <>
+                    {/* time: 왼쪽으로 15도 => -15deg */}
                     <Stamp
                       type="time"
                       className="transform -rotate-20 -translate-x-4"
                     />
-                  ) : status.unlockType === "LOCATION" ? (
+
+                    {/* location: 오른쪽으로 25도 => +25deg */}
                     <Stamp type="location" className="transform rotate-15" />
-                  ) : null
+                  </>
+                ) : status.unlockType === "TIME" ? (
+                  <Stamp
+                    type="time"
+                    className="transform -rotate-20 -translate-x-4"
+                  />
+                ) : status.unlockType === "LOCATION" ? (
+                  <Stamp type="location" className="transform rotate-15" />
                 ) : null}
               </div>
             </div>
@@ -394,41 +370,42 @@ export default function EnvelopeCard({
             <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
               <div className="w-full h-full flex items-center justify-center">
                 <div className="absolute inset-0">
-                  <svg
-                    width="280"
-                    height="180"
-                    viewBox="0 0 280 180"
-                    fill="none"
-                  >
-                    <defs>
-                      <filter
-                        id="cardShadow"
-                        x="0"
-                        y="0"
-                        width="280"
-                        height="180"
-                        filterUnits="userSpaceOnUse"
-                        colorInterpolationFilters="sRGB"
-                      >
-                        <feDropShadow
-                          dx="0"
-                          dy="4"
-                          stdDeviation="6"
-                          floodColor="#000"
-                          floodOpacity="0.18"
-                        />
-                      </filter>
-                    </defs>
-                    <path d="M0 11H280V180H0V11Z" fill={backShade3} />
-                    <g filter="url(#cardShadow)" className="shadow-md">
-                      <rect x="31" width="218" height="128" fill="#FDFDFD" />
-                    </g>
-                    <path
-                      d="M0 11L140 91.5142L280 11V180H0V11Z"
-                      fill={backShade1}
-                    />
-                    <path d="M280 180H0L140 92L280 180Z" fill={backShade2} />
-                  </svg>
+                  <div className="w-full h-full aspect-14/9">
+                    <svg
+                      viewBox="0 0 280 180"
+                      preserveAspectRatio="xMidYMid meet"
+                      className="w-full h-full"
+                    >
+                      <defs>
+                        <filter
+                          id="cardShadow"
+                          x="0"
+                          y="0"
+                          width="280"
+                          height="180"
+                          filterUnits="userSpaceOnUse"
+                          colorInterpolationFilters="sRGB"
+                        >
+                          <feDropShadow
+                            dx="0"
+                            dy="4"
+                            stdDeviation="6"
+                            floodColor="#000"
+                            floodOpacity="0.18"
+                          />
+                        </filter>
+                      </defs>
+                      <path d="M0 11H280V180H0V11Z" fill={backShade3} />
+                      <g filter="url(#cardShadow)" className="shadow-md">
+                        <rect x="31" width="218" height="128" fill="#FDFDFD" />
+                      </g>
+                      <path
+                        d="M0 11L140 91.5142L280 11V180H0V11Z"
+                        fill={backShade1}
+                      />
+                      <path d="M280 180H0L140 92L280 180Z" fill={backShade2} />
+                    </svg>
+                  </div>
                 </div>
 
                 <div className="relative text-[#3f4756] flex flex-col items-center justify-center gap-2">
@@ -443,16 +420,17 @@ export default function EnvelopeCard({
             <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
               <div className="w-full h-full flex items-center justify-center">
                 <div className="absolute inset-0">
-                  <svg
-                    width="280"
-                    height="180"
-                    viewBox="0 0 280 180"
-                    fill="none"
-                  >
-                    <path d="M0 0H280V180H0V0Z" fill={backShade1} />
-                    <path d="M280 180H0L140 86L280 180Z" fill={backShade2} />
-                    <path d="M280 0H0L140 118L280 0Z" fill={backShade3} />
-                  </svg>
+                  <div className="w-full h-full aspect-14/9">
+                    <svg
+                      viewBox="0 0 280 180"
+                      preserveAspectRatio="xMidYMid meet"
+                      className="w-full h-full"
+                    >
+                      <path d="M0 0H280V180H0V0Z" fill={backShade1} />
+                      <path d="M280 180H0L140 86L280 180Z" fill={backShade2} />
+                      <path d="M280 0H0L140 118L280 0Z" fill={backShade3} />
+                    </svg>
+                  </div>
                 </div>
 
                 <div className="relative text-[#3f4756] flex flex-col items-center justify-center gap-2">
@@ -474,7 +452,7 @@ export default function EnvelopeCard({
                         <span className="text-xs">클릭하여 확인/수정</span>
                       ) : (
                         <span className="text-xs text-[#6f7786]">
-                          열람 후에는 수정할 수 없어요
+                          상대방이 열람한 뒤에는 수정할 수 없어요
                         </span>
                       )}
                     </>
