@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -193,6 +194,30 @@ export default function LetterDetailModal({
     if (closeHref) router.push(closeHref, { scroll: false });
     else router.back();
   };
+
+  // ESC 키로 닫기
+  useEffect(() => {
+    if (!open) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
+  // 모바일에서 뒤 화면 스크롤 락
+  useEffect(() => {
+    if (!open) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [open]);
 
   // 저장 mutation (공개 편지 저장하기)
   const saveMutation = useMutation({
@@ -599,7 +624,7 @@ export default function LetterDetailModal({
 
   if (!initialData && isLoading) {
     return (
-      <div className="fixed inset-0 z-9999 bg-black/50">
+      <div className="fixed inset-0 z-9999 bg-black/50 select-none">
         <div className="flex h-full justify-center p-15">
           <div className="max-w-330 w-full rounded-2xl bg-bg p-8">
             <div className="flex items-center justify-between">
@@ -616,7 +641,7 @@ export default function LetterDetailModal({
 
   if (isError) {
     return (
-      <div className="fixed inset-0 z-9999 bg-black/50">
+      <div className="fixed inset-0 z-9999 bg-black/50 select-none">
         <div className="flex h-full justify-center p-15">
           <div className="max-w-330 w-full rounded-2xl bg-bg p-8">
             <div className="flex items-center justify-between">
@@ -637,7 +662,7 @@ export default function LetterDetailModal({
 
   if (!capsule) {
     return (
-      <div className="fixed inset-0 z-9999 bg-black/50">
+      <div className="fixed inset-0 z-9999 bg-black/50 select-none">
         <div className="flex h-full justify-center p-15">
           <div className="max-w-330 w-full rounded-2xl bg-bg p-8">
             <div className="flex items-center justify-between">
@@ -716,7 +741,10 @@ export default function LetterDetailModal({
     (capsule.currentViewCount ?? 0) >= capsule.maxViewCount;
 
   return (
-    <div className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen">
+    <div
+      className="fixed inset-0 z-9999 bg-black/50 w-full min-h-screen select-none"
+      onClick={close}
+    >
       {/* 저장 성공 모달 */}
       {isSaveSuccessOpen && (
         <ActiveModal
@@ -834,8 +862,11 @@ export default function LetterDetailModal({
         />
       )}
 
-      <div className="flex h-full justify-center md:p-15 p-6">
-        <div className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-bg rounded-2xl border border-outline">
+      <div className="absolute inset-0 flex justify-center items-center md:p-15 p-6">
+        <div
+          className="flex flex-col max-w-300 w-full h-[calc(100vh-48px)] md:h-[calc(100vh-120px)] bg-bg rounded-2xl border border-outline"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
           <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
             <div className="flex justify-between items-center gap-2 md:gap-4">
