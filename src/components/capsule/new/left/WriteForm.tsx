@@ -664,6 +664,8 @@ export default function WriteForm({
               dayForm,
               locationForm,
               attachmentIds,
+              packingColor: envelopeSelected?.name ?? "",
+              contentColor: paperSelected?.name ?? "",
             });
             return createMyCapsule(myPayload);
           })()
