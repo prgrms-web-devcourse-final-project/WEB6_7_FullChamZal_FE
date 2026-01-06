@@ -1,7 +1,6 @@
 "use client";
 
 import { ListOrdered, MapPin, Shuffle, TrendingUp, Users } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 const DEFAULT_THUMBNAIL =
@@ -21,11 +20,10 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
     >
       <div className="relative">
         {/* Top */}
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={thumbnailUrl}
           alt={track.title}
-          width={800}
-          height={200}
           className="w-full h-40 object-cover rounded-t-xl"
         />
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ListOrdered, MapPin, Shuffle, Users } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
@@ -169,11 +168,13 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         className="relative isolate border border-outline rounded-xl overflow-hidden group"
         onClick={handleCardClick}
       >
-        <Image
-          src={track.imageUrl || "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={
+            track.imageUrl ||
+            "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"
+          }
           alt={track.title}
-          width={800}
-          height={200}
           className="w-full h-40 object-cover"
           draggable={false}
         />

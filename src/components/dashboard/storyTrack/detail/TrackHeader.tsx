@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 const DEFAULT_THUMBNAIL =
   "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg";
 
@@ -12,12 +10,11 @@ export default function TrackHeader({ imageUrl }: Props) {
 
   return (
     <div className="relative w-full h-44 sm:h-56 lg:h-64 rounded-2xl overflow-hidden">
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={thumbnailUrl}
         alt="대표 이미지"
-        fill
-        className="object-cover"
-        priority
+        className="w-full h-full object-cover"
       />
     </div>
   );
