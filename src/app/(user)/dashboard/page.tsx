@@ -1,5 +1,5 @@
 import DashBoardMain from "@/components/dashboard/contents/main/DashBoardMain";
-import DashboardHomeSkeleton from "@/components/skeleton/dashboard/home/DashboardHomeSkeleton";
+import DashboardHomeSkeleton from "@/components/ui/skeleton/dashboard/home/DashboardHomeSkeleton";
 import { Suspense } from "react";
 
 export default function DashboardPage() {

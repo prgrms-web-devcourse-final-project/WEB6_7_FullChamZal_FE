@@ -9,7 +9,7 @@ import { fetchPublicCapsules } from "@/lib/api/dashboard/map";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
-import MapContentsSkeleton from "@/components/skeleton/dashboard/map/MapContentsSkeleton";
+import MapContentsSkeleton from "@/components/ui/skeleton/dashboard/map/MapContentsSkeleton";
 import ApiError from "@/components/common/error/ApiError";
 
 const PublicCapsuleMap = dynamic(() => import("./PublicCapsuleMap"), {

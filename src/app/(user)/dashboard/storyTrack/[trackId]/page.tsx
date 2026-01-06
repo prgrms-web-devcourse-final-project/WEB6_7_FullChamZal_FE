@@ -1,5 +1,5 @@
 import TrackDetailPage from "@/components/dashboard/storyTrack/detail/TrackDetailPage";
-import TrackDetailSkeleton from "@/components/skeleton/dashboard/storytrack/TrackDetailSkeleton";
+import TrackDetailSkeleton from "@/components/ui/skeleton/dashboard/storytrack/TrackDetailSkeleton";
 import { Suspense } from "react";
 
 export default function StoryTrackDetailPage() {

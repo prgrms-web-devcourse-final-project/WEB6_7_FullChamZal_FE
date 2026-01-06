@@ -2,7 +2,7 @@
 
 import ApiError from "@/components/common/error/ApiError";
 import DivBox from "@/components/dashboard/DivBox";
-import TodayLettersSkeleton from "@/components/skeleton/dashboard/home/TodayLettersSkeleton";
+import TodayLettersSkeleton from "@/components/ui/skeleton/dashboard/home/TodayLettersSkeleton";
 import { authApiClient } from "@/lib/api/auth/auth.client";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";

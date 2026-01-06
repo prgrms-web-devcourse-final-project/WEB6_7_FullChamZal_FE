@@ -13,7 +13,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import LetterDetailView from "@/components/capsule/detail/LetterDetailView";
 import ActiveModal from "@/components/common/modal/ActiveModal";
-import TrackDetailSkeleton from "@/components/skeleton/dashboard/storytrack/TrackDetailSkeleton";
+import TrackDetailSkeleton from "@/components/ui/skeleton/dashboard/storytrack/TrackDetailSkeleton";
 import ApiError from "@/components/common/error/ApiError";
 
 type TabType = "route" | "map";

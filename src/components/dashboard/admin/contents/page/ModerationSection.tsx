@@ -5,7 +5,7 @@ import AdminBody from "../body/AdminBody";
 import StatsOverview from "../StatsOverview";
 import { useQuery } from "@tanstack/react-query";
 import { AdminModerationApi } from "@/lib/api/admin/moderation/adminModeration";
-import AdminDashboardPageSkeleton from "@/components/skeleton/admin/AdminDashboardPageSkeleton";
+import AdminDashboardPageSkeleton from "@/components/ui/skeleton/admin/AdminDashboardPageSkeleton";
 import ApiError from "@/components/common/error/ApiError";
 
 const REPORT_TABS = [

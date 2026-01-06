@@ -1,5 +1,5 @@
 import MapContents from "@/components/dashboard/map/MapContents";
-import MapPageSkeleton from "@/components/skeleton/dashboard/map/MapPageSkeleton";
+import MapPageSkeleton from "@/components/ui/skeleton/dashboard/map/MapPageSkeleton";
 import { Suspense } from "react";
 
 export default function MapPage() {

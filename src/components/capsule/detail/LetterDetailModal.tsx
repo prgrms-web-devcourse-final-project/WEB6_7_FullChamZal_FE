@@ -47,7 +47,7 @@ import {
 import { formatDate } from "@/lib/hooks/formatDate";
 import { formatDateTime } from "@/lib/hooks/formatDateTime";
 import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
-import { CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";
+import { CAPTURE_COLOR_MAP } from "@/lib/constants/capsulePalette";
 import ReportModal from "../report/ReportModal";
 import toast from "react-hot-toast";
 import Image from "next/image";
