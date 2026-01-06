@@ -138,6 +138,9 @@ export default function TrackOverview() {
       router.replace("/dashboard/storyTrack/mine");
       router.refresh();
     },
+    onError: (error) => {
+      toast.error(error?.message);
+    },
   });
 
   const serverMemberType = trackData?.data.memberType;
