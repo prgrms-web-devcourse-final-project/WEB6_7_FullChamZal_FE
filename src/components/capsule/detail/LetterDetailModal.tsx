@@ -79,6 +79,9 @@ export type UICapsule = {
     presignedUrl: string;
     attachmentId: number;
   }>;
+
+  maxViewCount?: number;
+  currentViewCount?: number;
 };
 
 type PostLoginAction =
@@ -533,6 +536,9 @@ export default function LetterDetailModal({
           viewStatus: !!s.viewStatus,
           isBookmarked: !!s.isBookmarked,
           attachments: s.attachments,
+
+          maxViewCount: s.maxViewCount,
+          currentViewCount: s.currentViewCount,
         };
       }
 
@@ -675,7 +681,6 @@ export default function LetterDetailModal({
 
   const detailHex = CAPTURE_COLOR_MAP[detailKey] ?? DEFAULT_HEX;
 
-  // Footer에서 북마크 버튼을 보여줄지:
   // - 관리자면 없음
   // - 보호편지(= 북마크 모드)일 때는 북마크 토글
   const isBookmarkMode = !isAdmin && !!isProtected;
@@ -806,11 +811,8 @@ export default function LetterDetailModal({
           {/* Header */}
           <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
             <div className="flex justify-between items-center gap-2 md:gap-4">
-              <div className="flex-none font-medium text-base md:text-lg lg:text-xl">
-                제목: {capsule.title}
-              </div>
-
-              <div className="flex-1 flex flex-col items-center gap-0.5 text-xs md:text-sm lg:text-base justify-center">
+              {/* 해제 조건 */}
+              <div className="flex flex-col items-center gap-0.5 text-xs md:text-sm lg:text-base justify-center">
                 <div className="flex flex-row gap-1">
                   <span className="hidden md:block text-text-2">
                     해제 조건:
@@ -834,6 +836,18 @@ export default function LetterDetailModal({
                 )}
               </div>
 
+              {/* 선착순 카운트 (maxViewCount > 0 일 때만 표시) */}
+              {capsule.maxViewCount != null && capsule.maxViewCount > 0 && (
+                <div className="flex items-center gap-1 text-xs md:text-sm text-text-3">
+                  <span className="font-medium">
+                    {capsule.currentViewCount}
+                  </span>
+                  <span>/</span>
+                  <span>{capsule.maxViewCount}</span>
+                </div>
+              )}
+
+              {/* 버튼 */}
               <div className="flex justify-end items-center gap-2">
                 {isSender || isReceiver ? (
                   <DropdownMenu>
@@ -910,13 +924,19 @@ export default function LetterDetailModal({
           {/* Body */}
           <div className="flex-1 overflow-hidden">
             <div
-              className="w-full h-full p-4 md:p-6 lg:p-12"
+              className="w-full h-full p-4 md:p-6 lg:p-10"
               style={{ backgroundColor: detailHex }}
             >
               <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8">
-                <div className="text-base md:text-xl lg:text-2xl space-x-1">
-                  <span className="text-primary font-bold">Dear.</span>
-                  <span className="text-[#070d19]">{dearName}</span>
+                <div className="space-y-2 text-base md:text-xl lg:text-2xl space-x-1">
+                  <div className="font-medium text-base md:text-lg lg:text-xl">
+                    {capsule.title}
+                  </div>
+
+                  <div className="space-x-1">
+                    <span className="text-primary font-bold">Dear.</span>
+                    <span className="text-[#070d19]">{dearName}</span>
+                  </div>
                 </div>
 
                 <div className="flex-1 mx-3 overflow-x-hidden overflow-y-auto space-y-4">

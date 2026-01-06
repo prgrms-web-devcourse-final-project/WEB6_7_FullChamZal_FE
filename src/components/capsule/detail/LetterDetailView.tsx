@@ -426,7 +426,7 @@ export default function LetterDetailView({
         <LetterLockedView
           isPublic={isPublic}
           unlockAt={capsule.unlockAt ?? new Date().toISOString()}
-          unlockUntil={capsule.unlockUntil ?? new Date().toISOString()}
+          unlockUntil={capsule.unlockUntil}
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
           targetLocation={targetLocation}

@@ -104,6 +104,8 @@ type CapsuleDashboardSendItem = {
   locationLat: number | null;
   locationLng: number | null;
   locationRadiusM: number;
+  maxViewCount: number;
+  currentViewCount: number;
   isBookmarked: boolean;
   result: string;
   attachments?: CapsuleAttachmentViewResponse[];
