@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
 import ConfirmModal from "@/components/common/modal/ConfirmModal";
+import Image from "next/image";
 
 export default function TrackCard({ track }: { track: StoryTrackItem }) {
   const router = useRouter();
@@ -168,13 +169,11 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         className="relative isolate border border-outline rounded-xl overflow-hidden group"
         onClick={handleCardClick}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={
-            track.imageUrl ||
-            "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"
-          }
+        <Image
+          src={track.imageUrl || "/img/basicImg.png"}
           alt={track.title}
+          width={800}
+          height={800}
           className="w-full h-40 object-cover"
           draggable={false}
         />
