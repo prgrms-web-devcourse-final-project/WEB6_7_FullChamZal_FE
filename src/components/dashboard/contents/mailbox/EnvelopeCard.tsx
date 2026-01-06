@@ -452,7 +452,7 @@ export default function EnvelopeCard({
                         <span className="text-xs">클릭하여 확인/수정</span>
                       ) : (
                         <span className="text-xs text-[#6f7786]">
-                          열람 후에는 수정할 수 없어요
+                          상대방이 열람한 뒤에는 수정할 수 없어요
                         </span>
                       )}
                     </>

@@ -649,6 +649,25 @@ export default function LetterDetailModal({
       </div>
     );
   }
+  // 해제 조건 달성 판단 기준
+  const isUnlocked =
+    capsule.unlockType === "TIME"
+      ? capsule.unlockAt != null &&
+        new Date(capsule.unlockAt).getTime() <= Date.now()
+      : capsule.unlockType === "LOCATION"
+      ? true // sender는 위치 조건 검증 대상 아님
+      : capsule.unlockType === "TIME_AND_LOCATION"
+      ? capsule.unlockAt != null &&
+        new Date(capsule.unlockAt).getTime() <= Date.now()
+      : false;
+
+  // 북마크 가능 여부
+  const canBookmarkOrSave =
+    !isAdmin &&
+    // 받는 사람 / 공개 편지는 기존 로직 유지
+    (!isSender ||
+      // sender일 경우: 해제 조건 달성 시만 가능
+      (isSender && isUnlocked));
 
   // 공개 편지이면 보는 사람 이름, 비공개 편지일 경우 받는 사람 이름, 그냥 빈 데이터이면 당신
   const dearName = isPublic
@@ -681,9 +700,8 @@ export default function LetterDetailModal({
 
   const detailHex = CAPTURE_COLOR_MAP[detailKey] ?? DEFAULT_HEX;
 
-  // - 관리자면 없음
   // - 보호편지(= 북마크 모드)일 때는 북마크 토글
-  const isBookmarkMode = !isAdmin && !!isProtected;
+  const isBookmarkMode = !isAdmin && !!isProtected && canBookmarkOrSave;
 
   const bookmarkButtonDisabled = bookmarkMutation.isPending;
 
@@ -830,7 +848,7 @@ export default function LetterDetailModal({
                 </div>
 
                 {unlockUntilLabel && (
-                  <span className="text-xs md:text-xs text-text-3">
+                  <span className="text-xs md:text-xs text-text-3 line-clamp-1">
                     열람 가능 기한: {unlockUntilLabel} 까지 열람 가능
                   </span>
                 )}
@@ -933,7 +951,7 @@ export default function LetterDetailModal({
             >
               <div className="w-full h-full flex flex-col justify-between gap-2 md:gap-4 lg:gap-8 text-[#070d19]">
                 <div className="space-y-2 text-base md:text-xl lg:text-2xl space-x-1">
-                  <div className="font-medium text-base md:text-lg lg:text-xl">
+                  <div className="font-medium text-lg lg:text-xl">
                     {capsule.title}
                   </div>
 
@@ -983,7 +1001,7 @@ export default function LetterDetailModal({
           </div>
 
           {/* Footer */}
-          <div className="shrink-0 border-t border-outline p-5">
+          <div className="shrink-0 border-t border-outline p-5 min-h-16">
             {role === "ADMIN" ? null : (
               <div className="flex-1 flex items-center justify-center">
                 {!isSender && (
@@ -1035,7 +1053,7 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
-                {!isPublic && (
+                {!isPublic && !isSender && (
                   <div className="flex-1 flex items-center justify-center">
                     <Link
                       href={"/capsules/new"}
@@ -1047,45 +1065,46 @@ export default function LetterDetailModal({
                   </div>
                 )}
 
-                {/* 저장하기(공개) vs 북마크(보호) 분기 */}
-                <div className="flex-1 flex items-center justify-center">
-                  {isBookmarkMode ? (
-                    <button
-                      onClick={handleToggleBookmark}
-                      type="button"
-                      className="cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
-                      disabled={bookmarkButtonDisabled}
-                    >
-                      <Bookmark
-                        size={16}
-                        className={
-                          isBookmarked
-                            ? "text-primary fill-primary"
-                            : "text-primary"
-                        }
-                      />
-                      <span>
-                        {bookmarkButtonDisabled
-                          ? "처리 중..."
-                          : isBookmarked
-                          ? "북마크 해제"
-                          : "북마크"}
-                      </span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleSave}
-                      type="button"
-                      className="cursor-pointer flex items-center justify-center gap-2"
-                      disabled={saveMutation.isPending}
-                    >
-                      <Archive size={16} className="text-primary" />
-                      <span>
-                        {saveMutation.isPending ? "저장 중..." : "저장하기"}
-                      </span>
-                    </button>
-                  )}
-                </div>
+                {canBookmarkOrSave && (
+                  <div className="flex-1 flex items-center justify-center">
+                    {isBookmarkMode ? (
+                      <button
+                        onClick={handleToggleBookmark}
+                        type="button"
+                        className="cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                        disabled={bookmarkButtonDisabled}
+                      >
+                        <Bookmark
+                          size={16}
+                          className={
+                            isBookmarked
+                              ? "text-primary fill-primary"
+                              : "text-primary"
+                          }
+                        />
+                        <span>
+                          {bookmarkButtonDisabled
+                            ? "처리 중..."
+                            : isBookmarked
+                            ? "북마크 해제"
+                            : "북마크"}
+                        </span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleSave}
+                        type="button"
+                        className="cursor-pointer flex items-center justify-center gap-2"
+                        disabled={saveMutation.isPending}
+                      >
+                        <Archive size={16} className="text-primary" />
+                        <span>
+                          {saveMutation.isPending ? "저장 중..." : "저장하기"}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
