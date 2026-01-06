@@ -173,7 +173,7 @@ export default function TrackDetailPage() {
               <div className="border border-outline rounded-2xl overflow-hidden flex flex-col lg:flex-1 lg:min-h-0">
                 <TrackTabMenu activeTab={tab} onChange={setTab} />
 
-                <div className="overflow-visible lg:overflow-auto lg:flex-1 lg:min-h-0">
+                <div className="overflow-visible h-screen lg:overflow-auto lg:flex-1 lg:min-h-0">
                   {tab === "map" && (
                     <TrackMap
                       storytrackType={data?.data.storytrackType}
