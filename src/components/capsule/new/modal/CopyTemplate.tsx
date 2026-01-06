@@ -55,7 +55,7 @@ ${data?.password ? `비밀번호: ${data.password}` : ""}
   }, [open, data?.userName, data?.url, data?.password, shareText]);
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} closeOnOverlayClick={false}>
       <div className="w-full max-w-130 flex flex-col items-center gap-3 md:gap-5 rounded-2xl border-2 border-outline bg-bg p-4 md:p-6">
         <div className="w-20 h-20 rounded-full bg-sub flex items-center justify-center">
           <Check size={40} strokeWidth={1} />

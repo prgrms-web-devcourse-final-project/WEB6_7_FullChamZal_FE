@@ -1,7 +1,7 @@
 "use client";
 
 import { Lock, MapPin, Clock } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type LatLng = { lat: number; lng: number };
@@ -136,6 +136,7 @@ export default function LetterLockedView({
   viewingRadius = 50,
   locationName = "없음",
   locationErrorMessage,
+  onUnlocked,
 }: {
   isPublic: boolean;
   unlockAt: string;
@@ -146,6 +147,7 @@ export default function LetterLockedView({
   viewingRadius?: number;
   locationName?: string;
   locationErrorMessage?: string;
+  onUnlocked?: () => void;
 }) {
   const router = useRouter();
 
@@ -214,6 +216,22 @@ export default function LetterLockedView({
   const showLocation =
     unlockType === "LOCATION" || unlockType === "TIME_AND_LOCATION";
 
+  const isUnlocked =
+    unlockType === "TIME"
+      ? isTimeUnlocked
+      : unlockType === "LOCATION"
+      ? isLocationUnlocked
+      : isTimeUnlocked && isLocationUnlocked;
+
+  const hasTriggeredRefetch = useRef(false);
+
+  useEffect(() => {
+    if (isUnlocked && !hasTriggeredRefetch.current) {
+      hasTriggeredRefetch.current = true;
+      onUnlocked?.();
+    }
+  }, [isUnlocked, onUnlocked]);
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center">
       <div className="w-full max-w-120 px-4 shadow-2xl p-10 rounded-3xl border border-outline">
@@ -260,7 +278,7 @@ export default function LetterLockedView({
           ) : null}
 
           {/* ---------- UNLOCK UNTIL UI ---------- */}
-          {isUnlockUntilExpired ? (
+          {isUnlockUntilExpired ?? (
             <div className="w-full flex flex-col items-center gap-3 mt-2">
               <p className="text-sm text-error font-medium">
                 열람 가능 시간이 종료되었습니다
@@ -272,14 +290,14 @@ export default function LetterLockedView({
 
               <div className="flex items-center gap-2">
                 {expired.days > 0 && (
-                  <TimeBox label="일" value={expired.days} />
+                  <TimeBox label="days" value={expired.days} />
                 )}
-                <TimeBox label="시간" value={pad2(expired.hours)} />
-                <TimeBox label="분" value={pad2(expired.minutes)} />
-                <TimeBox label="초" value={pad2(expired.seconds)} />
+                <TimeBox label="hours" value={pad2(expired.hours)} />
+                <TimeBox label="min" value={pad2(expired.minutes)} />
+                <TimeBox label="sec" value={pad2(expired.seconds)} />
               </div>
             </div>
-          ) : null}
+          )}
 
           {/* ---------- LOCATION UI ---------- */}
           {showLocation ? (

@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
 import ApiError from "@/components/common/error/ApiError";
+import toast from "react-hot-toast";
 
 type LatLng = { lat: number; lng: number };
 
@@ -432,6 +433,10 @@ export default function LetterDetailView({
           targetLocation={targetLocation}
           locationName={capsule.locationName}
           locationErrorMessage={locationError ?? undefined}
+          onUnlocked={() => {
+            toast.success(`조건이 충족되었습니다!\n편지를 여는 중이에요.`);
+            refetch();
+          }}
         />
       </div>
     );
