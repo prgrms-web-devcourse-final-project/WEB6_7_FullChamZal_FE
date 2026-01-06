@@ -13,7 +13,7 @@ type FirstFormValue = {
   title: string;
   description: string;
   order: TrackType;
-  imageFile: File | null;
+  thumbnailAttachmentId?: number; // 썸네일 attachmentId
 };
 
 type MemberType = "CREATOR" | "NOT_JOINED" | "PARTICIPANT" | "COMPLETED";
