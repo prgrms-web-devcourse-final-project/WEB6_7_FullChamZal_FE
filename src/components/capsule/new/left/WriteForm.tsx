@@ -12,6 +12,7 @@ import {
   PlusIcon,
   Minus,
   X,
+  Loader2,
 } from "lucide-react";
 import {
   CAPTURE_ENVELOPE_PALETTE,
@@ -40,7 +41,10 @@ import {
   buildMyPayload,
   createMyCapsule,
 } from "@/lib/api/capsule/capsule";
-import { attachmentApi } from "@/lib/api/capsule/attachment";
+import {
+  attachmentApi,
+  type CapsuleAttachmentStatus,
+} from "@/lib/api/capsule/attachment";
 import toast from "react-hot-toast";
 
 type PreviewState = {
@@ -160,12 +164,15 @@ export default function WriteForm({
       attachmentId: number;
       fileName: string;
       previewUrl?: string;
+      status: CapsuleAttachmentStatus;
     }[]
   >([]);
   // cleanup에서 최신 값을 참조하기 위한 ref
   const uploadedAttachmentsRef = useRef(uploadedAttachments);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // 폴링 cleanup을 위한 timeout ID 저장
+  const pollingTimeoutsRef = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
   /* 편지 내용 글자 수 제한 길이 */
   const MAX_CONTENT_LENGTH = 3000;
@@ -274,6 +281,43 @@ export default function WriteForm({
     setContent(next.slice(0, MAX_CONTENT_LENGTH));
   };
 
+  // 이미지 필터링 상태 폴링 함수
+  const pollAttachmentStatus = async (
+    attachmentId: number,
+    onStatusChange: (status: CapsuleAttachmentStatus) => void
+  ) => {
+    // 기존 폴링이 있다면 취소
+    const existingTimeout = pollingTimeoutsRef.current.get(attachmentId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+    }
+
+    const poll = async () => {
+      try {
+        const { status } = await attachmentApi.getStatus(attachmentId);
+        onStatusChange(status);
+
+        // TEMP 또는 DELETED 상태면 폴링 종료
+        if (status === "TEMP" || status === "DELETED") {
+          pollingTimeoutsRef.current.delete(attachmentId);
+          return;
+        }
+
+        // 2초 후 다시 폴링
+        const timeoutId = setTimeout(poll, 2000);
+        pollingTimeoutsRef.current.set(attachmentId, timeoutId);
+      } catch (error) {
+        console.error(`Failed to poll status for ${attachmentId}:`, error);
+        onStatusChange("DELETED"); // 오류 발생 시 DELETED로 처리
+        pollingTimeoutsRef.current.delete(attachmentId);
+      }
+    };
+
+    // 초기 지연 후 폴링 시작
+    const initialTimeoutId = setTimeout(poll, 500);
+    pollingTimeoutsRef.current.set(attachmentId, initialTimeoutId);
+  };
+
   // 이미지 파일 선택 핸들러
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -282,8 +326,10 @@ export default function WriteForm({
     const MAX_FILES = 3; // 최대 3개까지
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-    // 기존 파일 수 확인
-    const currentCount = uploadedAttachments.length;
+    // 기존 파일 수 확인 (DELETED 상태인 이미지는 제외)
+    const currentCount = uploadedAttachments.filter(
+      (a) => a.status !== "DELETED"
+    ).length;
     if (currentCount + files.length > MAX_FILES) {
       toast.error(`이미지는 최대 ${MAX_FILES}개까지 업로드할 수 있습니다.`);
       // input 초기화
@@ -322,21 +368,48 @@ export default function WriteForm({
     setIsUploading(true);
     try {
       for (const file of validFiles) {
-        const response = await attachmentApi.uploadByServer(file);
-
         // 미리보기 URL 생성 (로컬)
         const previewUrl = URL.createObjectURL(file);
 
+        // Presigned URL 방식으로 업로드
+        const response = await attachmentApi.uploadByPresignedUrl(file);
+
+        // 업로드 완료 후 상태를 PENDING으로 설정하고 폴링 시작
         setUploadedAttachments((prev) => [
           ...prev,
           {
             attachmentId: response.attachmentId,
             fileName: file.name,
             previewUrl,
+            status: "PENDING" as CapsuleAttachmentStatus, // 업로드 완료, 필터링 대기 중
           },
         ]);
+
+        // 폴링 시작: 상태가 TEMP 또는 DELETED가 될 때까지 조회
+        pollAttachmentStatus(response.attachmentId, (status) => {
+          setUploadedAttachments((prev) => {
+            const prevItem = prev.find(
+              (item) => item.attachmentId === response.attachmentId
+            );
+            const prevStatus = prevItem?.status;
+
+            // DELETED로 변경되었을 때 토스트 표시
+            if (prevStatus !== "DELETED" && status === "DELETED") {
+              const fileName = prevItem?.fileName || "이미지";
+              toast.error(
+                `${fileName}: 유해 이미지로 검열되어 삭제되었습니다.`
+              );
+            }
+
+            return prev.map((item) =>
+              item.attachmentId === response.attachmentId
+                ? { ...item, status }
+                : item
+            );
+          });
+        });
       }
-      toast.success(`${validFiles.length}개의 이미지가 업로드되었습니다!`);
+      toast.success(`${validFiles.length}개의 이미지 업로드를 시작했습니다!`);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
@@ -374,6 +447,18 @@ export default function WriteForm({
   // ㄴ 브라우저 탭 나가기 (beforeunload)
   // ㄴ 컴포넌트 언마운트 (뒤로가기, 페이지 이동 등)
   useCleanupTempFiles(uploadedAttachmentsRef);
+
+  // 컴포넌트 언마운트 시 폴링 정리
+  useEffect(() => {
+    const timeoutsMap = pollingTimeoutsRef.current;
+    return () => {
+      // 모든 진행 중인 폴링 취소
+      timeoutsMap.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      timeoutsMap.clear();
+    };
+  }, []);
 
   const showBadFieldsToast = (rawMessage: string) => {
     const fields = extractBadFields(rawMessage);
@@ -435,6 +520,15 @@ export default function WriteForm({
         toast.error("비밀번호를 입력해 주세요.");
         return;
       }
+    }
+
+    // 이미지 업로드 상태 검증
+    const hasPendingOrUploading = uploadedAttachments.some(
+      (a) => a.status === "PENDING" || a.status === "UPLOADING"
+    );
+    if (hasPendingOrUploading) {
+      toast.error("이미지 업로드 및 검토가 완료될 때까지 기다려주세요.");
+      return;
     }
 
     if (!me?.memberId) {
@@ -508,7 +602,10 @@ export default function WriteForm({
     const envelopeSelected = envelopeThemes[selectedEnvelope];
     const paperSelected = paperThemes[selectedPaper];
 
-    const attachmentIds = uploadedAttachments.map((a) => a.attachmentId);
+    // TEMP 상태인 이미지만 사용 (필터링 완료된 이미지)
+    const attachmentIds = uploadedAttachments
+      .filter((a) => a.status === "TEMP")
+      .map((a) => a.attachmentId);
 
     const privatePayload = buildPrivatePayload({
       memberId: me.memberId,
@@ -846,74 +943,123 @@ export default function WriteForm({
         <WriteDiv title="이미지 첨부 (선택사항)">
           <div className="space-y-3">
             {/* 파일 선택 버튼 */}
-            <div className="flex items-center gap-3">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-                id="image-upload"
-                disabled={isUploading}
-              />
-              <label
-                htmlFor="image-upload"
-                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-bg text-sm font-medium transition-colors ${
-                  isUploading
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-sub-2 hover:border-primary-2"
-                }`}
-              >
-                <ImageIcon size={16} />
-                {isUploading ? "업로드 중..." : "파일 선택"}
-              </label>
-              {isUploading && (
-                <span className="text-sm text-text-3">
-                  이미지를 업로드하는 중...
-                </span>
-              )}
-            </div>
+            {(() => {
+              // 필터링 완료되지 않은 이미지가 있는지 확인
+              const hasPendingOrUploading = uploadedAttachments.some(
+                (a) => a.status === "PENDING" || a.status === "UPLOADING"
+              );
+              const isButtonDisabled = isUploading || hasPendingOrUploading;
+              const statusText = hasPendingOrUploading
+                ? "검토 중..."
+                : isUploading
+                ? "업로드 중..."
+                : "파일 선택";
+
+              return (
+                <div className="flex items-center gap-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="image-upload"
+                    disabled={isButtonDisabled}
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-outline bg-bg text-sm font-medium transition-colors ${
+                      isButtonDisabled
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-sub-2 hover:border-primary-2"
+                    }`}
+                  >
+                    <ImageIcon size={16} />
+                    {statusText}
+                  </label>
+                  {isButtonDisabled && (
+                    <span className="text-sm text-text-3">
+                      {hasPendingOrUploading
+                        ? "이미지 검토가 완료될 때까지 기다려주세요..."
+                        : "이미지를 업로드하는 중..."}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* 업로드된 이미지 목록 */}
-            {uploadedAttachments.length > 0 && (
+            {uploadedAttachments.filter((a) => a.status !== "DELETED").length >
+              0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {uploadedAttachments.map((attachment) => (
-                  <div
-                    key={attachment.attachmentId}
-                    className="relative group aspect-square rounded-lg overflow-hidden border border-outline bg-sub-2"
-                  >
-                    {attachment.previewUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={attachment.previewUrl}
-                        alt={attachment.fileName}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          // 이미지 로드 실패 시 대체 UI 표시
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-text-3 text-xs">
-                        <ImageIcon size={24} />
+                {uploadedAttachments
+                  .filter((a) => a.status !== "DELETED")
+                  .map((attachment) => {
+                    const isUploading = attachment.status === "UPLOADING";
+                    const isPending = attachment.status === "PENDING";
+                    const isDeleted = attachment.status === "DELETED";
+                    const isLoading = isUploading || isPending;
+
+                    return (
+                      <div
+                        key={attachment.attachmentId}
+                        className="relative group aspect-square rounded-lg overflow-hidden border border-outline bg-sub-2"
+                      >
+                        {attachment.previewUrl ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={attachment.previewUrl}
+                            alt={attachment.fileName}
+                            className={`w-full h-full object-cover ${
+                              isDeleted ? "opacity-50" : ""
+                            }`}
+                            onError={(e) => {
+                              // 이미지 로드 실패 시 대체 UI 표시
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-text-3 text-xs">
+                            <ImageIcon size={24} />
+                          </div>
+                        )}
+
+                        {/* 상태 오버레이 */}
+                        {isLoading && (
+                          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white z-20">
+                            <Loader2 className="animate-spin mb-2" size={24} />
+                            <span className="text-xs">
+                              {isUploading ? "업로드 중..." : "검토 중..."}
+                            </span>
+                          </div>
+                        )}
+
+                        {isDeleted && (
+                          <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white z-20">
+                            <X className="mb-2 text-red-400" size={24} />
+                            <span className="text-xs text-center px-2">
+                              필터링 실패
+                            </span>
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleRemoveAttachment(attachment.attachmentId)
+                          }
+                          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-30"
+                          aria-label="이미지 삭제"
+                        >
+                          <X size={16} />
+                        </button>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60 text-white text-xs truncate z-20">
+                          {attachment.fileName}
+                        </div>
                       </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleRemoveAttachment(attachment.attachmentId)
-                      }
-                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                      aria-label="이미지 삭제"
-                    >
-                      <X size={16} />
-                    </button>
-                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60 text-white text-xs truncate">
-                      {attachment.fileName}
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
               </div>
             )}
 
