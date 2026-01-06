@@ -190,8 +190,6 @@ export default function EnvelopeCard({
     [capsule, type, currentPos]
   );
 
-  console.log(capsule);
-
   const href = `/dashboard/${type}?id=${capsule.capsuleId}`;
 
   // send는 항상 상세 진입 가능

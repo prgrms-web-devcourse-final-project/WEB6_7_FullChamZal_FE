@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { guestCapsuleApi } from "@/lib/api/capsule/guestCapsule";
+import { guestCapsuleApi } from "@/lib/api/capsule/readCapsule";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import LetterPasswordModal from "../detail/LetterPasswordModal";

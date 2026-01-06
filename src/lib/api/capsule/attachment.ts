@@ -104,11 +104,11 @@ export const attachmentApi = {
     }
 
     // 디버깅: Presigned URL의 SignedHeaders 확인
-    const signedHeaders = new URL(presignedUrl).searchParams.get(
+    /* const signedHeaders = new URL(presignedUrl).searchParams.get(
       "X-Amz-SignedHeaders"
     );
     console.log("SignedHeaders=", signedHeaders);
-    console.log("Presigned URL (PUT 요청 전):", presignedUrl);
+    console.log("Presigned URL (PUT 요청 전):", presignedUrl); */
 
     // 2단계: S3에 직접 업로드
     // 백엔드에서 Presigned URL 생성 시 contentType과 contentLength를 서명에 포함하지 않았으므로

@@ -9,7 +9,7 @@ import LetterLockedView from "./LetterLockedView";
 import {
   guestCapsuleApi,
   storyTrackCapsuleApi,
-} from "@/lib/api/capsule/guestCapsule";
+} from "@/lib/api/capsule/readCapsule";
 import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
 import ApiError from "@/components/common/error/ApiError";
@@ -452,6 +452,8 @@ export default function LetterDetailView({
     locationName: capsule.locationName ?? null,
     viewStatus: !!capsule.viewStatus,
     isBookmarked: !!capsule.isBookmarked,
+    maxViewCount: capsule.maxViewCount,
+    currentViewCount: capsule.currentViewCount,
   };
 
   return (
