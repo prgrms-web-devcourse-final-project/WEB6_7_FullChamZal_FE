@@ -57,7 +57,7 @@ export default function SixthSection() {
 
             <Button
               onClick={() => router.push("/auth/login")}
-              className="border border-outline py-4 px-5 bg-white hover:bg-button-hover font-normal text-[#070d19]"
+              className="border border-outline py-4 px-5 bg-white hover:bg-button-hover text-[#070d19]"
             >
               로그인
             </Button>
