@@ -302,7 +302,7 @@ export default function EnvelopeCard({
     >
       <div
         className={[
-          "relative w-full md:w-70 h-45 transform-3d will-change-transform",
+          "relative w-70 h-45 transform-3d will-change-transform",
           "transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
           rotateClass,
         ].join(" ")}
@@ -394,41 +394,42 @@ export default function EnvelopeCard({
             <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
               <div className="w-full h-full flex items-center justify-center">
                 <div className="absolute inset-0">
-                  <svg
-                    width="280"
-                    height="180"
-                    viewBox="0 0 280 180"
-                    fill="none"
-                  >
-                    <defs>
-                      <filter
-                        id="cardShadow"
-                        x="0"
-                        y="0"
-                        width="280"
-                        height="180"
-                        filterUnits="userSpaceOnUse"
-                        colorInterpolationFilters="sRGB"
-                      >
-                        <feDropShadow
-                          dx="0"
-                          dy="4"
-                          stdDeviation="6"
-                          floodColor="#000"
-                          floodOpacity="0.18"
-                        />
-                      </filter>
-                    </defs>
-                    <path d="M0 11H280V180H0V11Z" fill={backShade3} />
-                    <g filter="url(#cardShadow)" className="shadow-md">
-                      <rect x="31" width="218" height="128" fill="#FDFDFD" />
-                    </g>
-                    <path
-                      d="M0 11L140 91.5142L280 11V180H0V11Z"
-                      fill={backShade1}
-                    />
-                    <path d="M280 180H0L140 92L280 180Z" fill={backShade2} />
-                  </svg>
+                  <div className="w-full h-full aspect-14/9">
+                    <svg
+                      viewBox="0 0 280 180"
+                      preserveAspectRatio="xMidYMid meet"
+                      className="w-full h-full"
+                    >
+                      <defs>
+                        <filter
+                          id="cardShadow"
+                          x="0"
+                          y="0"
+                          width="280"
+                          height="180"
+                          filterUnits="userSpaceOnUse"
+                          colorInterpolationFilters="sRGB"
+                        >
+                          <feDropShadow
+                            dx="0"
+                            dy="4"
+                            stdDeviation="6"
+                            floodColor="#000"
+                            floodOpacity="0.18"
+                          />
+                        </filter>
+                      </defs>
+                      <path d="M0 11H280V180H0V11Z" fill={backShade3} />
+                      <g filter="url(#cardShadow)" className="shadow-md">
+                        <rect x="31" width="218" height="128" fill="#FDFDFD" />
+                      </g>
+                      <path
+                        d="M0 11L140 91.5142L280 11V180H0V11Z"
+                        fill={backShade1}
+                      />
+                      <path d="M280 180H0L140 92L280 180Z" fill={backShade2} />
+                    </svg>
+                  </div>
                 </div>
 
                 <div className="relative text-[#3f4756] flex flex-col items-center justify-center gap-2">
@@ -443,16 +444,17 @@ export default function EnvelopeCard({
             <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
               <div className="w-full h-full flex items-center justify-center">
                 <div className="absolute inset-0">
-                  <svg
-                    width="280"
-                    height="180"
-                    viewBox="0 0 280 180"
-                    fill="none"
-                  >
-                    <path d="M0 0H280V180H0V0Z" fill={backShade1} />
-                    <path d="M280 180H0L140 86L280 180Z" fill={backShade2} />
-                    <path d="M280 0H0L140 118L280 0Z" fill={backShade3} />
-                  </svg>
+                  <div className="w-full h-full aspect-14/9">
+                    <svg
+                      viewBox="0 0 280 180"
+                      preserveAspectRatio="xMidYMid meet"
+                      className="w-full h-full"
+                    >
+                      <path d="M0 0H280V180H0V0Z" fill={backShade1} />
+                      <path d="M280 180H0L140 86L280 180Z" fill={backShade2} />
+                      <path d="M280 0H0L140 118L280 0Z" fill={backShade3} />
+                    </svg>
+                  </div>
                 </div>
 
                 <div className="relative text-[#3f4756] flex flex-col items-center justify-center gap-2">
