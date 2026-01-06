@@ -155,13 +155,17 @@ export default function LetterLockedView({
     return Number.isFinite(t) ? t : NaN;
   }, [unlockAt]);
 
-  const unlockUntilTime = useMemo(() => {
-    if (!unlockUntil) return NaN;
+  const unlockUntilTime = useMemo<number | null>(() => {
+    if (!unlockUntil) return null;
+
     const t = new Date(toUtcIso(unlockUntil)).getTime();
-    return Number.isFinite(t) ? t : NaN;
+    return Number.isFinite(t) ? t : null;
   }, [unlockUntil]);
 
   const [now, setNow] = useState(() => Date.now());
+
+  const isUnlockUntilExpired =
+    unlockUntilTime !== null && now > unlockUntilTime;
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
@@ -178,10 +182,7 @@ export default function LetterLockedView({
     ? Math.max(0, remainingMsRaw)
     : 0;
 
-  const expiredMs =
-    Number.isFinite(unlockUntilTime) && now > unlockUntilTime
-      ? now - unlockUntilTime
-      : 0;
+  const expiredMs = isUnlockUntilExpired ? now - unlockUntilTime! : 0;
 
   const expired = formatRemaining(expiredMs);
 
@@ -216,7 +217,7 @@ export default function LetterLockedView({
   return (
     <div className="w-full min-h-screen flex items-center justify-center">
       <div className="w-full max-w-120 px-4 shadow-2xl p-10 rounded-3xl border border-outline">
-        <div className="flex flex-col items-center justify-center gap-5">
+        <div className="flex flex-col items-center justify-center gap-4">
           <div className="p-5 rounded-full bg-sub">
             <Lock size={40} />
           </div>
@@ -259,25 +260,23 @@ export default function LetterLockedView({
           ) : null}
 
           {/* ---------- UNLOCK UNTIL UI ---------- */}
-          {unlockUntil &&
-          Number.isFinite(unlockUntilTime) &&
-          now > unlockUntilTime ? (
+          {isUnlockUntilExpired ? (
             <div className="w-full flex flex-col items-center gap-3 mt-2">
               <p className="text-sm text-error font-medium">
                 열람 가능 시간이 종료되었습니다
               </p>
 
               <p className="text-xs text-text-3">
-                종료 시각: {formatKstDateTime(unlockUntilTime)}
+                종료 시각: {formatKstDateTime(unlockUntilTime!)}
               </p>
 
               <div className="flex items-center gap-2">
                 {expired.days > 0 && (
-                  <TimeBox label="days ago" value={expired.days} />
+                  <TimeBox label="일" value={expired.days} />
                 )}
-                <TimeBox label="hours ago" value={pad2(expired.hours)} />
-                <TimeBox label="min ago" value={pad2(expired.minutes)} />
-                <TimeBox label="sec ago" value={pad2(expired.seconds)} />
+                <TimeBox label="시간" value={pad2(expired.hours)} />
+                <TimeBox label="분" value={pad2(expired.minutes)} />
+                <TimeBox label="초" value={pad2(expired.seconds)} />
               </div>
             </div>
           ) : null}
@@ -324,7 +323,7 @@ export default function LetterLockedView({
           </div>
 
           {isPublic ? (
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-3">
               <button
                 className="cursor-pointer px-4 py-2 rounded-xl bg-sub"
                 onClick={() => router.back()}
@@ -334,7 +333,7 @@ export default function LetterLockedView({
               </button>
             </div>
           ) : (
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-3">
               <button
                 className="cursor-pointer px-4 py-2 rounded-xl bg-sub"
                 onClick={() => router.push("/")}
