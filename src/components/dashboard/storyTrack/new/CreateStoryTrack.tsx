@@ -50,6 +50,11 @@ export default function CreateStoryTrack() {
 
   const [step2, setStep2] = useState<Step2UIState>({ routeItems: [] });
 
+  // Step 3에서 사용할 썸네일 이미지 URL
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string | null>(
+    null
+  );
+
   // Step1 → Step2로 이동하는 경우 cleanup을 스킵하기 위한 ref
   const skipCleanupForNextStepRef = useRef(false);
 
@@ -77,12 +82,9 @@ export default function CreateStoryTrack() {
     // 취소 시 cleanup 스킵 플래그를 false로 리셋하여 cleanup이 실행되도록 함
     skipCleanupForNextStepRef.current = false;
 
-    // Step1, Step2 모두에서 취소 시 cleanup 실행
-    if (form.thumbnailAttachmentId) {
-      console.log("[CreateStoryTrack] 취소 버튼 클릭: 임시 파일 정리", {
-        step,
-        thumbnailAttachmentId: form.thumbnailAttachmentId,
-      });
+    // Step1, Step2에서만 취소 시 cleanup 실행
+    // Step 3에서는 스토리트랙 생성 완료로 썸네일이 THUMBNAIL 상태이므로 cleanup 불필요
+    if (step !== 3 && form.thumbnailAttachmentId) {
       cleanupStorytrackTempFile(form.thumbnailAttachmentId);
     }
 
@@ -93,9 +95,6 @@ export default function CreateStoryTrack() {
     if (step === 1 && !canGoNextFromStep1) return;
     if (step === 1) {
       // Step1 -> Step2로 이동하기 전에 cleanup 스킵 플래그 설정
-      console.log(
-        "[CreateStoryTrack] Step1 -> Step2: cleanup 스킵 플래그 설정"
-      );
       skipCleanupForNextStepRef.current = true;
       setStep(2);
     }
@@ -105,9 +104,6 @@ export default function CreateStoryTrack() {
   const handleBack = () => {
     if (step === 2) {
       // Step2 → Step1로 돌아가기 전에 cleanup 스킵 플래그 설정
-      console.log(
-        "[CreateStoryTrack] Step2 -> Step1: cleanup 스킵 플래그 설정"
-      );
       skipCleanupForNextStepRef.current = true;
       setStep(1);
     }
@@ -119,9 +115,6 @@ export default function CreateStoryTrack() {
     // (언마운트 cleanup이 실행된 후 리셋되도록)
     const timeoutId = setTimeout(() => {
       if (skipCleanupForNextStepRef.current) {
-        console.log(
-          "[CreateStoryTrack] Step 간 이동 완료: cleanup 스킵 플래그 리셋"
-        );
         skipCleanupForNextStepRef.current = false;
       }
     }, 100);
@@ -129,24 +122,19 @@ export default function CreateStoryTrack() {
     return () => clearTimeout(timeoutId);
   }, [step]);
 
-  // 페이지 이탈 시 cleanup 실행 (Step1, Step2 모두)
+  // 페이지 이탈 시 cleanup 실행 (Step1, Step2만)
   // Step1 → Step2, Step2 → Step1 이동 시에만 cleanup 스킵
+  // Step 3에서는 스토리트랙 생성 완료로 썸네일이 THUMBNAIL 상태이므로 cleanup 불필요
   useEffect(() => {
     const handleBeforeUnload = () => {
+      // Step 3에서는 cleanup 실행하지 않음 (스토리트랙 생성 완료)
+      if (step === 3) return;
+
       // Step 간 이동 중이면 cleanup 스킵
-      if (skipCleanupForNextStepRef.current) {
-        console.log(
-          "[CreateStoryTrack] beforeunload: Step 간 이동 중이므로 cleanup 스킵"
-        );
-        return;
-      }
+      if (skipCleanupForNextStepRef.current) return;
 
       // 그 외 모든 경우 (취소, 탭 닫기, 뒤로가기 등): cleanup 실행
       if (form.thumbnailAttachmentId) {
-        console.log("[CreateStoryTrack] beforeunload: 임시 파일 정리", {
-          step,
-          thumbnailAttachmentId: form.thumbnailAttachmentId,
-        });
         cleanupStorytrackTempFile(form.thumbnailAttachmentId);
       }
     };
@@ -158,24 +146,19 @@ export default function CreateStoryTrack() {
     };
   }, [step, form.thumbnailAttachmentId]);
 
-  // 컴포넌트 언마운트 시 cleanup 실행 (Step1, Step2 모두)
-  // Step1 → Step2, Step2 → Step1 이동 시에만 cleanup 스킵
+  // 컴포넌트 언마운트 시 cleanup 실행 (Step1, Step2만)
+  // Step1 -> Step2, Step2 -> Step1 이동 시에만 cleanup 스킵
+  // Step 3에서는 스토리트랙 생성 완료로 썸네일이 THUMBNAIL 상태이므로 cleanup 불필요
   useEffect(() => {
     return () => {
+      // Step 3에서는 cleanup 실행하지 않음 (스토리트랙 생성 완료)
+      if (step === 3) return;
+
       // Step 간 이동 중이면 cleanup 스킵
-      if (skipCleanupForNextStepRef.current) {
-        console.log(
-          "[CreateStoryTrack] 언마운트: Step 간 이동 중이므로 cleanup 스킵"
-        );
-        return;
-      }
+      if (skipCleanupForNextStepRef.current) return;
 
       // 그 외 모든 경우 (취소, 뒤로가기 등): cleanup 실행
       if (form.thumbnailAttachmentId) {
-        console.log("[CreateStoryTrack] 언마운트: 임시 파일 정리", {
-          step,
-          thumbnailAttachmentId: form.thumbnailAttachmentId,
-        });
         cleanupStorytrackTempFile(form.thumbnailAttachmentId);
       }
     };
@@ -206,6 +189,20 @@ export default function CreateStoryTrack() {
       // 성공 시 Step 3으로 이동
       if (response.code === "200") {
         queryClient.invalidateQueries({ queryKey: ["mineStoryTrack"] });
+
+        // 스토리트랙 상세 조회로 썸네일 이미지 URL 가져오기
+        try {
+          const detailResponse = await storyTrackApi.storyTrackDetail({
+            storytrackId: String(response.data.storytrackId),
+          });
+          if (detailResponse.code === "200" && detailResponse.data.imageUrl) {
+            setThumbnailImageUrl(detailResponse.data.imageUrl);
+          }
+        } catch (error) {
+          console.error("썸네일 이미지 URL 조회 실패:", error);
+          // 이미지 URL 조회 실패는 무시 (이미지 없이 표시)
+        }
+
         toast.success("스토리트랙 생성이 완료되었습니다!");
         setStep(3);
       } else {
@@ -294,6 +291,7 @@ export default function CreateStoryTrack() {
                 title={form.title}
                 order={form.order}
                 routeCount={form.routeLetterIds.length}
+                imageUrl={thumbnailImageUrl || undefined}
               />
             )}
           </form>
