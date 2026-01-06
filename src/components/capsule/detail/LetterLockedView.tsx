@@ -16,16 +16,6 @@ function toUtcIso(s: string) {
   return s.replace(" ", "T") + "Z";
 }
 
-/** 화면 표시: KST(+9) 기준 날짜/시간 포맷 */
-function formatKstDate(ms: number) {
-  return new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(ms));
-}
-
 function formatKstDateTime(ms: number) {
   return new Intl.DateTimeFormat("ko-KR", {
     timeZone: "Asia/Seoul",
@@ -36,35 +26,6 @@ function formatKstDateTime(ms: number) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(ms));
-}
-
-/** D-day 계산도 KST '자정 기준'으로 */
-function kstYmd(ms: number) {
-  // YYYY-MM-DD 형태로 안정적으로 뽑기
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(ms));
-}
-
-function diffDaysKst(targetMs: number, nowMs: number) {
-  const [ty, tm, td] = kstYmd(targetMs).split("-").map(Number);
-  const [ny, nm, nd] = kstYmd(nowMs).split("-").map(Number);
-
-  // KST 자정(00:00 KST) -> UTC ms 로 환산 (KST = UTC+9)
-  const targetKstMidnightUtcMs = Date.UTC(ty, tm - 1, td) - 9 * 3600_000;
-  const nowKstMidnightUtcMs = Date.UTC(ny, nm - 1, nd) - 9 * 3600_000;
-
-  return Math.floor((targetKstMidnightUtcMs - nowKstMidnightUtcMs) / 86400_000);
-}
-
-function calcDDayKst(unlockAtMs: number, nowMs: number) {
-  const diffDays = diffDaysKst(unlockAtMs, nowMs);
-  if (diffDays === 0) return "D-Day";
-  if (diffDays > 0) return `D-${diffDays}`;
-  return `D+${Math.abs(diffDays)}`;
 }
 
 function formatRemaining(ms: number) {
@@ -168,6 +129,7 @@ function getLockMessage(args: {
 export default function LetterLockedView({
   isPublic,
   unlockAt,
+  unlockUntil,
   unlockType = "TIME",
   currentLocation,
   targetLocation,
@@ -177,6 +139,7 @@ export default function LetterLockedView({
 }: {
   isPublic: boolean;
   unlockAt: string;
+  unlockUntil: string;
   unlockType?: "TIME" | "LOCATION" | "TIME_AND_LOCATION";
   currentLocation?: LatLng;
   targetLocation?: LatLng;
@@ -192,13 +155,21 @@ export default function LetterLockedView({
     return Number.isFinite(t) ? t : NaN;
   }, [unlockAt]);
 
+  const unlockUntilTime = useMemo(() => {
+    if (!unlockUntil) return NaN;
+    const t = new Date(toUtcIso(unlockUntil)).getTime();
+    return Number.isFinite(t) ? t : NaN;
+  }, [unlockUntil]);
+
   const [now, setNow] = useState(() => Date.now());
+
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, []);
 
   const remainingMsRaw = unlockTime - now;
+
   const isTimeUnlocked = Number.isFinite(unlockTime)
     ? remainingMsRaw <= 0
     : false;
@@ -207,8 +178,14 @@ export default function LetterLockedView({
     ? Math.max(0, remainingMsRaw)
     : 0;
 
+  const expiredMs =
+    Number.isFinite(unlockUntilTime) && now > unlockUntilTime
+      ? now - unlockUntilTime
+      : 0;
+
+  const expired = formatRemaining(expiredMs);
+
   const t = formatRemaining(remainingMs);
-  const dDay = Number.isFinite(unlockTime) ? calcDDayKst(unlockTime, now) : "-";
 
   // ---------------- LOCATION ----------------
   const distance = useMemo(() => {
@@ -277,6 +254,30 @@ export default function LetterLockedView({
                 <TimeBox label="hours" value={pad2(t.hours)} />
                 <TimeBox label="min" value={pad2(t.minutes)} />
                 <TimeBox label="sec" value={pad2(t.seconds)} />
+              </div>
+            </div>
+          ) : null}
+
+          {/* ---------- UNLOCK UNTIL UI ---------- */}
+          {unlockUntil &&
+          Number.isFinite(unlockUntilTime) &&
+          now > unlockUntilTime ? (
+            <div className="w-full flex flex-col items-center gap-3 mt-2">
+              <p className="text-sm text-error font-medium">
+                열람 가능 시간이 종료되었습니다
+              </p>
+
+              <p className="text-xs text-text-3">
+                종료 시각: {formatKstDateTime(unlockUntilTime)}
+              </p>
+
+              <div className="flex items-center gap-2">
+                {expired.days > 0 && (
+                  <TimeBox label="days ago" value={expired.days} />
+                )}
+                <TimeBox label="hours ago" value={pad2(expired.hours)} />
+                <TimeBox label="min ago" value={pad2(expired.minutes)} />
+                <TimeBox label="sec ago" value={pad2(expired.seconds)} />
               </div>
             </div>
           ) : null}

@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/purity */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -94,55 +94,54 @@ export default function LetterDetailView({
 }: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  // ---------------- LOCATION STATE ----------------
   // 내 위치 (current)
   const [currentLocation, setCurrentLocation] = useState<LatLng | null>(
     initialLocation
   );
+  // 위치 상태
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationStatus, setLocationStatus] = useState<
+    "idle" | "loading" | "ready" | "error"
+  >(initialLocation ? "ready" : "idle");
 
-  // initialLocation이 없을 때만 위치 정보 가져오기
   useEffect(() => {
-    // initialLocation이 이미 있으면 스킵
-    if (initialLocation) {
-      setCurrentLocation(initialLocation);
-      return;
-    }
+    if (initialLocation) return;
 
-    let mounted = true;
-
+    setLocationStatus("loading");
     getCurrentPosition()
       .then((pos) => {
-        if (!mounted) return;
         setCurrentLocation(pos);
+        setLocationError(null);
+        setLocationStatus("ready");
       })
-      .catch((e: any) => {
-        if (!mounted) return;
+      .catch((e) => {
         setLocationError(
           e?.message || "위치 정보를 가져오지 못했어요. (권한/설정 확인)"
         );
         setCurrentLocation(null);
+        setLocationStatus("error");
       });
-
-    return () => {
-      mounted = false;
-    };
   }, [initialLocation]);
 
+  // ---------------- QUERY ----------------
   // 너무 자주 리패치 방지(좌표 라운딩)
   const locationKey = useMemo(() => {
     if (!currentLocation) return "no-location";
-    const lat = Number(currentLocation.lat.toFixed(5));
-    const lng = Number(currentLocation.lng.toFixed(5));
-    return `${lat},${lng}`;
+    return `${currentLocation.lat.toFixed(5)},${currentLocation.lng.toFixed(
+      5
+    )}`;
   }, [currentLocation]);
 
-  //스토리트랙 캡슐, 일반 캡슐 queryKey 구분
   const queryKey = isStoryTrack
     ? ["storyTrackCapsuleRead", storytrackId, capsuleId, password, locationKey]
     : ["capsuleRead", capsuleId, password, locationKey];
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: queryKey,
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
+    queryKey,
+    enabled: capsuleId > 0,
+    retry: false,
     queryFn: async ({ signal }) => {
       const unlockAt = new Date().toISOString();
 
@@ -150,10 +149,8 @@ export default function LetterDetailView({
       const locationLng = currentLocation?.lng ?? 0;
 
       if (isStoryTrack && storytrackId) {
-        const res = await storyTrackCapsuleApi.read(
-          {
-            storytrackId,
-          },
+        return storyTrackCapsuleApi.read(
+          { storytrackId },
           {
             capsuleId,
             unlockAt,
@@ -163,28 +160,22 @@ export default function LetterDetailView({
           },
           signal
         );
-        return res;
-      } else {
-        const res = await guestCapsuleApi.read(
-          {
-            capsuleId,
-            unlockAt,
-            locationLat,
-            locationLng,
-            password,
-          },
-          signal
-        );
-        return res;
       }
+
+      return guestCapsuleApi.read(
+        {
+          capsuleId,
+          unlockAt,
+          locationLat,
+          locationLng,
+          password,
+        },
+        signal
+      );
     },
-    retry: false,
-    // 공개 캡슐의 경우 위치 정보가 준비될 때까지 대기
-    // initialLocation이 있으면 즉시 실행, 없으면 currentLocation이 설정될 때까지 대기
-    enabled:
-      capsuleId > 0 && (initialLocation !== null || currentLocation !== null),
   });
 
+  // ---------------- SIDE EFFECT ----------------
   //캡슐 읽기 성공하면 storyTrackDetail 재요청
   useEffect(() => {
     if (isStoryTrack && storytrackId && data?.result === "SUCCESS") {
@@ -198,25 +189,26 @@ export default function LetterDetailView({
   }, [isStoryTrack, storytrackId, data, queryClient]);
 
   const handleBack = () => {
-    // 히스토리 없는 진입(공유 링크 첫 방문) 대비
-    if (typeof window !== "undefined" && window.history.length > 1) {
+    if (window.history.length > 1) {
       router.back();
-      return;
+    } else {
+      router.push("/dashboard", { scroll: false });
     }
-    router.push("/dashboard", { scroll: false });
   };
 
   const shouldShowLocationPermissionGate =
     isPublic &&
-    initialLocation === null &&
-    currentLocation === null &&
-    !!locationError;
+    locationStatus === "error" &&
+    !initialLocation &&
+    !currentLocation;
 
+  // ---------------- UI FLOW ----------------
+
+  // 1. 위치 권한 실패
   if (shouldShowLocationPermissionGate) {
     return (
       <div className="h-full w-full flex items-center justify-center p-0 md:p-8">
         <div className="w-full max-w-md rounded-2xl border border-outline bg-bg p-4 md:p-6 space-y-5">
-          {/* 헤더 */}
           <div className="space-y-2">
             <h2 className="text-lg font-medium text-text">
               위치 권한이 필요해요
@@ -224,58 +216,19 @@ export default function LetterDetailView({
             <p className="text-sm text-text-2 leading-relaxed">
               이 편지는 <span className="font-medium text-text">장소 조건</span>
               이 있어 현재 위치 확인이 필요해요.
-              <br />
-              Chrome에서 위치 권한을{" "}
-              <span className="font-medium text-text">허용</span>으로 변경해
-              주세요.
             </p>
           </div>
 
-          {/* 방법 안내 */}
           <details className="rounded-xl border border-outline bg-sub/60 px-3 md:px-4 py-3">
             <summary className="cursor-pointer text-sm font-medium text-text">
               Chrome에서 위치 권한 설정 방법
             </summary>
-
-            <div className="mt-4 space-y-4 text-sm text-text-2">
-              <div>
-                <div className="font-medium text-text mb-1">
-                  모바일 (Chrome)
-                </div>
-                <ol className="list-decimal pl-4 md:pl-5 space-y-1">
-                  <li>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex gap-1">
-                        주소창 왼쪽의 자물쇠
-                        <CircleAlert size={20} className="flex-none" />
-                      </div>
-                      <span>또는 사이트 정보 아이콘을 누르세요.</span>
-                    </div>
-                  </li>
-                  <li>사이트 설정(또는 권한) → 위치로 이동하세요.</li>
-                  <li>위치를 “허용”으로 변경한 뒤 다시 시도해 주세요.</li>
-                </ol>
-              </div>
-
-              <div>
-                <div className="font-medium text-text mb-1">PC (Chrome)</div>
-                <ol className="list-decimal pl-4 md:pl-5 space-y-1">
-                  <li>
-                    <div className="flex gap-1">
-                      주소창 왼쪽의 자물쇠
-                      <CircleAlert size={20} />를 클릭하세요.
-                    </div>
-                  </li>
-                  <li>사이트 설정 → 위치 → 허용으로 변경하세요.</li>
-                  <li>페이지를 새로고침한 뒤 다시 시도해 주세요.</li>
-                </ol>
-              </div>
-
-              <p className="text-xs text-text-3 leading-relaxed">
-                위치가 “차단됨”으로 되어 있으면 확인할 수 없어요.
-                <br />
-                기기 자체 위치 서비스(GPS)가 켜져 있는지도 함께 확인해 주세요.
+            <div className="mt-4 text-sm text-text-2 space-y-2">
+              <p>
+                주소창 왼쪽의 자물쇠 <CircleAlert size={14} /> → 사이트 설정 →
+                위치 → 허용
               </p>
+              <p>변경 후 새로고침해주세요.</p>
             </div>
           </details>
         </div>
@@ -283,6 +236,7 @@ export default function LetterDetailView({
     );
   }
 
+  // 2. 쿼리 로딩
   if (isLoading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-8">
@@ -291,10 +245,23 @@ export default function LetterDetailView({
     );
   }
 
-  // 여기서부터 에러 코드/메시지 기반 UI 분기
+  // 3. 위치 확인 중 (GPS 요청 중일 때만)
+  if (
+    isPublic &&
+    locationStatus === "loading" &&
+    !initialLocation &&
+    !currentLocation
+  ) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-8 text-text-3">
+        위치 정보를 확인하고 있어요…
+      </div>
+    );
+  }
+
+  // 4. 에러 처리
   if (isError) {
     const e = normalizeApiError(error);
-
     // 인증 필요(로그인 필요)
     if (e.message === "인증이 필요합니다." || e.code === "AUTH001") {
       return (
@@ -369,6 +336,19 @@ export default function LetterDetailView({
       );
     }
 
+    // 선착순 마감
+    if (e.code === "FCM001") {
+      return (
+        <ApiError
+          title="선착순이 마감되었습니다."
+          description={
+            "이 편지는 선착순으로 열람 가능했어요.\n이미 마감되어 더 이상 확인할 수 없습니다."
+          }
+          onRetry={handleBack}
+        />
+      );
+    }
+
     // 비정상 접근 패턴 / 의심 접근
     if (e.code === "SEC004" || e.code === "SEC006") {
       return (
@@ -407,29 +387,46 @@ export default function LetterDetailView({
     );
   }
 
-  // 응답 없음
-  if (!data) {
+  // 5. 진짜 데이터 없음
+  if (!data && !isFetching) {
     return (
       <ApiError
         title="데이터를 불러오지 못했어요"
-        description={"잠시 후 다시 시도해주세요."}
+        description="잠시 후 다시 시도해주세요."
         onRetry={() => refetch()}
       />
     );
   }
 
-  const capsule = data;
+  const capsule = data!;
 
   // 조건 미충족 (서버가 FAIL을 정상 응답으로 내려줌)
   if (capsule.result === "FAIL") {
     const maybeTarget = { lat: capsule.locationLat, lng: capsule.locationLng };
     const targetLocation = isLatLng(maybeTarget) ? maybeTarget : undefined;
 
+    // unlockUntil 만료 체크 (시간 초과)
+    if (
+      capsule.unlockUntil &&
+      new Date(capsule.unlockUntil).getTime() < Date.now()
+    ) {
+      return (
+        <ApiError
+          title="열람 시간이 지났어요"
+          description={
+            "이 편지는 정해진 시간까지만 열 수 있어요.\n이미 열람 가능 시간이 종료되었습니다."
+          }
+          onRetry={handleBack}
+        />
+      );
+    }
+
     return (
       <div className="h-screen w-full flex items-center justify-center p-8">
         <LetterLockedView
           isPublic={isPublic}
           unlockAt={capsule.unlockAt ?? new Date().toISOString()}
+          unlockUntil={capsule.unlockUntil ?? new Date().toISOString()}
           unlockType={capsule.unlockType}
           currentLocation={currentLocation ?? undefined}
           targetLocation={targetLocation}
