@@ -53,7 +53,7 @@ function normalizeApiError(err: any): {
 } {
   if (!err) return { message: "알 수 없는 오류가 발생했습니다." };
 
-  // fetch/axios 류
+  // axios
   const data =
     err?.response?.data ??
     err?.data ??

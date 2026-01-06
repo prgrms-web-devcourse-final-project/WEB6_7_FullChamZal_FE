@@ -94,7 +94,7 @@ export default function Sidebar({
         </div>
 
         {/* 하단(고정) */}
-        <div className="p-6 border-t border-outline">
+        <div className="border-t border-outline flex items-center justify-center h-15 md:h-18">
           <button
             onClick={handleLogout}
             className="cursor-pointer text-primary flex items-center justify-center gap-2 text-sm w-full"

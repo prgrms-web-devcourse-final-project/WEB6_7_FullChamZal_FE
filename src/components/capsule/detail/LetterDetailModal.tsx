@@ -812,7 +812,7 @@ export default function LetterDetailModal({
           <div className="shrink-0 border-b px-4 md:px-6 lg:px-8 py-3 md:py-4 border-outline">
             <div className="flex justify-between items-center gap-2 md:gap-4">
               {/* 해제 조건 */}
-              <div className="flex flex-col items-center gap-0.5 text-xs md:text-sm lg:text-base justify-center">
+              <div className="flex flex-col gap-0.5 text-xs md:text-sm lg:text-base justify-center">
                 <div className="flex flex-row gap-1">
                   <span className="hidden md:block text-text-2">
                     해제 조건:
@@ -831,92 +831,96 @@ export default function LetterDetailModal({
 
                 {unlockUntilLabel && (
                   <span className="text-xs md:text-xs text-text-3">
-                    열람 가능 기한: {unlockUntilLabel} 까지
+                    열람 가능 기한: {unlockUntilLabel} 까지 열람 가능
                   </span>
                 )}
               </div>
 
-              {/* 선착순 카운트 (maxViewCount > 0 일 때만 표시) */}
-              {capsule.maxViewCount != null && capsule.maxViewCount > 0 && (
-                <div className="flex items-center gap-1 text-xs md:text-sm text-text-3">
-                  <span className="font-medium">
-                    {capsule.currentViewCount}
-                  </span>
-                  <span>/</span>
-                  <span>{capsule.maxViewCount}</span>
-                </div>
-              )}
+              <div className="flex gap-2">
+                {/* 선착순 카운트 (maxViewCount > 0 일 때만 표시) */}
+                {capsule.maxViewCount != null && capsule.maxViewCount > 0 && (
+                  <div className="flex items-center gap-1 text-xs md:text-sm text-text-2">
+                    <span className="font-medium">
+                      현재 {capsule.currentViewCount}명 열람
+                    </span>
+                    <span>/</span>
+                    <span className="text-primary">
+                      선착순 {capsule.maxViewCount}명까지 열람 가능
+                    </span>
+                  </div>
+                )}
 
-              {/* 버튼 */}
-              <div className="flex justify-end items-center gap-2">
-                {isSender || isReceiver ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        className="cursor-pointer text-primary"
-                        aria-label="더보기"
+                {/* 버튼 */}
+                <div className="flex justify-end items-center gap-2">
+                  {isSender || isReceiver ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="cursor-pointer text-primary"
+                          aria-label="더보기"
+                        >
+                          <MoreHorizontal size={18} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-44 z-10000 bg-bg shadow-lg border border-outline"
                       >
-                        <MoreHorizontal size={18} />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="w-44 z-10000 bg-bg shadow-lg border border-outline"
-                    >
-                      <DropdownMenuLabel>관리</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        {isReceiver && (
-                          <DropdownMenuItem
-                            className="hover:bg-button-hover"
-                            onClick={() => backupMutation.mutate(capsuleId)}
-                          >
-                            <Download className="text-primary" />
-                            {backupMutation.isPending
-                              ? "백업 중..."
-                              : "백업하기"}
-                          </DropdownMenuItem>
-                        )}
-                        {isSender && !capsule.viewStatus && (
-                          <DropdownMenuItem
-                            className="hover:bg-button-hover"
-                            onClick={() => {
-                              router.push(
-                                `/capsules/edit?capsuleId=${capsuleId}`
-                              );
-                            }}
-                          >
-                            <PencilLine className="text-primary" />
-                            수정하기
-                          </DropdownMenuItem>
-                        )}
-                        {(isSender || isReceiver) && (
-                          <DropdownMenuItem
-                            className="hover:bg-button-hover"
-                            variant="destructive"
-                            disabled={deleteMutation.isPending}
-                            onClick={() => setIsDeleteConfirmOpen(true)}
-                          >
-                            <Trash2 className="text-primary" />
-                            삭제하기
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : null}
+                        <DropdownMenuLabel>관리</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          {isReceiver && (
+                            <DropdownMenuItem
+                              className="hover:bg-button-hover"
+                              onClick={() => backupMutation.mutate(capsuleId)}
+                            >
+                              <Download className="text-primary" />
+                              {backupMutation.isPending
+                                ? "백업 중..."
+                                : "백업하기"}
+                            </DropdownMenuItem>
+                          )}
+                          {isSender && !capsule.viewStatus && (
+                            <DropdownMenuItem
+                              className="hover:bg-button-hover"
+                              onClick={() => {
+                                router.push(
+                                  `/capsules/edit?capsuleId=${capsuleId}`
+                                );
+                              }}
+                            >
+                              <PencilLine className="text-primary" />
+                              수정하기
+                            </DropdownMenuItem>
+                          )}
+                          {(isSender || isReceiver) && (
+                            <DropdownMenuItem
+                              className="hover:bg-button-hover"
+                              variant="destructive"
+                              disabled={deleteMutation.isPending}
+                              onClick={() => setIsDeleteConfirmOpen(true)}
+                            >
+                              <Trash2 className="text-primary" />
+                              삭제하기
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : null}
 
-                <button
-                  type="button"
-                  className="cursor-pointer text-primary p-1 rounded-md hover:bg-button-hover"
-                  onClick={close}
-                  aria-label="닫기"
-                >
-                  <X size={24} />
-                </button>
+                  <button
+                    type="button"
+                    className="cursor-pointer text-primary p-1 rounded-md hover:bg-button-hover"
+                    onClick={close}
+                    aria-label="닫기"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
