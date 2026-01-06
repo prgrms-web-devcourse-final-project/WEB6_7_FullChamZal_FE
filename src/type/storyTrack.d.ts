@@ -13,7 +13,7 @@ type FirstFormValue = {
   title: string;
   description: string;
   order: TrackType;
-  thumbnailAttachmentId?: number; // 썸네일 attachmentId
+  thumbnailAttachmentId: number | undefined;
 };
 
 type MemberType = "CREATOR" | "NOT_JOINED" | "PARTICIPANT" | "COMPLETED";
@@ -52,7 +52,7 @@ type CreateStorytrackRequest = {
   isPublic: number; // 0: 비공개, 1: 공개
   price: number;
   capsuleList: number[]; // capsuleId 배열
-  attachmentId?: number; // 썸네일 attachmentId (선택)
+  attachmentId: number; // 썸네일 attachmentId (필수)
 };
 
 /* 스토리트랙 생성 응답 */

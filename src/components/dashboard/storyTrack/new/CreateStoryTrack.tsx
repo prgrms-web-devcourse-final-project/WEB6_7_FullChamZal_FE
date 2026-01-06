@@ -18,7 +18,7 @@ type FormState = {
   title: string;
   description: string;
   order: TrackType;
-  thumbnailAttachmentId?: number;
+  thumbnailAttachmentId: number | undefined; // 필수 (초기값은 undefined)
 
   // step2
   routeLetterIds: string[];
@@ -78,6 +78,7 @@ export default function CreateStoryTrack() {
       setIsSubmitting(true);
 
       // FormState → CreateStorytrackRequest 변환
+      // canSubmitFromStep2와 canGoNextFromStep1 검증을 통과했으므로 thumbnailAttachmentId는 반드시 존재
       const payload: CreateStorytrackRequest = {
         title: form.title.trim(),
         description: form.description.trim(),
@@ -85,7 +86,7 @@ export default function CreateStoryTrack() {
         isPublic: 1, // 기본값: 공개
         price: 0, // 기본값: 무료
         capsuleList: form.routeLetterIds.map((id) => Number(id)), // string[] → number[]
-        attachmentId: form.thumbnailAttachmentId, // 썸네일 attachmentId
+        attachmentId: form.thumbnailAttachmentId!, // 썸네일 attachmentId (필수, 검증 완료)
       };
 
       // API 호출
