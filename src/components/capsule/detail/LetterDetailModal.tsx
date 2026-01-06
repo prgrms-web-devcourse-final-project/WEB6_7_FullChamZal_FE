@@ -915,12 +915,15 @@ export default function LetterDetailModal({
                   {capsule.attachments && capsule.attachments.length > 0 && (
                     <div className="flex flex-col gap-3 mt-4 items-start">
                       {capsule.attachments.map((attachment) => (
-                        <div key={attachment.attachmentId} className="relative">
-                          <Image
+                        <div
+                          key={attachment.attachmentId}
+                          className="relative w-full max-h-96"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
                             src={attachment.presignedUrl}
                             alt={`첨부 이미지 ${attachment.attachmentId}`}
-                            fill
-                            className="max-h-96 h-auto object-contain"
+                            className="max-h-96 w-auto h-auto object-contain rounded-lg"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = "none";
