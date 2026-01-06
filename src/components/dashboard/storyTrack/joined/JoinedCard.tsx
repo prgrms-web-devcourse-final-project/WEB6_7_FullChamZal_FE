@@ -1,14 +1,17 @@
 "use client";
 
 import { ListOrdered, MapPin, Shuffle, TrendingUp, Users } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+
+const DEFAULT_THUMBNAIL =
+  "https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg";
 
 export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
   // 진행률 계산
   const total = track.totalSteps ?? 0;
   const done = track.completedSteps ?? 0;
   const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+  const thumbnailUrl = track.imageUrl || DEFAULT_THUMBNAIL;
 
   return (
     <Link
@@ -17,11 +20,10 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
     >
       <div className="relative">
         {/* Top */}
-        <Image
-          src="https://cdn.pixabay.com/photo/2024/01/15/21/13/puppy-8510899_1280.jpg"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={thumbnailUrl}
           alt={track.title}
-          width={800}
-          height={200}
           className="w-full h-40 object-cover rounded-t-xl"
         />
 

@@ -152,7 +152,7 @@ export default function TrackDetailPage() {
             {/* Left */}
             <div className="lg:flex-1 lg:min-w-80 flex flex-col gap-4 lg:gap-6 min-h-0">
               <div className="border border-outline rounded-2xl overflow-hidden">
-                <TrackHeader />
+                <TrackHeader imageUrl={data?.data.imageUrl} />
               </div>
 
               <div className="border border-outline rounded-2xl lg:flex-1 lg:min-h-0 overflow-hidden">
