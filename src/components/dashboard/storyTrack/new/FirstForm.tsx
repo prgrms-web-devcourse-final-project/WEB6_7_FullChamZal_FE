@@ -141,8 +141,11 @@ export default function FirstForm({ value, onChange }: Props) {
       };
       setUploadedAttachment(newAttachment);
 
-      // 부모 컴포넌트에 attachmentId 전달
-      onChange({ thumbnailAttachmentId: response.attachmentId });
+      // 부모 컴포넌트에 attachmentId와 상태 전달
+      onChange({
+        thumbnailAttachmentId: response.attachmentId,
+        thumbnailStatus: "PENDING",
+      });
 
       // 폴링 시작: 상태가 TEMP 또는 DELETED가 될 때까지 조회
       pollAttachmentStatus(response.attachmentId, (status) => {
@@ -153,13 +156,22 @@ export default function FirstForm({ value, onChange }: Props) {
 
           const prevStatus = prev.status;
 
-          // DELETED로 변경되었을 때 토스트 표시
-          if (prevStatus !== "DELETED" && status === "DELETED") {
-            toast.error(
-              `${prev.fileName}: 유해 이미지로 검열되어 삭제되었습니다.`
-            );
+          // 상태 변경 시 부모에게 전달
+          if (status === "DELETED") {
+            // DELETED로 변경되었을 때 토스트 표시
+            if (prevStatus !== "DELETED") {
+              toast.error(
+                `${prev.fileName}: 유해 이미지로 검열되어 삭제되었습니다.`
+              );
+            }
             // DELETED 상태면 부모 컴포넌트에서 attachmentId 제거
-            onChange({ thumbnailAttachmentId: undefined });
+            onChange({
+              thumbnailAttachmentId: undefined,
+              thumbnailStatus: "DELETED",
+            });
+          } else {
+            // 다른 상태 변경 시에도 부모에게 전달
+            onChange({ thumbnailStatus: status });
           }
 
           return {

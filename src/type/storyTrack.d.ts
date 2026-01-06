@@ -13,7 +13,8 @@ type FirstFormValue = {
   title: string;
   description: string;
   order: TrackType;
-  thumbnailAttachmentId: number | undefined;
+  thumbnailAttachmentId: number | undefined; // 썸네일 attachmentId (필수, 초기값은 undefined)
+  thumbnailStatus?: "UPLOADING" | "PENDING" | "TEMP" | "DELETED" | "USED"; // 썸네일 상태
 };
 
 type MemberType = "CREATOR" | "NOT_JOINED" | "PARTICIPANT" | "COMPLETED";
