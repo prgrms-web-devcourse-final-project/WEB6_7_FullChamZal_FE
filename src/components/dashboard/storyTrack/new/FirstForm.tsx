@@ -7,6 +7,7 @@ import {
   storytrackAttachmentApi,
   type StorytrackAttachmentStatus,
 } from "@/lib/api/dashboard/storyTrackAttachment";
+import { useCleanupStorytrackTempFile } from "@/lib/hooks/useCleanupStorytrackTempFile";
 
 type Props = {
   value: FirstFormValue;
@@ -48,6 +49,7 @@ export default function FirstForm({ value, onChange }: Props) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const uploadedAttachmentRef = useRef(uploadedAttachment);
 
   // 파일 프리뷰 URL 생성/해제
   useEffect(() => {
@@ -196,6 +198,16 @@ export default function FirstForm({ value, onChange }: Props) {
       toast.error("이미지 삭제에 실패했습니다.");
     }
   };
+
+  // uploadedAttachment 변경 시 ref 업데이트
+  useEffect(() => {
+    uploadedAttachmentRef.current = uploadedAttachment;
+  }, [uploadedAttachment]);
+
+  // 임시 파일 자동 정리 훅 사용
+  // ㄴ 브라우저 탭 나가기 (beforeunload)
+  // ㄴ 컴포넌트 언마운트 (뒤로가기, 페이지 이동 등)
+  useCleanupStorytrackTempFile(uploadedAttachmentRef);
 
   // 컴포넌트 언마운트 시 폴링 정리
   useEffect(() => {
