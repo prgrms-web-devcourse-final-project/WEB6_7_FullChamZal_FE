@@ -352,32 +352,24 @@ export default function EnvelopeCard({
 
             <div className="absolute top-0 right-0">
               <div className="text-primary p-2 space-y-2">
-                {type === "send" ? (
-                  status.mode === "send" && status.canEdit ? (
-                    <Pencil size={16} />
-                  ) : (
-                    <PencilOff size={16} />
-                  )
-                ) : status.mode === "unlock" ? (
-                  status.unlockType === "TIME_AND_LOCATION" ? (
-                    <>
-                      {/* time: 왼쪽으로 15도 => -15deg */}
-                      <Stamp
-                        type="time"
-                        className="transform -rotate-20 -translate-x-4"
-                      />
-
-                      {/* location: 오른쪽으로 25도 => +25deg */}
-                      <Stamp type="location" className="transform rotate-15" />
-                    </>
-                  ) : status.unlockType === "TIME" ? (
+                {status.unlockType === "TIME_AND_LOCATION" ? (
+                  <>
+                    {/* time: 왼쪽으로 15도 => -15deg */}
                     <Stamp
                       type="time"
                       className="transform -rotate-20 -translate-x-4"
                     />
-                  ) : status.unlockType === "LOCATION" ? (
+
+                    {/* location: 오른쪽으로 25도 => +25deg */}
                     <Stamp type="location" className="transform rotate-15" />
-                  ) : null
+                  </>
+                ) : status.unlockType === "TIME" ? (
+                  <Stamp
+                    type="time"
+                    className="transform -rotate-20 -translate-x-4"
+                  />
+                ) : status.unlockType === "LOCATION" ? (
+                  <Stamp type="location" className="transform rotate-15" />
                 ) : null}
               </div>
             </div>
