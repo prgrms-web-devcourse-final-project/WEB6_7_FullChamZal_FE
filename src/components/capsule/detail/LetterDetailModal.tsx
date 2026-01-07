@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -51,7 +52,6 @@ import { capsuleDashboardApi } from "@/lib/api/capsule/dashboardCapsule";
 import { CAPTURE_COLOR_MAP } from "@/lib/constants/capsulePalette";
 import ReportModal from "../report/ReportModal";
 import toast from "react-hot-toast";
-import Image from "next/image";
 
 type UnlockType = "TIME" | "LOCATION" | "TIME_AND_LOCATION";
 
@@ -1023,11 +1023,9 @@ export default function LetterDetailModal({
                           key={attachment.attachmentId}
                           className="relative w-full max-h-96"
                         >
-                          <Image
+                          <img
                             src={attachment.presignedUrl}
                             alt={`첨부 이미지 ${attachment.attachmentId}`}
-                            width={800}
-                            height={800}
                             className="max-h-96 w-auto h-auto object-contain rounded-lg"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;

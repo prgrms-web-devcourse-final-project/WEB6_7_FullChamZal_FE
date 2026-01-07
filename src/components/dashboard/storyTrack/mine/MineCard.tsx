@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
 import { ListOrdered, MapPin, Shuffle, Users } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 const DEFAULT_THUMBNAIL = "/img/basicImg.png";
@@ -13,11 +13,9 @@ export default function MineCard({ track }: { track: StoryTrackMineItem }) {
       className="block border border-outline rounded-xl hover:shadow-md transition"
     >
       {/* Top */}
-      <Image
+      <img
         src={thumbnailUrl}
         alt={track.title}
-        width={800}
-        height={800}
         className="w-full h-40 object-cover rounded-t-xl"
       />
 
