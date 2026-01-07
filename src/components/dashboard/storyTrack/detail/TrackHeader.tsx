@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 const DEFAULT_THUMBNAIL = "/img/basicImg.png";
 
@@ -11,11 +11,9 @@ export default function TrackHeader({ imageUrl }: Props) {
 
   return (
     <div className="relative w-full h-44 sm:h-56 lg:h-64 rounded-2xl overflow-hidden">
-      <Image
+      <img
         src={thumbnailUrl}
         alt="대표 이미지"
-        width={800}
-        height={800}
         className="w-full h-full object-cover"
       />
     </div>

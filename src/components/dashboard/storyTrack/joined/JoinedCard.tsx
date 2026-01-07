@@ -20,11 +20,9 @@ export default function JoinedCard({ track }: { track: StoryTrackJoinedItem }) {
     >
       <div className="relative">
         {/* Top */}
-        <Image
+        <img
           src={thumbnailUrl}
           alt={track.title}
-          width={800}
-          height={800}
           className="w-full h-40 object-cover rounded-t-xl"
         />
 

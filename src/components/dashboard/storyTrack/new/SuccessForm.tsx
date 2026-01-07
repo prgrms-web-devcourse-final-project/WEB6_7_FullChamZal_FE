@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { CheckCircle } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -38,11 +38,9 @@ export default function SuccessForm({
           {/* 썸네일 */}
           <div className="w-full h-30 md:w-32 md:h-32 rounded-lg bg-button-hover flex items-center justify-center overflow-hidden">
             {imageUrl ? (
-              <Image
+              <img
                 src={imageUrl}
                 alt="트랙 대표 이미지"
-                width={800}
-                height={800}
                 className="w-full h-full object-cover"
               />
             ) : (

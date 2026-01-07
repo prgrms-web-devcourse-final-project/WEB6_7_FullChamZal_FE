@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -7,7 +8,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyTrackApi } from "@/lib/api/dashboard/storyTrack";
 import toast from "react-hot-toast";
 import ConfirmModal from "@/components/common/modal/ConfirmModal";
-import Image from "next/image";
 
 export default function TrackCard({ track }: { track: StoryTrackItem }) {
   const router = useRouter();
@@ -169,11 +169,9 @@ export default function TrackCard({ track }: { track: StoryTrackItem }) {
         className="relative isolate border border-outline rounded-xl overflow-hidden group"
         onClick={handleCardClick}
       >
-        <Image
+        <img
           src={track.imageUrl || "/img/basicImg.png"}
           alt={track.title}
-          width={800}
-          height={800}
           className="w-full h-40 object-cover"
           draggable={false}
         />
