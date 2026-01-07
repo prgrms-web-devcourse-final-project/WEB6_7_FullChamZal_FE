@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { ListOrdered, MapPin, Shuffle, TrendingUp, Users } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 const DEFAULT_THUMBNAIL = "/img/basicImg.png";
