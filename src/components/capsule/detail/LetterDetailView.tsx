@@ -459,6 +459,7 @@ export default function LetterDetailView({
     isBookmarked: !!capsule.isBookmarked,
     maxViewCount: capsule.maxViewCount,
     currentViewCount: capsule.currentViewCount,
+    attachments: capsule.attachments,
   };
 
   return (
