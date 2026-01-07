@@ -264,7 +264,11 @@ export default function LetterDetailView({
   if (isError) {
     const e = normalizeApiError(error);
     // 인증 필요(로그인 필요)
-    if (e.message === "인증이 필요합니다." || e.code === "AUTH001") {
+    if (
+      e.message === "인증이 필요합니다." ||
+      e.code === "AUTH001" ||
+      e.code === "CPS03"
+    ) {
       return (
         <div className="w-full min-h-full flex items-center justify-center p-8">
           <div className="w-full max-w-md rounded-2xl border border-outline bg-bg p-6 text-center space-y-4">
