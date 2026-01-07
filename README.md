@@ -147,6 +147,20 @@ Dear.\_\_\_는 사용자가 직접 정한 **날짜 또는 장소**에 도달해�
 
 ---
 
+### 💌 편지 세부 (잠김/해제)
+
+<p align="center">
+  <img src="./docs/screens/letterDetailLock.png" width="450" height="270" style="vertical-align: middle;" />
+  <img src="./docs/screens/letterDetailUnLock.png" width="450" height="280" style="vertical-align: middle;" />
+</p>
+
+<p align="center">
+받은 캡슐, 보낸 캡슐, 즐겨찾기한 캡슐을<br/>
+한눈에 확인하고 관리할 수 있는 편지함 화면입니다.
+</p>
+
+---
+
 ### 🗺️ 공개 편지
 
 <p align="center">
