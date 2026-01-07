@@ -362,7 +362,7 @@ npm install
 touch .env.local
 
 # 6. 환경 변수 설정
-# NEXT_PUBLIC_API_BASE_URL=https://api.dear4u.cloud
+# NEXT_PUBLIC_API_BASE_URL=
 # NEXT_PUBLIC_KAKAOMAP_KEY=3923a92cd5c7731fe38af11940a10bc3
 
 # 7. 개발 서버 실행
