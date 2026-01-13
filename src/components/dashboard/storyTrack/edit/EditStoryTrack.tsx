@@ -147,7 +147,7 @@ export default function EditStoryTrack() {
           continue;
         }
 
-        // 캡슐이 변경된 경우에만 API 호출
+        // 편지이 변경된 경우에만 API 호출
         if (originalCapsuleId !== newCapsuleId) {
           await storyTrackApi.updatePath({
             storytrackId: storytrackIdNum,

@@ -70,8 +70,8 @@ export const storyTrackApi = {
   },
 
   /**
-   * 내가 만든 장소 기반 공개 캡슐 목록 조회 (스토리트랙 생성용)
-   * 장소 기반(LOCATION), 장소+시간 기반(TIME_AND_LOCATION) 공개 캡슐이 조회됩니다.
+   * 내가 만든 장소 기반 공개 편지 목록 조회 (스토리트랙 생성용)
+   * 장소 기반(LOCATION), 장소+시간 기반(TIME_AND_LOCATION) 공개 편지이 조회됩니다.
    * @param params 페이지네이션 파라미터
    */
   getCapsuleList: (
@@ -135,7 +135,7 @@ export const storyTrackApi = {
 
   /**
    * 스토리트랙 상세 조회
-   * @param params 캡슐id, 페이지네이션 파라미터
+   * @param params 편지id, 페이지네이션 파라미터
    */
   storyTrackDetail: (
     params?: { storytrackId?: string; page?: number; size?: number },
@@ -158,7 +158,7 @@ export const storyTrackApi = {
 
   /**
    * 스토리트랙 진행 상세 조회
-   * @param params 캡슐id 파라미터
+   * @param params 편지id 파라미터
    */
   storyTrackProgress: (
     params?: { storytrackId?: string },

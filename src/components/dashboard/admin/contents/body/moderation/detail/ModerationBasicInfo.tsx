@@ -17,7 +17,7 @@ export default function ModerationBasicInfo({
           label="생성 시간"
           value={formatDateTime(detail.createdAt)}
         />
-        <DetailItem label="캡슐 ID" value={String(detail.capsuleId ?? "-")} />
+        <DetailItem label="편지 ID" value={String(detail.capsuleId ?? "-")} />
         <DetailItem label="액터 회원 ID" value={String(detail.actorMemberId)} />
         <DetailItem label="액션 타입" value={detail.actionType} />
         <DetailItem label="결정" value={detail.decision} />

@@ -1,5 +1,5 @@
 /**
- * 캡슐 색상 팔레트 정의
+ * 편지 색상 팔레트 정의
  * - 봉투/편지지 색상을 이름(name)과 HEX(color)로 관리합니다.
  * - 사용 예시:
  *   import { CAPTURE_ENVELOPE_PALETTE, CAPTURE_COLOR_MAP } from "@/constants/capsulePalette";

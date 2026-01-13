@@ -27,7 +27,7 @@ export type CapsuleAttachmentStatus =
   | "PENDING" // 이미지 필터링 중
   | "TEMP" // 임시 저장 완료 (필터링 성공)
   | "DELETED" // 삭제 또는 필터링 실패
-  | "USED"; // 캡슐에 첨부됨
+  | "USED"; // 편지에 첨부됨
 
 /**
  * 상태 조회 응답 DTO

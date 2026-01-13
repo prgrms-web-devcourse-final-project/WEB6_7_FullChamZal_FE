@@ -1,7 +1,7 @@
 import { apiFetch } from "@/lib/api/fetchClient";
 
 export const guestCapsuleApi = {
-  // 캡슐 비밀번호 존재 여부 확인
+  // 편지 비밀번호 존재 여부 확인
   checkPassword: (params: ReadCapsuleRequest, signal?: AbortSignal) => {
     const query = new URLSearchParams({
       uuid: params.uuid,

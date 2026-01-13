@@ -54,7 +54,7 @@ export default function SortableRouteItem({
         </div>
       )}
 
-      {/* 내용(캡슐 정보 보고 다시 수정 필요) */}
+      {/* 내용(편지 정보 보고 다시 수정 필요) */}
       <div className="flex-1 min-w-0">
         <div className="text-sm text-text truncate">{item.title}</div>
         <div className="text-xs text-text-4 truncate">

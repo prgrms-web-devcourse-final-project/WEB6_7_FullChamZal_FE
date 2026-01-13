@@ -145,7 +145,7 @@ export default function PublicCapsuleMap({
           </CustomOverlayMap>
         )}
 
-        {/* 캡슐 위치 마커 */}
+        {/* 편지 위치 마커 */}
         <MarkerClusterer
           averageCenter={true} // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
           minLevel={2} // 클러스터 할 최소 지도 레벨

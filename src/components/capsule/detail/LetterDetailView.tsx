@@ -177,7 +177,7 @@ export default function LetterDetailView({
   });
 
   // ---------------- SIDE EFFECT ----------------
-  //캡슐 읽기 성공하면 storyTrackDetail 재요청
+  //편지 읽기 성공하면 storyTrackDetail 재요청
   useEffect(() => {
     if (isStoryTrack && storytrackId && data?.result === "SUCCESS") {
       queryClient.invalidateQueries({

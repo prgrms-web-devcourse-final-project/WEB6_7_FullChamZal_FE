@@ -804,7 +804,7 @@ export default function LetterDetailModal({
       {isDeleteConfirmOpen && (
         <ConfirmModal
           active="fail"
-          title="캡슐 삭제"
+          title="편지 삭제"
           content={
             isSender
               ? "보낸 편지를 삭제하시겠습니까?"
@@ -824,7 +824,7 @@ export default function LetterDetailModal({
         <ActiveModal
           active="success"
           title="삭제 완료"
-          content="캡슐이 삭제되었습니다."
+          content="편지이 삭제되었습니다."
           open={isDeleteSuccessOpen}
           onClose={() => setIsDeleteSuccessOpen(false)}
           onConfirm={() => {
@@ -841,7 +841,7 @@ export default function LetterDetailModal({
         <ActiveModal
           active="success"
           title="백업 완료"
-          content="구글 드라이브에 캡슐 내용이 저장되었습니다."
+          content="구글 드라이브에 편지 내용이 저장되었습니다."
           open={isBackupSuccessOpen}
           onClose={() => setIsBackupSuccessOpen(false)}
           onConfirm={() => {

@@ -27,11 +27,11 @@ export default function TrackDetailPage() {
   const storytrackId =
     typeof params.trackId === "string" ? params.trackId : undefined;
 
-  // 캡슐 페이지네이션
+  // 편지 페이지네이션
   const page = 0;
   const size = 100;
 
-  // 캡슐 상세 조회 시 캡슐 id
+  // 편지 상세 조회 시 편지 id
   const searchParams = useSearchParams();
   const capsuleId = searchParams.get("id");
 
@@ -118,7 +118,7 @@ export default function TrackDetailPage() {
     // 모바일: 전체 스크롤
     // 데스크탑: 내부 패널 스크롤
     <div className="min-h-dvh lg:h-screen flex flex-col p-4 lg:p-8 gap-4 lg:gap-8">
-      {/* 캡슐 상세 */}
+      {/* 편지 상세 */}
       {capsuleId ? (
         myLocation ? (
           <LetterDetailView
