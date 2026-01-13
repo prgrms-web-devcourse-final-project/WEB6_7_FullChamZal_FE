@@ -157,7 +157,7 @@ export default function MapContents() {
   }, [data, viewed, accessible]);
 
   // 로딩
-  if (!myLocation || isLoading || isFetching) return <MapContentsSkeleton />;
+  if (isLoading || isFetching) return <MapContentsSkeleton />;
 
   // 에러 처리
   if (isError) {
