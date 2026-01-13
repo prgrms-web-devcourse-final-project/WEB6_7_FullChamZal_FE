@@ -37,7 +37,7 @@ type AdminCapsuleBase = {
   createdAt: string;
 };
 
-// 최종 캡슐 타입 (조합)
+// 최종 편지 타입 (조합)
 interface AdminCapsule extends AdminCapsuleBase, CapsuleLocation {}
 
 type AdminCapsulesResponse = {

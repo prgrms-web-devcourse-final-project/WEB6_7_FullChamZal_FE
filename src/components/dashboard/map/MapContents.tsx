@@ -118,7 +118,7 @@ export default function MapContents() {
     return () => document.removeEventListener("mousedown", onDown, true);
   }, [isFilterOpen]);
 
-  // 근처 공개 캡슐 조회
+  // 근처 공개 편지 조회
   const query = useQuery({
     queryKey: ["publicCapsules", myLocation?.lat, myLocation?.lng, radius],
     queryFn: () => {

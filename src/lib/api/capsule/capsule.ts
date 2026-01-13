@@ -27,7 +27,7 @@ type BuildCommonArgs = {
 };
 
 /**
- * 화면 상태(폼) -> 내게쓰기 캡슐 DTO로 변환한다.
+ * 화면 상태(폼) -> 내게쓰기 편지 DTO로 변환한다.
  * - receiverNickname은 발신자 이름을 그대로 사용
  * - address/unlockUntil은 옵션으로 둔다
  */
@@ -93,7 +93,7 @@ export function buildMyPayload(args: BuildCommonArgs): CreateMyCapsuleRequest {
 }
 
 /**
- * 화면 상태(폼) -> 비공개 캡슐 생성 DTO로 변환한다.
+ * 화면 상태(폼) -> 비공개 편지 생성 DTO로 변환한다.
  * - unlockType/날짜/위치 상태를 백엔드가 기대하는 스키마에 맞춘다.
  */
 export function buildPrivatePayload(
@@ -177,7 +177,7 @@ export function buildPrivatePayload(
 }
 
 /**
- * 화면 상태(폼) -> 공개 캡슐 생성 DTO로 변환한다.
+ * 화면 상태(폼) -> 공개 편지 생성 DTO로 변환한다.
  * - capPassword, 색상, 위치 반경 등 공개 스펙 필드를 포함한다.
  */
 export function buildPublicPayload(
@@ -262,7 +262,7 @@ export function buildPublicPayload(
 }
 
 /**
- * 비공개 캡슐 생성 API 호출
+ * 비공개 편지 생성 API 호출
  * @param payload 빌드된 비공개 DTO
  */
 export async function createPrivateCapsule(
@@ -275,7 +275,7 @@ export async function createPrivateCapsule(
 }
 
 /**
- * 공개 캡슐 생성 API 호출
+ * 공개 편지 생성 API 호출
  * @param payload 빌드된 공개 DTO
  */
 export async function createPublicCapsule(
@@ -288,7 +288,7 @@ export async function createPublicCapsule(
 }
 
 /**
- * 내게쓰기 캡슐 생성 API 호출
+ * 내게쓰기 편지 생성 API 호출
  * @param payload 빌드된 내게쓰기 DTO
  */
 export async function createMyCapsule(
@@ -301,8 +301,8 @@ export async function createMyCapsule(
 }
 
 /**
- * 캡슐 수정 API 호출 (인증 필요)
- * @param capsuleId 수정할 캡슐 ID
+ * 편지 수정 API 호출 (인증 필요)
+ * @param capsuleId 수정할 편지 ID
  * @param payload 수정할 제목/내용
  */
 export async function updateCapsule(
@@ -319,8 +319,8 @@ export async function updateCapsule(
 }
 
 /**
- * 캡슐 삭제 API 호출 - 발신자 삭제 (인증 필요)
- * @param capsuleId 삭제할 캡슐 ID
+ * 편지 삭제 API 호출 - 발신자 삭제 (인증 필요)
+ * @param capsuleId 삭제할 편지 ID
  */
 export async function deleteCapsuleAsSender(
   capsuleId: number
@@ -334,8 +334,8 @@ export async function deleteCapsuleAsSender(
 }
 
 /**
- * 캡슐 삭제 API 호출 - 수신자 삭제 (인증 필요)
- * @param capsuleId 삭제할 캡슐 ID
+ * 편지 삭제 API 호출 - 수신자 삭제 (인증 필요)
+ * @param capsuleId 삭제할 편지 ID
  */
 export async function deleteCapsuleAsReceiver(
   capsuleId: number
@@ -349,8 +349,8 @@ export async function deleteCapsuleAsReceiver(
 }
 
 /**
- * 캡슐 좋아요 수 읽기 API 호출
- * @param capsuleId 캡슐 ID
+ * 편지 좋아요 수 읽기 API 호출
+ * @param capsuleId 편지 ID
  */
 export async function getCapsuleLikeCount(
   capsuleId: number
@@ -364,8 +364,8 @@ export async function getCapsuleLikeCount(
 }
 
 /**
- * 캡슐 좋아요 증가 API 호출 (인증 필요)
- * @param capsuleId 캡슐 ID
+ * 편지 좋아요 증가 API 호출 (인증 필요)
+ * @param capsuleId 편지 ID
  */
 export async function likeCapsule(
   capsuleId: number
@@ -380,8 +380,8 @@ export async function likeCapsule(
 }
 
 /**
- * 캡슐 좋아요 감소 API 호출 (인증 필요)
- * @param capsuleId 캡슐 ID
+ * 편지 좋아요 감소 API 호출 (인증 필요)
+ * @param capsuleId 편지 ID
  */
 export async function unlikeCapsule(
   capsuleId: number
@@ -396,9 +396,9 @@ export async function unlikeCapsule(
 }
 
 /**
- * 수신자 캡슐 조회 API 호출 (인증 필요)
- * 사용자가 보낸 캡슐의 내용을 조건 없이 보여줍니다.
- * @param capsuleId 캡슐 ID
+ * 수신자 편지 조회 API 호출 (인증 필요)
+ * 사용자가 보낸 편지의 내용을 조건 없이 보여줍니다.
+ * @param capsuleId 편지 ID
  */
 export async function readSendCapsule(
   capsuleId: number
@@ -413,8 +413,8 @@ export async function readSendCapsule(
 
 /**
  * 구글 드라이브 백업 API 호출
- * 사용자가 수신한 캡슐을 구글 드라이브에 CSV 파일로 백업합니다.
- * @param capsuleId 캡슐 ID
+ * 사용자가 수신한 편지을 구글 드라이브에 CSV 파일로 백업합니다.
+ * @param capsuleId 편지 ID
  */
 export async function backupCapsule(
   capsuleId: number

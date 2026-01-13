@@ -143,7 +143,7 @@ export default function CapsuleEditPage() {
   if (!capsuleId) {
     return (
       <div className="min-h-screen flex items-center justify-center text-text-2">
-        캡슐 ID가 없습니다.
+        편지 ID가 없습니다.
       </div>
     );
   }
@@ -258,7 +258,7 @@ export default function CapsuleEditPage() {
       <ActiveModal
         active="success"
         title="수정이 완료되었습니다."
-        content="캡슐이 성공적으로 수정되었습니다."
+        content="편지이 성공적으로 수정되었습니다."
         open={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
         onConfirm={() => {

@@ -11,8 +11,8 @@ const ACTION_OPTIONS: { value: ReportAction; label: string; hint?: string }[] =
     },
     {
       value: "HIDE_CAPSULE",
-      label: "캡슐 숨김",
-      hint: "신고 대상 캡슐을 비노출 처리",
+      label: "편지 숨김",
+      hint: "신고 대상 편지을 비노출 처리",
     },
     {
       value: "SUSPEND_MEMBER",

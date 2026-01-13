@@ -510,7 +510,7 @@ export default function WriteForm({
       toast.error("내용을 입력해 주세요.");
       return;
     }
-    // 비공개 캡슐일 경우에만 검증
+    // 비공개 편지일 경우에만 검증
     if (isPrivateOnly) {
       if (sendMethod === "PHONE" && !phoneNum) {
         toast.error("전화번호를 입력해 주세요.");
@@ -548,9 +548,9 @@ export default function WriteForm({
         ? "TIME_AND_LOCATION"
         : (unlockType as UnlockType);
 
-    // 공개 캡슐은 장소 기반이어야 함 (TIME만 선택 불가)
+    // 공개 편지은 장소 기반이어야 함 (TIME만 선택 불가)
     if (visibility === "PUBLIC" && effectiveUnlockType === "TIME") {
-      toast.error("공개 캡슐은 '장소' 또는 '시간+장소'만 선택할 수 있습니다.");
+      toast.error("공개 편지은 '장소' 또는 '시간+장소'만 선택할 수 있습니다.");
       return;
     }
 
@@ -586,7 +586,7 @@ export default function WriteForm({
       return;
     }
 
-    // 공개 캡슐 선착순 인원 검증
+    // 공개 편지 선착순 인원 검증
     if (visibility === "PUBLIC" && isMaxViewCountExpanded) {
       if (!maxViewCount || maxViewCount.trim() === "") {
         toast.error("선착순 인원을 입력해 주세요.");
@@ -1076,7 +1076,7 @@ export default function WriteForm({
           <div className="space-y-3">
             {visibility === "PUBLIC" && (
               <p className="text-xs text-text-3">
-                공개 캡슐은 지도 노출을 위해 장소 기반이어야 합니다.
+                공개 편지은 지도 노출을 위해 장소 기반이어야 합니다.
               </p>
             )}
             <UnlockConditionTabs

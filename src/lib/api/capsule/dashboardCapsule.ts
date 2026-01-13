@@ -9,7 +9,7 @@ export const capsuleDashboardApi = {
     );
   },
 
-  /* 올 해 송수신 한 캡슐들의 수 */
+  /* 올 해 송수신 한 편지들의 수 */
   yearLetters: (year: number, signal?: AbortSignal) => {
     const sp = new URLSearchParams();
     sp.set("year", String(year));
