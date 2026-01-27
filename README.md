@@ -243,17 +243,7 @@ Dear.\_\_\_는 사용자가 직접 정한 **날짜 또는 장소**에 도달해�
 #### 📊 Charts · Visualization
 
 <p>
-  <img src="https://img.shields.io/badge/Chart.js-FF6384?style=flat-square&logo=chartdotjs&logoColor=white" />
   <img src="https://img.shields.io/badge/Recharts-22B5BF?style=flat-square&logo=recharts&logoColor=white" />
-</p>
-
----
-
-### ☁️ Infra
-
-<p>
-  <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" />
-  <img src="https://img.shields.io/badge/Next.js%20Deploy-000000?style=flat-square&logo=vercel&logoColor=white" />
 </p>
 
 ---
@@ -265,7 +255,6 @@ Dear.\_\_\_는 사용자가 직접 정한 **날짜 또는 장소**에 도달해�
   <img src="https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white" />
   <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat-square&logo=figma&logoColor=white" />
   <img src="https://img.shields.io/badge/ESLint-4B32C3?style=flat-square&logo=eslint&logoColor=white" />
-  <img src="https://img.shields.io/badge/PostCSS-DD3A0A?style=flat-square&logo=postcss&logoColor=white" />
 </p>
 
 <br />
